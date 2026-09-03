@@ -10,14 +10,18 @@ export const ROLES = Object.freeze({
 });
 
 /** Authority-ascending array; a role at index i implies all roles before it. */
-export const ROLE_ORDER = Object.freeze([ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN]);
+export const ROLE_ORDER = /** @type {readonly string[]} */ (
+  Object.freeze([ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN]),
+);
+
+const KNOWN_ROLES = /** @type {ReadonlySet<string>} */ (new Set(Object.values(ROLES)));
 
 /**
  * @param {string} role A candidate role string.
  * @returns {boolean} True when the string is a known role identifier.
  */
 export function isRole(role) {
-  return Object.values(ROLES).includes(role);
+  return KNOWN_ROLES.has(role);
 }
 
 /**
