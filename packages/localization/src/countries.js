@@ -40,7 +40,7 @@ export function listCountryOptions(locale = DEFAULT_UI_LOCALE) {
   return COUNTRY_REFERENCE.map((country) => ({
     code: country.iso2,
     iso3: country.iso3,
-    name: getCountryDisplayName(country.iso2, normalizedLocale),
+    name: getCountryDisplayName(country.iso2, normalizedLocale) ?? country.name ?? country.iso2,
     currencyCodes: [...country.currencyCodes],
     languageCodes: [...country.languageCodes],
   })).sort((left, right) =>
