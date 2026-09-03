@@ -3,13 +3,28 @@ import { roleMeets } from '@attravoya/constants';
 import { AuthenticationError, AuthorizationError } from '../errors/app-error.js';
 
 /**
+ * @typedef {object} AuthorizationOptions
+ * @property {string} [minimumRole]
+ * @property {string[]} [allPermissions]
+ * @property {string[]} [anyPermissions]
+ */
+
+/**
  * Create an authorization hook for a protected route.
  *
  * `allPermissions` is used for sensitive operations that require every listed
  * capability. `anyPermissions` is useful when multiple administrative roles can
  * reach the same operation through different permission grants.
+ *
+ * @param {AuthorizationOptions} [options]
  */
-export function createAuthorizeHook({ minimumRole, allPermissions = [], anyPermissions = [] } = {}) {
+export function createAuthorizeHook(options = {}) {
+  const {
+    minimumRole,
+    allPermissions = [],
+    anyPermissions = [],
+  } = options;
+
   return async function authorize(request) {
     if (!request.auth) {
       throw new AuthenticationError();
