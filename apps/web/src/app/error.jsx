@@ -3,6 +3,8 @@
 /**
  * Customer-site route error boundary. It offers a safe retry without exposing
  * stack traces, provider responses, or request internals to travellers.
+ *
+ * @param {{ reset: () => void }} props
  */
 export default function WebError({ reset }) {
   return (
