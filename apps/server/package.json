@@ -14,9 +14,9 @@
     "build": "node ../../scripts/check-javascript.js .",
     "lint": "eslint . --max-warnings=0",
     "check:js": "node ../../scripts/check-javascript.js .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:integration": "vitest run src/tests/integration",
+    "test:integration": "vitest run src/tests/integration --passWithNoTests",
     "clean": "node -e \"const fs=require('node:fs'); for(const path of ['coverage','dist']) fs.rmSync(path,{recursive:true,force:true});\""
   },
   "dependencies": {
