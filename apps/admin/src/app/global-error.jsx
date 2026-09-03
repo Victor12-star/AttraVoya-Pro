@@ -3,6 +3,8 @@
 /**
  * Last-resort Admin error boundary. Keep it dependency-light because it must
  * render even when the normal root layout cannot.
+ *
+ * @param {{ reset: () => void }} props
  */
 export default function AdminGlobalError({ reset }) {
   return (
