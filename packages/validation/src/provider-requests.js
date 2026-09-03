@@ -61,7 +61,7 @@ export const translationBodySchema = z.object({
   path: ['target'],
 });
 
-const accommodationTypeValues = Object.values(ACCOMMODATION_TYPES);
+const accommodationTypeValues = /** @type {readonly string[]} */ (Object.values(ACCOMMODATION_TYPES));
 export const accommodationNearbyQuerySchema = z.object({
   latitude,
   longitude,
