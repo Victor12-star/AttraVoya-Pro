@@ -34,15 +34,19 @@ async function createProtectedApp(auth) {
     healthRepository: { checkDatabase: async () => true },
   });
 
+  // Fastify decorators are installed dynamically by buildApp. Cast only in
+  // this test harness so checkJs does not mistake runtime decorators for missing APIs.
+  const decoratedApp = /** @type {any} */ (app);
+
   app.get(
     '/protected',
     {
       onRequest: [
-        app.authenticate,
-        app.authorize({ allPermissions: [PERMISSIONS.USERS_READ] }),
+        decoratedApp.authenticate,
+        decoratedApp.authorize({ allPermissions: [PERMISSIONS.USERS_READ] }),
       ],
     },
-    async (request) => ({ userId: request.auth.id }),
+    async (request) => ({ userId: /** @type {any} */ (request).auth.id }),
   );
 
   apps.push(app);
