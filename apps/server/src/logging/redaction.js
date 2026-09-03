@@ -52,6 +52,6 @@ export function safeErrorForLog(error) {
     name: error.name,
     message: sanitizeLogText(error.message),
     stack: sanitizeLogText(error.stack),
-    ...(typeof error.code === 'string' ? { code: error.code } : {}),
+    ...('code' in error && typeof error.code === 'string' ? { code: error.code } : {}),
   };
 }
