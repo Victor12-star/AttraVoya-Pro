@@ -23,7 +23,9 @@ function baseOptions() {
     countriesRepository: { list: async () => [] },
     languagesRepository: { list: async () => [] },
     healthRepository: { checkDatabase: async () => true },
-    authRepository: { findAuthenticatedUser: async () => null },
+    authRepository: {
+      findAuthorizationContextByUserId: async () => null,
+    },
     weatherProvider: { getForecast: async (query) => ({ provider: 'test', current: { temperatureC: 20 }, query }) },
     currencyProvider: {
       getRates: async ({ base }) => ({ provider: 'test', base, rates: [] }),
