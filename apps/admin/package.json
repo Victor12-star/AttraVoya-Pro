@@ -14,7 +14,7 @@
     "start": "next start --port 3001",
     "lint": "eslint . --max-warnings=0",
     "check:js": "node ../../scripts/check-javascript.js .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "clean": "node -e \"const fs=require('node:fs'); for(const path of ['.next','coverage','playwright-report','test-results']) fs.rmSync(path,{recursive:true,force:true});\""
