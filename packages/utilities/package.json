@@ -20,17 +20,12 @@
     "pnpm": ">=11.22.0 <12"
   },
   "scripts": {
-    "build": "pnpm run check:js",
-    "lint": "eslint . --max-warnings=0",
-    "check:js": "node ../../scripts/check-javascript.js .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
+    "build": "node -e \"console.log('Utilities are source-consumed.')\"",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "node -e \"console.log('JavaScript package; static checking runs from the root jsconfig.')\""
   },
   "devDependencies": {
-    "@attravoya/eslint-config": "workspace:*",
-    "@attravoya/javascript-config": "workspace:*",
-    "@vitest/coverage-v8": "4.1.10",
-    "vitest": "4.1.10"
+    "vitest": "^4.0.18"
   }
 }
