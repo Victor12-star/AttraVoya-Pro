@@ -66,6 +66,19 @@ const nextConfig = [
       'react/prop-types': 'off',
     },
   },
+  {
+    files: [
+      'apps/web/src/components/feedback/cookie-preferences.jsx',
+      'apps/web/src/components/navigation/site-header.jsx',
+      'apps/web/src/features/home/recent-searches.jsx',
+    ],
+    rules: {
+      // These three client-only controls intentionally hydrate persisted browser
+      // preferences after mount. The effect is a synchronization boundary with
+      // local browser storage, not derived React state.
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
 ];
 
 export default nextConfig;
