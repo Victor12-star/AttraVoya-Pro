@@ -25,7 +25,7 @@
     "build": "pnpm run check:js",
     "lint": "eslint . --max-warnings=0",
     "check:js": "node ../../scripts/check-javascript.js .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
   },
