@@ -88,6 +88,11 @@ jobs:
       - name: Validate environment contract
         run: pnpm env:check
 
+      # Prisma's JavaScript client types are generated code. Generate them in
+      # this job before checkJs so the checker sees the same API runtime uses.
+      - name: Generate Prisma client for JavaScript checks
+        run: pnpm db:generate
+
       - name: Check JavaScript
         run: pnpm check:js
 
@@ -272,8 +277,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Audit production dependencies
-        run: pnpm audit --prod --audit-level=high
-
+      # Run this independently of the dependency audit so a dependency finding
+      # never prevents us from checking the repository for accidentally committed secrets.
       - name: Scan tracked files for common secret patterns
         run: node scripts/secret-scan.js
+
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level=high
