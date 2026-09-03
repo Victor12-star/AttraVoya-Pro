@@ -8,6 +8,14 @@ const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
 
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
+/**
+ * @typedef {object} ProviderHttpClientOptions
+ * @property {string} provider Human-readable provider name used in safe errors.
+ * @property {typeof globalThis.fetch} [fetchImpl] Injectable fetch for deterministic tests.
+ * @property {number} [timeoutMs] Default request timeout in milliseconds.
+ * @property {number} [retryMax] Maximum transient retries for safe idempotent requests.
+ */
+
 async function parseJsonResponse(response, provider) {
   try {
     return await response.json();
@@ -26,13 +34,17 @@ async function parseJsonResponse(response, provider) {
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Keeps upstream response text out of application errors/logs by default.
  * - Accepts an injected fetch implementation for deterministic unit tests.
+ *
+ * @param {ProviderHttpClientOptions} options
  */
-export function createProviderHttpClient({
-  provider,
-  fetchImpl = globalThis.fetch,
-  timeoutMs = 10_000,
-  retryMax = 2,
-} = {}) {
+export function createProviderHttpClient(options) {
+  const {
+    provider,
+    fetchImpl = globalThis.fetch,
+    timeoutMs = 10_000,
+    retryMax = 2,
+  } = options ?? {};
+
   if (!provider) throw new TypeError('Provider HTTP client requires a provider name.');
   if (typeof fetchImpl !== 'function') throw new TypeError('Provider HTTP client requires fetch.');
 
