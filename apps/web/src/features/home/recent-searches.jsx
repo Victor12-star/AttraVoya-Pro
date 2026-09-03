@@ -21,7 +21,9 @@ function getSearchHref(search) {
 
 export function RecentSearches({ messages }) {
   const router = useRouter();
-  const [searches, setSearches] = useState([]);
+  const [searches, setSearches] = useState(
+    /** @type {ReturnType<typeof getRecentSearches>} */ ([]),
+  );
 
   useEffect(() => {
     setSearches(getRecentSearches());
