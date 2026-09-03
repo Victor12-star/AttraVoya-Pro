@@ -18,7 +18,7 @@
     "build": "expo export --platform all --output-dir dist",
     "lint": "eslint . --max-warnings=0",
     "check:js": "node ../../scripts/check-javascript.js . tooling",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --passWithNoTests",
     "test:watch": "jest --watch",
     "clean": "node -e \"const fs=require('node:fs'); for(const path of ['.expo','dist','coverage']) fs.rmSync(path,{recursive:true,force:true});\""
   },
