@@ -265,7 +265,7 @@ async function seedPlansAndEntitlements() {
 }
 
 async function seedFeatureFlags() {
-  const defaultEnabled = new Set(DEFAULT_ENABLED_FLAGS);
+  const defaultEnabled = /** @type {Set<string>} */ (new Set(DEFAULT_ENABLED_FLAGS));
 
   for (const key of Object.values(FEATURE_FLAGS)) {
     await prisma.featureFlag.upsert({
