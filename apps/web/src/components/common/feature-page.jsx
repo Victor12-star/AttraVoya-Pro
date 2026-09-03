@@ -5,7 +5,7 @@ import { ArrowLeft, Info } from 'lucide-react';
  * Honest interim route shell used while a vertical feature is being connected.
  * It prevents dead navigation without fabricating live travel results.
  */
-export function FeaturePage({ eyebrow, title, description, backLabel, children }) {
+export function FeaturePage({ eyebrow, title, description, backLabel, children = null }) {
   return (
     <section className="feature-page">
       <div className="shell">
