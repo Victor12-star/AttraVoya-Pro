@@ -1,4 +1,5 @@
 import eslint from '@eslint/js';
+import globals from 'globals';
 import importX, { createNodeResolver } from 'eslint-plugin-import-x';
 
 const nodeResolver = createNodeResolver({
@@ -43,7 +44,10 @@ const baseConfig = [
       'import-x/resolver-next': [nodeResolver],
     },
     rules: {
-      curly: ['error', 'all'],
+      // Require braces whenever a control-flow body spans multiple lines. Concise
+      // single-line guards remain readable while accidental multiline fall-throughs
+      // are still rejected across the monorepo.
+      curly: ['error', 'multi-line'],
       eqeqeq: ['error', 'always', { null: 'ignore' }],
       'import-x/first': 'error',
       'import-x/newline-after-import': ['error', { count: 1 }],
@@ -73,6 +77,17 @@ const baseConfig = [
       'object-shorthand': 'error',
       'prefer-const': 'error',
       'prefer-template': 'error',
+    },
+  },
+  {
+    files: ['packages/api-client/**/*.{js,jsx,mjs,cjs}'],
+    languageOptions: {
+      // The shared API client deliberately runs in both browser/mobile-style
+      // runtimes and Node-based tests, so its standard Web API globals are valid.
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
   },
 ];
