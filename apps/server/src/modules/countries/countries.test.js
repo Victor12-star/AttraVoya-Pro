@@ -64,8 +64,10 @@ describe('country reference endpoint', () => {
       },
       languagesRepository: { list: async () => [] },
       healthRepository: { checkDatabase: async () => true },
+      // buildApp validates the same authorization-repository contract used in
+      // production even though this particular endpoint is public.
       authRepository: {
-        findAuthenticatedUser: async () => null,
+        findAuthorizationContextByUserId: async () => null,
       },
     });
     apps.push(app);
