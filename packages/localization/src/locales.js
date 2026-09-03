@@ -24,11 +24,12 @@ export const UI_LOCALES = Object.freeze([
 ]);
 
 const UI_LOCALE_MAP = new Map(UI_LOCALES.map((locale) => [locale.code, locale]));
+const FALLBACK_UI_LOCALE = UI_LOCALE_MAP.get(DEFAULT_UI_LOCALE) ?? UI_LOCALES[0];
 
 export function normalizeLocale(value) {
   if (typeof value !== 'string' || !value.trim()) return DEFAULT_UI_LOCALE;
   const normalized = value.trim().replace('_', '-').toLowerCase();
-  const baseLanguage = normalized.split('-')[0];
+  const baseLanguage = normalized.split('-')[0] ?? DEFAULT_UI_LOCALE;
   return UI_LOCALE_MAP.has(normalized)
     ? normalized
     : UI_LOCALE_MAP.has(baseLanguage)
@@ -41,9 +42,9 @@ export function isSupportedUiLocale(value) {
 }
 
 export function getUiLocale(value) {
-  return UI_LOCALE_MAP.get(normalizeLocale(value)) ?? UI_LOCALE_MAP.get(DEFAULT_UI_LOCALE);
+  return UI_LOCALE_MAP.get(normalizeLocale(value)) ?? FALLBACK_UI_LOCALE;
 }
 
 export function getTextDirection(locale) {
-  return getUiLocale(locale).direction;
+  return getUiLocale(locale)?.direction ?? 'ltr';
 }
