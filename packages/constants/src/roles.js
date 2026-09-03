@@ -11,7 +11,7 @@ export const ROLES = Object.freeze({
 
 /** Authority-ascending array; a role at index i implies all roles before it. */
 export const ROLE_ORDER = /** @type {readonly string[]} */ (
-  Object.freeze([ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN]),
+  Object.freeze([ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN])
 );
 
 const KNOWN_ROLES = /** @type {ReadonlySet<string>} */ (new Set(Object.values(ROLES)));
