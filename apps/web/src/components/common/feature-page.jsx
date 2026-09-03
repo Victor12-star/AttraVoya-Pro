@@ -4,6 +4,14 @@ import { ArrowLeft, Info } from 'lucide-react';
 /**
  * Honest interim route shell used while a vertical feature is being connected.
  * It prevents dead navigation without fabricating live travel results.
+ *
+ * @param {{
+ *   eyebrow: import('react').ReactNode,
+ *   title: import('react').ReactNode,
+ *   description: import('react').ReactNode,
+ *   backLabel: import('react').ReactNode,
+ *   children?: import('react').ReactNode
+ * }} props
  */
 export function FeaturePage({ eyebrow, title, description, backLabel, children = null }) {
   return (
