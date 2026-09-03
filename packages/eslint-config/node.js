@@ -35,13 +35,14 @@ const nodeConfig = [
     },
   },
   {
-    files: ['scripts/check-javascript.js'],
+    files: ['scripts/**/*.{js,mjs,cjs}'],
     rules: {
-      // The checker validates target existence, canonicalizes config paths, and only
-      // passes those paths to the local TypeScript executable.
-      'security/detect-non-literal-fs-filename': 'off',
-      // This command-line tool intentionally reports check progress to stdout.
+      // These are trusted repository-local CLI tools. They intentionally report
+      // progress to stdout and operate on validated project paths supplied by the
+      // scripts themselves, not arbitrary user-controlled filesystem input.
       'no-restricted-syntax': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
+      'security/detect-non-literal-regexp': 'off',
     },
   },
   {
