@@ -1,4 +1,7 @@
 {
   "extends": "../javascript-config/base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
   "include": ["src/**/*.js", "tests/**/*.js"]
 }
