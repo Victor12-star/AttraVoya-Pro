@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Explorar",
+    "flights": "Vuelos",
+    "stays": "Alojamientos",
+    "thingsToDo": "Qué hacer",
+    "trips": "Viajes",
+    "nearby": "Cerca de ti",
+    "signIn": "Iniciar sesión"
+  },
+  "common": {
+    "search": "Buscar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "retry": "Reintentar",
+    "loading": "Cargando…",
+    "unavailable": "No disponible temporalmente",
+    "chooseLanguage": "Elegir idioma",
+    "chooseCountry": "Elegir país",
+    "chooseCurrency": "Elegir moneda",
+    "recentSearches": "Búsquedas recientes",
+    "clear": "Borrar"
+  },
+  "home": {
+    "heroTitle": "Descubre más. Viaja mejor. Mantente seguro.",
+    "budgetTitle": "Planifica un viaje que se ajuste a tu presupuesto real.",
+    "budgetDescription": "Dinos cuánto puedes gastar, quién viaja y qué te importa. AttraVoya Pro te ayuda a encontrar destinos realistas y a organizar el viaje según tu presupuesto.",
+    "budgetCta": "Planificar por presupuesto",
+    "exploreCta": "Explorar destinos",
+    "trending": "Inspiración de destinos",
+    "tripTypes": "Encuentra tu tipo de viaje",
+    "stayNear": "Alójate cerca de lo que importa",
+    "family": "Viajes pensados para toda la familia",
+    "local": "Explora como un local",
+    "tools": "Herramientas de viaje",
+    "safety": "Viaja con confianza",
+    "stayDescription": "Compara hoteles, casas de huéspedes, hostales y alquileres de larga estancia por su impacto total en el viaje, no solo por el precio por noche.",
+    "familyDescription": "Planifica según las edades de los niños, alojamientos familiares y actividades que encajen en el mismo presupuesto del viaje."
+  },
+  "search": {
+    "destinationQuestion": "¿A dónde quieres ir?",
+    "destinationPlaceholder": "Busca ciudades, países y destinos",
+    "from": "Desde",
+    "to": "Hasta",
+    "departure": "Salida",
+    "return": "Regreso",
+    "travellers": "Viajeros",
+    "budget": "Presupuesto"
+  },
+  "budget": {
+    "title": "Planificar por presupuesto",
+    "totalBudget": "Presupuesto total",
+    "origin": "¿Desde dónde viajas?",
+    "flexibleDates": "Fechas flexibles",
+    "adults": "Adultos",
+    "children": "Niños",
+    "childrenAges": "Edades de los niños",
+    "interests": "Intereses",
+    "comfort": "Nivel de comodidad",
+    "submit": "Buscar viajes que pueda pagar"
+  },
+  "stays": {
+    "title": "Alojamientos",
+    "breakfastIncluded": "Desayuno incluido",
+    "kitchen": "Cocina",
+    "entirePlace": "Alojamiento entero",
+    "privateRoom": "Habitación privada",
+    "sharedRoom": "Habitación compartida",
+    "longStay": "Ideal para estancias largas",
+    "totalStayPrice": "Precio total de la estancia"
+  },
+  "cookies": {
+    "title": "Tus opciones de privacidad",
+    "description": "Usamos cookies esenciales para la seguridad y las funciones básicas. Las preferencias opcionales pueden recordar opciones como el idioma. Las analíticas permanecen desactivadas hasta que las aceptes.",
+    "acceptAll": "Aceptar todo",
+    "rejectNonEssential": "Rechazar no esenciales",
+    "manage": "Gestionar preferencias",
+    "essential": "Esenciales",
+    "preferences": "Preferencias",
+    "analytics": "Analíticas"
+  },
+  "safety": {
+    "title": "Seguridad y emergencias",
+    "verifiedEmergency": "Información de emergencia verificada",
+    "nearbyHospitals": "Hospitales cercanos",
+    "nearbyPharmacies": "Farmacias cercanas",
+    "nearbyPolice": "Policía cercana",
+    "verifiedOnly": "Solo información verificada"
+  },
+  "auth": {
+    "title": "Te damos la bienvenida de nuevo",
+    "subtitle": "Inicia sesión para seguir planificando tus viajes.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signIn": "Iniciar sesión",
+    "createAccount": "Crear cuenta",
+    "newHere": "¿Eres nuevo en AttraVoya Pro?",
+    "alreadyAccount": "¿Ya tienes una cuenta?",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Empieza a planificar viajes según tu presupuesto.",
+    "confirmPassword": "Confirmar contraseña",
+    "working": "Espera…",
+    "loginFailed": "No pudimos iniciar sesión. Revisa tus datos e inténtalo de nuevo.",
+    "registerFailed": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+    "registered": "Cuenta creada. Revisa tu correo para verificarla."
+  }
+}

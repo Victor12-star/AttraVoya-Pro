@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Udforsk",
+    "flights": "Fly",
+    "stays": "Overnatning",
+    "thingsToDo": "Oplevelser",
+    "trips": "Rejser",
+    "nearby": "I nærheden",
+    "signIn": "Log ind"
+  },
+  "common": {
+    "search": "Søg",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "retry": "Prøv igen",
+    "loading": "Indlæser…",
+    "unavailable": "Midlertidigt utilgængelig",
+    "chooseLanguage": "Vælg sprog",
+    "chooseCountry": "Vælg land",
+    "chooseCurrency": "Vælg valuta",
+    "recentSearches": "Seneste søgninger",
+    "clear": "Ryd"
+  },
+  "home": {
+    "heroTitle": "Oplev mere. Rejs smartere. Vær mere sikker.",
+    "budgetTitle": "Planlæg en rejse, der passer til dit reelle budget.",
+    "budgetDescription": "Fortæl os, hvor meget du kan bruge, hvem der rejser, og hvad der betyder noget. AttraVoya Pro hjælper med at finde realistiske destinationer og bygge rejsen omkring dit budget.",
+    "budgetCta": "Planlæg efter budget",
+    "exploreCta": "Udforsk destinationer",
+    "trending": "Inspiration til rejsemål",
+    "tripTypes": "Find din rejsetype",
+    "stayNear": "Bo tæt på det, der betyder noget",
+    "family": "Rejser for hele familien",
+    "local": "Udforsk som en lokal",
+    "tools": "Rejseværktøjer",
+    "safety": "Rejs med tryghed",
+    "stayDescription": "Sammenlign hoteller, gæstehuse, hostels og længere lejeophold ud fra deres samlede betydning for rejsebudgettet – ikke kun prisen pr. nat.",
+    "familyDescription": "Planlæg efter børnenes alder, familievenlige ophold og aktiviteter, der passer ind i det samme rejsebudget."
+  },
+  "search": {
+    "destinationQuestion": "Hvor vil du hen?",
+    "destinationPlaceholder": "Søg efter byer, lande og destinationer",
+    "from": "Fra",
+    "to": "Til",
+    "departure": "Afrejse",
+    "return": "Retur",
+    "travellers": "Rejsende",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Planlæg efter budget",
+    "totalBudget": "Samlet budget",
+    "origin": "Hvor rejser du fra?",
+    "flexibleDates": "Fleksible datoer",
+    "adults": "Voksne",
+    "children": "Børn",
+    "childrenAges": "Børnenes alder",
+    "interests": "Interesser",
+    "comfort": "Komfortniveau",
+    "submit": "Find rejser jeg har råd til"
+  },
+  "stays": {
+    "title": "Overnatning",
+    "breakfastIncluded": "Morgenmad inkluderet",
+    "kitchen": "Køkken",
+    "entirePlace": "Hele boligen",
+    "privateRoom": "Privat værelse",
+    "sharedRoom": "Delt værelse",
+    "longStay": "God til længere ophold",
+    "totalStayPrice": "Samlet pris for opholdet"
+  },
+  "cookies": {
+    "title": "Dine privatlivsvalg",
+    "description": "Vi bruger nødvendige cookies til sikkerhed og kernefunktioner. Valgfrie præferencer kan huske fx sprog. Analyse er slået fra, indtil du tillader det.",
+    "acceptAll": "Accepter alle",
+    "rejectNonEssential": "Afvis ikke-nødvendige",
+    "manage": "Administrer valg",
+    "essential": "Nødvendige",
+    "preferences": "Præferencer",
+    "analytics": "Analyse"
+  },
+  "safety": {
+    "title": "Sikkerhed og nødsituation",
+    "verifiedEmergency": "Verificerede nødoplysninger",
+    "nearbyHospitals": "Hospitaler i nærheden",
+    "nearbyPharmacies": "Apoteker i nærheden",
+    "nearbyPolice": "Politi i nærheden",
+    "verifiedOnly": "Kun verificerede oplysninger"
+  },
+  "auth": {
+    "title": "Velkommen tilbage",
+    "subtitle": "Log ind for at fortsætte med at planlægge dine rejser.",
+    "email": "E-mailadresse",
+    "password": "Adgangskode",
+    "signIn": "Log ind",
+    "createAccount": "Opret konto",
+    "newHere": "Ny på AttraVoya Pro?",
+    "alreadyAccount": "Har du allerede en konto?",
+    "registerTitle": "Opret din konto",
+    "registerSubtitle": "Begynd at planlægge rejser ud fra dit budget.",
+    "confirmPassword": "Bekræft adgangskode",
+    "working": "Vent venligst…",
+    "loginFailed": "Vi kunne ikke logge dig ind. Kontrollér dine oplysninger og prøv igen.",
+    "registerFailed": "Vi kunne ikke oprette din konto. Prøv igen.",
+    "registered": "Kontoen er oprettet. Tjek din e-mail for at bekræfte den."
+  }
+}

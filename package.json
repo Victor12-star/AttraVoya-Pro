@@ -1,0 +1,56 @@
+{
+  "name": "attravoya-pro",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AttraVoya Pro — Discover more. Travel smarter. Stay safer.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup-development.js && node scripts/validate-env.js",
+    "environment:check": "node scripts/check-environment.js",
+    "env:check": "node scripts/validate-env.js",
+    "services:up": "docker compose up -d",
+    "services:down": "docker compose down",
+    "services:status": "docker compose ps",
+    "services:logs": "docker compose logs -f",
+    "dev": "turbo run dev --parallel",
+    "dev:web": "pnpm --filter @attravoya/web dev",
+    "dev:mobile": "pnpm --filter @attravoya/mobile dev",
+    "dev:admin": "pnpm --filter @attravoya/admin dev",
+    "dev:server": "pnpm --filter @attravoya/server dev",
+    "build": "turbo run build",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "check:js": "node scripts/check-javascript.js . apps/admin apps/mobile apps/mobile/tooling apps/server apps/web packages/api-client packages/constants packages/database packages/design-tokens packages/localization packages/shared-types packages/utilities packages/validation",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch --parallel",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "turbo run clean",
+    "db:generate": "pnpm --filter @attravoya/database generate",
+    "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
+    "db:deploy": "pnpm --filter @attravoya/database migrate:deploy",
+    "db:seed": "pnpm --filter @attravoya/database seed",
+    "db:studio": "pnpm --filter @attravoya/database studio",
+    "translations:check": "node scripts/check-translations.js",
+    "providers:smoke": "node scripts/provider-smoke-test.js"
+  },
+  "devDependencies": {
+    "@types/eslint-plugin-security": "3.0.1",
+    "@types/node": "24.13.3",
+    "@types/punycode": "2.1.4",
+    "eslint": "10.9.0",
+    "prettier": "3.9.6",
+    "turbo": "2.10.11",
+    "typescript": "5.9.3"
+  }
+}

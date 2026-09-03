@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Entdecken",
+    "flights": "Flüge",
+    "stays": "Unterkünfte",
+    "thingsToDo": "Aktivitäten",
+    "trips": "Reisen",
+    "nearby": "In der Nähe",
+    "signIn": "Anmelden"
+  },
+  "common": {
+    "search": "Suchen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "retry": "Erneut versuchen",
+    "loading": "Wird geladen…",
+    "unavailable": "Vorübergehend nicht verfügbar",
+    "chooseLanguage": "Sprache wählen",
+    "chooseCountry": "Land wählen",
+    "chooseCurrency": "Währung wählen",
+    "recentSearches": "Letzte Suchen",
+    "clear": "Löschen"
+  },
+  "home": {
+    "heroTitle": "Mehr entdecken. Smarter reisen. Sicherer unterwegs.",
+    "budgetTitle": "Plane eine Reise, die wirklich zu deinem Budget passt.",
+    "budgetDescription": "Sag uns, wie viel du ausgeben kannst, wer mitreist und was dir wichtig ist. AttraVoya Pro findet realistische Reiseziele und plant die Reise rund um dein Budget.",
+    "budgetCta": "Nach Budget planen",
+    "exploreCta": "Reiseziele entdecken",
+    "trending": "Reiseziel-Inspiration",
+    "tripTypes": "Finde deine Reiseart",
+    "stayNear": "Übernachte dort, wo es wichtig ist",
+    "family": "Reisen für die ganze Familie",
+    "local": "Entdecke wie ein Einheimischer",
+    "tools": "Reisetools",
+    "safety": "Mit Vertrauen reisen",
+    "stayDescription": "Vergleiche Hotels, Gästehäuser, Hostels und längere Mietaufenthalte nach ihren Gesamtauswirkungen auf die Reisekosten – nicht nur nach dem Preis pro Nacht.",
+    "familyDescription": "Plane nach dem Alter der Kinder, familienfreundlichen Unterkünften und Aktivitäten, die in dasselbe Reisebudget passen."
+  },
+  "search": {
+    "destinationQuestion": "Wohin möchtest du reisen?",
+    "destinationPlaceholder": "Städte, Länder und Reiseziele suchen",
+    "from": "Von",
+    "to": "Nach",
+    "departure": "Abreise",
+    "return": "Rückreise",
+    "travellers": "Reisende",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Nach Budget planen",
+    "totalBudget": "Gesamtbudget",
+    "origin": "Von wo reist du ab?",
+    "flexibleDates": "Flexible Daten",
+    "adults": "Erwachsene",
+    "children": "Kinder",
+    "childrenAges": "Alter der Kinder",
+    "interests": "Interessen",
+    "comfort": "Komfortniveau",
+    "submit": "Bezahlbare Reisen finden"
+  },
+  "stays": {
+    "title": "Unterkünfte",
+    "breakfastIncluded": "Frühstück inklusive",
+    "kitchen": "Küche",
+    "entirePlace": "Ganze Unterkunft",
+    "privateRoom": "Privatzimmer",
+    "sharedRoom": "Mehrbettzimmer",
+    "longStay": "Gut für längere Aufenthalte",
+    "totalStayPrice": "Gesamtpreis des Aufenthalts"
+  },
+  "cookies": {
+    "title": "Deine Datenschutzauswahl",
+    "description": "Wir verwenden notwendige Cookies für Sicherheit und Grundfunktionen. Optionale Einstellungen können sich z. B. deine Sprache merken. Analysen bleiben deaktiviert, bis du zustimmst.",
+    "acceptAll": "Alle akzeptieren",
+    "rejectNonEssential": "Nicht notwendige ablehnen",
+    "manage": "Einstellungen verwalten",
+    "essential": "Notwendig",
+    "preferences": "Einstellungen",
+    "analytics": "Analyse"
+  },
+  "safety": {
+    "title": "Sicherheit und Notfall",
+    "verifiedEmergency": "Verifizierte Notfallinformationen",
+    "nearbyHospitals": "Krankenhäuser in der Nähe",
+    "nearbyPharmacies": "Apotheken in der Nähe",
+    "nearbyPolice": "Polizei in der Nähe",
+    "verifiedOnly": "Nur verifizierte Informationen"
+  },
+  "auth": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melde dich an, um deine Reisen weiter zu planen.",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "createAccount": "Konto erstellen",
+    "newHere": "Neu bei AttraVoya Pro?",
+    "alreadyAccount": "Du hast bereits ein Konto?",
+    "registerTitle": "Erstelle dein Konto",
+    "registerSubtitle": "Plane Reisen passend zu deinem Budget.",
+    "confirmPassword": "Passwort bestätigen",
+    "working": "Bitte warten…",
+    "loginFailed": "Anmeldung nicht möglich. Prüfe deine Angaben und versuche es erneut.",
+    "registerFailed": "Konto konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "registered": "Konto erstellt. Prüfe deine E-Mail, um es zu bestätigen."
+  }
+}

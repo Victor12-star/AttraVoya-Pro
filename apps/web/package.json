@@ -1,0 +1,61 @@
+{
+  "name": "@attravoya/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AttraVoya Pro customer website.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "lint": "eslint . --max-warnings=0",
+    "check:js": "node ../../scripts/check-javascript.js .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "clean": "node -e \"const fs=require('node:fs'); for(const path of ['.next','coverage','playwright-report','test-results']) fs.rmSync(path,{recursive:true,force:true});\""
+  },
+  "dependencies": {
+    "@attravoya/api-client": "workspace:*",
+    "@attravoya/constants": "workspace:*",
+    "@attravoya/design-tokens": "workspace:*",
+    "@attravoya/localization": "workspace:*",
+    "@attravoya/shared-types": "workspace:*",
+    "@attravoya/utilities": "workspace:*",
+    "@attravoya/validation": "workspace:*",
+    "@hookform/resolvers": "5.7.1",
+    "@tanstack/react-query": "5.101.4",
+    "clsx": "2.1.1",
+    "lucide-react": "1.31.0",
+    "next": "16.3.4",
+    "next-themes": "0.4.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-hook-form": "7.85.0",
+    "tailwind-merge": "3.6.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@attravoya/eslint-config": "workspace:*",
+    "@attravoya/javascript-config": "workspace:*",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "7.0.0",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "24.13.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@vitest/coverage-v8": "4.1.10",
+    "jsdom": "30.0.1",
+    "postcss": "8.5.6",
+    "tailwindcss": "4.3.3",
+    "vitest": "4.1.10"
+  }
+}

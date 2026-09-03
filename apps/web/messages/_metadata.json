@@ -1,0 +1,24 @@
+{
+  "sourceLocale": "en",
+  "locales": [
+    "en",
+    "sv",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "pt",
+    "pl",
+    "nl",
+    "no",
+    "da",
+    "fi",
+    "tr",
+    "ar",
+    "zh",
+    "ja",
+    "ko",
+    "hi"
+  ],
+  "note": "Baseline interface translations. Before public launch, native-speaker review is required for each enabled locale. Safety-critical phrases use a separate verified-content workflow."
+}

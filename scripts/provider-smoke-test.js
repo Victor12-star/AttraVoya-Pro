@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+
+import assert from 'node:assert/strict';
+
+import { createProviderCache } from '../apps/server/src/integrations/http/provider-cache.js';
+import { createProviderHttpClient } from '../apps/server/src/integrations/http/provider-http-client.js';
+import { createOpenMeteoWeatherProvider } from '../apps/server/src/integrations/weather/openmeteo-weather-provider.js';
+import { createFrankfurterCurrencyProvider } from '../apps/server/src/integrations/currency/frankfurter-currency-provider.js';
+import { createLibreTranslateProvider } from '../apps/server/src/integrations/translation/libretranslate-translation-provider.js';
+
+/**
+ * Dependency-light provider smoke test.
+ *
+ * It never calls the internet and never consumes API credits. The purpose is to
+ * prove that core adapters normalize representative provider responses and that
+ * the shared HTTP layer works before developers add real credentials.
+ */
+async function main() {
+  const transport = createProviderHttpClient({
+    provider: 'smoke',
+    retryMax: 0,
+    fetchImpl: async () => new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }),
+  });
+  assert.deepEqual(await transport.requestJson('https://provider.invalid/smoke'), { ok: true });
+
+  const weather = createOpenMeteoWeatherProvider({
+    cache: createProviderCache(),
+    http: {
+      requestJson: async () => ({
+        latitude: 59.33,
+        longitude: 18.07,
+        timezone: 'Europe/Stockholm',
+        current: { temperature_2m: 19 },
+        daily: {
+          time: ['2026-09-03'],
+          temperature_2m_max: [21],
+          temperature_2m_min: [12],
+        },
+      }),
+    },
+  });
+  const forecast = await weather.getForecast({ latitude: 59.33, longitude: 18.07, forecastDays: 1 });
+  assert.equal(forecast.current.temperatureC, 19);
+  assert.equal(forecast.daily[0].temperatureMaxC, 21);
+
+  const currency = createFrankfurterCurrencyProvider({
+    cache: createProviderCache(),
+    http: { requestJson: async () => ({ date: '2026-09-03', base: 'SEK', quote: 'EUR', rate: 0.09 }) },
+  });
+  const conversion = await currency.convert({ amount: 1000, from: 'SEK', to: 'EUR' });
+  assert.equal(conversion.convertedAmount, 90);
+  assert.equal(conversion.approximate, true);
+
+  const translation = createLibreTranslateProvider({
+    baseUrl: 'http://localhost:5001',
+    http: { requestJson: async () => ({ translatedText: 'Hola' }) },
+  });
+  const translated = await translation.translate({ text: 'Hello', source: 'en', target: 'es' });
+  assert.equal(translated.translatedText, 'Hola');
+
+  console.log('Provider smoke tests passed. No external API calls were made.');
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

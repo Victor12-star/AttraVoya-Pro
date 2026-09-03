@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "探索",
+    "flights": "航班",
+    "stays": "住宿",
+    "thingsToDo": "玩乐",
+    "trips": "行程",
+    "nearby": "附近",
+    "signIn": "登录"
+  },
+  "common": {
+    "search": "搜索",
+    "save": "保存",
+    "cancel": "取消",
+    "retry": "重试",
+    "loading": "加载中…",
+    "unavailable": "暂时不可用",
+    "chooseLanguage": "选择语言",
+    "chooseCountry": "选择国家/地区",
+    "chooseCurrency": "选择货币",
+    "recentSearches": "最近搜索",
+    "clear": "清除"
+  },
+  "home": {
+    "heroTitle": "发现更多。更聪明地旅行。更安心地出发。",
+    "budgetTitle": "规划真正符合你预算的旅行。",
+    "budgetDescription": "告诉我们你能花多少钱、谁一起旅行以及你最看重什么。AttraVoya Pro 会帮助你寻找现实可行的目的地，并围绕预算规划整个旅程。",
+    "budgetCta": "按预算规划",
+    "exploreCta": "探索目的地",
+    "trending": "目的地灵感",
+    "tripTypes": "找到适合你的旅行方式",
+    "stayNear": "住在你最在意的地方附近",
+    "family": "适合全家人的旅行",
+    "local": "像当地人一样探索",
+    "tools": "旅行工具",
+    "safety": "安心旅行",
+    "stayDescription": "比较酒店、旅馆、青年旅舍和长期租赁对整趟旅行成本的影响，而不只是每晚价格。",
+    "familyDescription": "根据儿童年龄、适合家庭的住宿和能纳入同一旅行预算的活动进行规划。"
+  },
+  "search": {
+    "destinationQuestion": "你想去哪里？",
+    "destinationPlaceholder": "搜索城市、国家和目的地",
+    "from": "出发地",
+    "to": "目的地",
+    "departure": "出发",
+    "return": "返回",
+    "travellers": "旅行者",
+    "budget": "预算"
+  },
+  "budget": {
+    "title": "按预算规划",
+    "totalBudget": "总预算",
+    "origin": "你从哪里出发？",
+    "flexibleDates": "灵活日期",
+    "adults": "成人",
+    "children": "儿童",
+    "childrenAges": "儿童年龄",
+    "interests": "兴趣",
+    "comfort": "舒适程度",
+    "submit": "寻找我负担得起的旅行"
+  },
+  "stays": {
+    "title": "住宿",
+    "breakfastIncluded": "含早餐",
+    "kitchen": "厨房",
+    "entirePlace": "整套房源",
+    "privateRoom": "独立房间",
+    "sharedRoom": "合住房间",
+    "longStay": "适合长住",
+    "totalStayPrice": "住宿总价"
+  },
+  "cookies": {
+    "title": "你的隐私选择",
+    "description": "我们使用必要的 Cookie 来保障安全和核心功能。可选偏好可记住语言等选择。除非你允许，否则分析功能保持关闭。",
+    "acceptAll": "全部接受",
+    "rejectNonEssential": "拒绝非必要项",
+    "manage": "管理偏好",
+    "essential": "必要",
+    "preferences": "偏好",
+    "analytics": "分析"
+  },
+  "safety": {
+    "title": "安全与紧急情况",
+    "verifiedEmergency": "已核实的紧急信息",
+    "nearbyHospitals": "附近医院",
+    "nearbyPharmacies": "附近药房",
+    "nearbyPolice": "附近警察",
+    "verifiedOnly": "仅显示已核实信息"
+  },
+  "auth": {
+    "title": "欢迎回来",
+    "subtitle": "登录以继续规划您的行程。",
+    "email": "电子邮箱",
+    "password": "密码",
+    "signIn": "登录",
+    "createAccount": "创建账户",
+    "newHere": "第一次使用 AttraVoya Pro？",
+    "alreadyAccount": "已经有账户？",
+    "registerTitle": "创建您的账户",
+    "registerSubtitle": "开始根据您的预算规划旅行。",
+    "confirmPassword": "确认密码",
+    "working": "请稍候…",
+    "loginFailed": "无法登录。请检查您的信息后重试。",
+    "registerFailed": "无法创建账户。请重试。",
+    "registered": "账户已创建。请查看电子邮件完成验证。"
+  }
+}

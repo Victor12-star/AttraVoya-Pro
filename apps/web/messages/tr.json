@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Keşfet",
+    "flights": "Uçuşlar",
+    "stays": "Konaklama",
+    "thingsToDo": "Yapılacaklar",
+    "trips": "Seyahatler",
+    "nearby": "Yakındakiler",
+    "signIn": "Giriş yap"
+  },
+  "common": {
+    "search": "Ara",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "unavailable": "Geçici olarak kullanılamıyor",
+    "chooseLanguage": "Dil seç",
+    "chooseCountry": "Ülke seç",
+    "chooseCurrency": "Para birimi seç",
+    "recentSearches": "Son aramalar",
+    "clear": "Temizle"
+  },
+  "home": {
+    "heroTitle": "Daha fazlasını keşfet. Daha akıllı seyahat et. Daha güvende kal.",
+    "budgetTitle": "Gerçek bütçene uyan bir seyahat planla.",
+    "budgetDescription": "Ne kadar harcayabileceğini, kimlerin seyahat ettiğini ve senin için neyin önemli olduğunu söyle. AttraVoya Pro gerçekçi destinasyonlar bulup seyahati bütçene göre kurmana yardımcı olur.",
+    "budgetCta": "Bütçeye göre planla",
+    "exploreCta": "Destinasyonları keşfet",
+    "trending": "Destinasyon ilhamı",
+    "tripTypes": "Seyahat tarzını bul",
+    "stayNear": "Önemli yerlere yakın kal",
+    "family": "Tüm aileye uygun seyahat",
+    "local": "Yerel biri gibi keşfet",
+    "tools": "Seyahat araçları",
+    "safety": "Güvenle seyahat et",
+    "stayDescription": "Otelleri, konukevlerini, hostelleri ve uzun süreli kiralamaları yalnızca gecelik fiyata göre değil, toplam seyahat maliyetine etkilerine göre karşılaştırın.",
+    "familyDescription": "Çocukların yaşlarına, aile dostu konaklamalara ve aynı seyahat bütçesine uyan etkinliklere göre plan yapın."
+  },
+  "search": {
+    "destinationQuestion": "Nereye gitmek istiyorsun?",
+    "destinationPlaceholder": "Şehir, ülke ve destinasyon ara",
+    "from": "Nereden",
+    "to": "Nereye",
+    "departure": "Gidiş",
+    "return": "Dönüş",
+    "travellers": "Yolcular",
+    "budget": "Bütçe"
+  },
+  "budget": {
+    "title": "Bütçeye göre planla",
+    "totalBudget": "Toplam bütçe",
+    "origin": "Nereden seyahat ediyorsun?",
+    "flexibleDates": "Esnek tarihler",
+    "adults": "Yetişkinler",
+    "children": "Çocuklar",
+    "childrenAges": "Çocukların yaşları",
+    "interests": "İlgi alanları",
+    "comfort": "Konfor seviyesi",
+    "submit": "Bütçeme uygun seyahatleri bul"
+  },
+  "stays": {
+    "title": "Konaklama",
+    "breakfastIncluded": "Kahvaltı dahil",
+    "kitchen": "Mutfak",
+    "entirePlace": "Tüm konaklama",
+    "privateRoom": "Özel oda",
+    "sharedRoom": "Paylaşımlı oda",
+    "longStay": "Uzun konaklamaya uygun",
+    "totalStayPrice": "Toplam konaklama fiyatı"
+  },
+  "cookies": {
+    "title": "Gizlilik tercihleriniz",
+    "description": "Güvenlik ve temel işlevler için gerekli çerezleri kullanıyoruz. İsteğe bağlı tercihler dil gibi seçimleri hatırlayabilir. İzin verene kadar analiz kapalı kalır.",
+    "acceptAll": "Tümünü kabul et",
+    "rejectNonEssential": "Gerekli olmayanları reddet",
+    "manage": "Tercihleri yönet",
+    "essential": "Gerekli",
+    "preferences": "Tercihler",
+    "analytics": "Analiz"
+  },
+  "safety": {
+    "title": "Güvenlik ve acil durum",
+    "verifiedEmergency": "Doğrulanmış acil durum bilgileri",
+    "nearbyHospitals": "Yakındaki hastaneler",
+    "nearbyPharmacies": "Yakındaki eczaneler",
+    "nearbyPolice": "Yakındaki polis",
+    "verifiedOnly": "Yalnızca doğrulanmış bilgi"
+  },
+  "auth": {
+    "title": "Tekrar hoş geldiniz",
+    "subtitle": "Seyahatlerinizi planlamaya devam etmek için giriş yapın.",
+    "email": "E-posta adresi",
+    "password": "Şifre",
+    "signIn": "Giriş yap",
+    "createAccount": "Hesap oluştur",
+    "newHere": "AttraVoya Pro’da yeni misiniz?",
+    "alreadyAccount": "Zaten hesabınız var mı?",
+    "registerTitle": "Hesabınızı oluşturun",
+    "registerSubtitle": "Bütçenize göre seyahat planlamaya başlayın.",
+    "confirmPassword": "Şifreyi doğrula",
+    "working": "Lütfen bekleyin…",
+    "loginFailed": "Giriş yapılamadı. Bilgilerinizi kontrol edip tekrar deneyin.",
+    "registerFailed": "Hesabınız oluşturulamadı. Lütfen tekrar deneyin.",
+    "registered": "Hesap oluşturuldu. Doğrulamak için e-postanızı kontrol edin."
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@attravoya/constants",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared AttraVoya Pro roles, permissions, entitlements, limits, and feature-flag constants.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./roles": "./src/roles.js",
+    "./permissions": "./src/permissions.js",
+    "./entitlements": "./src/entitlements.js",
+    "./plan-limits": "./src/plan-limits.js",
+    "./feature-flags": "./src/feature-flags.js",
+    "./accommodation": "./src/accommodation.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "scripts": {
+    "build": "pnpm run check:js",
+    "lint": "eslint . --max-warnings=0",
+    "check:js": "node ../../scripts/check-javascript.js .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
+  },
+  "devDependencies": {
+    "@attravoya/eslint-config": "workspace:*",
+    "@attravoya/javascript-config": "workspace:*",
+    "@vitest/coverage-v8": "4.1.10",
+    "vitest": "4.1.10"
+  }
+}

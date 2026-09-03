@@ -1,0 +1,268 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: test
+  API_HOST: 127.0.0.1
+  API_PORT: 5000
+  LOG_LEVEL: silent
+  WEB_URL: http://localhost:3000
+  ADMIN_URL: http://localhost:3001
+  API_URL: http://localhost:5000
+  DATABASE_URL: postgresql://attravoya:attravoya_ci_password@127.0.0.1:5432/attravoya_ci?schema=public
+  JWT_ACCESS_SECRET: ci-jwt-access-secret-attravoya-pro-0123456789abcdef
+  COOKIE_SECRET: ci-cookie-secret-attravoya-pro-0123456789abcdef
+  DATA_ENCRYPTION_KEY: ci-data-encryption-key-attravoya-pro-0123456789abcdef
+  JWT_ACCESS_TTL: 15m
+  AUTH_REFRESH_SESSION_DAYS: 30
+  JWT_ISSUER: attravoya-pro-api
+  JWT_AUDIENCE: attravoya-pro
+  LIBRETRANSLATE_URL: http://127.0.0.1:5001
+  WEATHER_PROVIDER: openmeteo
+  CURRENCY_PROVIDER: frankfurter
+  TRANSLATION_PROVIDER: libretranslate
+  MAPS_PROVIDER: geoapify
+  PLACES_PROVIDER: geoapify
+  GEOCODING_PROVIDER: geoapify
+  ROUTING_PROVIDER: geoapify
+  ACCOMMODATION_PROVIDER: geoapify
+  EVENTS_PROVIDER: ticketmaster
+  NEWS_PROVIDER: newsdata
+  IMAGE_PROVIDER: pexels
+  EMAIL_PROVIDER: resend
+  FLIGHT_PROVIDER: none
+
+jobs:
+  quality:
+    name: Code quality and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate environment contract
+        run: pnpm env:check
+
+      - name: Check JavaScript
+        run: pnpm check:js
+
+      - name: Check translations
+        run: pnpm translations:check
+
+      - name: Run provider smoke tests
+        run: pnpm providers:smoke
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Check formatting
+        run: pnpm format:check
+
+  database:
+    name: PostgreSQL and Prisma verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: attravoya_ci
+          POSTGRES_USER: attravoya
+          POSTGRES_PASSWORD: attravoya_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U attravoya -d attravoya_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Validate Prisma schema
+        run: pnpm --filter @attravoya/database validate:schema
+
+      - name: Apply schema to disposable CI database
+        run: pnpm --filter @attravoya/database db:push
+
+      - name: Seed reference data
+        run: pnpm db:seed
+
+      - name: Run database tests
+        run: pnpm --filter @attravoya/database test
+
+  build:
+    name: Production builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Build workspace
+        run: pnpm build
+
+  live-providers:
+    name: Live no-cost provider checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local LibreTranslate
+        run: |
+          docker run -d --name attravoya-libretranslate \
+            -p 5001:5000 \
+            -e LT_DISABLE_WEB_UI=true \
+            -e LT_DISABLE_FILES_TRANSLATION=true \
+            -e LT_LOAD_ONLY=en,es \
+            -e LT_UPDATE_MODELS=false \
+            libretranslate/libretranslate:v1.9.6
+
+      - name: Wait for LibreTranslate
+        run: |
+          for attempt in {1..36}; do
+            if curl --fail --silent http://127.0.0.1:5001/languages >/dev/null; then
+              echo "LibreTranslate is ready."
+              exit 0
+            fi
+            echo "Waiting for LibreTranslate ($attempt/36)..."
+            sleep 10
+          done
+          docker logs attravoya-libretranslate
+          exit 1
+
+      - name: Run live provider checks
+        env:
+          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
+        run: node scripts/live-provider-check.js
+
+      - name: Show LibreTranslate logs on failure
+        if: failure()
+        run: docker logs attravoya-libretranslate || true
+
+  security:
+    name: Dependency and secret checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level=high
+
+      - name: Scan tracked files for common secret patterns
+        run: node scripts/secret-scan.js

@@ -1,0 +1,8 @@
+{
+  "extends": "../javascript-config/base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "WebWorker", "WebWorker.Iterable"]
+  },
+  "include": ["src/**/*.js", "tests/**/*.js"],
+  "exclude": ["node_modules", "coverage"]
+}

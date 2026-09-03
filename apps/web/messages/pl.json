@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Odkrywaj",
+    "flights": "Loty",
+    "stays": "Noclegi",
+    "thingsToDo": "Atrakcje",
+    "trips": "Podróże",
+    "nearby": "W pobliżu",
+    "signIn": "Zaloguj się"
+  },
+  "common": {
+    "search": "Szukaj",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "retry": "Spróbuj ponownie",
+    "loading": "Ładowanie…",
+    "unavailable": "Tymczasowo niedostępne",
+    "chooseLanguage": "Wybierz język",
+    "chooseCountry": "Wybierz kraj",
+    "chooseCurrency": "Wybierz walutę",
+    "recentSearches": "Ostatnie wyszukiwania",
+    "clear": "Wyczyść"
+  },
+  "home": {
+    "heroTitle": "Odkrywaj więcej. Podróżuj mądrzej. Bądź bezpieczniej.",
+    "budgetTitle": "Zaplanuj podróż dopasowaną do Twojego rzeczywistego budżetu.",
+    "budgetDescription": "Powiedz nam, ile możesz wydać, kto podróżuje i co jest dla Ciebie ważne. AttraVoya Pro pomaga znaleźć realistyczne kierunki i zbudować podróż wokół budżetu.",
+    "budgetCta": "Planuj według budżetu",
+    "exploreCta": "Odkrywaj kierunki",
+    "trending": "Inspiracje kierunków",
+    "tripTypes": "Znajdź swój rodzaj podróży",
+    "stayNear": "Zatrzymaj się blisko tego, co ważne",
+    "family": "Podróże dla całej rodziny",
+    "local": "Odkrywaj jak lokalny mieszkaniec",
+    "tools": "Narzędzia podróżne",
+    "safety": "Podróżuj pewnie",
+    "stayDescription": "Porównuj hotele, pensjonaty, hostele i dłuższe wynajmy według ich wpływu na całkowity koszt podróży, a nie tylko ceny za noc.",
+    "familyDescription": "Planuj z uwzględnieniem wieku dzieci, rodzinnych noclegów i atrakcji mieszczących się w tym samym budżecie podróży."
+  },
+  "search": {
+    "destinationQuestion": "Dokąd chcesz pojechać?",
+    "destinationPlaceholder": "Szukaj miast, krajów i kierunków",
+    "from": "Z",
+    "to": "Do",
+    "departure": "Wyjazd",
+    "return": "Powrót",
+    "travellers": "Podróżni",
+    "budget": "Budżet"
+  },
+  "budget": {
+    "title": "Planuj według budżetu",
+    "totalBudget": "Całkowity budżet",
+    "origin": "Skąd podróżujesz?",
+    "flexibleDates": "Elastyczne daty",
+    "adults": "Dorośli",
+    "children": "Dzieci",
+    "childrenAges": "Wiek dzieci",
+    "interests": "Zainteresowania",
+    "comfort": "Poziom komfortu",
+    "submit": "Znajdź podróże w moim budżecie"
+  },
+  "stays": {
+    "title": "Noclegi",
+    "breakfastIncluded": "Śniadanie w cenie",
+    "kitchen": "Kuchnia",
+    "entirePlace": "Cały obiekt",
+    "privateRoom": "Pokój prywatny",
+    "sharedRoom": "Pokój współdzielony",
+    "longStay": "Dobre na dłuższy pobyt",
+    "totalStayPrice": "Łączna cena pobytu"
+  },
+  "cookies": {
+    "title": "Twoje wybory prywatności",
+    "description": "Używamy niezbędnych plików cookie do bezpieczeństwa i podstawowych funkcji. Opcjonalne preferencje mogą zapamiętać np. język. Analityka pozostaje wyłączona bez Twojej zgody.",
+    "acceptAll": "Akceptuj wszystkie",
+    "rejectNonEssential": "Odrzuć zbędne",
+    "manage": "Zarządzaj preferencjami",
+    "essential": "Niezbędne",
+    "preferences": "Preferencje",
+    "analytics": "Analityka"
+  },
+  "safety": {
+    "title": "Bezpieczeństwo i nagłe wypadki",
+    "verifiedEmergency": "Zweryfikowane informacje alarmowe",
+    "nearbyHospitals": "Szpitale w pobliżu",
+    "nearbyPharmacies": "Apteki w pobliżu",
+    "nearbyPolice": "Policja w pobliżu",
+    "verifiedOnly": "Tylko zweryfikowane informacje"
+  },
+  "auth": {
+    "title": "Witamy ponownie",
+    "subtitle": "Zaloguj się, aby dalej planować podróże.",
+    "email": "Adres e-mail",
+    "password": "Hasło",
+    "signIn": "Zaloguj się",
+    "createAccount": "Utwórz konto",
+    "newHere": "Nowy w AttraVoya Pro?",
+    "alreadyAccount": "Masz już konto?",
+    "registerTitle": "Utwórz swoje konto",
+    "registerSubtitle": "Zacznij planować podróże zgodnie ze swoim budżetem.",
+    "confirmPassword": "Potwierdź hasło",
+    "working": "Proszę czekać…",
+    "loginFailed": "Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.",
+    "registerFailed": "Nie udało się utworzyć konta. Spróbuj ponownie.",
+    "registered": "Konto utworzone. Sprawdź e-mail, aby je zweryfikować."
+  }
+}

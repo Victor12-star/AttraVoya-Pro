@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/jsconfig",
+  "extends": "./packages/javascript-config/node.json",
+  "compilerOptions": {
+    "maxNodeModuleJsDepth": 0
+  },
+  "include": [
+    "eslint.config.js",
+    "prettier.config.js",
+    "scripts/**/*.js",
+    "packages/eslint-config/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    ".expo",
+    ".turbo",
+    "dist",
+    "build",
+    "out",
+    "coverage"
+  ]
+}

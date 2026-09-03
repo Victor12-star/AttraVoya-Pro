@@ -1,0 +1,5 @@
+{
+  "extends": "../../packages/javascript-config/node.json",
+  "include": ["src/**/*.js", "vitest.config.js"],
+  "exclude": ["node_modules", "coverage", "dist"]
+}

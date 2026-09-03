@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "탐색",
+    "flights": "항공편",
+    "stays": "숙소",
+    "thingsToDo": "즐길 거리",
+    "trips": "여행",
+    "nearby": "주변",
+    "signIn": "로그인"
+  },
+  "common": {
+    "search": "검색",
+    "save": "저장",
+    "cancel": "취소",
+    "retry": "다시 시도",
+    "loading": "로딩 중…",
+    "unavailable": "일시적으로 사용할 수 없음",
+    "chooseLanguage": "언어 선택",
+    "chooseCountry": "국가 선택",
+    "chooseCurrency": "통화 선택",
+    "recentSearches": "최근 검색",
+    "clear": "지우기"
+  },
+  "home": {
+    "heroTitle": "더 많이 발견하고, 더 똑똑하게 여행하고, 더 안전하게.",
+    "budgetTitle": "실제 예산에 맞는 여행을 계획하세요.",
+    "budgetDescription": "사용할 수 있는 금액, 여행 인원, 중요하게 생각하는 것을 알려주세요. AttraVoya Pro가 현실적인 여행지를 찾고 예산에 맞춰 전체 여행을 구성합니다.",
+    "budgetCta": "예산으로 계획",
+    "exploreCta": "여행지 탐색",
+    "trending": "여행지 영감",
+    "tripTypes": "나에게 맞는 여행 찾기",
+    "stayNear": "중요한 곳 가까이에 머물기",
+    "family": "온 가족을 위한 여행",
+    "local": "현지인처럼 탐색",
+    "tools": "여행 도구",
+    "safety": "안심하고 여행하기",
+    "stayDescription": "호텔, 게스트하우스, 호스텔, 장기 임대를 1박 요금뿐 아니라 전체 여행 비용에 미치는 영향으로 비교하세요.",
+    "familyDescription": "아이들의 나이, 가족 친화적인 숙소, 같은 여행 예산에 맞는 활동을 고려해 계획하세요."
+  },
+  "search": {
+    "destinationQuestion": "어디로 가고 싶으세요?",
+    "destinationPlaceholder": "도시, 국가, 여행지 검색",
+    "from": "출발지",
+    "to": "도착지",
+    "departure": "출발",
+    "return": "귀국",
+    "travellers": "여행자",
+    "budget": "예산"
+  },
+  "budget": {
+    "title": "예산으로 계획",
+    "totalBudget": "총예산",
+    "origin": "어디에서 출발하나요?",
+    "flexibleDates": "유연한 날짜",
+    "adults": "성인",
+    "children": "어린이",
+    "childrenAges": "어린이 나이",
+    "interests": "관심사",
+    "comfort": "편안함 수준",
+    "submit": "내 예산에 맞는 여행 찾기"
+  },
+  "stays": {
+    "title": "숙소",
+    "breakfastIncluded": "조식 포함",
+    "kitchen": "주방",
+    "entirePlace": "숙소 전체",
+    "privateRoom": "개인실",
+    "sharedRoom": "다인실",
+    "longStay": "장기 숙박에 적합",
+    "totalStayPrice": "총 숙박 요금"
+  },
+  "cookies": {
+    "title": "개인정보 선택",
+    "description": "보안과 핵심 기능을 위해 필수 쿠키를 사용합니다. 선택적 환경설정은 언어 같은 선택을 기억할 수 있습니다. 분석은 허용하기 전까지 꺼져 있습니다.",
+    "acceptAll": "모두 허용",
+    "rejectNonEssential": "필수 외 거부",
+    "manage": "환경설정 관리",
+    "essential": "필수",
+    "preferences": "환경설정",
+    "analytics": "분석"
+  },
+  "safety": {
+    "title": "안전 및 긴급 상황",
+    "verifiedEmergency": "확인된 긴급 정보",
+    "nearbyHospitals": "주변 병원",
+    "nearbyPharmacies": "주변 약국",
+    "nearbyPolice": "주변 경찰",
+    "verifiedOnly": "확인된 정보만 제공"
+  },
+  "auth": {
+    "title": "다시 오신 것을 환영합니다",
+    "subtitle": "로그인하고 여행 계획을 계속하세요.",
+    "email": "이메일 주소",
+    "password": "비밀번호",
+    "signIn": "로그인",
+    "createAccount": "계정 만들기",
+    "newHere": "AttraVoya Pro가 처음이신가요?",
+    "alreadyAccount": "이미 계정이 있으신가요?",
+    "registerTitle": "계정 만들기",
+    "registerSubtitle": "예산에 맞춰 여행 계획을 시작하세요.",
+    "confirmPassword": "비밀번호 확인",
+    "working": "잠시 기다려 주세요…",
+    "loginFailed": "로그인할 수 없습니다. 정보를 확인하고 다시 시도하세요.",
+    "registerFailed": "계정을 만들 수 없습니다. 다시 시도하세요.",
+    "registered": "계정이 생성되었습니다. 이메일을 확인해 인증하세요."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Utforska",
+    "flights": "Flyg",
+    "stays": "Boenden",
+    "thingsToDo": "Saker att göra",
+    "trips": "Resor",
+    "nearby": "I närheten",
+    "signIn": "Logga in"
+  },
+  "common": {
+    "search": "Sök",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "retry": "Försök igen",
+    "loading": "Laddar…",
+    "unavailable": "Tillfälligt otillgängligt",
+    "chooseLanguage": "Välj språk",
+    "chooseCountry": "Välj land",
+    "chooseCurrency": "Välj valuta",
+    "recentSearches": "Senaste sökningar",
+    "clear": "Rensa"
+  },
+  "home": {
+    "heroTitle": "Upptäck mer. Res smartare. Res säkrare.",
+    "budgetTitle": "Planera en resa som passar din verkliga budget.",
+    "budgetDescription": "Berätta hur mycket du kan spendera, vilka som reser och vad som är viktigt för dig. AttraVoya Pro hjälper dig hitta realistiska resmål och bygga resan kring din budget.",
+    "budgetCta": "Planera efter budget",
+    "exploreCta": "Utforska resmål",
+    "trending": "Inspiration för resmål",
+    "tripTypes": "Hitta din typ av resa",
+    "stayNear": "Bo nära det som är viktigt",
+    "family": "Resor som fungerar för hela familjen",
+    "local": "Utforska som en lokalbo",
+    "tools": "Reseverktyg",
+    "safety": "Res med trygghet",
+    "stayDescription": "Jämför hotell, pensionat, vandrarhem och längre boenden utifrån deras totala påverkan på resbudgeten – inte bara priset per natt.",
+    "familyDescription": "Planera utifrån barnens åldrar, familjevänliga boenden och aktiviteter som ryms inom samma resebudget."
+  },
+  "search": {
+    "destinationQuestion": "Vart vill du åka?",
+    "destinationPlaceholder": "Sök städer, länder och resmål",
+    "from": "Från",
+    "to": "Till",
+    "departure": "Avresa",
+    "return": "Retur",
+    "travellers": "Resenärer",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Planera efter budget",
+    "totalBudget": "Total budget",
+    "origin": "Var reser du från?",
+    "flexibleDates": "Flexibla datum",
+    "adults": "Vuxna",
+    "children": "Barn",
+    "childrenAges": "Barnens åldrar",
+    "interests": "Intressen",
+    "comfort": "Komfortnivå",
+    "submit": "Hitta resor jag har råd med"
+  },
+  "stays": {
+    "title": "Boenden",
+    "breakfastIncluded": "Frukost ingår",
+    "kitchen": "Kök",
+    "entirePlace": "Hela boendet",
+    "privateRoom": "Privat rum",
+    "sharedRoom": "Delat rum",
+    "longStay": "Bra för längre vistelser",
+    "totalStayPrice": "Totalt boendepris"
+  },
+  "cookies": {
+    "title": "Dina integritetsval",
+    "description": "Vi använder nödvändiga cookies för säkerhet och grundläggande funktioner. Valfria inställningar kan komma ihåg exempelvis språk. Analys är avstängd tills du tillåter den.",
+    "acceptAll": "Acceptera alla",
+    "rejectNonEssential": "Avvisa icke-nödvändiga",
+    "manage": "Hantera inställningar",
+    "essential": "Nödvändiga",
+    "preferences": "Inställningar",
+    "analytics": "Analys"
+  },
+  "safety": {
+    "title": "Säkerhet och nödläge",
+    "verifiedEmergency": "Verifierad nödinformation",
+    "nearbyHospitals": "Sjukhus i närheten",
+    "nearbyPharmacies": "Apotek i närheten",
+    "nearbyPolice": "Polis i närheten",
+    "verifiedOnly": "Endast verifierad information"
+  },
+  "auth": {
+    "title": "Välkommen tillbaka",
+    "subtitle": "Logga in för att fortsätta planera dina resor.",
+    "email": "E-postadress",
+    "password": "Lösenord",
+    "signIn": "Logga in",
+    "createAccount": "Skapa konto",
+    "newHere": "Ny på AttraVoya Pro?",
+    "alreadyAccount": "Har du redan ett konto?",
+    "registerTitle": "Skapa ditt konto",
+    "registerSubtitle": "Börja planera resor utifrån din budget.",
+    "confirmPassword": "Bekräfta lösenord",
+    "working": "Vänta…",
+    "loginFailed": "Det gick inte att logga in. Kontrollera dina uppgifter och försök igen.",
+    "registerFailed": "Det gick inte att skapa kontot. Försök igen.",
+    "registered": "Kontot skapades. Kontrollera din e-post för att verifiera det."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Explorar",
+    "flights": "Voos",
+    "stays": "Estadias",
+    "thingsToDo": "O que fazer",
+    "trips": "Viagens",
+    "nearby": "Perto de si",
+    "signIn": "Entrar"
+  },
+  "common": {
+    "search": "Pesquisar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "retry": "Tentar novamente",
+    "loading": "A carregar…",
+    "unavailable": "Temporariamente indisponível",
+    "chooseLanguage": "Escolher idioma",
+    "chooseCountry": "Escolher país",
+    "chooseCurrency": "Escolher moeda",
+    "recentSearches": "Pesquisas recentes",
+    "clear": "Limpar"
+  },
+  "home": {
+    "heroTitle": "Descubra mais. Viaje melhor. Fique mais seguro.",
+    "budgetTitle": "Planeie uma viagem que caiba no seu orçamento real.",
+    "budgetDescription": "Diga-nos quanto pode gastar, quem vai viajar e o que é importante para si. A AttraVoya Pro ajuda a encontrar destinos realistas e a montar a viagem em torno do seu orçamento.",
+    "budgetCta": "Planear por orçamento",
+    "exploreCta": "Explorar destinos",
+    "trending": "Inspiração de destinos",
+    "tripTypes": "Encontre o seu tipo de viagem",
+    "stayNear": "Fique perto do que importa",
+    "family": "Viagens para toda a família",
+    "local": "Explore como um local",
+    "tools": "Ferramentas de viagem",
+    "safety": "Viaje com confiança",
+    "stayDescription": "Compare hotéis, casas de hóspedes, hostels e alugueres mais longos pelo impacto total na viagem, e não apenas pelo preço por noite.",
+    "familyDescription": "Planeie de acordo com as idades das crianças, alojamentos familiares e atividades que caibam no mesmo orçamento de viagem."
+  },
+  "search": {
+    "destinationQuestion": "Para onde quer ir?",
+    "destinationPlaceholder": "Pesquisar cidades, países e destinos",
+    "from": "De",
+    "to": "Para",
+    "departure": "Partida",
+    "return": "Regresso",
+    "travellers": "Viajantes",
+    "budget": "Orçamento"
+  },
+  "budget": {
+    "title": "Planear por orçamento",
+    "totalBudget": "Orçamento total",
+    "origin": "De onde vai viajar?",
+    "flexibleDates": "Datas flexíveis",
+    "adults": "Adultos",
+    "children": "Crianças",
+    "childrenAges": "Idades das crianças",
+    "interests": "Interesses",
+    "comfort": "Nível de conforto",
+    "submit": "Encontrar viagens dentro do meu orçamento"
+  },
+  "stays": {
+    "title": "Estadias",
+    "breakfastIncluded": "Pequeno-almoço incluído",
+    "kitchen": "Cozinha",
+    "entirePlace": "Alojamento inteiro",
+    "privateRoom": "Quarto privado",
+    "sharedRoom": "Quarto partilhado",
+    "longStay": "Bom para estadias longas",
+    "totalStayPrice": "Preço total da estadia"
+  },
+  "cookies": {
+    "title": "As suas escolhas de privacidade",
+    "description": "Usamos cookies essenciais para segurança e funções principais. Preferências opcionais podem guardar escolhas como o idioma. A análise permanece desligada até autorizar.",
+    "acceptAll": "Aceitar tudo",
+    "rejectNonEssential": "Rejeitar não essenciais",
+    "manage": "Gerir preferências",
+    "essential": "Essenciais",
+    "preferences": "Preferências",
+    "analytics": "Análise"
+  },
+  "safety": {
+    "title": "Segurança e emergência",
+    "verifiedEmergency": "Informação de emergência verificada",
+    "nearbyHospitals": "Hospitais próximos",
+    "nearbyPharmacies": "Farmácias próximas",
+    "nearbyPolice": "Polícia próxima",
+    "verifiedOnly": "Apenas informação verificada"
+  },
+  "auth": {
+    "title": "Bem-vindo de volta",
+    "subtitle": "Inicie sessão para continuar a planear as suas viagens.",
+    "email": "Endereço de e-mail",
+    "password": "Palavra-passe",
+    "signIn": "Iniciar sessão",
+    "createAccount": "Criar conta",
+    "newHere": "Novo no AttraVoya Pro?",
+    "alreadyAccount": "Já tem uma conta?",
+    "registerTitle": "Crie a sua conta",
+    "registerSubtitle": "Comece a planear viagens com base no seu orçamento.",
+    "confirmPassword": "Confirmar palavra-passe",
+    "working": "Aguarde…",
+    "loginFailed": "Não foi possível iniciar sessão. Verifique os dados e tente novamente.",
+    "registerFailed": "Não foi possível criar a conta. Tente novamente.",
+    "registered": "Conta criada. Consulte o seu e-mail para a verificar."
+  }
+}

@@ -1,0 +1,937 @@
+// AttraVoya Pro — core PostgreSQL domain schema.
+//
+// Design goals:
+// - Keep traveler roles separate from subscription entitlements.
+// - Make budget-first trip planning a first-class domain instead of a UI-only feature.
+// - Preserve provenance for safety and externally sourced price information.
+// - Avoid storing provider secrets in PostgreSQL; ProviderStatus stores health/config state only.
+// - Use soft deletion for user accounts so audit history and ownership checks remain traceable.
+//
+// DATABASE_URL is supplied by prisma.config.js. No credential belongs in this file.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  DEACTIVATED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum DestinationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EmergencyVerificationStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  STALE
+  REJECTED
+}
+
+enum EmergencyServiceType {
+  GENERAL_EMERGENCY
+  POLICE
+  FIRE
+  AMBULANCE
+  MEDICAL
+  TOURIST_POLICE
+  COAST_GUARD
+  POISON_CONTROL
+  OTHER
+}
+
+enum PlannerRequestStatus {
+  DRAFT
+  SEARCHING
+  READY
+  FAILED
+  ARCHIVED
+}
+
+enum TravelComfortLevel {
+  BUDGET
+  VALUE
+  COMFORT
+  PREMIUM
+}
+
+enum BudgetConfidence {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum BudgetFitStatus {
+  COMFORTABLE
+  TIGHT
+  OVER_BUDGET
+  INSUFFICIENT_DATA
+}
+
+enum PricingBasis {
+  LIVE
+  VERIFIED_PRICE
+  ESTIMATE
+  USER_ENTERED
+  UNAVAILABLE
+}
+
+
+enum AccommodationType {
+  HOTEL
+  BUDGET_HOTEL
+  GUEST_HOUSE
+  BED_AND_BREAKFAST
+  HOSTEL
+  SERVICED_APARTMENT
+  APARTHOTEL
+  SHORT_TERM_RENTAL
+  VACATION_HOME
+  RESORT
+  VILLA
+  COTTAGE
+  CAMPSITE
+  HOLIDAY_PARK
+  OTHER
+}
+
+enum StayUnitType {
+  ENTIRE_PLACE
+  PRIVATE_ROOM
+  SHARED_ROOM
+  ANY
+}
+
+enum StayPreferenceLevel {
+  NOT_REQUIRED
+  PREFERRED
+  REQUIRED
+}
+
+enum BudgetCategory {
+  FLIGHTS
+  ACCOMMODATION
+  FOOD
+  LOCAL_TRANSPORT
+  ACTIVITIES
+  CHILDREN_ACTIVITIES
+  AIRPORT_TRANSFER
+  TRAVEL_INSURANCE
+  SAFETY_RESERVE
+  OTHER
+}
+
+enum TripStatus {
+  DRAFT
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELED
+}
+
+enum TravellerType {
+  ADULT
+  CHILD
+  INFANT
+}
+
+enum TripItemCategory {
+  FLIGHT
+  ACCOMMODATION
+  RESTAURANT
+  ATTRACTION
+  FAMILY_ACTIVITY
+  BEACH
+  SHOPPING
+  TRANSPORT
+  EVENT
+  OTHER
+}
+
+enum RecentSearchType {
+  DESTINATION
+  FLIGHT
+  ACCOMMODATION
+  BUDGET_TRIP
+}
+
+enum FavoriteResourceType {
+  DESTINATION
+  ACCOMMODATION
+  RESTAURANT
+  ATTRACTION
+  BEACH
+  FAMILY_ACTIVITY
+  EVENT
+  FLIGHT
+  ITINERARY
+  OTHER
+}
+
+enum ProviderHealthStatus {
+  UNKNOWN
+  HEALTHY
+  DEGRADED
+  UNAVAILABLE
+  NOT_CONFIGURED
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique
+  passwordHash    String
+  status          UserStatus @default(PENDING_VERIFICATION)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+
+  profile                   UserProfile?
+  roles                     UserRole[]
+  subscriptions             Subscription[]
+  authSessions              AuthSession[]
+  emailVerificationTokens   EmailVerificationToken[]
+  passwordResetTokens       PasswordResetToken[]
+  trips                     Trip[]
+  favorites                 Favorite[]
+  recentSearches             RecentSearch[]
+  travelPlanRequests        TravelPlanRequest[]
+  emergencyRecordsVerified EmergencyRecord[] @relation("EmergencyRecordVerifier")
+  featureFlagsUpdated       FeatureFlag[]     @relation("FeatureFlagUpdater")
+  auditLogs                 AdminAuditLog[]   @relation("AuditActor")
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  displayName         String?
+  firstName           String?
+  lastName            String?
+  preferredCountryId  String?
+  preferredLanguageId String?
+  preferredCurrencyId String?
+  travelInterests     String[]
+  dietaryPreferences  String[]
+  accessibilityPrefs  Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredCountry  Country?  @relation("PreferredCountry", fields: [preferredCountryId], references: [id], onDelete: SetNull)
+  preferredLanguage Language? @relation("PreferredLanguage", fields: [preferredLanguageId], references: [id], onDelete: SetNull)
+  preferredCurrency Currency? @relation("PreferredCurrency", fields: [preferredCurrencyId], references: [id], onDelete: SetNull)
+}
+
+model Role {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  description String?
+  isSystem    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model Plan {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  name        String
+  description String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  entitlements PlanEntitlement[]
+  subscriptions Subscription[]
+}
+
+model Entitlement {
+  id          String @id @default(cuid())
+  key         String @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plans PlanEntitlement[]
+}
+
+model PlanEntitlement {
+  planId        String
+  entitlementId String
+
+  plan        Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  entitlement Entitlement @relation(fields: [entitlementId], references: [id], onDelete: Cascade)
+
+  @@id([planId, entitlementId])
+  @@index([entitlementId])
+}
+
+model Subscription {
+  id                    String             @id @default(cuid())
+  userId                String
+  planId                String
+  status                SubscriptionStatus @default(ACTIVE)
+  provider              String?
+  externalCustomerId    String?
+  externalSubscriptionId String?
+  startsAt              DateTime            @default(now())
+  currentPeriodEnd      DateTime?
+  canceledAt            DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status])
+  @@index([externalSubscriptionId])
+}
+
+model AuthSession {
+  id               String   @id @default(cuid())
+  userId           String
+  refreshTokenHash String   @unique
+  userAgent         String?
+  ipHash            String?
+  lastUsedAt        DateTime @default(now())
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model Country {
+  id              String @id @default(cuid())
+  iso2            String @unique @db.Char(2)
+  iso3            String @unique @db.Char(3)
+  name            String
+  callingCode     String?
+  region          String?
+  subregion       String?
+  defaultTimeZone String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cities              City[]
+  airports            Airport[]
+  languages           CountryLanguage[]
+  currencies          CountryCurrency[]
+  emergencyRecords    EmergencyRecord[]
+  preferredByProfiles UserProfile[] @relation("PreferredCountry")
+
+  @@index([region])
+  @@index([name])
+}
+
+model Language {
+  id           String @id @default(cuid())
+  code         String @unique
+  name         String
+  nativeName   String
+  direction    String @default("ltr")
+  isUiSupported Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  countries           CountryLanguage[]
+  preferredByProfiles UserProfile[] @relation("PreferredLanguage")
+
+  @@index([isUiSupported])
+}
+
+model Currency {
+  id           String @id @default(cuid())
+  code         String @unique @db.Char(3)
+  name         String
+  symbol       String?
+  decimalDigits Int @default(2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  countries                CountryCurrency[]
+  preferredByProfiles      UserProfile[] @relation("PreferredCurrency")
+  travelPlanRequests       TravelPlanRequest[]
+  trips                    Trip[]
+  tripExpenses             TripExpense[]
+  accommodationOptions     AccommodationOption[]
+}
+
+model CountryLanguage {
+  countryId  String
+  languageId String
+  isOfficial Boolean @default(false)
+  isCommon   Boolean @default(false)
+  rank       Int?
+
+  country  Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+
+  @@id([countryId, languageId])
+  @@index([languageId])
+}
+
+model CountryCurrency {
+  countryId String
+  currencyId String
+  isPrimary Boolean @default(false)
+
+  country  Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  currency Currency @relation(fields: [currencyId], references: [id], onDelete: Restrict)
+
+  @@id([countryId, currencyId])
+  @@index([currencyId])
+}
+
+model City {
+  id             String  @id @default(cuid())
+  countryId      String
+  name           String
+  normalizedName String
+  slug           String
+  regionName     String?
+  latitude       Decimal @db.Decimal(9, 6)
+  longitude      Decimal @db.Decimal(9, 6)
+  timeZone       String?
+  geoProvider    String?
+  geoExternalId  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  country             Country            @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  destination         Destination?
+  airports            Airport[]
+  originPlanRequests  TravelPlanRequest[] @relation("PlannerOriginCity")
+
+  @@unique([countryId, slug])
+  @@index([countryId, normalizedName])
+  @@index([geoProvider, geoExternalId])
+}
+
+model Destination {
+  id          String            @id @default(cuid())
+  cityId      String            @unique
+  slug        String            @unique
+  status      DestinationStatus @default(DRAFT)
+  summary     String?
+  heroImageUrl String?
+  heroImageProvider String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  city                 City                       @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  trips                Trip[]
+  targetPlanRequests   TravelPlanRequest[]        @relation("PlannerTargetDestination")
+  recommendations      TravelPlanRecommendation[]
+
+  @@index([status, publishedAt])
+}
+
+model Airport {
+  id            String  @id @default(cuid())
+  countryId     String
+  cityId        String?
+  name          String
+  iataCode      String? @unique @db.Char(3)
+  icaoCode      String? @unique @db.Char(4)
+  latitude      Decimal @db.Decimal(9, 6)
+  longitude     Decimal @db.Decimal(9, 6)
+  timeZone      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  country            Country            @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  city               City?              @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  originPlanRequests TravelPlanRequest[] @relation("PlannerOriginAirport")
+
+  @@index([countryId])
+  @@index([cityId])
+}
+
+// A TravelPlanRequest captures what the traveller can afford and what kind of
+// trip they want. `targetDestinationId` is optional on purpose: the most useful
+// AttraVoya flow can recommend destinations when the traveller does not yet know
+// where to go.
+model TravelPlanRequest {
+  id                  String               @id @default(cuid())
+  userId              String?
+  originCityId        String?
+  originAirportId     String?
+  originLabel         String
+  targetDestinationId String?
+  earliestDeparture   DateTime?            @db.Date
+  latestReturn        DateTime?            @db.Date
+  fixedDeparture      DateTime?            @db.Date
+  fixedReturn         DateTime?            @db.Date
+  minNights           Int                  @default(2)
+  maxNights           Int                  @default(14)
+  flexibleDates       Boolean              @default(true)
+  budgetAmount        Decimal              @db.Decimal(12, 2)
+  budgetCurrencyId    String
+  adults              Int                  @default(1)
+  childrenAges        Int[]
+  interests           String[]
+  comfortLevel        TravelComfortLevel   @default(VALUE)
+  safetyReservePercent Decimal             @default(7.50) @db.Decimal(5, 2)
+  status              PlannerRequestStatus @default(DRAFT)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  originCity        City?        @relation("PlannerOriginCity", fields: [originCityId], references: [id], onDelete: SetNull)
+  originAirport     Airport?     @relation("PlannerOriginAirport", fields: [originAirportId], references: [id], onDelete: SetNull)
+  targetDestination Destination? @relation("PlannerTargetDestination", fields: [targetDestinationId], references: [id], onDelete: SetNull)
+  budgetCurrency    Currency     @relation(fields: [budgetCurrencyId], references: [id], onDelete: Restrict)
+  recommendations   TravelPlanRecommendation[]
+  stayPreference    TravelStayPreference?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([targetDestinationId])
+}
+
+
+// TravelStayPreference captures lodging choices separately from the core planner
+// request so accommodation can grow without turning TravelPlanRequest into a
+// provider-specific or excessively wide table. Required vs preferred values let
+// the ranking engine preserve user choice while still finding viable alternatives.
+model TravelStayPreference {
+  id                       String              @id @default(cuid())
+  requestId                String              @unique
+  types                    AccommodationType[]
+  unitType                 StayUnitType        @default(ANY)
+  breakfast                StayPreferenceLevel @default(NOT_REQUIRED)
+  kitchen                  StayPreferenceLevel @default(NOT_REQUIRED)
+  privateBathroom          StayPreferenceLevel @default(NOT_REQUIRED)
+  requiredAmenities        String[]
+  preferredAmenities       String[]
+  nearPriorities           String[]
+  maxNightlyAmount         Decimal?            @db.Decimal(12, 2)
+  maxTotalStayAmount       Decimal?            @db.Decimal(12, 2)
+  longStayFriendly         Boolean             @default(false)
+  familyFriendly           Boolean             @default(false)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+
+  request TravelPlanRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([longStayFriendly, familyFriendly])
+}
+
+model TravelPlanRecommendation {
+  id                   String           @id @default(cuid())
+  requestId            String
+  destinationId        String
+  rank                  Int
+  overallFitScore       Int
+  budgetFitScore        Int
+  familyFitScore        Int?
+  weatherFitScore       Int?
+  estimatedTotalMin     Decimal          @db.Decimal(12, 2)
+  estimatedTotalMax     Decimal          @db.Decimal(12, 2)
+  remainingBudgetMin    Decimal          @db.Decimal(12, 2)
+  remainingBudgetMax    Decimal          @db.Decimal(12, 2)
+  confidence            BudgetConfidence
+  budgetFitStatus       BudgetFitStatus
+  dataCompletenessPct   Int
+  summary               String?
+  explanation           Json?
+  sourceDataUpdatedAt   DateTime?
+  selectedAt            DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  request      TravelPlanRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  destination  Destination       @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  budgetPlans  BudgetPlan[]
+  createdTrip  Trip?              @relation("TripSourceRecommendation")
+
+  @@unique([requestId, destinationId])
+  @@unique([requestId, rank])
+  @@index([destinationId])
+  @@index([overallFitScore])
+}
+
+// BudgetPlan is versioned so AttraVoya can recalculate a trip after the user
+// changes dates, accommodation, activities, or transport without losing the
+// previous scenario. This supports the future "make this trip cheaper" flow.
+model BudgetPlan {
+  id               String   @id @default(cuid())
+  recommendationId String?
+  tripId            String?
+  version           Int      @default(1)
+  isCurrent         Boolean  @default(true)
+  totalMin          Decimal  @db.Decimal(12, 2)
+  totalMax          Decimal  @db.Decimal(12, 2)
+  reserveAmount     Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt         DateTime @default(now())
+
+  recommendation TravelPlanRecommendation? @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+  trip           Trip?                     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  lines          BudgetLine[]
+  accommodationOptions AccommodationOption[]
+
+  @@unique([recommendationId, version])
+  @@unique([tripId, version])
+  @@index([tripId, isCurrent])
+  @@index([recommendationId, isCurrent])
+}
+
+
+// AccommodationOption stores a planning snapshot, not a permanent copy of a
+// provider catalogue. It lets AttraVoya explain why a stay is good value using
+// the whole-trip impact (room + food + local transport), while preserving price
+// provenance and never presenting an estimate as a confirmed live rate.
+model AccommodationOption {
+  id                         String           @id @default(cuid())
+  budgetPlanId               String
+  currencyId                 String?
+  provider                   String
+  externalId                 String
+  name                       String
+  type                       AccommodationType
+  unitType                   StayUnitType?
+  pricingBasis               PricingBasis
+  confidence                 BudgetConfidence
+  nightlyMin                 Decimal?         @db.Decimal(12, 2)
+  nightlyMax                 Decimal?         @db.Decimal(12, 2)
+  stayTotalMin               Decimal?         @db.Decimal(12, 2)
+  stayTotalMax               Decimal?         @db.Decimal(12, 2)
+  estimatedFoodImpactMin     Decimal?         @db.Decimal(12, 2)
+  estimatedFoodImpactMax     Decimal?         @db.Decimal(12, 2)
+  estimatedTransportMin      Decimal?         @db.Decimal(12, 2)
+  estimatedTransportMax      Decimal?         @db.Decimal(12, 2)
+  effectiveTripCostMin       Decimal?         @db.Decimal(12, 2)
+  effectiveTripCostMax       Decimal?         @db.Decimal(12, 2)
+  breakfastIncluded          Boolean?
+  breakfastAvailable         Boolean?
+  kitchen                    Boolean?
+  privateBathroom            Boolean?
+  familyFriendly             Boolean?
+  longStayFriendly           Boolean?
+  cancellationSummary        String?
+  latitude                   Decimal?         @db.Decimal(9, 6)
+  longitude                  Decimal?         @db.Decimal(9, 6)
+  distanceToPriorityKm       Decimal?         @db.Decimal(8, 3)
+  sourceFetchedAt            DateTime?
+  selectedAt                 DateTime?
+  createdAt                  DateTime         @default(now())
+
+  budgetPlan BudgetPlan @relation(fields: [budgetPlanId], references: [id], onDelete: Cascade)
+  currency   Currency?  @relation(fields: [currencyId], references: [id], onDelete: SetNull)
+
+  @@unique([budgetPlanId, provider, externalId])
+  @@index([budgetPlanId, effectiveTripCostMin])
+  @@index([provider, externalId])
+  @@index([type, familyFriendly, longStayFriendly])
+}
+
+model BudgetLine {
+  id               String           @id @default(cuid())
+  budgetPlanId     String
+  category         BudgetCategory
+  label            String
+  amountMin        Decimal          @db.Decimal(12, 2)
+  amountMax        Decimal          @db.Decimal(12, 2)
+  pricingBasis     PricingBasis
+  confidence       BudgetConfidence
+  sourceProvider   String?
+  sourceExternalId String?
+  sourceFetchedAt  DateTime?
+  notes            String?
+  createdAt        DateTime         @default(now())
+
+  budgetPlan BudgetPlan @relation(fields: [budgetPlanId], references: [id], onDelete: Cascade)
+
+  @@index([budgetPlanId, category])
+  @@index([sourceProvider, sourceExternalId])
+}
+
+model Trip {
+  id                     String     @id @default(cuid())
+  userId                 String
+  destinationId          String
+  sourceRecommendationId String?    @unique
+  title                  String
+  status                 TripStatus @default(DRAFT)
+  startDate              DateTime   @db.Date
+  endDate                DateTime   @db.Date
+  budgetLimit            Decimal?   @db.Decimal(12, 2)
+  budgetCurrencyId       String?
+  notes                  String?
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+
+  user                 User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination          Destination               @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  sourceRecommendation TravelPlanRecommendation? @relation("TripSourceRecommendation", fields: [sourceRecommendationId], references: [id], onDelete: SetNull)
+  budgetCurrency       Currency?                 @relation(fields: [budgetCurrencyId], references: [id], onDelete: SetNull)
+  travellers           TripTraveller[]
+  items                TripItem[]
+  budgetPlans          BudgetPlan[]
+  expenses             TripExpense[]
+
+  @@index([userId, startDate])
+  @@index([userId, status])
+  @@index([destinationId])
+}
+
+model TripTraveller {
+  id         String        @id @default(cuid())
+  tripId     String
+  type       TravellerType
+  ageAtStart Int?
+  createdAt  DateTime      @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, type])
+}
+
+model TripItem {
+  id               String           @id @default(cuid())
+  tripId           String
+  category         TripItemCategory
+  title            String
+  date             DateTime?        @db.Date
+  startsAt         DateTime?
+  endsAt           DateTime?
+  locationName     String?
+  latitude         Decimal?         @db.Decimal(9, 6)
+  longitude        Decimal?         @db.Decimal(9, 6)
+  provider         String?
+  externalId       String?
+  estimatedCost    Decimal?         @db.Decimal(12, 2)
+  notes            String?
+  sortOrder        Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, date, sortOrder])
+  @@index([provider, externalId])
+}
+
+// TripExpense records what the traveller actually spends. Comparing these
+// values with BudgetPlan allows the future Budget Guard to warn early and
+// suggest cheaper alternatives before the traveller exceeds their budget.
+model TripExpense {
+  id          String         @id @default(cuid())
+  tripId      String
+  currencyId  String
+  category    BudgetCategory
+  amount      Decimal        @db.Decimal(12, 2)
+  occurredAt  DateTime
+  note        String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  currency Currency @relation(fields: [currencyId], references: [id], onDelete: Restrict)
+
+  @@index([tripId, occurredAt])
+  @@index([tripId, category])
+}
+
+
+model RecentSearch {
+  id         String           @id @default(cuid())
+  userId     String
+  type       RecentSearchType
+  label      String           @db.VarChar(200)
+  criteria   Json
+  lastUsedAt DateTime         @default(now())
+  createdAt  DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lastUsedAt])
+  @@index([userId, type, lastUsedAt])
+}
+
+model Favorite {
+  id             String               @id @default(cuid())
+  userId         String
+  resourceType   FavoriteResourceType
+  resourceKey    String
+  title          String
+  internalId     String?
+  provider       String?
+  externalId     String?
+  metadata       Json?
+  createdAt      DateTime             @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceKey])
+  @@index([userId, resourceType, createdAt])
+  @@index([provider, externalId])
+}
+
+model EmergencyRecord {
+  id                 String                      @id @default(cuid())
+  countryId          String
+  regionName         String?
+  service            EmergencyServiceType
+  serviceLabel       String
+  phoneNumber        String
+  sourceName         String
+  sourceUrl          String
+  status             EmergencyVerificationStatus @default(DRAFT)
+  lastVerifiedAt     DateTime?
+  verifiedById       String?
+  isPublished        Boolean                     @default(false)
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+
+  country    Country @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  verifiedBy User?   @relation("EmergencyRecordVerifier", fields: [verifiedById], references: [id], onDelete: SetNull)
+
+  @@index([countryId, status, service])
+  @@index([status, lastVerifiedAt])
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  description String?
+  enabled     Boolean  @default(false)
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  updatedBy User? @relation("FeatureFlagUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+// ProviderStatus intentionally stores no credential value. It is safe for an
+// admin UI to display "configured" or health state without exposing API keys.
+model ProviderStatus {
+  id             String               @id @default(cuid())
+  providerKey    String               @unique
+  category       String
+  enabled        Boolean              @default(false)
+  configured     Boolean              @default(false)
+  health         ProviderHealthStatus @default(NOT_CONFIGURED)
+  statusMessage  String?
+  lastCheckedAt  DateTime?
+  lastSuccessAt  DateTime?
+  lastFailureAt  DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([category, health])
+}
+
+// Audit records are append-only at the application layer. The schema contains
+// no "updatedAt" field deliberately; admin history should describe what
+// happened at a point in time rather than behave like editable business data.
+model AdminAuditLog {
+  id           String   @id @default(cuid())
+  actorUserId  String
+  action       String
+  resourceType String
+  resourceId   String?
+  requestId    String?
+  ipHash       String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  actor User @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([actorUserId, createdAt])
+  @@index([resourceType, resourceId, createdAt])
+  @@index([requestId])
+}

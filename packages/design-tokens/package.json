@@ -1,0 +1,40 @@
+{
+  "name": "@attravoya/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-platform AttraVoya Pro color, spacing, typography, motion, and theme tokens.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./colors": "./src/colors.js",
+    "./spacing": "./src/spacing.js",
+    "./typography": "./src/typography.js",
+    "./radius": "./src/radius.js",
+    "./shadows": "./src/shadows.js",
+    "./motion": "./src/motion.js",
+    "./themes": "./src/themes.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "scripts": {
+    "build": "pnpm run check:js",
+    "lint": "eslint . --max-warnings=0",
+    "check:js": "node ../../scripts/check-javascript.js .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
+  },
+  "devDependencies": {
+    "@attravoya/eslint-config": "workspace:*",
+    "@attravoya/javascript-config": "workspace:*",
+    "@vitest/coverage-v8": "4.1.10",
+    "vitest": "4.1.10"
+  }
+}

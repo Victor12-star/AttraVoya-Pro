@@ -1,0 +1,54 @@
+{
+  "name": "@attravoya/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AttraVoya Pro Prisma and PostgreSQL data-access package.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "prisma",
+    "prisma.config.js",
+    "src"
+  ],
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "scripts": {
+    "build": "pnpm run generate && pnpm run check:js",
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:status": "prisma migrate status",
+    "db:push": "prisma db push",
+    "seed": "prisma db seed",
+    "studio": "prisma studio",
+    "format:schema": "prisma format",
+    "validate:schema": "prisma validate",
+    "lint": "eslint . --max-warnings=0",
+    "check:js": "node ../../scripts/check-javascript.js .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
+  },
+  "dependencies": {
+    "@attravoya/constants": "workspace:*",
+    "@attravoya/localization": "workspace:*",
+    "@prisma/adapter-pg": "7.9.1",
+    "@prisma/client": "7.9.1",
+    "pg": "8.23.0"
+  },
+  "devDependencies": {
+    "@attravoya/eslint-config": "workspace:*",
+    "@attravoya/javascript-config": "workspace:*",
+    "@types/node": "24.1.0",
+    "@types/pg": "8.20.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "dotenv": "17.4.2",
+    "prisma": "7.9.1",
+    "vitest": "4.1.10"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/jsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2023"
+    ],
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+    "target": "ES2023",
+    "types": [
+      "node"
+    ]
+  }
+}

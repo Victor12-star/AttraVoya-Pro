@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Utforsk",
+    "flights": "Fly",
+    "stays": "Overnatting",
+    "thingsToDo": "Ting å gjøre",
+    "trips": "Reiser",
+    "nearby": "I nærheten",
+    "signIn": "Logg inn"
+  },
+  "common": {
+    "search": "Søk",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "retry": "Prøv igjen",
+    "loading": "Laster…",
+    "unavailable": "Midlertidig utilgjengelig",
+    "chooseLanguage": "Velg språk",
+    "chooseCountry": "Velg land",
+    "chooseCurrency": "Velg valuta",
+    "recentSearches": "Nylige søk",
+    "clear": "Tøm"
+  },
+  "home": {
+    "heroTitle": "Oppdag mer. Reis smartere. Vær tryggere.",
+    "budgetTitle": "Planlegg en reise som passer det virkelige budsjettet ditt.",
+    "budgetDescription": "Fortell hvor mye du kan bruke, hvem som reiser og hva som betyr mest. AttraVoya Pro hjelper deg å finne realistiske reisemål og bygge reisen rundt budsjettet.",
+    "budgetCta": "Planlegg etter budsjett",
+    "exploreCta": "Utforsk reisemål",
+    "trending": "Reisemålsinspirasjon",
+    "tripTypes": "Finn din type reise",
+    "stayNear": "Bo nær det som betyr noe",
+    "family": "Reiser for hele familien",
+    "local": "Utforsk som en lokal",
+    "tools": "Reiseverktøy",
+    "safety": "Reis med trygghet",
+    "stayDescription": "Sammenlign hoteller, gjestehus, vandrerhjem og lengre leieopphold etter total påvirkning på reisekostnaden – ikke bare pris per natt.",
+    "familyDescription": "Planlegg etter barnas alder, familievennlige overnattingssteder og aktiviteter som passer innenfor samme reisebudsjett."
+  },
+  "search": {
+    "destinationQuestion": "Hvor vil du reise?",
+    "destinationPlaceholder": "Søk etter byer, land og reisemål",
+    "from": "Fra",
+    "to": "Til",
+    "departure": "Avreise",
+    "return": "Retur",
+    "travellers": "Reisende",
+    "budget": "Budsjett"
+  },
+  "budget": {
+    "title": "Planlegg etter budsjett",
+    "totalBudget": "Totalt budsjett",
+    "origin": "Hvor reiser du fra?",
+    "flexibleDates": "Fleksible datoer",
+    "adults": "Voksne",
+    "children": "Barn",
+    "childrenAges": "Barnas alder",
+    "interests": "Interesser",
+    "comfort": "Komfortnivå",
+    "submit": "Finn reiser jeg har råd til"
+  },
+  "stays": {
+    "title": "Overnatting",
+    "breakfastIncluded": "Frokost inkludert",
+    "kitchen": "Kjøkken",
+    "entirePlace": "Hele stedet",
+    "privateRoom": "Privat rom",
+    "sharedRoom": "Delt rom",
+    "longStay": "Bra for lengre opphold",
+    "totalStayPrice": "Total pris for oppholdet"
+  },
+  "cookies": {
+    "title": "Dine personvernvalg",
+    "description": "Vi bruker nødvendige informasjonskapsler for sikkerhet og kjernefunksjoner. Valgfrie preferanser kan huske for eksempel språk. Analyse er av til du tillater det.",
+    "acceptAll": "Godta alle",
+    "rejectNonEssential": "Avvis ikke-nødvendige",
+    "manage": "Administrer valg",
+    "essential": "Nødvendige",
+    "preferences": "Preferanser",
+    "analytics": "Analyse"
+  },
+  "safety": {
+    "title": "Sikkerhet og nødhjelp",
+    "verifiedEmergency": "Verifisert nødinformasjon",
+    "nearbyHospitals": "Sykehus i nærheten",
+    "nearbyPharmacies": "Apotek i nærheten",
+    "nearbyPolice": "Politi i nærheten",
+    "verifiedOnly": "Kun verifisert informasjon"
+  },
+  "auth": {
+    "title": "Velkommen tilbake",
+    "subtitle": "Logg inn for å fortsette å planlegge reisene dine.",
+    "email": "E-postadresse",
+    "password": "Passord",
+    "signIn": "Logg inn",
+    "createAccount": "Opprett konto",
+    "newHere": "Ny på AttraVoya Pro?",
+    "alreadyAccount": "Har du allerede en konto?",
+    "registerTitle": "Opprett kontoen din",
+    "registerSubtitle": "Begynn å planlegge reiser ut fra budsjettet ditt.",
+    "confirmPassword": "Bekreft passord",
+    "working": "Vennligst vent…",
+    "loginFailed": "Vi kunne ikke logge deg inn. Kontroller opplysningene og prøv igjen.",
+    "registerFailed": "Vi kunne ikke opprette kontoen. Prøv igjen.",
+    "registered": "Kontoen er opprettet. Sjekk e-posten din for å bekrefte den."
+  }
+}

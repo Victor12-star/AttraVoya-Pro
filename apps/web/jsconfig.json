@@ -1,0 +1,28 @@
+{
+  "extends": "@attravoya/javascript-config/next.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.mjs",
+    "next.config.mjs",
+    "postcss.config.mjs",
+    "vitest.config.js",
+    "vitest.setup.js",
+    "playwright.config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "coverage",
+    "playwright-report",
+    "test-results"
+  ]
+}

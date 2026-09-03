@@ -1,0 +1,39 @@
+{
+  "name": "@attravoya/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-platform REST client for normalized AttraVoya Pro API contracts.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./src/client.js",
+    "./errors": "./src/errors.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "pnpm": ">=11.22.0 <12"
+  },
+  "scripts": {
+    "build": "pnpm run check:js",
+    "lint": "eslint . --max-warnings=0",
+    "check:js": "node ../../scripts/check-javascript.js .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
+  },
+  "dependencies": {
+    "@attravoya/shared-types": "workspace:*",
+    "@attravoya/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@attravoya/eslint-config": "workspace:*",
+    "@attravoya/javascript-config": "workspace:*",
+    "@vitest/coverage-v8": "4.1.10",
+    "vitest": "4.1.10"
+  }
+}

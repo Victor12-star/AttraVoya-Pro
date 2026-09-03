@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Ontdekken",
+    "flights": "Vluchten",
+    "stays": "Verblijven",
+    "thingsToDo": "Activiteiten",
+    "trips": "Reizen",
+    "nearby": "In de buurt",
+    "signIn": "Inloggen"
+  },
+  "common": {
+    "search": "Zoeken",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "retry": "Opnieuw proberen",
+    "loading": "Laden…",
+    "unavailable": "Tijdelijk niet beschikbaar",
+    "chooseLanguage": "Taal kiezen",
+    "chooseCountry": "Land kiezen",
+    "chooseCurrency": "Valuta kiezen",
+    "recentSearches": "Recente zoekopdrachten",
+    "clear": "Wissen"
+  },
+  "home": {
+    "heroTitle": "Ontdek meer. Reis slimmer. Blijf veiliger.",
+    "budgetTitle": "Plan een reis die echt binnen je budget past.",
+    "budgetDescription": "Vertel hoeveel je kunt besteden, wie er reist en wat belangrijk is. AttraVoya Pro helpt realistische bestemmingen te vinden en de reis rond je budget op te bouwen.",
+    "budgetCta": "Plannen op budget",
+    "exploreCta": "Bestemmingen ontdekken",
+    "trending": "Bestemmingsinspiratie",
+    "tripTypes": "Vind jouw type reis",
+    "stayNear": "Verblijf dicht bij wat belangrijk is",
+    "family": "Reizen voor het hele gezin",
+    "local": "Ontdek als een local",
+    "tools": "Reistools",
+    "safety": "Reis met vertrouwen",
+    "stayDescription": "Vergelijk hotels, pensions, hostels en langere huurverblijven op hun totale invloed op de reiskosten, niet alleen op de prijs per nacht.",
+    "familyDescription": "Plan op basis van de leeftijden van kinderen, gezinsvriendelijke verblijven en activiteiten die binnen hetzelfde reisbudget passen."
+  },
+  "search": {
+    "destinationQuestion": "Waar wil je naartoe?",
+    "destinationPlaceholder": "Zoek steden, landen en bestemmingen",
+    "from": "Van",
+    "to": "Naar",
+    "departure": "Vertrek",
+    "return": "Terug",
+    "travellers": "Reizigers",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Plannen op budget",
+    "totalBudget": "Totaalbudget",
+    "origin": "Waar vertrek je vandaan?",
+    "flexibleDates": "Flexibele data",
+    "adults": "Volwassenen",
+    "children": "Kinderen",
+    "childrenAges": "Leeftijden van kinderen",
+    "interests": "Interesses",
+    "comfort": "Comfortniveau",
+    "submit": "Vind reizen die ik kan betalen"
+  },
+  "stays": {
+    "title": "Verblijven",
+    "breakfastIncluded": "Ontbijt inbegrepen",
+    "kitchen": "Keuken",
+    "entirePlace": "Gehele accommodatie",
+    "privateRoom": "Privékamer",
+    "sharedRoom": "Gedeelde kamer",
+    "longStay": "Geschikt voor lange verblijven",
+    "totalStayPrice": "Totale verblijfsprijs"
+  },
+  "cookies": {
+    "title": "Jouw privacykeuzes",
+    "description": "We gebruiken essentiële cookies voor beveiliging en kernfuncties. Optionele voorkeuren kunnen keuzes zoals taal onthouden. Analyse blijft uit totdat je toestemming geeft.",
+    "acceptAll": "Alles accepteren",
+    "rejectNonEssential": "Niet-essentiële weigeren",
+    "manage": "Voorkeuren beheren",
+    "essential": "Essentieel",
+    "preferences": "Voorkeuren",
+    "analytics": "Analyse"
+  },
+  "safety": {
+    "title": "Veiligheid en noodgevallen",
+    "verifiedEmergency": "Geverifieerde noodinformatie",
+    "nearbyHospitals": "Ziekenhuizen in de buurt",
+    "nearbyPharmacies": "Apotheken in de buurt",
+    "nearbyPolice": "Politie in de buurt",
+    "verifiedOnly": "Alleen geverifieerde informatie"
+  },
+  "auth": {
+    "title": "Welkom terug",
+    "subtitle": "Meld je aan om verder te gaan met het plannen van je reizen.",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "signIn": "Aanmelden",
+    "createAccount": "Account maken",
+    "newHere": "Nieuw bij AttraVoya Pro?",
+    "alreadyAccount": "Heb je al een account?",
+    "registerTitle": "Maak je account",
+    "registerSubtitle": "Plan reizen op basis van je budget.",
+    "confirmPassword": "Wachtwoord bevestigen",
+    "working": "Even geduld…",
+    "loginFailed": "Aanmelden is niet gelukt. Controleer je gegevens en probeer opnieuw.",
+    "registerFailed": "We konden je account niet maken. Probeer opnieuw.",
+    "registered": "Account gemaakt. Controleer je e-mail om het te verifiëren."
+  }
+}

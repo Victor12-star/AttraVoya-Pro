@@ -1,0 +1,35 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# Enforce the 24-hour package-maturity gate without fallback or missing-time bypass.
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+allowBuilds:
+  "@prisma/engines@7.9.1": true
+  "argon2@0.44.0": true
+  "dtrace-provider@0.8.8": false
+  "prisma@7.9.1": true
+  "sharp@0.34.5": true
+  "unrs-resolver@1.12.2": false
+
+overrides:
+  # These exact legacy plugins are registered through @eslint/compat.
+  # Remove each override when that upstream release declares ESLint 10 support.
+  "eslint-plugin-jsx-a11y@6.10.2>eslint": ">=10.9.0 <11"
+  "eslint-plugin-react@7.37.5>eslint": ">=10.9.0 <11"
+  "eslint-plugin-react-native@5.0.0>eslint": ">=10.9.0 <11"
+
+# Intentional, scoped exemption from the 24-hour maturity gate.
+# Expo publishes tightly-coupled SDK-57 patch sets (expo + @expo/* + expo-*) that
+# `expo install --check` mandates as a unit. These are vendor-owned infra adopted
+# day-of by Expo itself; exempting them keeps the SDK consistent without weakening
+# the gate for third-party deps. Remove this block to restore the strict gate.
+minimumReleaseAgeExclude:
+  - '@expo/cli@57.0.20'
+  - '@expo/env@2.4.3'
+  - '@expo/fingerprint@0.20.11'
+  - '@expo/metro-config@57.0.12'
+  - expo-constants@57.0.16
+  - expo-font@57.0.2
+  - expo@57.0.18

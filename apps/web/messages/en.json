@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Explore",
+    "flights": "Flights",
+    "stays": "Stays",
+    "thingsToDo": "Things to do",
+    "trips": "Trips",
+    "nearby": "Nearby",
+    "signIn": "Sign in"
+  },
+  "common": {
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "unavailable": "Temporarily unavailable",
+    "chooseLanguage": "Choose language",
+    "chooseCountry": "Choose country",
+    "chooseCurrency": "Choose currency",
+    "recentSearches": "Recent searches",
+    "clear": "Clear"
+  },
+  "home": {
+    "heroTitle": "Discover more. Travel smarter. Stay safer.",
+    "budgetTitle": "Plan a trip that fits your real budget.",
+    "budgetDescription": "Tell us what you can spend, who is travelling and what matters to you. AttraVoya Pro helps find realistic destinations and build the trip around your budget.",
+    "budgetCta": "Plan by budget",
+    "exploreCta": "Explore destinations",
+    "trending": "Destination inspiration",
+    "tripTypes": "Find your kind of trip",
+    "stayNear": "Stay near what matters",
+    "family": "Travel that works for the whole family",
+    "local": "Explore like a local",
+    "tools": "Travel tools",
+    "safety": "Travel with confidence",
+    "stayDescription": "Compare hotels, guest houses, hostels and longer rentals by their total trip impact—not just the nightly rate.",
+    "familyDescription": "Plan around children’s ages, family-friendly stays and activities that fit the same trip budget."
+  },
+  "search": {
+    "destinationQuestion": "Where do you want to go?",
+    "destinationPlaceholder": "Search cities, countries and destinations",
+    "from": "From",
+    "to": "To",
+    "departure": "Departure",
+    "return": "Return",
+    "travellers": "Travellers",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Plan by budget",
+    "totalBudget": "Total budget",
+    "origin": "Where are you travelling from?",
+    "flexibleDates": "Flexible dates",
+    "adults": "Adults",
+    "children": "Children",
+    "childrenAges": "Children’s ages",
+    "interests": "Interests",
+    "comfort": "Comfort level",
+    "submit": "Find trips I can afford"
+  },
+  "stays": {
+    "title": "Stays",
+    "breakfastIncluded": "Breakfast included",
+    "kitchen": "Kitchen",
+    "entirePlace": "Entire place",
+    "privateRoom": "Private room",
+    "sharedRoom": "Shared room",
+    "longStay": "Good for long stays",
+    "totalStayPrice": "Total stay price"
+  },
+  "cookies": {
+    "title": "Your privacy choices",
+    "description": "We use essential cookies for security and core functionality. Optional preferences can remember choices such as language. Analytics stays off unless you allow it.",
+    "acceptAll": "Accept all",
+    "rejectNonEssential": "Reject non-essential",
+    "manage": "Manage preferences",
+    "essential": "Essential",
+    "preferences": "Preferences",
+    "analytics": "Analytics"
+  },
+  "safety": {
+    "title": "Safety & emergency",
+    "verifiedEmergency": "Verified emergency information",
+    "nearbyHospitals": "Nearby hospitals",
+    "nearbyPharmacies": "Nearby pharmacies",
+    "nearbyPolice": "Nearby police",
+    "verifiedOnly": "Verified information only"
+  },
+  "auth": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to continue planning your trips.",
+    "email": "Email address",
+    "password": "Password",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "newHere": "New to AttraVoya Pro?",
+    "alreadyAccount": "Already have an account?",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Start planning trips around your budget.",
+    "confirmPassword": "Confirm password",
+    "working": "Please wait…",
+    "loginFailed": "We couldn't sign you in. Check your details and try again.",
+    "registerFailed": "We couldn't create your account. Please try again.",
+    "registered": "Account created. Check your email to verify it."
+  }
+}

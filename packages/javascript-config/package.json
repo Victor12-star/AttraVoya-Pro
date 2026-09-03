@@ -1,0 +1,22 @@
+{
+  "name": "@attravoya/javascript-config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared JavaScript project configurations for AttraVoya Pro.",
+  "type": "module",
+  "files": [
+    "base.json",
+    "next.json",
+    "node.json",
+    "react-native.json"
+  ],
+  "exports": {
+    "./base.json": "./base.json",
+    "./next.json": "./next.json",
+    "./node.json": "./node.json",
+    "./react-native.json": "./react-native.json"
+  },
+  "engines": {
+    "node": ">=24.20.0 <25"
+  }
+}

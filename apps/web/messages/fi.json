@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Tutustu",
+    "flights": "Lennot",
+    "stays": "Majoitukset",
+    "thingsToDo": "Tekemistä",
+    "trips": "Matkat",
+    "nearby": "Lähellä",
+    "signIn": "Kirjaudu"
+  },
+  "common": {
+    "search": "Hae",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "retry": "Yritä uudelleen",
+    "loading": "Ladataan…",
+    "unavailable": "Tilapäisesti poissa käytöstä",
+    "chooseLanguage": "Valitse kieli",
+    "chooseCountry": "Valitse maa",
+    "chooseCurrency": "Valitse valuutta",
+    "recentSearches": "Viimeisimmät haut",
+    "clear": "Tyhjennä"
+  },
+  "home": {
+    "heroTitle": "Löydä enemmän. Matkusta fiksummin. Pysy turvassa.",
+    "budgetTitle": "Suunnittele matka, joka sopii oikeaan budjettiisi.",
+    "budgetDescription": "Kerro paljonko voit käyttää, ketkä matkustavat ja mikä on tärkeää. AttraVoya Pro auttaa löytämään realistisia kohteita ja rakentamaan matkan budjettisi ympärille.",
+    "budgetCta": "Suunnittele budjetin mukaan",
+    "exploreCta": "Tutustu kohteisiin",
+    "trending": "Kohdeinspiraatiota",
+    "tripTypes": "Löydä oma matkasi",
+    "stayNear": "Majoitu lähelle tärkeää",
+    "family": "Matkoja koko perheelle",
+    "local": "Tutustu kuin paikallinen",
+    "tools": "Matkatyökalut",
+    "safety": "Matkusta luottavaisin mielin",
+    "stayDescription": "Vertaa hotelleja, majataloja, hostelleja ja pidempiä vuokramajoituksia niiden koko matkan kustannusvaikutuksen perusteella – ei vain yöhinnan mukaan.",
+    "familyDescription": "Suunnittele lasten iän, perheystävällisten majoitusten ja samaan matkabudjettiin sopivien aktiviteettien mukaan."
+  },
+  "search": {
+    "destinationQuestion": "Minne haluat matkustaa?",
+    "destinationPlaceholder": "Hae kaupunkeja, maita ja kohteita",
+    "from": "Mistä",
+    "to": "Minne",
+    "departure": "Lähtö",
+    "return": "Paluu",
+    "travellers": "Matkustajat",
+    "budget": "Budjetti"
+  },
+  "budget": {
+    "title": "Suunnittele budjetin mukaan",
+    "totalBudget": "Kokonaisbudjetti",
+    "origin": "Mistä matkustat?",
+    "flexibleDates": "Joustavat päivät",
+    "adults": "Aikuiset",
+    "children": "Lapset",
+    "childrenAges": "Lasten iät",
+    "interests": "Kiinnostuksen kohteet",
+    "comfort": "Mukavuustaso",
+    "submit": "Etsi matkoja joihin minulla on varaa"
+  },
+  "stays": {
+    "title": "Majoitukset",
+    "breakfastIncluded": "Aamiainen sisältyy",
+    "kitchen": "Keittiö",
+    "entirePlace": "Koko majoitus",
+    "privateRoom": "Yksityinen huone",
+    "sharedRoom": "Jaettu huone",
+    "longStay": "Sopii pitkään oleskeluun",
+    "totalStayPrice": "Majoituksen kokonaishinta"
+  },
+  "cookies": {
+    "title": "Tietosuoja-asetuksesi",
+    "description": "Käytämme välttämättömiä evästeitä turvallisuuteen ja perustoimintoihin. Valinnaiset asetukset voivat muistaa esimerkiksi kielen. Analytiikka pysyy pois päältä, kunnes hyväksyt sen.",
+    "acceptAll": "Hyväksy kaikki",
+    "rejectNonEssential": "Hylkää ei-välttämättömät",
+    "manage": "Hallitse asetuksia",
+    "essential": "Välttämättömät",
+    "preferences": "Asetukset",
+    "analytics": "Analytiikka"
+  },
+  "safety": {
+    "title": "Turvallisuus ja hätätilanne",
+    "verifiedEmergency": "Vahvistetut hätätiedot",
+    "nearbyHospitals": "Lähimmät sairaalat",
+    "nearbyPharmacies": "Lähimmät apteekit",
+    "nearbyPolice": "Lähin poliisi",
+    "verifiedOnly": "Vain vahvistettua tietoa"
+  },
+  "auth": {
+    "title": "Tervetuloa takaisin",
+    "subtitle": "Kirjaudu sisään jatkaaksesi matkojesi suunnittelua.",
+    "email": "Sähköpostiosoite",
+    "password": "Salasana",
+    "signIn": "Kirjaudu sisään",
+    "createAccount": "Luo tili",
+    "newHere": "Uusi AttraVoya Prossa?",
+    "alreadyAccount": "Onko sinulla jo tili?",
+    "registerTitle": "Luo tilisi",
+    "registerSubtitle": "Aloita matkojen suunnittelu budjettisi mukaan.",
+    "confirmPassword": "Vahvista salasana",
+    "working": "Odota hetki…",
+    "loginFailed": "Kirjautuminen epäonnistui. Tarkista tiedot ja yritä uudelleen.",
+    "registerFailed": "Tilin luominen epäonnistui. Yritä uudelleen.",
+    "registered": "Tili luotu. Tarkista sähköpostisi vahvistaaksesi sen."
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "探す",
+    "flights": "フライト",
+    "stays": "宿泊",
+    "thingsToDo": "アクティビティ",
+    "trips": "旅行",
+    "nearby": "周辺",
+    "signIn": "ログイン"
+  },
+  "common": {
+    "search": "検索",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "retry": "再試行",
+    "loading": "読み込み中…",
+    "unavailable": "一時的に利用できません",
+    "chooseLanguage": "言語を選択",
+    "chooseCountry": "国を選択",
+    "chooseCurrency": "通貨を選択",
+    "recentSearches": "最近の検索",
+    "clear": "クリア"
+  },
+  "home": {
+    "heroTitle": "もっと発見。もっと賢く旅する。もっと安心に。",
+    "budgetTitle": "実際の予算に合う旅行を計画しましょう。",
+    "budgetDescription": "使える予算、旅行する人、重視することを教えてください。AttraVoya Pro が現実的な目的地を探し、予算を中心に旅行を組み立てます。",
+    "budgetCta": "予算から計画",
+    "exploreCta": "目的地を探す",
+    "trending": "旅先のインスピレーション",
+    "tripTypes": "自分に合う旅を見つける",
+    "stayNear": "大切な場所の近くに泊まる",
+    "family": "家族みんなに合う旅行",
+    "local": "地元の人のように楽しむ",
+    "tools": "旅行ツール",
+    "safety": "安心して旅する",
+    "stayDescription": "ホテル、ゲストハウス、ホステル、長期レンタルを、1泊料金だけでなく旅行全体の費用への影響で比較します。",
+    "familyDescription": "子どもの年齢、家族向けの宿泊先、同じ旅行予算に収まるアクティビティを考慮して計画します。"
+  },
+  "search": {
+    "destinationQuestion": "どこへ行きたいですか？",
+    "destinationPlaceholder": "都市、国、目的地を検索",
+    "from": "出発地",
+    "to": "目的地",
+    "departure": "出発",
+    "return": "帰国",
+    "travellers": "旅行者",
+    "budget": "予算"
+  },
+  "budget": {
+    "title": "予算から計画",
+    "totalBudget": "総予算",
+    "origin": "どこから出発しますか？",
+    "flexibleDates": "柔軟な日程",
+    "adults": "大人",
+    "children": "子ども",
+    "childrenAges": "子どもの年齢",
+    "interests": "興味",
+    "comfort": "快適さ",
+    "submit": "予算内の旅行を探す"
+  },
+  "stays": {
+    "title": "宿泊",
+    "breakfastIncluded": "朝食付き",
+    "kitchen": "キッチン",
+    "entirePlace": "貸切",
+    "privateRoom": "個室",
+    "sharedRoom": "相部屋",
+    "longStay": "長期滞在向け",
+    "totalStayPrice": "宿泊合計料金"
+  },
+  "cookies": {
+    "title": "プライバシー設定",
+    "description": "安全性と基本機能のために必須 Cookie を使用します。任意の設定では言語などの選択を記憶できます。分析は許可するまで無効です。",
+    "acceptAll": "すべて許可",
+    "rejectNonEssential": "必須以外を拒否",
+    "manage": "設定を管理",
+    "essential": "必須",
+    "preferences": "設定",
+    "analytics": "分析"
+  },
+  "safety": {
+    "title": "安全・緊急情報",
+    "verifiedEmergency": "確認済みの緊急情報",
+    "nearbyHospitals": "近くの病院",
+    "nearbyPharmacies": "近くの薬局",
+    "nearbyPolice": "近くの警察",
+    "verifiedOnly": "確認済み情報のみ"
+  },
+  "auth": {
+    "title": "おかえりなさい",
+    "subtitle": "ログインして旅行の計画を続けましょう。",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "signIn": "ログイン",
+    "createAccount": "アカウントを作成",
+    "newHere": "AttraVoya Pro は初めてですか？",
+    "alreadyAccount": "すでにアカウントをお持ちですか？",
+    "registerTitle": "アカウントを作成",
+    "registerSubtitle": "予算に合わせた旅行計画を始めましょう。",
+    "confirmPassword": "パスワードを確認",
+    "working": "お待ちください…",
+    "loginFailed": "ログインできませんでした。入力内容を確認してもう一度お試しください。",
+    "registerFailed": "アカウントを作成できませんでした。もう一度お試しください。",
+    "registered": "アカウントを作成しました。メールを確認して認証してください。"
+  }
+}

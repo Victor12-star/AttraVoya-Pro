@@ -1,0 +1,5 @@
+{
+  "extends": "../javascript-config/base.json",
+  "include": ["src/**/*.js", "tests/**/*.js"],
+  "exclude": ["node_modules", "coverage"]
+}

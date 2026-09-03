@@ -1,0 +1,107 @@
+{
+  "navigation": {
+    "explore": "Explorer",
+    "flights": "Vols",
+    "stays": "Hébergements",
+    "thingsToDo": "Activités",
+    "trips": "Voyages",
+    "nearby": "À proximité",
+    "signIn": "Se connecter"
+  },
+  "common": {
+    "search": "Rechercher",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "retry": "Réessayer",
+    "loading": "Chargement…",
+    "unavailable": "Temporairement indisponible",
+    "chooseLanguage": "Choisir la langue",
+    "chooseCountry": "Choisir le pays",
+    "chooseCurrency": "Choisir la devise",
+    "recentSearches": "Recherches récentes",
+    "clear": "Effacer"
+  },
+  "home": {
+    "heroTitle": "Découvrez plus. Voyagez mieux. Restez en sécurité.",
+    "budgetTitle": "Planifiez un voyage adapté à votre budget réel.",
+    "budgetDescription": "Indiquez votre budget, les voyageurs et ce qui compte pour vous. AttraVoya Pro vous aide à trouver des destinations réalistes et à construire le voyage autour de votre budget.",
+    "budgetCta": "Planifier selon le budget",
+    "exploreCta": "Explorer les destinations",
+    "trending": "Inspiration destinations",
+    "tripTypes": "Trouvez votre type de voyage",
+    "stayNear": "Séjournez près de ce qui compte",
+    "family": "Des voyages adaptés à toute la famille",
+    "local": "Explorez comme un habitant",
+    "tools": "Outils de voyage",
+    "safety": "Voyagez en confiance",
+    "stayDescription": "Comparez hôtels, maisons d’hôtes, auberges et locations longue durée selon leur impact sur le coût total du voyage, pas seulement le prix par nuit.",
+    "familyDescription": "Planifiez selon l’âge des enfants, des hébergements adaptés aux familles et des activités qui respectent le même budget de voyage."
+  },
+  "search": {
+    "destinationQuestion": "Où voulez-vous aller ?",
+    "destinationPlaceholder": "Rechercher des villes, pays et destinations",
+    "from": "De",
+    "to": "Vers",
+    "departure": "Départ",
+    "return": "Retour",
+    "travellers": "Voyageurs",
+    "budget": "Budget"
+  },
+  "budget": {
+    "title": "Planifier selon le budget",
+    "totalBudget": "Budget total",
+    "origin": "D’où partez-vous ?",
+    "flexibleDates": "Dates flexibles",
+    "adults": "Adultes",
+    "children": "Enfants",
+    "childrenAges": "Âges des enfants",
+    "interests": "Centres d’intérêt",
+    "comfort": "Niveau de confort",
+    "submit": "Trouver des voyages dans mon budget"
+  },
+  "stays": {
+    "title": "Hébergements",
+    "breakfastIncluded": "Petit-déjeuner inclus",
+    "kitchen": "Cuisine",
+    "entirePlace": "Logement entier",
+    "privateRoom": "Chambre privée",
+    "sharedRoom": "Chambre partagée",
+    "longStay": "Adapté aux longs séjours",
+    "totalStayPrice": "Prix total du séjour"
+  },
+  "cookies": {
+    "title": "Vos choix de confidentialité",
+    "description": "Nous utilisons des cookies essentiels pour la sécurité et les fonctions principales. Les préférences facultatives peuvent mémoriser des choix comme la langue. Les analyses restent désactivées sans votre accord.",
+    "acceptAll": "Tout accepter",
+    "rejectNonEssential": "Refuser les non essentiels",
+    "manage": "Gérer les préférences",
+    "essential": "Essentiels",
+    "preferences": "Préférences",
+    "analytics": "Analyses"
+  },
+  "safety": {
+    "title": "Sécurité et urgence",
+    "verifiedEmergency": "Informations d’urgence vérifiées",
+    "nearbyHospitals": "Hôpitaux à proximité",
+    "nearbyPharmacies": "Pharmacies à proximité",
+    "nearbyPolice": "Police à proximité",
+    "verifiedOnly": "Informations vérifiées uniquement"
+  },
+  "auth": {
+    "title": "Bon retour",
+    "subtitle": "Connectez-vous pour continuer à planifier vos voyages.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "newHere": "Nouveau sur AttraVoya Pro ?",
+    "alreadyAccount": "Vous avez déjà un compte ?",
+    "registerTitle": "Créez votre compte",
+    "registerSubtitle": "Commencez à planifier des voyages selon votre budget.",
+    "confirmPassword": "Confirmer le mot de passe",
+    "working": "Veuillez patienter…",
+    "loginFailed": "Connexion impossible. Vérifiez vos informations et réessayez.",
+    "registerFailed": "Impossible de créer votre compte. Veuillez réessayer.",
+    "registered": "Compte créé. Consultez votre e-mail pour le vérifier."
+  }
+}

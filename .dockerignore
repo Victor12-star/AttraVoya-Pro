@@ -1,0 +1,49 @@
+# Version control and editor metadata
+.git
+.gitignore
+.github
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Dependency and generated output directories
+**/node_modules
+**/.next
+**/.expo
+**/.turbo
+**/.cache
+**/.parcel-cache
+**/.vite
+**/coverage
+**/dist
+**/build
+**/out
+**/test-results
+**/playwright-report
+
+# Logs and local diagnostics
+**/*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment and secret material
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+**/.ssh
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx
+**/secrets
+**/secrets/**
+
+# Operating-system and language caches
+**/__pycache__
+**/*.py[cod]

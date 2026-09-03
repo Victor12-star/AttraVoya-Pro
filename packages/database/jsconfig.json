@@ -1,0 +1,11 @@
+{
+  "extends": "../javascript-config/node.json",
+  "include": [
+    "src/**/*.js",
+    "prisma/**/*.js",
+    "tests/**/*.js",
+    "prisma.config.js",
+    "vitest.config.js"
+  ],
+  "exclude": ["node_modules", "coverage"]
+}
