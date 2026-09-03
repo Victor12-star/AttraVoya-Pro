@@ -44,7 +44,6 @@ const ROLE_PERMISSIONS = Object.freeze({
   [ROLES.SUPER_ADMIN]: Object.values(PERMISSIONS),
 });
 
-
 async function seedGlobalLocalizationReference() {
   const supportedUiLocales = new Set(UI_LOCALES.map(({ code }) => code));
   const languageByCode = new Map();
@@ -53,18 +52,24 @@ async function seedGlobalLocalizationReference() {
   // Country/language/currency reference data is safe seed data: it describes
   // stable platform metadata rather than inventing travel prices or availability.
   for (const language of LANGUAGE_REFERENCE) {
+    // Database columns require a stable human-readable name. Some upstream
+    // locale datasets can omit an English display name for regional language
+    // codes, so fall back safely instead of allowing seed data to become null.
+    const languageName = language.name || language.nativeName || language.code.toUpperCase();
+    const nativeName = language.nativeName || languageName;
+
     const record = await prisma.language.upsert({
       where: { code: language.code },
       update: {
-        name: language.name,
-        nativeName: language.nativeName,
+        name: languageName,
+        nativeName,
         direction: language.direction,
         isUiSupported: supportedUiLocales.has(language.code),
       },
       create: {
         code: language.code,
-        name: language.name,
-        nativeName: language.nativeName,
+        name: languageName,
+        nativeName,
         direction: language.direction,
         isUiSupported: supportedUiLocales.has(language.code),
       },
