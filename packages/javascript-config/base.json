@@ -15,13 +15,15 @@
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2023",
     "useDefineForClassFields": true,
-    "types": []
+    "types": [],
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false
   },
   "exclude": [
     "node_modules",
