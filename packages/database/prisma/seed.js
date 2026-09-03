@@ -85,17 +85,23 @@ async function seedGlobalLocalizationReference() {
     const metadata = getCurrencyMetadata(code, 'en');
     if (!metadata) continue;
 
+    // Intl metadata can be typed as nullable even though valid ISO currency
+    // codes normally resolve. Persist a stable fallback instead of allowing
+    // reference-data seeding to depend on a particular runtime's ICU dataset.
+    const currencyName = metadata.name ?? code;
+    const currencySymbol = metadata.symbol ?? code;
+
     const currency = await prisma.currency.upsert({
       where: { code },
       update: {
-        name: metadata.name,
-        symbol: metadata.symbol,
+        name: currencyName,
+        symbol: currencySymbol,
         decimalDigits: metadata.decimalDigits,
       },
       create: {
         code,
-        name: metadata.name,
-        symbol: metadata.symbol,
+        name: currencyName,
+        symbol: currencySymbol,
         decimalDigits: metadata.decimalDigits,
       },
     });
