@@ -47,11 +47,11 @@ export function RegisterForm({ messages }) {
       </label>
       <label>
         <span>{messages.password}</span>
-        <div className="auth-input"><LockKeyhole size={18} /><input name="password" type="password" minLength="8" autoComplete="new-password" required /></div>
+        <div className="auth-input"><LockKeyhole size={18} /><input name="password" type="password" minLength={8} autoComplete="new-password" required /></div>
       </label>
       <label>
         <span>{messages.confirmPassword}</span>
-        <div className="auth-input"><LockKeyhole size={18} /><input name="confirmPassword" type="password" minLength="8" autoComplete="new-password" required /></div>
+        <div className="auth-input"><LockKeyhole size={18} /><input name="confirmPassword" type="password" minLength={8} autoComplete="new-password" required /></div>
       </label>
       {error ? <p className="auth-error" role="alert">{error}</p> : null}
       {success ? <p className="auth-success" role="status">{success}</p> : null}
