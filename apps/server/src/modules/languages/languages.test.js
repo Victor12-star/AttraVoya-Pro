@@ -37,7 +37,9 @@ describe('language reference endpoint', () => {
         ],
       },
       healthRepository: { checkDatabase: async () => true },
-      authRepository: { findAuthenticatedUser: async () => null },
+      authRepository: {
+        findAuthorizationContextByUserId: async () => null,
+      },
     });
     apps.push(app);
 
