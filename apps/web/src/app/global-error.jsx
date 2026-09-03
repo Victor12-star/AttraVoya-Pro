@@ -3,6 +3,8 @@
 /**
  * Last-resort customer-site error boundary. It is intentionally dependency-light
  * so a critical root-layout failure can still show a useful recovery action.
+ *
+ * @param {{ reset: () => void }} props
  */
 export default function WebGlobalError({ reset }) {
   return (
