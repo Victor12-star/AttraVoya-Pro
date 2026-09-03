@@ -3,6 +3,8 @@
 /**
  * Route-level Admin error boundary.
  * Next.js supplies `reset` so the failed route can be retried without a full reload.
+ *
+ * @param {{ reset: () => void }} props
  */
 export default function AdminError({ reset }) {
   return (
