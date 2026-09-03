@@ -4,7 +4,6 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 // eslint-plugin-react-native 5.0.0 publishes no declarations; runtime
 // compatibility is covered by the ESLint 10 regression suite.
-// @ts-expect-error -- Upstream package has no type declarations.
 import reactNativePlugin from 'eslint-plugin-react-native';
 
 const react = fixupPluginRules(reactPlugin);
