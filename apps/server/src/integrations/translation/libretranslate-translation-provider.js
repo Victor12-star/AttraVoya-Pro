@@ -1,6 +1,20 @@
 import { normalizeLibreTranslateLanguages, normalizeLibreTranslateResult } from './translation-normalizer.js';
 
-export function createLibreTranslateProvider({ http, baseUrl, languageCache, languageCacheTtlSeconds = 3600 }) {
+/**
+ * @typedef {object} LibreTranslateProviderOptions
+ * @property {{ requestJson: Function }} http
+ * @property {string} baseUrl
+ * @property {{ get?: Function, set?: Function } | null} [languageCache]
+ * @property {number} [languageCacheTtlSeconds]
+ */
+
+/** @param {LibreTranslateProviderOptions} options */
+export function createLibreTranslateProvider({
+  http,
+  baseUrl,
+  languageCache = null,
+  languageCacheTtlSeconds = 3600,
+}) {
   const normalizedBaseUrl = String(baseUrl).replace(/\/$/, '');
 
   return {
@@ -20,7 +34,7 @@ export function createLibreTranslateProvider({ http, baseUrl, languageCache, lan
 
     async getLanguages() {
       const cacheKey = 'languages';
-      const cached = languageCache?.get(cacheKey);
+      const cached = languageCache?.get?.(cacheKey);
       if (cached) return cached;
       const payload = await http.requestJson(`${normalizedBaseUrl}/languages`);
       const result = {
@@ -28,7 +42,9 @@ export function createLibreTranslateProvider({ http, baseUrl, languageCache, lan
         fetchedAt: new Date().toISOString(),
         languages: normalizeLibreTranslateLanguages(payload),
       };
-      return languageCache ? languageCache.set(cacheKey, result, languageCacheTtlSeconds) : result;
+      return languageCache?.set
+        ? languageCache.set(cacheKey, result, languageCacheTtlSeconds)
+        : result;
     },
   };
 }
