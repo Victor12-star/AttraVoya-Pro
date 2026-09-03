@@ -5,6 +5,16 @@ import { normalizeGeoapifyAutocomplete, normalizeGeoapifyFeatureCollection } fro
 const AUTOCOMPLETE_ENDPOINT = 'https://api.geoapify.com/v1/geocode/autocomplete';
 const PLACES_ENDPOINT = 'https://api.geoapify.com/v2/places';
 
+/**
+ * @typedef {object} GeoapifyAutocompleteOptions
+ * @property {string} query
+ * @property {number} [limit]
+ * @property {string} [language]
+ * @property {string} [countryCode]
+ * @property {number} [biasLatitude]
+ * @property {number} [biasLongitude]
+ */
+
 export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeconds = 3600 }) {
   function key() {
     return requireProviderCredential(apiKey, 'Geoapify', 'GEOAPIFY_API_KEY');
@@ -13,7 +23,9 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
   return {
     name: 'geoapify',
 
-    async autocomplete({ query, limit = 8, language = 'en', countryCode, biasLatitude, biasLongitude }) {
+    /** @param {GeoapifyAutocompleteOptions} options */
+    async autocomplete(options) {
+      const { query, limit = 8, language = 'en', countryCode, biasLatitude, biasLongitude } = options;
       const cacheKey = ['autocomplete', query.toLowerCase(), limit, language, countryCode ?? '', biasLatitude ?? '', biasLongitude ?? ''].join(':');
       const cached = cache?.get(cacheKey);
       if (cached) return cached;
