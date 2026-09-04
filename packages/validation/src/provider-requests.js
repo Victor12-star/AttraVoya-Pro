@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  ACCOMMODATION_TYPES,
-  PLACE_CATEGORY_GROUP_VALUES,
-} from '@attravoya/constants';
+import { ACCOMMODATION_TYPES, PLACE_CATEGORY_GROUP_VALUES } from '@attravoya/constants';
 
 const latitude = z.coerce.number().min(-90).max(90);
 const longitude = z.coerce.number().min(-180).max(180);
@@ -268,8 +265,7 @@ export const newsQuerySchema = z
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['query'],
-        message:
-          'Provide a query, countryCode, or category to avoid an unbounded news request',
+        message: 'Provide a query, countryCode, or category to avoid an unbounded news request',
       });
     }
   });

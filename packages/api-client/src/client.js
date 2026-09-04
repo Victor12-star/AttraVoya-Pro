@@ -49,16 +49,11 @@ export function createApiClient(options) {
   } = options ?? {};
 
   if (!baseUrl) throw new TypeError('createApiClient requires baseUrl.');
-  if (typeof fetchImpl !== 'function') {
-    throw new TypeError('A fetch implementation is required.');
-  }
+  if (typeof fetchImpl !== 'function') throw new TypeError('A fetch implementation is required.');
 
   async function request(path, requestOptions = {}) {
     const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
-      requestOptions.timeoutMs ?? timeoutMs,
-    );
+    const timeout = setTimeout(() => controller.abort(), requestOptions.timeoutMs ?? timeoutMs);
 
     try {
       const headers = new Headers(requestOptions.headers);
@@ -85,16 +80,12 @@ export function createApiClient(options) {
       const payload = await readResponseBody(response);
       if (!response.ok) {
         const apiError = payload?.error;
-        throw new ApiClientError(
-          apiError?.message ?? 'The request could not be completed.',
-          {
-            status: response.status,
-            code: apiError?.code ?? 'API_REQUEST_FAILED',
-            requestId:
-              apiError?.requestId ?? response.headers.get('x-request-id'),
-            details: apiError?.details,
-          },
-        );
+        throw new ApiClientError(apiError?.message ?? 'The request could not be completed.', {
+          status: response.status,
+          code: apiError?.code ?? 'API_REQUEST_FAILED',
+          requestId: apiError?.requestId ?? response.headers.get('x-request-id'),
+          details: apiError?.details,
+        });
       }
 
       return payload;
@@ -120,48 +111,30 @@ export function createApiClient(options) {
 
   return {
     request,
-    getCountries: () =>
-      request('/api/v1/countries', { cache: 'force-cache' }),
-    getLanguages: () =>
-      request('/api/v1/languages', { cache: 'force-cache' }),
-    register: (body) =>
-      request('/api/v1/auth/register', { method: 'POST', body }),
+    getCountries: () => request('/api/v1/countries', { cache: 'force-cache' }),
+    getLanguages: () => request('/api/v1/languages', { cache: 'force-cache' }),
+    register: (body) => request('/api/v1/auth/register', { method: 'POST', body }),
     login: (body) => request('/api/v1/auth/login', { method: 'POST', body }),
     refresh: () => request('/api/v1/auth/refresh', { method: 'POST' }),
     logout: () => request('/api/v1/auth/logout', { method: 'POST' }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
     forgotPassword: (email) =>
-      request('/api/v1/auth/forgot-password', {
-        method: 'POST',
-        body: { email },
-      }),
-    resetPassword: (body) =>
-      request('/api/v1/auth/reset-password', { method: 'POST', body }),
-    getWeather: (query) =>
-      request(`/api/v1/weather?${toSearchParams(query)}`),
+      request('/api/v1/auth/forgot-password', { method: 'POST', body: { email } }),
+    resetPassword: (body) => request('/api/v1/auth/reset-password', { method: 'POST', body }),
+    getWeather: (query) => request(`/api/v1/weather?${toSearchParams(query)}`),
     getCurrencyRates: ({ base = 'EUR', quotes = [] } = {}) =>
       request(
-        `/api/v1/currency/rates?${toSearchParams({
-          base,
-          ...(quotes.length ? { quotes } : {}),
-        })}`,
+        `/api/v1/currency/rates?${toSearchParams({ base, ...(quotes.length ? { quotes } : {}) })}`,
       ),
     convertCurrency: ({ amount, from, to }) =>
-      request(
-        `/api/v1/currency/convert?${toSearchParams({ amount, from, to })}`,
-      ),
-    autocompletePlaces: (query) =>
-      request(`/api/v1/places/autocomplete?${toSearchParams(query)}`),
-    getNearbyPlaces: (query) =>
-      request(`/api/v1/places/nearby?${toSearchParams(query)}`),
-    getEvents: (query) =>
-      request(`/api/v1/events?${toSearchParams(query)}`),
+      request(`/api/v1/currency/convert?${toSearchParams({ amount, from, to })}`),
+    autocompletePlaces: (query) => request(`/api/v1/places/autocomplete?${toSearchParams(query)}`),
+    getNearbyPlaces: (query) => request(`/api/v1/places/nearby?${toSearchParams(query)}`),
+    getEvents: (query) => request(`/api/v1/events?${toSearchParams(query)}`),
     getNews: (query) => request(`/api/v1/news?${toSearchParams(query)}`),
-    searchImages: (query) =>
-      request(`/api/v1/images/search?${toSearchParams(query)}`),
-    translateText: (body) =>
-      request('/api/v1/translation', { method: 'POST', body }),
+    searchImages: (query) => request(`/api/v1/images/search?${toSearchParams(query)}`),
+    translateText: (body) => request('/api/v1/translation', { method: 'POST', body }),
     getTranslationLanguages: () =>
       request('/api/v1/translation/languages', { cache: 'force-cache' }),
     getNearbyAccommodation: (query) => {

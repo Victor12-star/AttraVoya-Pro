@@ -28,10 +28,7 @@ async function main() {
         headers: { 'content-type': 'application/json' },
       }),
   });
-  assert.deepEqual(
-    await transport.requestJson('https://provider.invalid/smoke'),
-    { ok: true },
-  );
+  assert.deepEqual(await transport.requestJson('https://provider.invalid/smoke'), { ok: true });
 
   const weather = createOpenMeteoWeatherProvider({
     cache: createProviderCache(),
@@ -60,19 +57,10 @@ async function main() {
   const currency = createFrankfurterCurrencyProvider({
     cache: createProviderCache(),
     http: {
-      requestJson: async () => ({
-        date: '2026-09-03',
-        base: 'SEK',
-        quote: 'EUR',
-        rate: 0.09,
-      }),
+      requestJson: async () => ({ date: '2026-09-03', base: 'SEK', quote: 'EUR', rate: 0.09 }),
     },
   });
-  const conversion = await currency.convert({
-    amount: 1000,
-    from: 'SEK',
-    to: 'EUR',
-  });
+  const conversion = await currency.convert({ amount: 1000, from: 'SEK', to: 'EUR' });
   assert.equal(conversion.convertedAmount, 90);
   assert.equal(conversion.approximate, true);
 
@@ -80,11 +68,7 @@ async function main() {
     baseUrl: 'http://localhost:5001',
     http: { requestJson: async () => ({ translatedText: 'Hola' }) },
   });
-  const translated = await translation.translate({
-    text: 'Hello',
-    source: 'en',
-    target: 'es',
-  });
+  const translated = await translation.translate({ text: 'Hello', source: 'en', target: 'es' });
   assert.equal(translated.translatedText, 'Hola');
 
   const events = createTicketmasterEventsProvider({
@@ -101,12 +85,7 @@ async function main() {
             },
           ],
         },
-        page: {
-          totalElements: 1,
-          totalPages: 1,
-          number: 0,
-          size: 20,
-        },
+        page: { totalElements: 1, totalPages: 1, number: 0, size: 20 },
       }),
     },
   });

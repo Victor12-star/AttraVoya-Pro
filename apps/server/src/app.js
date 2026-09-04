@@ -86,10 +86,7 @@ export async function buildApp(options = {}) {
   });
 
   const authenticationRepository = options.authRepository ?? authRepository;
-  app.decorate(
-    'authenticate',
-    createAuthenticateHook({ repository: authenticationRepository }),
-  );
+  app.decorate('authenticate', createAuthenticateHook({ repository: authenticationRepository }));
   app.decorate('authorize', createAuthorizeHook);
 
   await app.register(rateLimit, {

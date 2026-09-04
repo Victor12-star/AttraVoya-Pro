@@ -16,12 +16,7 @@ function imageCacheKey(query) {
   });
 }
 
-export function createPexelsImageProvider({
-  http,
-  apiKey,
-  cache,
-  cacheTtlSeconds = 86400,
-}) {
+export function createPexelsImageProvider({ http, apiKey, cache, cacheTtlSeconds = 86400 }) {
   function key() {
     return requireProviderCredential(apiKey, 'Pexels', 'PEXELS_API_KEY');
   }
@@ -49,15 +44,11 @@ export function createPexelsImageProvider({
         headers: { Authorization: key() },
       });
       if (!payload || typeof payload !== 'object' || !Array.isArray(payload.photos)) {
-        throw new ProviderResponseError(
-          'Pexels returned an unexpected photo search response.',
-        );
+        throw new ProviderResponseError('Pexels returned an unexpected photo search response.');
       }
 
       const normalized = normalizePexelsSearch(payload);
-      return cache
-        ? cache.set(cacheKey, normalized, cacheTtlSeconds)
-        : normalized;
+      return cache ? cache.set(cacheKey, normalized, cacheTtlSeconds) : normalized;
     },
   };
 }

@@ -46,11 +46,7 @@ async function checkFrankfurter() {
     cacheTtlSeconds: 30,
   });
 
-  const result = await provider.convert({
-    amount: 100,
-    from: 'SEK',
-    to: 'EUR',
-  });
+  const result = await provider.convert({ amount: 100, from: 'SEK', to: 'EUR' });
   assert.equal(result.provider, 'frankfurter');
   assert.ok(result.rate > 0);
   assert.ok(result.convertedAmount > 0);
@@ -69,11 +65,7 @@ async function checkLibreTranslate() {
   assert.ok(languages.languages.some((language) => language.code === 'en'));
   assert.ok(languages.languages.some((language) => language.code === 'es'));
 
-  const result = await provider.translate({
-    text: 'Hello',
-    source: 'en',
-    target: 'es',
-  });
+  const result = await provider.translate({ text: 'Hello', source: 'en', target: 'es' });
   assert.equal(result.provider, 'libretranslate');
   assert.ok(result.translatedText.trim().length > 0);
   assert.notEqual(result.translatedText.trim().toLowerCase(), 'hello');
@@ -96,11 +88,7 @@ async function checkGeoapifyWhenConfigured() {
     cacheTtlSeconds: 30,
   });
 
-  const result = await provider.autocomplete({
-    query: 'Stockholm',
-    limit: 3,
-    language: 'en',
-  });
+  const result = await provider.autocomplete({ query: 'Stockholm', limit: 3, language: 'en' });
   assert.equal(result.provider, 'geoapify');
   assert.ok(result.results.length > 0);
   console.log('✓ Geoapify live check passed.');
@@ -122,11 +110,7 @@ async function checkTicketmasterWhenConfigured() {
     cacheTtlSeconds: 30,
   });
 
-  const result = await provider.searchEvents({
-    countryCode: 'SE',
-    size: 1,
-    page: 0,
-  });
+  const result = await provider.searchEvents({ countryCode: 'SE', size: 1, page: 0 });
   assert.equal(result.provider, 'ticketmaster');
   assert.ok(Array.isArray(result.events));
   console.log('✓ Ticketmaster live check passed.');

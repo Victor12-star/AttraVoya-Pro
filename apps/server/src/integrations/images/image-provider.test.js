@@ -55,9 +55,7 @@ describe('Pexels image adapter', () => {
     expect(first.photos).toHaveLength(1);
     expect(first.photos[0].externalId).toBe('123');
     expect(first.photos[0].alt).toBe('Stockholm waterfront');
-    expect(first.photos[0].photographer.name).toBe(
-      'Example Photographer',
-    );
+    expect(first.photos[0].photographer.name).toBe('Example Photographer');
     expect(first.attribution.providerLinkRequired).toBe(true);
     expect(first.page.hasNext).toBe(true);
     expect(second).toEqual(first);
@@ -80,9 +78,9 @@ describe('Pexels image adapter', () => {
       cache: createProviderCache(),
     });
 
-    await expect(
-      provider.searchPhotos({ query: 'Stockholm' }),
-    ).rejects.toBeInstanceOf(ProviderAuthenticationError);
+    await expect(provider.searchPhotos({ query: 'Stockholm' })).rejects.toBeInstanceOf(
+      ProviderAuthenticationError,
+    );
     expect(http.requestJson).not.toHaveBeenCalled();
   });
 });

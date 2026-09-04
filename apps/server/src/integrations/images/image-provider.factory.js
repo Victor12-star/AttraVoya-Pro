@@ -15,9 +15,7 @@ export function createImageProvider(options = {}) {
   const providerName = options.providerName ?? env.IMAGE_PROVIDER;
   const createProvider = IMAGE_PROVIDER_REGISTRY[providerName];
   if (!createProvider) {
-    throw new ProviderUnavailableError(
-      `Image provider '${providerName}' is not supported.`,
-    );
+    throw new ProviderUnavailableError(`Image provider '${providerName}' is not supported.`);
   }
 
   return assertImageProvider(
@@ -31,8 +29,7 @@ export function createImageProvider(options = {}) {
         }),
       apiKey: options.apiKey ?? env.PEXELS_API_KEY,
       cache: options.cache ?? cache,
-      cacheTtlSeconds:
-        options.cacheTtlSeconds ?? env.IMAGES_CACHE_TTL_SECONDS,
+      cacheTtlSeconds: options.cacheTtlSeconds ?? env.IMAGES_CACHE_TTL_SECONDS,
     }),
   );
 }

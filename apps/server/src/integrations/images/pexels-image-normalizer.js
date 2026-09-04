@@ -1,9 +1,7 @@
 const PEXELS_URL = 'https://www.pexels.com';
 
 function stringOrNull(value) {
-  return typeof value === 'string' && value.trim().length > 0
-    ? value.trim()
-    : null;
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
 function finiteNumberOrNull(value) {
@@ -62,9 +60,7 @@ export function normalizePexelsSearch(payload, fetchedAt = new Date().toISOStrin
 
   const photos = Array.isArray(payload.photos) ? payload.photos : [];
   const page = Number.isInteger(payload.page) ? payload.page : 1;
-  const perPage = Number.isInteger(payload.per_page)
-    ? payload.per_page
-    : photos.length;
+  const perPage = Number.isInteger(payload.per_page) ? payload.per_page : photos.length;
   const totalResults = Number.isInteger(payload.total_results)
     ? payload.total_results
     : photos.length;

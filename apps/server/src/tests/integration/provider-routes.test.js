@@ -15,9 +15,7 @@ process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 const { buildApp } = await import('../../app.js');
 const apps = [];
 
-afterEach(async () =>
-  Promise.all(apps.splice(0).map((app) => app.close())),
-);
+afterEach(async () => Promise.all(apps.splice(0).map((app) => app.close())));
 
 function baseOptions() {
   return {
@@ -29,11 +27,7 @@ function baseOptions() {
       findAuthorizationContextByUserId: async () => null,
     },
     weatherProvider: {
-      getForecast: async (query) => ({
-        provider: 'test',
-        current: { temperatureC: 20 },
-        query,
-      }),
+      getForecast: async (query) => ({ provider: 'test', current: { temperatureC: 20 }, query }),
     },
     currencyProvider: {
       getRates: async ({ base }) => ({ provider: 'test', base, rates: [] }),
@@ -46,15 +40,8 @@ function baseOptions() {
       }),
     },
     placesProvider: {
-      autocomplete: async ({ query }) => ({
-        provider: 'test',
-        results: [{ name: query }],
-      }),
-      searchNearby: async ({ categoryGroup }) => ({
-        provider: 'test',
-        categoryGroup,
-        results: [],
-      }),
+      autocomplete: async ({ query }) => ({ provider: 'test', results: [{ name: query }] }),
+      searchNearby: async ({ categoryGroup }) => ({ provider: 'test', categoryGroup, results: [] }),
     },
     translationProvider: {
       translate: async ({ text, target }) => ({
@@ -67,11 +54,7 @@ function baseOptions() {
       }),
     },
     accommodationProvider: {
-      searchNearby: async () => ({
-        provider: 'test',
-        results: [],
-        inventoryDataAvailable: false,
-      }),
+      searchNearby: async () => ({ provider: 'test', results: [], inventoryDataAvailable: false }),
     },
     eventsProvider: {
       searchEvents: async (query) => ({
@@ -83,9 +66,7 @@ function baseOptions() {
     newsProvider: {
       searchNews: async (query) => ({
         provider: 'test',
-        articles: [
-          { externalId: 'news-1', title: 'Stockholm travel update' },
-        ],
+        articles: [{ externalId: 'news-1', title: 'Stockholm travel update' }],
         query,
       }),
     },
@@ -135,13 +116,10 @@ describe('real-provider API contracts', () => {
 
     const accommodation = await app.inject({
       method: 'GET',
-      url:
-        '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE',
+      url: '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE',
     });
     expect(accommodation.statusCode).toBe(200);
-    expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(
-      false,
-    );
+    expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(false);
 
     const events = await app.inject({
       method: 'GET',
@@ -156,15 +134,12 @@ describe('real-provider API contracts', () => {
       url: '/api/v1/news?countryCode=SE&language=en&size=5',
     });
     expect(news.statusCode).toBe(200);
-    expect(news.json().news.articles[0].title).toBe(
-      'Stockholm travel update',
-    );
+    expect(news.json().news.articles[0].title).toBe('Stockholm travel update');
     expect(news.json().news.query.countryCode).toBe('SE');
 
     const images = await app.inject({
       method: 'GET',
-      url:
-        '/api/v1/images/search?query=Stockholm&orientation=landscape&perPage=5',
+      url: '/api/v1/images/search?query=Stockholm&orientation=landscape&perPage=5',
     });
     expect(images.statusCode).toBe(200);
     expect(images.json().images.photos[0].alt).toBe('Stockholm waterfront');
@@ -206,10 +181,7 @@ describe('real-provider API contracts', () => {
     const app = await buildApp(options);
     apps.push(app);
 
-    const response = await app.inject({
-      method: 'GET',
-      url: '/api/v1/news?size=10',
-    });
+    const response = await app.inject({ method: 'GET', url: '/api/v1/news?size=10' });
     expect(response.statusCode).toBe(400);
     expect(providerCalled).toBe(false);
   });
