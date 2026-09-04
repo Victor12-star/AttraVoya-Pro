@@ -12,6 +12,18 @@ import styles from './destination-search.module.css';
 const MIN_QUERY_LENGTH = 2;
 const RESULT_LIMIT = 8;
 
+/**
+ * @typedef {object} DestinationResult
+ * @property {string|null|undefined} externalId
+ * @property {string} name
+ * @property {string|null|undefined} state
+ * @property {string|null|undefined} country
+ * @property {string} countryCode
+ * @property {number} latitude
+ * @property {number} longitude
+ */
+
+/** @param {DestinationResult} result */
 function destinationResultId(result) {
   return (
     result.externalId ??
@@ -19,6 +31,10 @@ function destinationResultId(result) {
   );
 }
 
+/**
+ * @param {DestinationResult} result
+ * @param {string} locale
+ */
 function destinationLabel(result, locale) {
   const country = result.countryCode
     ? getCountryDisplayName(result.countryCode, locale)
@@ -34,10 +50,10 @@ function destinationLabel(result, locale) {
 export function DestinationSearch({ initialQuery = '', locale = 'en', messages }) {
   const [query, setQuery] = useState(initialQuery);
   const [submittedQuery, setSubmittedQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(/** @type {DestinationResult[]} */ ([]));
   const [status, setStatus] = useState('idle');
   const [formError, setFormError] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(/** @type {string|null} */ (null));
   const requestSequence = useRef(0);
   const initialSearchStarted = useRef(false);
 
@@ -66,7 +82,11 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
 
         // Ignore an older response when a newer search has already started.
         if (requestId !== requestSequence.current) return;
-        setResults(Array.isArray(response?.destinations?.results) ? response.destinations.results : []);
+        setResults(
+          Array.isArray(response?.destinations?.results)
+            ? /** @type {DestinationResult[]} */ (response.destinations.results)
+            : [],
+        );
         setStatus('success');
       } catch {
         if (requestId !== requestSequence.current) return;
@@ -97,6 +117,7 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
     void runSearch(cleanQuery);
   }
 
+  /** @param {DestinationResult} result */
   function selectDestination(result) {
     const id = destinationResultId(result);
     setSelectedId(id);
