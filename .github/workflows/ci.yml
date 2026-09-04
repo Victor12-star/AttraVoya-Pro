@@ -95,6 +95,21 @@ jobs:
       - name: Run unit tests
         run: pnpm test
 
+      - name: Print Safety Prettier diff (temporary diagnostic)
+        run: |
+          pnpm exec prettier --write \
+            apps/web/src/features/destinations/safety-page-copy.js \
+            apps/web/src/features/destinations/safety-page.jsx \
+            apps/web/tests/unit/safety-page.test.jsx
+          git diff -- \
+            apps/web/src/features/destinations/safety-page-copy.js \
+            apps/web/src/features/destinations/safety-page.jsx \
+            apps/web/tests/unit/safety-page.test.jsx
+          git checkout -- \
+            apps/web/src/features/destinations/safety-page-copy.js \
+            apps/web/src/features/destinations/safety-page.jsx \
+            apps/web/tests/unit/safety-page.test.jsx
+
       - name: Check formatting
         run: pnpm format:check
 
