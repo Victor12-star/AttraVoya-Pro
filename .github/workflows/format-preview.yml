@@ -6,7 +6,7 @@ on:
       - develop
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   preview:
@@ -26,13 +26,23 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Show exact Prettier patch
+      - name: Format remaining Phase 6B files
         run: |
           pnpm exec prettier --write \
             apps/server/src/integrations/email/resend-email-provider.test.js \
             apps/server/src/modules/auth/auth.routes.js \
             apps/web/src/i18n/auth-recovery-messages.js
-          git diff -- \
+      - name: Commit exact Prettier output
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
             apps/server/src/integrations/email/resend-email-provider.test.js \
             apps/server/src/modules/auth/auth.routes.js \
             apps/web/src/i18n/auth-recovery-messages.js
+          git commit -m "style: apply Prettier to Phase 6B auth email files"
+          git push origin HEAD:develop
