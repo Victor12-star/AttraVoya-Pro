@@ -108,7 +108,9 @@ describe('BeachesPage', () => {
 
     render(<BeachesPage destination={destination} locale="en" messages={messages} />);
 
-    expect(await screen.findByText('No beaches were found in this search area.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('No beaches were found in this search area.'),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Example Beach' })).not.toBeInTheDocument();
   });
 
@@ -119,7 +121,9 @@ describe('BeachesPage', () => {
 
     render(<BeachesPage destination={destination} locale="en" messages={messages} />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Beaches could not be loaded right now.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Beaches could not be loaded right now.',
+    );
     expect(screen.queryByText(/secret provider details/i)).not.toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Retry' }).click();
