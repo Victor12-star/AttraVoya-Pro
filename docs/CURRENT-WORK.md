@@ -2,67 +2,47 @@
 
 Last updated: 2026-09-04
 
-This file is the engineering source of truth for continuing the project without relying on chat history.
+This file is the engineering handoff for continuing AttraVoya Pro without relying on chat history.
 
 ## Repository
 
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Verified Phase 7G merge checkpoint on `develop`: `ff40f33f257ba2e2cb8688d65912e01aebd76403`.
-- Phase 7G pull request `#7` is merged.
-- Post-merge `develop` CI for Phase 7G (`CI #134`) passed all five workflow jobs.
-- Current Phase 7H pull request: `#8` from `feature/phase-7h-accommodation-discovery` into `develop`.
-- Clean Phase 7H code checkpoint: `552c51c5f465d383a215e92f6da97ca20db3aa84`.
-- Clean Phase 7H code CI (`CI #139`) passed all five workflow jobs before this handoff update.
+- Latest verified merged checkpoint before the current PR: Phase 7H at `05162952c277388fc143b4d45a2d8e1d94758294`.
+- Phase 7H post-merge `develop` CI `#141` passed all five workflow jobs.
+- Current pull request: `#9` from `feature/phase-7i-family-destination` into `develop`.
 
-## Non-negotiable quality rule
+## Quality rule
 
-Every slice follows this sequence:
+Every vertical slice must follow this sequence:
 
-1. create a fresh feature branch from verified `develop`
-2. implement one coherent vertical slice
-3. open a pull request into `develop`
-4. require the exact final PR head to pass the complete CI gate
-5. merge only after every required job is green
-6. require the resulting `develop` push CI to pass before starting the next slice
+1. Create a feature branch from the latest verified `develop` commit.
+2. Implement one coherent slice only.
+3. Open a pull request into `develop`.
+4. Require all GitHub CI jobs to pass on the exact final PR head.
+5. Merge only after the complete gate is green.
+6. Verify the resulting `develop` push CI is also fully green.
+7. Only then start the next slice.
 
-The standard gate includes:
+The standard CI gate includes:
 
 - JavaScript checks
 - translation parity
 - provider smoke tests
 - ESLint
 - unit/integration tests
-- Prettier formatting
+- normal Prettier formatting
 - PostgreSQL + Prisma verification
 - dependency audit + secret scan
 - production builds
-- live provider checks where credentials are available
+- live provider checks when credentials are available
 
-Never merge failed or pending code. Never claim a keyed provider is live-network verified when its GitHub Actions key is not configured.
+Never weaken CI to make a slice pass, and never claim a provider was live-verified when its required API key was not configured.
 
-## Product/data rules
+## Product and architecture foundation
 
-- Real provider data only. Never invent live fares, prices, availability, ratings, opening hours, weather, safety facts or provider records.
-- Clearly distinguish live/retrieved data, estimates and unavailable/unknown data.
-- Provider credentials remain server-side.
-- New async UI must have honest loading, success, empty, error and retry behavior where useful.
-- Preserve all 18 supported UI locales, RTL, accessibility, responsive design and reduced-motion handling.
-- Use JavaScript unless the product owner explicitly approves TypeScript.
-- Use Lucide icons consistently.
-- Every visible interactive control must genuinely work.
-- Budget-first trip planning remains a core differentiator.
-- Cheapest room is not necessarily cheapest total trip.
-- Family planning must account for child age bands: 0–3, 4–8, 9–12 and 13–17.
-- Basic emergency/safety functionality is never paywalled.
-- Official emergency numbers must come from authoritative verified data, never AI.
-- Premium never grants Admin permissions.
-- Frontend visibility is never an authorization boundary.
-
-## Completed foundation
-
-The JavaScript monorepo includes:
+The project is a JavaScript monorepo with:
 
 - Next.js customer website
 - Next.js Admin app
@@ -77,7 +57,7 @@ The JavaScript monorepo includes:
 - budget-first trip-planning domain foundation
 - verified-safety architecture
 
-Provider adapters include:
+Provider adapters already implemented include:
 
 - Open-Meteo weather
 - Frankfurter currency
@@ -88,106 +68,113 @@ Provider adapters include:
 - Pexels destination imagery
 - Resend transactional email
 
-## Phase 7 customer destination slices
+Provider secrets stay server-side. Never invent live travel prices, availability, emergency facts, ratings, opening times, safety claims or other provider data.
+
+## Phase 7 destination progress
 
 ### Phase 7A — Global destination search API
 
-Merged into `develop`.
+Completed and merged.
 
-Implemented:
-
-- `GET /api/v1/destinations/search`
-- provider-neutral destination service
-- Geoapify city-only discovery
-- validation before provider calls
-- malformed/duplicate provider-row filtering
-- shared API-client method
-- unit and Fastify integration tests
+Implemented provider-neutral destination search with Geoapify city discovery, validation, normalization, deduplication, shared API-client support and tests.
 
 ### Phase 7B — Customer destination search UI
 
-Merged into `develop` at `47ca3064ceb80a108d1888db67035fee61f85bf7`.
+Completed and merged.
 
-Implemented dedicated `/destinations` search, `/search` integration, honest async states, provider-backed destination selection, privacy-controlled recent searches, responsive UI and focused tests.
+Implemented `/destinations` search, `/search` integration, loading/empty/error/retry states, real destination selection and privacy-controlled recent-search persistence.
 
 ### Phase 7C — Destination page foundation
 
-Merged through PR `#3` at `1f2028242323d438efc0b8d88dddcaf9c32c88c0`.
+Completed and merged through PR `#3`.
 
-Implemented stable validated destination routes, real Open-Meteo current weather, Pexels imagery, provider attribution, honest unavailable/retry states, destination feature entry points, localization, RTL/responsive styling and route/page tests.
+Implemented stable destination routing, validated shareable destination context, real Open-Meteo weather, configured Pexels imagery, honest provider states and destination feature entry points.
 
 ### Phase 7D — Attractions discovery
 
-Merged through PR `#4` at `1531d5cc0005d5a3f2ea1c3d8bd786bc382490e4`.
+Completed and merged through PR `#4`.
 
-Implemented real `/destinations/[slug]/attractions` using provider-neutral `/api/v1/places/nearby`, a 10 km/24-result request, genuine provider fields only, safe websites, localization, honest async states and tests. Final PR CI `#117` and post-merge CI `#118` passed.
+Implemented real provider-backed destination attractions using the existing neutral places API, bounded search, defensive normalization and factual provider fields only.
 
 ### Phase 7E — Restaurants discovery
 
-Merged through PR `#5` at `e802427e48e3d20b65a4f0cbe7238b1560788f11`.
+Completed and merged through PR `#5`.
 
-Implemented real `/destinations/[slug]/restaurants` using the shared places API, a 5 km/24-result request, destination entry point, genuine provider fields only, safe websites, localization and tests. No cuisine, ratings, menus, prices, hours, bookings or popularity are fabricated. Final PR CI `#123` and post-merge CI `#124` passed.
+Implemented real provider-backed restaurant discovery with validated destination context and no fabricated cuisine, ratings, menus, prices, hours or booking availability.
 
 ### Phase 7F — Beaches discovery
 
-Merged through PR `#6` at `72c2b34e7d1d13200afaa557c006f8a5e70435fd`.
+Completed and merged.
 
-Implemented:
-
-- real `/destinations/[slug]/beaches`
-- provider-neutral `BEACHES` category and server-side Geoapify `beach` mapping
-- shared places API reuse
-- 20 km/24-result request
-- defensive normalization/deduplication/distance ordering
-- genuine name/address/distance/provider/website fields only
-- no invented water quality, lifeguard, flag, weather, crowd, facility, accessibility, fee or safety claims
-- all 18 locales, RTL/responsive/reduced-motion styling and focused tests
-
-Final PR CI `#131` and post-merge `develop` CI `#132` passed all five workflow jobs.
+Implemented the neutral `beaches` category contract, Geoapify `beach` mapping, bounded coastal discovery and explicit guardrails against invented water quality, lifeguard, flag, crowd, facility or safety claims.
 
 ### Phase 7G — Shopping discovery
 
-Merged through PR `#7` into `develop` at `ff40f33f257ba2e2cb8688d65912e01aebd76403`.
+Completed and merged into `develop` at `ff40f33f257ba2e2cb8688d65912e01aebd76403`.
 
-Implemented:
-
-- real `/destinations/[slug]/shopping`
-- reuse of provider-neutral `/api/v1/places/nearby`
-- existing `SHOPPING` alias mapped server-side to Geoapify `commercial.shopping_mall`
-- 10 km/24-result request
-- defensive normalization/deduplication/distance ordering
-- genuine name/address/distance/provider/website fields only
-- no invented store directory, hours, prices, sales, ratings, accessibility, parking, stock or availability
-- localized Shopping destination entry point
-- all 18 locales, responsive/RTL/reduced-motion styling and focused tests
+Implemented real shopping-location discovery through the existing provider-neutral places API and Geoapify shopping mapping, with no invented store directory, hours, prices, sales, ratings, parking, stock or availability.
 
 Final PR CI `#133` and post-merge `develop` CI `#134` passed all five workflow jobs.
 
 ### Phase 7H — Accommodation discovery
 
-Current implementation is in PR `#8` from `feature/phase-7h-accommodation-discovery` into `develop`.
+Completed and merged through PR `#8` into `develop` at:
+
+`05162952c277388fc143b4d45a2d8e1d94758294`
 
 Implemented:
 
-- real destination accommodation experience at `/accommodation` using validated destination context
-- reuse of the existing dedicated `/api/v1/accommodation/nearby` backend and shared API client
-- existing server-side Geoapify accommodation adapter only; no browser provider calls
-- 10 km/24-result request
-- type filters for hotels, guest houses, hostels and apartments/short-term rentals
-- reusable validated top-level destination-context parser for later Nearby/Transport work
-- defensive client normalization, deduplication and distance ordering
-- genuine lodging name, normalized accommodation type, address, distance, provider and validated website only
-- explicit location-data-only notice because the connected Geoapify adapter is not live lodging inventory
+- real destination accommodation experience using validated destination context
+- existing dedicated `/api/v1/accommodation/nearby` backend and shared API client
+- existing server-side Geoapify accommodation adapter only
+- 10 km search radius and capped 24-result request
+- filters for hotels, guest houses, hostels and apartments/short-term rentals
+- reusable validated top-level destination-context parser
+- defensive normalization, deduplication and distance ordering
+- genuine lodging name/type/address/distance/provider/validated website only
+- explicit location-data-only notice because Geoapify is not live room inventory
 - no fabricated room prices, live availability, cancellation rules, amenities, breakfast, kitchens, ratings or booking claims
 - loading, success, empty, error and retry states
-- all 18 locales, RTL/responsive/reduced-motion styling
-- focused accommodation UI, destination-context and destination-entry tests
+- all 18 locales, RTL, responsive and reduced-motion styling
+- focused UI/context/entry tests
 
-The clean Phase 7H code checkpoint `552c51c5f465d383a215e92f6da97ca20db3aa84` passed complete PR CI `#139`, including normal Prettier and production builds.
+Final PR CI `#140` passed all five jobs on the exact final PR head. Post-merge `develop` CI `#141` also passed all five jobs before Phase 7I started.
 
-A temporary formatter diagnostic was used only to print Prettier's exact wrapping changes after CI identified formatting-only issues. The diagnostic workflow change was fully removed, the clean branch diff returned to the eight intended Phase 7H files, and normal `pnpm format:check` passed in CI `#139`.
+### Phase 7I — Family destination discovery
 
-This handoff update creates a newer PR head. Do not merge PR `#8` based only on CI `#139`; require a new complete green CI run on the exact final head containing this documentation update.
+Current implementation is in PR `#9` from `feature/phase-7i-family-destination` into `develop`.
+
+Implemented:
+
+- real `/destinations/[slug]/family` customer experience
+- reuse of the existing provider-neutral `/api/v1/places/nearby` API; no fake dedicated Family provider
+- factual nearby discovery using existing `PLAYGROUNDS`, `PARKS` and `ATTRACTIONS` category groups
+- 10 km search radius and capped 12-result request per category
+- defensive client normalization, deduplication and distance ordering
+- valid HTTP/HTTPS websites only
+- partial-category failure handling so successful sections remain usable
+- required child age bands `0–3`, `4–8`, `9–12`, `13–17` as interactive planning context
+- explicit notice that age selections do not mean provider places are verified for age suitability or child safety
+- no fabricated age suitability, child safety, supervision, accessibility, opening times, admission prices, ratings or availability
+- loading, success, empty, error and retry behavior
+- localized Family copy for all 18 supported UI locales
+- RTL-compatible, responsive and reduced-motion-aware styling
+- focused Family UI tests
+
+CI fixes made during the slice:
+
+- fixed an initial locale-map syntax error caught by strict JavaScript/build checks
+- corrected the age-band test to use React Testing Library event handling
+- applied the exact Prettier output for the Family locale file
+- a temporary formatting diagnostic was used only to print Prettier's exact diff and was fully removed afterward
+
+Clean Phase 7I code checkpoint:
+
+`791cb8e0435ab3a4fb4faf00021fda5e0a2f317c`
+
+Clean PR CI `#147` passed all five workflow jobs, including JavaScript, translations, provider smoke, ESLint, unit tests, normal `prettier --check .`, PostgreSQL/Prisma, dependency/secret checks, production builds and the live-provider job.
+
+This handoff update creates a newer PR head. Do not merge PR `#9` based only on CI `#147`; require a new complete green CI run on the exact final head containing this documentation update.
 
 ## Live-provider verification status
 
@@ -204,37 +191,56 @@ Keyed provider checks are skipped when their GitHub Actions secrets are not conf
 - NewsData (`NEWSDATA_API_KEY`)
 - Pexels (`PEXELS_API_KEY`)
 
-Therefore Geoapify-backed destination slices are covered by adapter/API/UI tests and production builds, but do not claim a real Geoapify network call was verified by CI unless the key is configured and the live check actually runs.
+Therefore Geoapify-backed destination slices are covered by shared-category, adapter/API/UI tests and production builds, but do not claim a real Geoapify network request was verified by CI unless the key is configured and the live check actually runs.
 
 ## Immediate next engineering step
 
-Finish Phase 7H safely:
+Finish Phase 7I safely:
 
-1. Wait for complete GitHub CI on the exact final head of PR `#8` after this handoff update.
+1. Require a complete green GitHub CI run on the exact final head of PR `#9` after this handoff update.
 2. Fix any real failure without weakening CI.
-3. Merge PR `#8` into `develop` only when all five workflow jobs are green.
-4. Verify the resulting `develop` push CI is fully green.
-5. Only then create the next feature branch from that exact verified merge commit.
+3. Confirm PR `#9` is mergeable and still points to the verified head.
+4. Merge PR `#9` into `develop` only after all five jobs are green.
+5. Verify the resulting `develop` push CI is fully green.
+6. Create the next branch from that exact verified merge commit only after the integration gate passes.
 
 ## Recommended next slice
 
-### Phase 7I — Family destination discovery foundation
+### Phase 7J — Nearby destination discovery foundation
 
-Keep the slice factual and age-aware without claiming provider places are suitable for a child age unless real data supports that claim.
+Keep Nearby provider-backed and location-focused. Do not turn it into a duplicate of every existing destination vertical.
 
 Suggested scope:
 
-1. Replace `/destinations/[slug]/family` unavailable shell with a real family-planning discovery experience.
-2. Reuse the validated destination contract and existing provider-neutral places API rather than pretending a dedicated family provider exists.
-3. Use factual nearby categories such as playgrounds, parks and attractions through existing category groups.
-4. Capture/retain child ages using the product age bands 0–3, 4–8, 9–12 and 13–17 as trip-planning context.
-5. Do not infer or invent age suitability, child safety, accessibility, admission prices, opening hours or facilities from category membership alone.
-6. Keep provider results clearly separated from age-planning context.
-7. Add honest loading, success, empty, error and retry behavior.
-8. Preserve all 18 locales, RTL, accessibility, responsive behavior and reduced motion.
-9. Add focused tests and require the complete CI gate before proceeding.
+1. Inspect the current Nearby route/shell and existing `nearby` server module before changing code.
+2. Reuse the validated destination context and provider-neutral places API wherever possible.
+3. Define a small set of useful factual nearby categories only when the existing neutral category contract supports them.
+4. Use bounded radius and result limits under existing validation constraints.
+5. Normalize, deduplicate and sort real provider results defensively.
+6. Show only genuine provider fields such as name, address, distance, category/provider and validated website when present.
+7. Do not invent walking times, opening hours, ratings, prices, crowd levels, accessibility, safety, popularity or availability.
+8. Add honest loading, success, empty, error and retry behavior, including partial-category failure if multiple requests are used.
+9. Preserve all 18 locales, RTL, accessibility, responsive behavior and reduced motion.
+10. Add focused tests and require the complete CI gate before proceeding.
 
-After Family, continue Nearby and Safety as separate coherent slices; do not combine unrelated verticals into one PR.
+After Nearby is fully verified and merged, continue Safety as its own coherent slice. Safety must use authoritative verified facts; never generate emergency numbers or safety claims with AI.
+
+## Product constraints that must not be forgotten
+
+- Budget-first trip planning is a core differentiator.
+- Cheapest room is not necessarily cheapest total trip.
+- Family travel must use children’s ages: `0–3`, `4–8`, `9–12`, `13–17`.
+- Basic emergency/safety functionality is never paywalled.
+- Official emergency numbers must come from authoritative verified data, never AI.
+- Premium never grants Admin permissions.
+- Frontend visibility is never an authorization boundary.
+- Use JavaScript only unless the product owner explicitly approves TypeScript.
+- Use Lucide icons consistently.
+- Avoid generic AI-template visuals, fake testimonials, fake statistics and fake live data.
+- Whole-app language support and country/language/currency separation must remain intact.
+- All new async UI features need loading, success, empty, error and retry behavior where useful.
+- Every visible interactive control must genuinely work.
+- Do not call a phase complete unless the relevant runtime/CI tests actually passed.
 
 ## How to resume in a new chat
 
@@ -242,4 +248,4 @@ Tell ChatGPT:
 
 > Continue AttraVoya Pro from `docs/CURRENT-WORK.md` in GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, inspect `develop`, then continue the next unfinished phase. Keep the rule that every slice must pass GitHub CI before proceeding.
 
-The repository and this handoff are the source of truth if chat memory and Git history disagree.
+The repository and this handoff are the source of truth if chat memory and Git history ever disagree.
