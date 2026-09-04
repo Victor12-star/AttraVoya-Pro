@@ -9,10 +9,10 @@ This file exists so a new ChatGPT conversation can continue the project from the
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Verified Phase 7C merge checkpoint on `develop`: `1f2028242323d438efc0b8d88dddcaf9c32c88c0`.
-- Phase 7C pull request `#3` is merged.
-- The post-merge `develop` CI run for Phase 7C (`CI #109`) completed successfully.
-- Current Phase 7D pull request: `#4` from `feature/phase-7d-attractions-discovery` into `develop`.
+- Verified Phase 7D merge checkpoint on `develop`: `1531d5cc0005d5a3f2ea1c3d8bd786bc382490e4`.
+- Phase 7D pull request `#4` is merged.
+- The post-merge `develop` CI run for Phase 7D (`CI #118`) completed successfully.
+- Current Phase 7E pull request: `#5` from `feature/phase-7e-restaurants-discovery` into `develop`.
 
 ## Quality rule
 
@@ -77,11 +77,9 @@ Implemented:
 - shared API-client method
 - unit and Fastify integration tests
 
-The Phase 7A PR CI passed before merge.
-
 ### Phase 7B — Customer destination search UI
 
-Merged into `develop` at commit:
+Merged into `develop` at:
 
 `47ca3064ceb80a108d1888db67035fee61f85bf7`
 
@@ -90,16 +88,11 @@ Implemented:
 - dedicated destination-search UI
 - `/destinations` search page
 - `/search` integration for Explore queries
-- loading state
-- empty state
-- safe provider error state
-- retry action
+- loading, empty, safe provider error and retry states
 - destination selection state
-- recent-search persistence through the existing privacy-controlled recent-search helper
+- recent-search persistence through the existing privacy-controlled helper
 - responsive destination-search styling
-- unit tests for loading/results/selection/error/retry/empty/client-side validation
-
-The Phase 7B branch CI completed successfully before merge (`CI #96`).
+- focused unit tests
 
 ### Phase 7C — Destination page foundation
 
@@ -119,81 +112,108 @@ Implemented:
 - responsive and RTL-safe destination-page styling
 - localized destination-page copy
 - destination route/page/search-selection unit tests
-- strict JavaScript, React lint and formatting compliance
 
 The Phase 7C final pull-request CI and post-merge `develop` CI both passed before work continued.
 
 ### Phase 7D — Destination attractions discovery foundation
 
-Implementation is in pull request `#4` from `feature/phase-7d-attractions-discovery` into `develop`.
+Merged through pull request `#4` into `develop` at:
+
+`1531d5cc0005d5a3f2ea1c3d8bd786bc382490e4`
 
 Implemented:
 
 - real `/destinations/[slug]/attractions` customer experience
-- reuse of the existing provider-neutral `/api/v1/places/nearby` backend contract rather than creating a duplicate attractions endpoint
+- reuse of the existing provider-neutral `/api/v1/places/nearby` backend contract
 - existing Geoapify places adapter with the `attractions` category group
-- validated destination coordinates carried forward from the Phase 7C route contract
-- 10 km search radius and a capped 24-result request
-- defensive client rendering of normalized provider results
-- deduplication and distance ordering of returned places
-- name, address, distance, provider and website shown only when genuine provider data exists
-- external website links accepted only for valid HTTP/HTTPS URLs
+- validated destination coordinates carried forward from Phase 7C
+- 10 km search radius and capped 24-result request
+- defensive normalization, deduplication and distance ordering
+- genuine name, address, distance, provider and validated website fields only
 - no fabricated ratings, opening times, ticket prices, popularity, accessibility facts or availability
 - loading, success, empty, error and retry states
-- localized attractions copy for all 18 supported UI locales
+- localized copy for all 18 supported UI locales
 - responsive, RTL-safe and reduced-motion-aware styling
-- unit tests covering provider calls, real result rendering, unsafe website rejection, empty state, provider failure/retry and malformed destination state
+- focused unit tests
 
-The Phase 7D code checkpoint `c8ea1b60e12bce2cdc9e632af4577fbb274e95c8` passed the complete pull-request CI gate (`CI #116`), including JavaScript checks, translations, provider smoke tests, ESLint, unit tests, Prettier, PostgreSQL/Prisma, dependency/secret checks and production builds.
+The final Phase 7D pull-request CI (`CI #117`) and post-merge `develop` CI (`CI #118`) both passed all five workflow jobs.
 
-This handoff update creates a newer Phase 7D head, so pull request `#4` must receive a new fully green CI run on its final head before merge. Do not merge based only on `CI #116`.
+### Phase 7E — Destination restaurants discovery foundation
+
+Implementation is in pull request `#5` from `feature/phase-7e-restaurants-discovery` into `develop`.
+
+Implemented:
+
+- real `/destinations/[slug]/restaurants` customer experience
+- reuse of the existing provider-neutral `/api/v1/places/nearby` backend contract rather than adding a duplicate restaurants endpoint
+- existing Geoapify places adapter with `PLACE_CATEGORY_GROUPS.RESTAURANTS`
+- validated destination coordinates carried forward from the shared destination route contract
+- 5 km search radius and capped 24-result request
+- restaurant child route added to the validated destination child-route allowlist
+- localized Restaurants entry point added to the destination page
+- defensive client normalization, deduplication and distance ordering
+- restaurant name, address, distance, provider and website shown only when genuine provider data exists
+- external website links accepted only for valid HTTP/HTTPS URLs
+- no fabricated cuisine, ratings, menus, prices, opening times, booking availability or popularity
+- loading, success, empty, error and retry states
+- provider failure details are not exposed to users
+- localized restaurants copy for all 18 supported UI locales
+- responsive, RTL-safe and reduced-motion-aware styling
+- unit tests covering provider calls, real result rendering, distance ordering, unsafe website rejection, empty state, provider failure/retry, invalid destination state, restaurant route context and destination-page entry
+
+The clean Phase 7E code checkpoint `a85e44d68e453fe7d8a7b5726b6c8988d64cd7f4` passed the complete pull-request CI gate (`CI #122`), including JavaScript checks, translations, provider smoke tests, ESLint, unit tests, Prettier, PostgreSQL/Prisma, dependency/secret checks, production builds and the live-provider job.
+
+A temporary formatting diagnostic was used only to obtain Prettier's exact change for one localized Japanese line. The diagnostic was fully removed and the repository's normal `prettier --check .` gate passed in `CI #122`.
+
+This handoff update creates a newer Phase 7E head, so pull request `#5` must receive a new fully green CI run on its final head before merge. Do not merge based only on `CI #122`.
 
 ## Live-provider verification status
 
-The `CI #116` live-provider job verified these real network paths successfully:
+The live-provider CI verifies these real network paths successfully:
 
 - Open-Meteo
 - Frankfurter
 - the CI-hosted LibreTranslate service
 
-The following keyed provider checks were skipped because their GitHub Actions secrets are not configured:
+The following keyed provider checks are skipped because their GitHub Actions secrets are not configured:
 
 - Geoapify: `GEOAPIFY_API_KEY`
 - Ticketmaster: `TICKETMASTER_API_KEY`
 - NewsData: `NEWSDATA_API_KEY`
 - Pexels: `PEXELS_API_KEY`
 
-Therefore Phase 7D Geoapify behavior is covered by automated adapter/API/UI tests and production builds, but the real Geoapify network call is not yet live-verified in GitHub CI. Do not claim otherwise.
+Therefore Phase 7E Geoapify restaurant behavior is covered by automated adapter/API/UI tests and production builds, but the real Geoapify network call is not yet live-verified in GitHub CI. Do not claim otherwise.
 
 ## Next engineering step
 
-First finish Phase 7D safely:
+First finish Phase 7E safely:
 
-1. Wait for a fully green GitHub CI run on the final head of pull request `#4`.
-2. Merge pull request `#4` into `develop` only after that gate passes.
+1. Wait for a fully green GitHub CI run on the final head of pull request `#5`.
+2. Merge pull request `#5` into `develop` only after that gate passes.
 3. Verify the resulting `develop` push CI is also green.
 4. Create a fresh feature branch from that verified `develop` checkpoint before modifying code for the next slice.
 
 Recommended next slice:
 
-### Phase 7E — Destination restaurants discovery foundation
+### Phase 7F — Destination beaches discovery foundation
 
-Continue Phase 7's destination vertical one narrow slice at a time.
+Continue Phase 7 one narrow destination slice at a time.
 
 Suggested scope:
 
-1. Reuse the validated destination selection and coordinate contract from Phase 7C.
-2. Reuse the existing provider-neutral `/api/v1/places/nearby` API and Geoapify places adapter rather than calling providers directly from the browser.
-3. Use the existing `restaurants` place category group with strict radius/result-limit validation.
-4. Normalize, deduplicate and safely render real provider results only.
-5. Build the selected destination's `/restaurants` experience.
-6. Show only fields that genuinely exist, such as name, address/location, distance, cuisine/category or website when actually supplied by the provider contract.
-7. Do not invent ratings, menus, prices, opening hours, booking availability or popularity.
+1. Reuse the validated destination selection and coordinate contract.
+2. Reuse the existing provider-neutral places API and Geoapify adapter; do not call the provider directly from the browser.
+3. Use the existing beaches place category group with strict radius/result-limit validation.
+4. Replace the existing `/destinations/[slug]/beaches` unavailable shell with a real provider-backed experience.
+5. Normalize, deduplicate and safely render real provider results only.
+6. Show only genuine provider fields such as name, address/location, distance or website when present.
+7. Do not invent beach quality, water conditions, lifeguard status, accessibility, fees, facilities, crowd levels or safety facts.
 8. Add loading, success, empty, error and retry behavior.
-9. Preserve all 18 UI locales, RTL, accessibility and responsive behavior.
-10. Add focused tests and run the complete GitHub CI gate before proceeding.
+9. Add a localized Beaches entry point from the destination experience when the route is ready.
+10. Preserve all 18 UI locales, RTL, accessibility, responsive behavior and reduced-motion handling.
+11. Add focused tests and run the complete GitHub CI gate before proceeding.
 
-After restaurants passes its full gate, continue beaches/shopping, accommodation, family, nearby and safety as separate coherent slices according to the Phase 7 working plan.
+After beaches passes its full gate, continue shopping, accommodation, family, nearby and safety as separate coherent slices according to the Phase 7 working plan.
 
 ## Product constraints that must not be forgotten
 
