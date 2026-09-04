@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  ProviderAuthenticationError,
-  ProviderResponseError,
-} from '../../errors/app-error.js';
+import { ProviderAuthenticationError, ProviderResponseError } from '../../errors/app-error.js';
 import { createProviderCache } from '../http/provider-cache.js';
 import { createNewsDataNewsProvider } from './newsdata-news-provider.js';
 

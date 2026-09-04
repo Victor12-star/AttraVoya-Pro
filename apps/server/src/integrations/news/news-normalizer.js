@@ -4,7 +4,9 @@ function stringOrNull(value) {
 
 function stringArray(value) {
   if (Array.isArray(value)) {
-    return value.filter((item) => typeof item === 'string' && item.trim()).map((item) => item.trim());
+    return value
+      .filter((item) => typeof item === 'string' && item.trim())
+      .map((item) => item.trim());
   }
   const single = stringOrNull(value);
   return single ? [single] : [];

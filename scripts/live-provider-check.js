@@ -118,7 +118,9 @@ async function checkTicketmasterWhenConfigured() {
 async function checkNewsDataWhenConfigured() {
   const apiKey = process.env.NEWSDATA_API_KEY?.trim();
   if (!apiKey) {
-    console.log('○ NewsData live check skipped: NEWSDATA_API_KEY is not configured in GitHub Secrets.');
+    console.log(
+      '○ NewsData live check skipped: NEWSDATA_API_KEY is not configured in GitHub Secrets.',
+    );
     return;
   }
 
