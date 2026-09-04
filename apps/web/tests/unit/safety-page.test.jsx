@@ -11,7 +11,9 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { SafetyDestinationPage } = await import('../../src/features/destinations/safety-page.jsx');
+const { SafetyDestinationPage } = await import(
+  '../../src/features/destinations/safety-page.jsx'
+);
 
 const messages = {
   common: {
@@ -61,12 +63,19 @@ describe('SafetyDestinationPage', () => {
   });
 
   it('shows only the verified emergency records returned by AttraVoya', async () => {
-    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(
-      screen.getByRole('heading', { name: 'Verified emergency contacts for Stockholm', level: 1 }),
+      screen.getByRole('heading', {
+        name: 'Verified emergency contacts for Stockholm',
+        level: 1,
+      }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'General emergency', level: 2 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'General emergency', level: 2 }),
+    ).toBeInTheDocument();
     expect(screen.getByText('112')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:112');
     expect(screen.getByRole('link', { name: /Official emergency authority/ })).toHaveAttribute(
@@ -81,7 +90,9 @@ describe('SafetyDestinationPage', () => {
       emergency: { countryCode: 'SE', records: [] },
     });
 
-    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(
       await screen.findByText(
@@ -96,7 +107,9 @@ describe('SafetyDestinationPage', () => {
       .mockRejectedValueOnce(new Error('private database detail'))
       .mockResolvedValueOnce(emergencyResponse());
 
-    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Verified emergency information could not be loaded right now.',
@@ -104,7 +117,9 @@ describe('SafetyDestinationPage', () => {
     expect(screen.queryByText(/private database detail/i)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(await screen.findByRole('heading', { name: 'General emergency', level: 2 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'General emergency', level: 2 }),
+    ).toBeInTheDocument();
     expect(mocks.getEmergencyRecords).toHaveBeenCalledTimes(2);
   });
 
@@ -116,7 +131,9 @@ describe('SafetyDestinationPage', () => {
       },
     });
 
-    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.queryByText('112')).not.toBeInTheDocument();
