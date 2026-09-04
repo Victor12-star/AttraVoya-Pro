@@ -86,6 +86,10 @@ function normalizeRecord(record) {
   };
 }
 
+/**
+ * @param {string} countryCode
+ * @returns {Promise<SafetyState>}
+ */
 async function requestEmergency(countryCode) {
   try {
     const response = await apiClient.getEmergencyRecords({ countryCode });
