@@ -19,7 +19,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     en: {
       eyebrow: 'Beaches',
       title: 'Beaches near {destination}',
-      intro: 'Discover real beaches returned by the configured places provider near this destination.',
+      intro:
+        'Discover real beaches returned by the configured places provider near this destination.',
       back: 'Back to destination',
       searchArea: 'Within 20 km',
       results: 'Results',
@@ -31,7 +32,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     sv: {
       eyebrow: 'Stränder',
       title: 'Stränder nära {destination}',
-      intro: 'Upptäck verkliga stränder som hämtas från den konfigurerade platsleverantören nära destinationen.',
+      intro:
+        'Upptäck verkliga stränder som hämtas från den konfigurerade platsleverantören nära destinationen.',
       back: 'Tillbaka till destinationen',
       searchArea: 'Inom 20 km',
       results: 'Resultat',
@@ -43,7 +45,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     es: {
       eyebrow: 'Playas',
       title: 'Playas cerca de {destination}',
-      intro: 'Descubre playas reales devueltas por el proveedor de lugares configurado cerca de este destino.',
+      intro:
+        'Descubre playas reales devueltas por el proveedor de lugares configurado cerca de este destino.',
       back: 'Volver al destino',
       searchArea: 'En un radio de 20 km',
       results: 'Resultados',
@@ -55,7 +58,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     fr: {
       eyebrow: 'Plages',
       title: 'Plages près de {destination}',
-      intro: 'Découvrez de vraies plages renvoyées par le fournisseur de lieux configuré près de cette destination.',
+      intro:
+        'Découvrez de vraies plages renvoyées par le fournisseur de lieux configuré près de cette destination.',
       back: 'Retour à la destination',
       searchArea: 'Dans un rayon de 20 km',
       results: 'Résultats',
@@ -67,7 +71,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     de: {
       eyebrow: 'Strände',
       title: 'Strände nahe {destination}',
-      intro: 'Entdecke echte Strände, die der konfigurierte Orte-Anbieter in der Nähe dieses Reiseziels liefert.',
+      intro:
+        'Entdecke echte Strände, die der konfigurierte Orte-Anbieter in der Nähe dieses Reiseziels liefert.',
       back: 'Zurück zum Reiseziel',
       searchArea: 'Im Umkreis von 20 km',
       results: 'Ergebnisse',
@@ -79,7 +84,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     it: {
       eyebrow: 'Spiagge',
       title: 'Spiagge vicino a {destination}',
-      intro: 'Scopri spiagge reali restituite dal provider di luoghi configurato vicino a questa destinazione.',
+      intro:
+        'Scopri spiagge reali restituite dal provider di luoghi configurato vicino a questa destinazione.',
       back: 'Torna alla destinazione',
       searchArea: 'Entro 20 km',
       results: 'Risultati',
@@ -91,7 +97,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     pt: {
       eyebrow: 'Praias',
       title: 'Praias perto de {destination}',
-      intro: 'Descubra praias reais devolvidas pelo fornecedor de locais configurado perto deste destino.',
+      intro:
+        'Descubra praias reais devolvidas pelo fornecedor de locais configurado perto deste destino.',
       back: 'Voltar ao destino',
       searchArea: 'Num raio de 20 km',
       results: 'Resultados',
@@ -103,7 +110,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     pl: {
       eyebrow: 'Plaże',
       title: 'Plaże w pobliżu {destination}',
-      intro: 'Odkrywaj prawdziwe plaże zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu tego celu podróży.',
+      intro:
+        'Odkrywaj prawdziwe plaże zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu tego celu podróży.',
       back: 'Wróć do celu podróży',
       searchArea: 'W promieniu 20 km',
       results: 'Wyniki',
@@ -115,7 +123,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     nl: {
       eyebrow: 'Stranden',
       title: 'Stranden bij {destination}',
-      intro: 'Ontdek echte stranden die door de ingestelde plaatsenprovider nabij deze bestemming worden geleverd.',
+      intro:
+        'Ontdek echte stranden die door de ingestelde plaatsenprovider nabij deze bestemming worden geleverd.',
       back: 'Terug naar bestemming',
       searchArea: 'Binnen 20 km',
       results: 'Resultaten',
@@ -127,7 +136,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     no: {
       eyebrow: 'Strender',
       title: 'Strender nær {destination}',
-      intro: 'Oppdag ekte strender som returneres av den konfigurerte stedsleverandøren nær dette reisemålet.',
+      intro:
+        'Oppdag ekte strender som returneres av den konfigurerte stedsleverandøren nær dette reisemålet.',
       back: 'Tilbake til reisemålet',
       searchArea: 'Innen 20 km',
       results: 'Resultater',
@@ -139,7 +149,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     da: {
       eyebrow: 'Strande',
       title: 'Strande nær {destination}',
-      intro: 'Find rigtige strande, som den konfigurerede stedsudbyder returnerer nær denne destination.',
+      intro:
+        'Find rigtige strande, som den konfigurerede stedsudbyder returnerer nær denne destination.',
       back: 'Tilbage til destinationen',
       searchArea: 'Inden for 20 km',
       results: 'Resultater',
@@ -151,7 +162,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     fi: {
       eyebrow: 'Rannat',
       title: 'Rannat kohteen {destination} lähellä',
-      intro: 'Tutustu todellisiin rantoihin, jotka määritetty paikkapalvelu palauttaa tämän kohteen läheltä.',
+      intro:
+        'Tutustu todellisiin rantoihin, jotka määritetty paikkapalvelu palauttaa tämän kohteen läheltä.',
       back: 'Takaisin kohteeseen',
       searchArea: '20 km säteellä',
       results: 'Tulokset',
@@ -163,7 +175,8 @@ const BEACHES_PAGE_COPY = /** @type {Readonly<Record<string, BeachesPageCopy>>} 
     tr: {
       eyebrow: 'Plajlar',
       title: '{destination} yakınındaki plajlar',
-      intro: 'Bu varış noktasının yakınında yapılandırılmış yer sağlayıcısının döndürdüğü gerçek plajları keşfedin.',
+      intro:
+        'Bu varış noktasının yakınında yapılandırılmış yer sağlayıcısının döndürdüğü gerçek plajları keşfedin.',
       back: 'Varış noktasına dön',
       searchArea: '20 km içinde',
       results: 'Sonuçlar',
