@@ -27,7 +27,9 @@ describe('Resend email adapter', () => {
     expect(options.retry).toBe(false);
     expect(options.headers.Authorization).toBe('Bearer test-resend-key');
     expect(options.body.to).toEqual(['traveller@example.test']);
-    expect(options.body.html).toContain('https://attravoya.example/verify-email?token=verification-token');
+    expect(options.body.html).toContain(
+      'https://attravoya.example/verify-email?token=verification-token',
+    );
   });
 
   it('builds password-reset mail with the reset route and expiry guidance', async () => {
@@ -45,7 +47,9 @@ describe('Resend email adapter', () => {
     });
 
     const options = http.requestJson.mock.calls[0][1];
-    expect(options.body.html).toContain('https://attravoya.example/reset-password?token=reset-token');
+    expect(options.body.html).toContain(
+      'https://attravoya.example/reset-password?token=reset-token',
+    );
     expect(options.body.text).toContain('expires in 1 hour');
   });
 

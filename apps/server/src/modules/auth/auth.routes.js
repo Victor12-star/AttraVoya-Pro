@@ -15,11 +15,7 @@ function resolveConfiguredEmailProvider(options) {
   // Development can boot before a free Resend account is configured. In
   // production env validation requires these values, so real users are not
   // left with an account that cannot receive verification/reset mail.
-  if (
-    env.EMAIL_PROVIDER === 'resend' &&
-    env.RESEND_API_KEY?.trim() &&
-    env.EMAIL_FROM?.trim()
-  ) {
+  if (env.EMAIL_PROVIDER === 'resend' && env.RESEND_API_KEY?.trim() && env.EMAIL_FROM?.trim()) {
     return createEmailProvider();
   }
 

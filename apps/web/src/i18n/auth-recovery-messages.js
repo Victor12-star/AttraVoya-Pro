@@ -30,7 +30,8 @@ const messages = Object.freeze({
   sv: {
     forgotLink: 'Glömt lösenordet?',
     forgotTitle: 'Återställ ditt lösenord',
-    forgotSubtitle: 'Ange din e-postadress så skickar vi en säker återställningslänk om kontot finns.',
+    forgotSubtitle:
+      'Ange din e-postadress så skickar vi en säker återställningslänk om kontot finns.',
     sendReset: 'Skicka återställningslänk',
     resetSent: 'Om ett konto finns för e-postadressen har instruktioner skickats.',
     resetFailed: 'Vi kunde inte begära en lösenordsåterställning. Försök igen.',
@@ -82,7 +83,8 @@ const messages = Object.freeze({
   fr: {
     forgotLink: 'Mot de passe oublié ?',
     forgotTitle: 'Réinitialiser votre mot de passe',
-    forgotSubtitle: 'Saisissez votre e-mail et nous enverrons un lien sécurisé si un compte existe.',
+    forgotSubtitle:
+      'Saisissez votre e-mail et nous enverrons un lien sécurisé si un compte existe.',
     sendReset: 'Envoyer le lien de réinitialisation',
     resetSent: 'Si un compte existe pour cet e-mail, les instructions ont été envoyées.',
     resetFailed: 'Impossible de demander la réinitialisation. Réessayez.',
@@ -108,7 +110,8 @@ const messages = Object.freeze({
   de: {
     forgotLink: 'Passwort vergessen?',
     forgotTitle: 'Passwort zurücksetzen',
-    forgotSubtitle: 'Gib deine E-Mail-Adresse ein. Falls ein Konto existiert, senden wir einen sicheren Link.',
+    forgotSubtitle:
+      'Gib deine E-Mail-Adresse ein. Falls ein Konto existiert, senden wir einen sicheren Link.',
     sendReset: 'Link zum Zurücksetzen senden',
     resetSent: 'Falls ein Konto für diese E-Mail existiert, wurden Anweisungen gesendet.',
     resetFailed: 'Die Zurücksetzung konnte nicht angefordert werden. Bitte erneut versuchen.',
@@ -212,7 +215,8 @@ const messages = Object.freeze({
   nl: {
     forgotLink: 'Wachtwoord vergeten?',
     forgotTitle: 'Wachtwoord opnieuw instellen',
-    forgotSubtitle: 'Vul je e-mailadres in. Als er een account bestaat, sturen we een veilige link.',
+    forgotSubtitle:
+      'Vul je e-mailadres in. Als er een account bestaat, sturen we een veilige link.',
     sendReset: 'Resetlink verzenden',
     resetSent: 'Als er een account voor dit e-mailadres bestaat, zijn instructies verzonden.',
     resetFailed: 'De reset kon niet worden aangevraagd. Probeer het opnieuw.',
@@ -290,7 +294,8 @@ const messages = Object.freeze({
   fi: {
     forgotLink: 'Unohditko salasanasi?',
     forgotTitle: 'Palauta salasana',
-    forgotSubtitle: 'Anna sähköpostiosoitteesi. Jos tili löytyy, lähetämme turvallisen palautuslinkin.',
+    forgotSubtitle:
+      'Anna sähköpostiosoitteesi. Jos tili löytyy, lähetämme turvallisen palautuslinkin.',
     sendReset: 'Lähetä palautuslinkki',
     resetSent: 'Jos tili löytyy tälle sähköpostille, ohjeet on lähetetty.',
     resetFailed: 'Salasanan palautusta ei voitu pyytää. Yritä uudelleen.',
@@ -394,7 +399,8 @@ const messages = Object.freeze({
   ja: {
     forgotLink: 'パスワードをお忘れですか？',
     forgotTitle: 'パスワードをリセット',
-    forgotSubtitle: 'メールアドレスを入力してください。アカウントが存在する場合、安全なリンクを送信します。',
+    forgotSubtitle:
+      'メールアドレスを入力してください。アカウントが存在する場合、安全なリンクを送信します。',
     sendReset: 'リセットリンクを送信',
     resetSent: 'そのメールアドレスのアカウントが存在する場合、手順を送信しました。',
     resetFailed: 'パスワードのリセットを要求できませんでした。もう一度お試しください。',
