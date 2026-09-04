@@ -102,6 +102,14 @@ describe('DestinationPage', () => {
       'href',
       'https://www.pexels.com',
     );
+    expect(screen.getByRole('link', { name: 'Stays' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/accommodation?'),
+    );
+    expect(screen.getByRole('link', { name: 'Stays' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('destination=Stockholm'),
+    );
     expect(screen.getByRole('link', { name: 'Restaurants' })).toHaveAttribute(
       'href',
       expect.stringContaining('/destinations/stockholm-se/restaurants?'),
