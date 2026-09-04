@@ -19,6 +19,7 @@ import {
   Navigation,
   RefreshCw,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
   ThermometerSun,
   Utensils,
@@ -31,6 +32,7 @@ import { getBeachesPageCopy } from './beaches-page-copy.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
+import { getShoppingPageCopy } from './shopping-page-copy.js';
 import styles from './destination-page.module.css';
 
 /**
@@ -170,6 +172,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
   const beachesCopy = getBeachesPageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
+  const shoppingCopy = getShoppingPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
     /** @type {ProviderState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -260,6 +263,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'beaches'),
       icon: Waves,
       label: beachesCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'shopping'),
+      icon: ShoppingBag,
+      label: shoppingCopy.eyebrow,
     },
     {
       href: buildDestinationContextHref('/nearby', destination),
