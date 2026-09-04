@@ -9,7 +9,8 @@ This file exists so a new ChatGPT conversation can continue the project from the
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Current `develop` checkpoint before this handoff document: `47ca3064ceb80a108d1888db67035fee61f85bf7`
+- `develop` checkpoint before the Phase 7C pull request: `fb33a821b0e9a3bb83fce62013d2a772f9f5bac1`
+- Phase 7C pull request: `#3` from `feature/phase-7c-destination-page` into `develop`.
 
 ## Quality rule
 
@@ -58,7 +59,7 @@ Provider adapters already implemented include:
 
 Provider secrets stay server-side. No fake live travel prices, availability, emergency facts, ratings, or provider data may be shown.
 
-## Latest completed customer vertical slices
+## Latest customer vertical slices
 
 ### Phase 7A — Global destination search API
 
@@ -98,36 +99,56 @@ Implemented:
 
 The Phase 7B branch CI completed successfully before merge (`CI #96`).
 
+### Phase 7C — Destination page foundation
+
+Implementation is in pull request `#3` from `feature/phase-7c-destination-page` into `develop`.
+
+Implemented:
+
+- stable human-readable destination route contract from normalized search selections
+- validated/shareable `/destinations/[slug]` state
+- selected city/country/coordinates/provider reference data without fabricating destination records
+- real current weather through the existing Open-Meteo backend/API-client path
+- Pexels destination imagery through the configured backend provider only
+- honest image/weather loading, unavailable, error and retry states
+- entry points for stays, things to do, nearby, family, currency, language, transport and safety
+- responsive and RTL-safe destination-page styling
+- localized destination-page copy
+- destination route/page/search-selection unit tests
+- strict JavaScript, React lint and formatting compliance fixes discovered by CI
+
+Phase 7C must not be treated as merged until pull request `#3` has a fully green GitHub CI run on its final head commit. Do not bypass this gate.
+
 ## Important current limitation
 
 Geoapify adapter behavior is covered by automated tests, but the real Geoapify network call is not live-verified in GitHub until `GEOAPIFY_API_KEY` is added to GitHub Actions Secrets.
 
-The same rule applies to other keyed providers if their secrets are not configured.
+The same rule applies to other keyed providers if their secrets are not configured. Pexels imagery must remain honestly unavailable when its configured key/provider is unavailable; do not substitute fake destination imagery.
 
 ## Next engineering step
 
-Continue from `develop` and create a fresh feature branch before modifying code.
+After Phase 7C pull request `#3` is merged into `develop`, create a fresh feature branch before modifying code.
 
 Recommended next slice:
 
-### Phase 7C — Destination page foundation
+### Phase 7D — Destination attractions discovery foundation
 
-Build the first real destination page around a selected destination, without inventing data.
+Continue Phase 7's destination vertical one narrow slice at a time. Start with attractions before expanding into restaurants, beaches or shopping.
 
 Suggested scope:
 
-1. Establish a stable destination identifier/route strategy from search selection.
-2. Build `/destinations/[slug]` as a real page instead of the unavailable shell.
-3. Show only provider/reference data we genuinely have: city, country, coordinates/provider source where appropriate.
-4. Add real weather through Open-Meteo.
-5. Add destination imagery through Pexels only when configured; otherwise use an honest unavailable/image-neutral state rather than fake imagery.
-6. Add entry points for stays, things to do, nearby, family, currency, language, transport and safety without pretending those child pages are complete.
-7. Add loading, empty, error and retry behavior.
-8. Preserve localization and RTL compatibility.
-9. Add unit/integration tests.
-10. Run the full GitHub CI gate and do not proceed until green.
+1. Reuse the validated destination selection/coordinate contract from Phase 7C.
+2. Add a provider-neutral attractions discovery service through the existing Geoapify places adapter rather than calling providers directly from the browser.
+3. Define a strict attraction query/response contract and validate coordinates, categories, radius and result limits before provider calls.
+4. Normalize and deduplicate provider results and reject malformed rows.
+5. Build the selected destination's `/attractions` experience with real provider results only.
+6. Show useful reference fields that genuinely exist, such as name, category, distance/location and provider attribution where available.
+7. Do not invent ratings, opening hours, ticket prices, popularity, accessibility facts or availability when the provider does not supply them.
+8. Add loading, success, empty, error and retry behavior.
+9. Preserve localization, RTL, accessibility and responsive behavior.
+10. Add API/service/UI tests and run the complete GitHub CI gate before proceeding to the next destination slice.
 
-After Phase 7C, continue destination vertical slices one at a time (weather/details, nearby, attractions/restaurants, accommodation, family, safety, etc.) with a test gate after each.
+After attractions passes its full gate, continue restaurants, beaches/shopping, accommodation, family, nearby and safety as separate coherent slices according to the Phase 7 working plan.
 
 ## Product constraints that must not be forgotten
 

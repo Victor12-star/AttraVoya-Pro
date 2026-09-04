@@ -2,8 +2,13 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
   searchDestinations: vi.fn(),
   rememberRecentSearch: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mocks.push }),
 }));
 
 vi.mock('../../src/lib/api-client.js', () => ({
@@ -44,16 +49,18 @@ function destination(name = 'Stockholm') {
     countryCode: 'SE',
     latitude: 59.3293,
     longitude: 18.0686,
+    timeZone: 'Europe/Stockholm',
   };
 }
 
 describe('DestinationSearch', () => {
   beforeEach(() => {
+    mocks.push.mockReset();
     mocks.searchDestinations.mockReset();
     mocks.rememberRecentSearch.mockReset();
   });
 
-  it('loads real destination results for an initial explore query and supports selection', async () => {
+  it('loads real destination results and routes a selection into the destination page', async () => {
     mocks.searchDestinations.mockResolvedValue({
       destinations: { results: [destination()] },
     });
@@ -77,8 +84,14 @@ describe('DestinationSearch', () => {
           query: 'Stockholm',
           countryCode: 'SE',
           destinationId: 'geo-stockholm',
+          provider: 'geoapify',
+          latitude: 59.3293,
+          longitude: 18.0686,
         }),
       }),
+    );
+    expect(mocks.push).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/destinations\/stockholm-se\?name=Stockholm&country=SE&lat=/),
     );
   });
 
