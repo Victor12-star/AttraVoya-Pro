@@ -112,10 +112,16 @@ function FeatureLink({ href, icon: Icon, label }) {
 export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
-    /** @type {ProviderState} */ ({ status: 'idle', data: null }),
+    /** @type {ProviderState} */ ({
+      status: destination ? 'loading' : 'idle',
+      data: null,
+    }),
   );
   const [imageState, setImageState] = useState(
-    /** @type {ProviderState} */ ({ status: 'idle', data: null }),
+    /** @type {ProviderState} */ ({
+      status: destination ? 'loading' : 'idle',
+      data: null,
+    }),
   );
 
   const numberFormatter = useMemo(
@@ -129,7 +135,6 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
 
   const loadWeather = useCallback(async () => {
     if (!destination) return;
-    setWeatherState({ status: 'loading', data: null });
 
     try {
       const response = /** @type {any} */ (
@@ -153,7 +158,6 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
 
   const loadImage = useCallback(async () => {
     if (!destination) return;
-    setImageState({ status: 'loading', data: null });
 
     try {
       const response = /** @type {any} */ (
@@ -180,6 +184,16 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     void loadWeather();
     void loadImage();
   }, [destination, loadImage, loadWeather]);
+
+  function retryWeather() {
+    setWeatherState({ status: 'loading', data: null });
+    void loadWeather();
+  }
+
+  function retryImage() {
+    setImageState({ status: 'loading', data: null });
+    void loadImage();
+  }
 
   if (!destination) {
     return (
@@ -298,7 +312,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
                   <button
                     className="button button--secondary button--compact"
                     type="button"
-                    onClick={() => void loadImage()}
+                    onClick={retryImage}
                   >
                     <RefreshCw size={15} aria-hidden="true" />
                     {messages.common.retry}
@@ -355,7 +369,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
               <button
                 className="button button--secondary button--compact"
                 type="button"
-                onClick={() => void loadWeather()}
+                onClick={retryWeather}
               >
                 <RefreshCw size={15} aria-hidden="true" />
                 {messages.common.retry}
