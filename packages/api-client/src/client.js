@@ -132,6 +132,7 @@ export function createApiClient(options) {
     autocompletePlaces: (query) => request(`/api/v1/places/autocomplete?${toSearchParams(query)}`),
     getNearbyPlaces: (query) => request(`/api/v1/places/nearby?${toSearchParams(query)}`),
     getEvents: (query) => request(`/api/v1/events?${toSearchParams(query)}`),
+    getNews: (query) => request(`/api/v1/news?${toSearchParams(query)}`),
     translateText: (body) => request('/api/v1/translation', { method: 'POST', body }),
     getTranslationLanguages: () =>
       request('/api/v1/translation/languages', { cache: 'force-cache' }),

@@ -26,6 +26,7 @@ import { placesRoutes } from './modules/places/places.routes.js';
 import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
 import { eventsRoutes } from './modules/events/events.routes.js';
+import { newsRoutes } from './modules/news/news.routes.js';
 
 export async function buildApp(options = {}) {
   const app = Fastify({
@@ -151,6 +152,11 @@ export async function buildApp(options = {}) {
   await app.register(eventsRoutes, {
     prefix: `${API_PREFIX}/events`,
     provider: options.eventsProvider,
+  });
+
+  await app.register(newsRoutes, {
+    prefix: `${API_PREFIX}/news`,
+    provider: options.newsProvider,
   });
 
   return app;

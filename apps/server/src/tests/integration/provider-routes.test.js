@@ -63,11 +63,18 @@ function baseOptions() {
         query,
       }),
     },
+    newsProvider: {
+      searchNews: async (query) => ({
+        provider: 'test',
+        articles: [{ externalId: 'news-1', title: 'Stockholm travel update' }],
+        query,
+      }),
+    },
   };
 }
 
 describe('real-provider API contracts', () => {
-  it('validates and serves weather, currency, places, translation, accommodation, and events routes', async () => {
+  it('validates and serves weather, currency, places, translation, accommodation, events, and news routes', async () => {
     const app = await buildApp(baseOptions());
     apps.push(app);
 
@@ -114,6 +121,14 @@ describe('real-provider API contracts', () => {
     expect(events.statusCode).toBe(200);
     expect(events.json().events.events[0].name).toBe('Stockholm Live');
     expect(events.json().events.query.countryCode).toBe('SE');
+
+    const news = await app.inject({
+      method: 'GET',
+      url: '/api/v1/news?countryCode=SE&language=en&size=5',
+    });
+    expect(news.statusCode).toBe(200);
+    expect(news.json().news.articles[0].title).toBe('Stockholm travel update');
+    expect(news.json().news.query.countryCode).toBe('SE');
   });
 
   it('rejects invalid event coordinate pairs before calling the provider', async () => {
@@ -134,6 +149,24 @@ describe('real-provider API contracts', () => {
       url: '/api/v1/events?latitude=59.33',
     });
 
+    expect(response.statusCode).toBe(400);
+    expect(providerCalled).toBe(false);
+  });
+
+  it('rejects an unbounded news request before calling the provider', async () => {
+    let providerCalled = false;
+    const options = baseOptions();
+    options.newsProvider = {
+      searchNews: async (query) => {
+        providerCalled = true;
+        return { provider: 'test', articles: [], query };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/news?size=10' });
     expect(response.statusCode).toBe(400);
     expect(providerCalled).toBe(false);
   });

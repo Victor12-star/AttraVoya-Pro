@@ -9,6 +9,7 @@ import { createFrankfurterCurrencyProvider } from '../apps/server/src/integratio
 import { createLibreTranslateProvider } from '../apps/server/src/integrations/translation/libretranslate-translation-provider.js';
 import { createGeoapifyPlacesProvider } from '../apps/server/src/integrations/places/geoapify-places-provider.js';
 import { createTicketmasterEventsProvider } from '../apps/server/src/integrations/events/ticketmaster-events-provider.js';
+import { createNewsDataNewsProvider } from '../apps/server/src/integrations/news/newsdata-news-provider.js';
 
 function httpFor(provider) {
   return createProviderHttpClient({
@@ -114,12 +115,38 @@ async function checkTicketmasterWhenConfigured() {
   console.log('✓ Ticketmaster live check passed.');
 }
 
+async function checkNewsDataWhenConfigured() {
+  const apiKey = process.env.NEWSDATA_API_KEY?.trim();
+  if (!apiKey) {
+    console.log('○ NewsData live check skipped: NEWSDATA_API_KEY is not configured in GitHub Secrets.');
+    return;
+  }
+
+  const provider = createNewsDataNewsProvider({
+    http: httpFor('newsdata-live-ci'),
+    apiKey,
+    cache: createProviderCache(),
+    cacheTtlSeconds: 30,
+  });
+
+  const result = await provider.searchNews({
+    query: 'travel',
+    countryCode: 'SE',
+    language: 'en',
+    size: 1,
+  });
+  assert.equal(result.provider, 'newsdata');
+  assert.ok(Array.isArray(result.articles));
+  console.log('✓ NewsData live check passed.');
+}
+
 async function main() {
   await checkOpenMeteo();
   await checkFrankfurter();
   await checkLibreTranslate();
   await checkGeoapifyWhenConfigured();
   await checkTicketmasterWhenConfigured();
+  await checkNewsDataWhenConfigured();
   console.log('Live provider checks finished successfully.');
 }
 

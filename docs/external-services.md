@@ -21,7 +21,7 @@ External API
 This design lets development use free/free-tier providers while preserving the
 ability to switch providers before commercial launch.
 
-## Phase 6A connected providers
+## Connected development providers
 
 ### Geoapify — places, geocoding, routing, accommodation locations
 
@@ -119,7 +119,60 @@ Official documentation:
 - https://docs.libretranslate.com/
 - https://docs.libretranslate.com/api/operations/translate/
 
-## Public API routes introduced in Phase 6A
+### Ticketmaster Discovery API — events
+
+Environment:
+
+```env
+EVENTS_PROVIDER=ticketmaster
+TICKETMASTER_API_KEY=
+EVENTS_CACHE_TTL_SECONDS=3600
+```
+
+The events adapter supports destination/country/keyword/classification/date and
+coordinate-radius filters. It uses Ticketmaster's current `geoPoint` location
+filter instead of the deprecated raw `latlong` parameter. Responses are
+normalized so AttraVoya clients do not depend on Ticketmaster's nested payload.
+
+Prices are not invented when Ticketmaster does not return pricing information.
+The current live CI check runs only when `TICKETMASTER_API_KEY` is configured in
+GitHub Secrets.
+
+Official documentation:
+
+- https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
+
+### NewsData.io — recent traveller-relevant news
+
+Environment:
+
+```env
+NEWS_PROVIDER=newsdata
+NEWSDATA_API_KEY=
+NEWS_CACHE_TTL_SECONDS=1800
+```
+
+AttraVoya uses NewsData's `latest` endpoint and exposes only a normalized article
+summary: title, description, source, publication metadata, image/video URL,
+countries, categories, keywords and the original article link. Full article
+content is deliberately not copied into AttraVoya API responses.
+
+The current no-cost development contract limits requests to 10 results, matching
+the free-tier request ceiling. At least one narrowing filter (query, country or
+category) is required to avoid wasting quota on unbounded global requests.
+NewsData pagination uses the provider's opaque `nextPage` token.
+
+The free tier is **not treated as real-time breaking news**. AttraVoya marks
+normalized responses with `realtimeGuaranteed: false`. City/region filtering is
+not exposed because NewsData's region feature is a higher-tier capability; a
+city name can instead be used as a search query together with a country filter.
+
+Official documentation:
+
+- https://newsdata.io/documentation
+- https://newsdata.io/blog/latest-news-endpoint/
+
+## Public provider API routes
 
 ```text
 GET  /api/v1/weather
@@ -130,6 +183,8 @@ GET  /api/v1/places/nearby
 GET  /api/v1/translation/languages
 POST /api/v1/translation
 GET  /api/v1/accommodation/nearby
+GET  /api/v1/events
+GET  /api/v1/news
 ```
 
 All input is validated with shared Zod schemas before provider calls.
@@ -143,7 +198,7 @@ The provider HTTP layer implements:
 - no tight-loop retry for HTTP 429;
 - provider-specific error mapping;
 - response JSON validation boundaries;
-- bounded TTL caches for weather, currency, geocoding and places;
+- bounded TTL caches for weather, currency, geocoding, places, events and news;
 - no caching of traveller-entered translation text.
 
 A provider failure must remain isolated to the affected feature. It must not
@@ -161,11 +216,8 @@ never display the secret itself.
 
 ## Next provider batch
 
-Phase 6B will connect the remaining development services through the same
-architecture:
+The remaining Phase 6B development integrations are:
 
-- Ticketmaster Discovery API — events;
-- NewsData.io — traveller-relevant local news;
 - Pexels — destination imagery;
 - Resend — transactional email delivery.
 

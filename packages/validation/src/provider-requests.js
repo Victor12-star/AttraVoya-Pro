@@ -203,3 +203,69 @@ export const eventsQuerySchema = z
       });
     }
   });
+
+const newsLanguageCode = z
+  .string()
+  .trim()
+  .min(2)
+  .max(3)
+  .regex(/^[A-Za-z]{2,3}$/)
+  .transform((value) => value.toLowerCase());
+
+export const newsQuerySchema = z
+  .object({
+    query: z.string().trim().min(1).max(200).optional(),
+    countryCode: z
+      .string()
+      .trim()
+      .length(2)
+      .regex(/^[A-Za-z]{2}$/)
+      .transform((value) => value.toUpperCase())
+      .optional(),
+    language: newsLanguageCode.default('en'),
+    categories: z
+      .string()
+      .trim()
+      .max(250)
+      .optional()
+      .transform((value) =>
+        value
+          ? value
+              .split(',')
+              .map((item) => item.trim().toLowerCase())
+              .filter(Boolean)
+          : [],
+      ),
+    // The no-cost NewsData plan currently permits at most 10 results/request.
+    // Keeping the public contract at that ceiling prevents accidental paid-plan dependency.
+    size: z.coerce.number().int().min(1).max(10).default(10),
+    page: z.string().trim().min(1).max(200).regex(/^\S+$/).optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.categories.length > 5) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['categories'],
+        message: 'At most five news categories can be requested at once',
+      });
+    }
+
+    value.categories.forEach((category, index) => {
+      if (!/^[a-z][a-z _-]{1,39}$/.test(category)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['categories', index],
+          message: `Invalid news category: ${category}`,
+        });
+      }
+    });
+
+    if (!value.query && !value.countryCode && value.categories.length === 0) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['query'],
+        message: 'Provide a query, countryCode, or category to avoid an unbounded news request',
+      });
+    }
+  });

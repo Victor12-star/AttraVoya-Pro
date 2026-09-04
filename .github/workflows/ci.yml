@@ -233,6 +233,7 @@ jobs:
         env:
           GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
         run: node scripts/live-provider-check.js
 
       - name: Show LibreTranslate logs on failure
@@ -242,7 +243,7 @@ jobs:
   security:
     name: Dependency and secret checks
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -269,4 +270,15 @@ jobs:
         run: node scripts/secret-scan.js
 
       - name: Audit production dependencies
-        run: pnpm audit --prod --audit-level=high
+        run: |
+          for attempt in 1 2 3; do
+            if pnpm audit --prod --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Dependency audit failed after 3 attempts."
+              exit 1
+            fi
+            echo "Dependency audit attempt $attempt failed; retrying after a short delay."
+            sleep $((attempt * 10))
+          done

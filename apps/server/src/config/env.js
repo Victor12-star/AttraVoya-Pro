@@ -50,6 +50,7 @@ const environmentSchema = z.object({
   CURRENCY_CACHE_TTL_SECONDS: z.coerce.number().int().min(60).max(604800).default(21600),
   PLACES_CACHE_TTL_SECONDS: z.coerce.number().int().min(30).max(86400).default(3600),
   EVENTS_CACHE_TTL_SECONDS: z.coerce.number().int().min(30).max(86400).default(3600),
+  NEWS_CACHE_TTL_SECONDS: z.coerce.number().int().min(30).max(86400).default(1800),
 });
 
 function formatEnvironmentErrors(error) {
