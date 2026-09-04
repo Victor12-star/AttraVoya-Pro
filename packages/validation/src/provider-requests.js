@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { ACCOMMODATION_TYPES, PLACE_CATEGORY_GROUP_VALUES } from '@attravoya/constants';
+import {
+  ACCOMMODATION_TYPES,
+  PLACE_CATEGORY_GROUP_VALUES,
+} from '@attravoya/constants';
 
 const latitude = z.coerce.number().min(-90).max(90);
 const longitude = z.coerce.number().min(-180).max(180);
@@ -265,7 +268,75 @@ export const newsQuerySchema = z
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['query'],
-        message: 'Provide a query, countryCode, or category to avoid an unbounded news request',
+        message:
+          'Provide a query, countryCode, or category to avoid an unbounded news request',
       });
     }
   });
+
+const pexelsLocales = [
+  'en-US',
+  'pt-BR',
+  'es-ES',
+  'ca-ES',
+  'de-DE',
+  'it-IT',
+  'fr-FR',
+  'sv-SE',
+  'id-ID',
+  'pl-PL',
+  'ja-JP',
+  'zh-TW',
+  'zh-CN',
+  'ko-KR',
+  'th-TH',
+  'nl-NL',
+  'hu-HU',
+  'vi-VN',
+  'cs-CZ',
+  'da-DK',
+  'fi-FI',
+  'uk-UA',
+  'el-GR',
+  'ro-RO',
+  'nb-NO',
+  'sk-SK',
+  'tr-TR',
+  'ru-RU',
+];
+const pexelsColorNames = new Set([
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'turquoise',
+  'blue',
+  'violet',
+  'pink',
+  'brown',
+  'black',
+  'gray',
+  'white',
+]);
+const pexelsColor = z
+  .string()
+  .trim()
+  .min(3)
+  .max(20)
+  .transform((value) => value.toLowerCase())
+  .refine(
+    (value) => pexelsColorNames.has(value) || /^#[0-9a-f]{6}$/.test(value),
+    'Use a supported Pexels color name or a six-digit hex color.',
+  );
+
+export const imagesSearchQuerySchema = z
+  .object({
+    query: z.string().trim().min(2).max(200),
+    orientation: z.enum(['landscape', 'portrait', 'square']).optional(),
+    size: z.enum(['large', 'medium', 'small']).optional(),
+    color: pexelsColor.optional(),
+    locale: z.enum(pexelsLocales).default('en-US'),
+    page: z.coerce.number().int().min(1).max(1000).default(1),
+    perPage: z.coerce.number().int().min(1).max(80).default(15),
+  })
+  .strict();

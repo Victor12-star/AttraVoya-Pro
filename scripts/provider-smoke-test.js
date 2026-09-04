@@ -8,6 +8,8 @@ import { createOpenMeteoWeatherProvider } from '../apps/server/src/integrations/
 import { createFrankfurterCurrencyProvider } from '../apps/server/src/integrations/currency/frankfurter-currency-provider.js';
 import { createLibreTranslateProvider } from '../apps/server/src/integrations/translation/libretranslate-translation-provider.js';
 import { createTicketmasterEventsProvider } from '../apps/server/src/integrations/events/ticketmaster-events-provider.js';
+import { createNewsDataNewsProvider } from '../apps/server/src/integrations/news/newsdata-news-provider.js';
+import { createPexelsImageProvider } from '../apps/server/src/integrations/images/pexels-image-provider.js';
 
 /**
  * Dependency-light provider smoke test.
@@ -26,7 +28,10 @@ async function main() {
         headers: { 'content-type': 'application/json' },
       }),
   });
-  assert.deepEqual(await transport.requestJson('https://provider.invalid/smoke'), { ok: true });
+  assert.deepEqual(
+    await transport.requestJson('https://provider.invalid/smoke'),
+    { ok: true },
+  );
 
   const weather = createOpenMeteoWeatherProvider({
     cache: createProviderCache(),
@@ -55,10 +60,19 @@ async function main() {
   const currency = createFrankfurterCurrencyProvider({
     cache: createProviderCache(),
     http: {
-      requestJson: async () => ({ date: '2026-09-03', base: 'SEK', quote: 'EUR', rate: 0.09 }),
+      requestJson: async () => ({
+        date: '2026-09-03',
+        base: 'SEK',
+        quote: 'EUR',
+        rate: 0.09,
+      }),
     },
   });
-  const conversion = await currency.convert({ amount: 1000, from: 'SEK', to: 'EUR' });
+  const conversion = await currency.convert({
+    amount: 1000,
+    from: 'SEK',
+    to: 'EUR',
+  });
   assert.equal(conversion.convertedAmount, 90);
   assert.equal(conversion.approximate, true);
 
@@ -66,7 +80,11 @@ async function main() {
     baseUrl: 'http://localhost:5001',
     http: { requestJson: async () => ({ translatedText: 'Hola' }) },
   });
-  const translated = await translation.translate({ text: 'Hello', source: 'en', target: 'es' });
+  const translated = await translation.translate({
+    text: 'Hello',
+    source: 'en',
+    target: 'es',
+  });
   assert.equal(translated.translatedText, 'Hola');
 
   const events = createTicketmasterEventsProvider({
@@ -83,13 +101,64 @@ async function main() {
             },
           ],
         },
-        page: { totalElements: 1, totalPages: 1, number: 0, size: 20 },
+        page: {
+          totalElements: 1,
+          totalPages: 1,
+          number: 0,
+          size: 20,
+        },
       }),
     },
   });
   const eventResult = await events.searchEvents({ countryCode: 'SE' });
   assert.equal(eventResult.provider, 'ticketmaster');
   assert.equal(eventResult.events[0].name, 'Test event');
+
+  const news = createNewsDataNewsProvider({
+    apiKey: 'smoke-key',
+    cache: createProviderCache(),
+    http: {
+      requestJson: async () => ({
+        status: 'success',
+        totalResults: 1,
+        results: [
+          {
+            article_id: 'smoke-news',
+            title: 'Test travel update',
+            source_name: 'Example News',
+          },
+        ],
+      }),
+    },
+  });
+  const newsResult = await news.searchNews({ countryCode: 'SE' });
+  assert.equal(newsResult.provider, 'newsdata');
+  assert.equal(newsResult.articles[0].title, 'Test travel update');
+
+  const images = createPexelsImageProvider({
+    apiKey: 'smoke-key',
+    cache: createProviderCache(),
+    http: {
+      requestJson: async () => ({
+        page: 1,
+        per_page: 1,
+        total_results: 1,
+        photos: [
+          {
+            id: 1,
+            url: 'https://www.pexels.com/photo/test-1/',
+            photographer: 'Test Photographer',
+            src: { landscape: 'https://images.pexels.com/test.jpeg' },
+            alt: 'Test destination',
+          },
+        ],
+      }),
+    },
+  });
+  const imageResult = await images.searchPhotos({ query: 'Stockholm' });
+  assert.equal(imageResult.provider, 'pexels');
+  assert.equal(imageResult.photos[0].alt, 'Test destination');
+  assert.equal(imageResult.attribution.providerLinkRequired, true);
 
   console.log('Provider smoke tests passed. No external API calls were made.');
 }

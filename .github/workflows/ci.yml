@@ -234,6 +234,7 @@ jobs:
           GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
           NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: node scripts/live-provider-check.js
 
       - name: Show LibreTranslate logs on failure

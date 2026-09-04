@@ -27,6 +27,7 @@ import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
 import { eventsRoutes } from './modules/events/events.routes.js';
 import { newsRoutes } from './modules/news/news.routes.js';
+import { imagesRoutes } from './modules/images/images.routes.js';
 
 export async function buildApp(options = {}) {
   const app = Fastify({
@@ -85,7 +86,10 @@ export async function buildApp(options = {}) {
   });
 
   const authenticationRepository = options.authRepository ?? authRepository;
-  app.decorate('authenticate', createAuthenticateHook({ repository: authenticationRepository }));
+  app.decorate(
+    'authenticate',
+    createAuthenticateHook({ repository: authenticationRepository }),
+  );
   app.decorate('authorize', createAuthorizeHook);
 
   await app.register(rateLimit, {
@@ -157,6 +161,11 @@ export async function buildApp(options = {}) {
   await app.register(newsRoutes, {
     prefix: `${API_PREFIX}/news`,
     provider: options.newsProvider,
+  });
+
+  await app.register(imagesRoutes, {
+    prefix: `${API_PREFIX}/images`,
+    provider: options.imageProvider,
   });
 
   return app;

@@ -172,6 +172,38 @@ Official documentation:
 - https://newsdata.io/documentation
 - https://newsdata.io/blog/latest-news-endpoint/
 
+### Pexels — destination imagery
+
+Environment:
+
+```env
+IMAGE_PROVIDER=pexels
+PEXELS_API_KEY=
+IMAGES_CACHE_TTL_SECONDS=86400
+```
+
+Pexels photo search is used only to enhance AttraVoya destination and travel
+experiences; AttraVoya is not an image-library or wallpaper product. Search
+supports Pexels' current orientation, minimum-size, color, locale and pagination
+filters. The API key is sent only from the server through the `Authorization`
+header.
+
+Normalized responses deliberately include provider and photographer attribution
+metadata so every web/mobile surface can link prominently to Pexels and credit
+the photographer when possible. Search responses are cached for 24 hours by
+default to conserve the development quota.
+
+Pexels currently documents a default API limit of 200 requests/hour and 20,000
+requests/month. Search can return up to 80 photos per page. API clients must not
+attempt to bypass provider limits or use Pexels content to reproduce Pexels'
+core service.
+
+Official documentation:
+
+- https://www.pexels.com/api/documentation/
+- https://www.pexels.com/license/
+- https://www.pexels.com/terms-of-service/
+
 ## Public provider API routes
 
 ```text
@@ -185,6 +217,7 @@ POST /api/v1/translation
 GET  /api/v1/accommodation/nearby
 GET  /api/v1/events
 GET  /api/v1/news
+GET  /api/v1/images/search
 ```
 
 All input is validated with shared Zod schemas before provider calls.
@@ -198,7 +231,8 @@ The provider HTTP layer implements:
 - no tight-loop retry for HTTP 429;
 - provider-specific error mapping;
 - response JSON validation boundaries;
-- bounded TTL caches for weather, currency, geocoding, places, events and news;
+- bounded TTL caches for weather, currency, geocoding, places, events, news and
+  destination imagery;
 - no caching of traveller-entered translation text.
 
 A provider failure must remain isolated to the affected feature. It must not
@@ -216,9 +250,8 @@ never display the secret itself.
 
 ## Next provider batch
 
-The remaining Phase 6B development integrations are:
+The remaining Phase 6B development integration is:
 
-- Pexels — destination imagery;
 - Resend — transactional email delivery.
 
 Live flight fares and live accommodation room pricing remain intentionally

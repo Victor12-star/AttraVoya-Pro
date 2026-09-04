@@ -15,7 +15,9 @@ process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 const { buildApp } = await import('../../app.js');
 const apps = [];
 
-afterEach(async () => Promise.all(apps.splice(0).map((app) => app.close())));
+afterEach(async () =>
+  Promise.all(apps.splice(0).map((app) => app.close())),
+);
 
 function baseOptions() {
   return {
@@ -27,7 +29,11 @@ function baseOptions() {
       findAuthorizationContextByUserId: async () => null,
     },
     weatherProvider: {
-      getForecast: async (query) => ({ provider: 'test', current: { temperatureC: 20 }, query }),
+      getForecast: async (query) => ({
+        provider: 'test',
+        current: { temperatureC: 20 },
+        query,
+      }),
     },
     currencyProvider: {
       getRates: async ({ base }) => ({ provider: 'test', base, rates: [] }),
@@ -40,8 +46,15 @@ function baseOptions() {
       }),
     },
     placesProvider: {
-      autocomplete: async ({ query }) => ({ provider: 'test', results: [{ name: query }] }),
-      searchNearby: async ({ categoryGroup }) => ({ provider: 'test', categoryGroup, results: [] }),
+      autocomplete: async ({ query }) => ({
+        provider: 'test',
+        results: [{ name: query }],
+      }),
+      searchNearby: async ({ categoryGroup }) => ({
+        provider: 'test',
+        categoryGroup,
+        results: [],
+      }),
     },
     translationProvider: {
       translate: async ({ text, target }) => ({
@@ -54,7 +67,11 @@ function baseOptions() {
       }),
     },
     accommodationProvider: {
-      searchNearby: async () => ({ provider: 'test', results: [], inventoryDataAvailable: false }),
+      searchNearby: async () => ({
+        provider: 'test',
+        results: [],
+        inventoryDataAvailable: false,
+      }),
     },
     eventsProvider: {
       searchEvents: async (query) => ({
@@ -66,7 +83,16 @@ function baseOptions() {
     newsProvider: {
       searchNews: async (query) => ({
         provider: 'test',
-        articles: [{ externalId: 'news-1', title: 'Stockholm travel update' }],
+        articles: [
+          { externalId: 'news-1', title: 'Stockholm travel update' },
+        ],
+        query,
+      }),
+    },
+    imageProvider: {
+      searchPhotos: async (query) => ({
+        provider: 'test',
+        photos: [{ externalId: 'photo-1', alt: 'Stockholm waterfront' }],
         query,
       }),
     },
@@ -74,7 +100,7 @@ function baseOptions() {
 }
 
 describe('real-provider API contracts', () => {
-  it('validates and serves weather, currency, places, translation, accommodation, events, and news routes', async () => {
+  it('validates and serves the public provider routes', async () => {
     const app = await buildApp(baseOptions());
     apps.push(app);
 
@@ -109,10 +135,13 @@ describe('real-provider API contracts', () => {
 
     const accommodation = await app.inject({
       method: 'GET',
-      url: '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE',
+      url:
+        '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE',
     });
     expect(accommodation.statusCode).toBe(200);
-    expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(false);
+    expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(
+      false,
+    );
 
     const events = await app.inject({
       method: 'GET',
@@ -127,8 +156,19 @@ describe('real-provider API contracts', () => {
       url: '/api/v1/news?countryCode=SE&language=en&size=5',
     });
     expect(news.statusCode).toBe(200);
-    expect(news.json().news.articles[0].title).toBe('Stockholm travel update');
+    expect(news.json().news.articles[0].title).toBe(
+      'Stockholm travel update',
+    );
     expect(news.json().news.query.countryCode).toBe('SE');
+
+    const images = await app.inject({
+      method: 'GET',
+      url:
+        '/api/v1/images/search?query=Stockholm&orientation=landscape&perPage=5',
+    });
+    expect(images.statusCode).toBe(200);
+    expect(images.json().images.photos[0].alt).toBe('Stockholm waterfront');
+    expect(images.json().images.query.orientation).toBe('landscape');
   });
 
   it('rejects invalid event coordinate pairs before calling the provider', async () => {
@@ -166,7 +206,31 @@ describe('real-provider API contracts', () => {
     const app = await buildApp(options);
     apps.push(app);
 
-    const response = await app.inject({ method: 'GET', url: '/api/v1/news?size=10' });
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/news?size=10',
+    });
+    expect(response.statusCode).toBe(400);
+    expect(providerCalled).toBe(false);
+  });
+
+  it('rejects unsupported image filters before calling the provider', async () => {
+    let providerCalled = false;
+    const options = baseOptions();
+    options.imageProvider = {
+      searchPhotos: async (query) => {
+        providerCalled = true;
+        return { provider: 'test', photos: [], query };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/images/search?query=Stockholm&orientation=panorama',
+    });
     expect(response.statusCode).toBe(400);
     expect(providerCalled).toBe(false);
   });
