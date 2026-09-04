@@ -8,6 +8,7 @@ import { createOpenMeteoWeatherProvider } from '../apps/server/src/integrations/
 import { createFrankfurterCurrencyProvider } from '../apps/server/src/integrations/currency/frankfurter-currency-provider.js';
 import { createLibreTranslateProvider } from '../apps/server/src/integrations/translation/libretranslate-translation-provider.js';
 import { createGeoapifyPlacesProvider } from '../apps/server/src/integrations/places/geoapify-places-provider.js';
+import { createTicketmasterEventsProvider } from '../apps/server/src/integrations/events/ticketmaster-events-provider.js';
 
 function httpFor(provider) {
   return createProviderHttpClient({
@@ -91,11 +92,34 @@ async function checkGeoapifyWhenConfigured() {
   console.log('✓ Geoapify live check passed.');
 }
 
+async function checkTicketmasterWhenConfigured() {
+  const apiKey = process.env.TICKETMASTER_API_KEY?.trim();
+  if (!apiKey) {
+    console.log(
+      '○ Ticketmaster live check skipped: TICKETMASTER_API_KEY is not configured in GitHub Secrets.',
+    );
+    return;
+  }
+
+  const provider = createTicketmasterEventsProvider({
+    http: httpFor('ticketmaster-live-ci'),
+    apiKey,
+    cache: createProviderCache(),
+    cacheTtlSeconds: 30,
+  });
+
+  const result = await provider.searchEvents({ countryCode: 'SE', size: 1, page: 0 });
+  assert.equal(result.provider, 'ticketmaster');
+  assert.ok(Array.isArray(result.events));
+  console.log('✓ Ticketmaster live check passed.');
+}
+
 async function main() {
   await checkOpenMeteo();
   await checkFrankfurter();
   await checkLibreTranslate();
   await checkGeoapifyWhenConfigured();
+  await checkTicketmasterWhenConfigured();
   console.log('Live provider checks finished successfully.');
 }
 

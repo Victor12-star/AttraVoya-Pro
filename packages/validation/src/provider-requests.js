@@ -137,3 +137,69 @@ export const accommodationNearbyQuerySchema = z
       }
     });
   });
+
+const eventDateTime = z.string().trim().datetime({ offset: true });
+const eventSortValues = [
+  'name,asc',
+  'name,desc',
+  'date,asc',
+  'date,desc',
+  'relevance,asc',
+  'relevance,desc',
+  'distance,asc',
+  'random',
+];
+
+export const eventsQuerySchema = z
+  .object({
+    keyword: z.string().trim().min(1).max(150).optional(),
+    city: z.string().trim().min(1).max(120).optional(),
+    countryCode: z
+      .string()
+      .trim()
+      .length(2)
+      .regex(/^[A-Za-z]{2}$/)
+      .transform((value) => value.toUpperCase())
+      .optional(),
+    classificationName: z.string().trim().min(1).max(100).optional(),
+    latitude: latitude.optional(),
+    longitude: longitude.optional(),
+    radius: z.coerce.number().positive().max(500).default(25),
+    unit: z.enum(['km', 'miles']).default('km'),
+    startDateTime: eventDateTime.optional(),
+    endDateTime: eventDateTime.optional(),
+    locale: languageCode.default('en'),
+    size: z.coerce.number().int().min(1).max(100).default(20),
+    page: z.coerce.number().int().min(0).max(999).default(0),
+    sort: z.enum(eventSortValues).default('date,asc'),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if ((value.latitude === undefined) !== (value.longitude === undefined)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['latitude'],
+        message: 'latitude and longitude must be provided together',
+      });
+    }
+
+    if (
+      value.startDateTime &&
+      value.endDateTime &&
+      Date.parse(value.startDateTime) > Date.parse(value.endDateTime)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['endDateTime'],
+        message: 'endDateTime must be after startDateTime',
+      });
+    }
+
+    if (value.size * value.page >= 1000) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['page'],
+        message: 'Ticketmaster deep paging supports only the first 1000 results',
+      });
+    }
+  });

@@ -7,6 +7,7 @@ import { createProviderHttpClient } from '../apps/server/src/integrations/http/p
 import { createOpenMeteoWeatherProvider } from '../apps/server/src/integrations/weather/openmeteo-weather-provider.js';
 import { createFrankfurterCurrencyProvider } from '../apps/server/src/integrations/currency/frankfurter-currency-provider.js';
 import { createLibreTranslateProvider } from '../apps/server/src/integrations/translation/libretranslate-translation-provider.js';
+import { createTicketmasterEventsProvider } from '../apps/server/src/integrations/events/ticketmaster-events-provider.js';
 
 /**
  * Dependency-light provider smoke test.
@@ -67,6 +68,28 @@ async function main() {
   });
   const translated = await translation.translate({ text: 'Hello', source: 'en', target: 'es' });
   assert.equal(translated.translatedText, 'Hola');
+
+  const events = createTicketmasterEventsProvider({
+    apiKey: 'smoke-key',
+    cache: createProviderCache(),
+    http: {
+      requestJson: async () => ({
+        _embedded: {
+          events: [
+            {
+              id: 'smoke-event',
+              name: 'Test event',
+              dates: { start: { localDate: '2026-10-10' } },
+            },
+          ],
+        },
+        page: { totalElements: 1, totalPages: 1, number: 0, size: 20 },
+      }),
+    },
+  });
+  const eventResult = await events.searchEvents({ countryCode: 'SE' });
+  assert.equal(eventResult.provider, 'ticketmaster');
+  assert.equal(eventResult.events[0].name, 'Test event');
 
   console.log('Provider smoke tests passed. No external API calls were made.');
 }

@@ -77,8 +77,6 @@ jobs:
       - name: Validate environment contract
         run: pnpm env:check
 
-      # Prisma's JavaScript client types are generated code. Generate them in
-      # this job before checkJs so the checker sees the same API runtime uses.
       - name: Generate Prisma client for JavaScript checks
         run: pnpm db:generate
 
@@ -234,6 +232,7 @@ jobs:
       - name: Run live provider checks
         env:
           GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
         run: node scripts/live-provider-check.js
 
       - name: Show LibreTranslate logs on failure
@@ -266,8 +265,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Run this independently of the dependency audit so a dependency finding
-      # never prevents us from checking the repository for accidentally committed secrets.
       - name: Scan tracked files for common secret patterns
         run: node scripts/secret-scan.js
 

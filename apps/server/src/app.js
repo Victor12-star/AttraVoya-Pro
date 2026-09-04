@@ -25,6 +25,7 @@ import { currencyRoutes } from './modules/currency/currency.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
+import { eventsRoutes } from './modules/events/events.routes.js';
 
 export async function buildApp(options = {}) {
   const app = Fastify({
@@ -145,6 +146,11 @@ export async function buildApp(options = {}) {
   await app.register(accommodationRoutes, {
     prefix: `${API_PREFIX}/accommodation`,
     provider: options.accommodationProvider,
+  });
+
+  await app.register(eventsRoutes, {
+    prefix: `${API_PREFIX}/events`,
+    provider: options.eventsProvider,
   });
 
   return app;

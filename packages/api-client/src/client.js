@@ -131,6 +131,7 @@ export function createApiClient(options) {
       request(`/api/v1/currency/convert?${toSearchParams({ amount, from, to })}`),
     autocompletePlaces: (query) => request(`/api/v1/places/autocomplete?${toSearchParams(query)}`),
     getNearbyPlaces: (query) => request(`/api/v1/places/nearby?${toSearchParams(query)}`),
+    getEvents: (query) => request(`/api/v1/events?${toSearchParams(query)}`),
     translateText: (body) => request('/api/v1/translation', { method: 'POST', body }),
     getTranslationLanguages: () =>
       request('/api/v1/translation/languages', { cache: 'force-cache' }),
