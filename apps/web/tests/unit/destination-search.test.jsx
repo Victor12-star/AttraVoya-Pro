@@ -1,17 +1,19 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const searchDestinations = vi.fn();
-const rememberRecentSearch = vi.fn();
+const mocks = vi.hoisted(() => ({
+  searchDestinations: vi.fn(),
+  rememberRecentSearch: vi.fn(),
+}));
 
 vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
-    searchDestinations,
+    searchDestinations: mocks.searchDestinations,
   },
 }));
 
 vi.mock('../../src/lib/recent-searches.js', () => ({
-  rememberRecentSearch,
+  rememberRecentSearch: mocks.rememberRecentSearch,
 }));
 
 const { DestinationSearch } = await import(
@@ -48,12 +50,12 @@ function destination(name = 'Stockholm') {
 
 describe('DestinationSearch', () => {
   beforeEach(() => {
-    searchDestinations.mockReset();
-    rememberRecentSearch.mockReset();
+    mocks.searchDestinations.mockReset();
+    mocks.rememberRecentSearch.mockReset();
   });
 
   it('loads real destination results for an initial explore query and supports selection', async () => {
-    searchDestinations.mockResolvedValue({
+    mocks.searchDestinations.mockResolvedValue({
       destinations: { results: [destination()] },
     });
 
@@ -61,7 +63,7 @@ describe('DestinationSearch', () => {
 
     expect(screen.getByText('Loading…')).toBeInTheDocument();
     const result = await screen.findByRole('button', { name: /Stockholm/i });
-    expect(searchDestinations).toHaveBeenCalledWith({
+    expect(mocks.searchDestinations).toHaveBeenCalledWith({
       query: 'Stockholm',
       language: 'en',
       limit: 8,
@@ -69,7 +71,7 @@ describe('DestinationSearch', () => {
 
     fireEvent.click(result);
     expect(result).toHaveAttribute('aria-pressed', 'true');
-    expect(rememberRecentSearch).toHaveBeenCalledWith(
+    expect(mocks.rememberRecentSearch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'DESTINATION',
         criteria: expect.objectContaining({
@@ -82,7 +84,7 @@ describe('DestinationSearch', () => {
   });
 
   it('shows a safe provider error and retries the same query', async () => {
-    searchDestinations
+    mocks.searchDestinations
       .mockRejectedValueOnce(new Error('provider details must not be rendered'))
       .mockResolvedValueOnce({ destinations: { results: [destination('Paris')] } });
 
@@ -93,15 +95,15 @@ describe('DestinationSearch', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(await screen.findByRole('button', { name: /Paris/i })).toBeInTheDocument();
-    expect(searchDestinations).toHaveBeenCalledTimes(2);
+    expect(mocks.searchDestinations).toHaveBeenCalledTimes(2);
   });
 
   it('renders an explicit empty state when the provider returns no destinations', async () => {
-    searchDestinations.mockResolvedValue({ destinations: { results: [] } });
+    mocks.searchDestinations.mockResolvedValue({ destinations: { results: [] } });
 
     render(<DestinationSearch initialQuery="zz" locale="en" messages={messages} />);
 
-    await waitFor(() => expect(searchDestinations).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mocks.searchDestinations).toHaveBeenCalledTimes(1));
     expect(
       await screen.findByText('Search cities, countries and destinations', { selector: 'strong' }),
     ).toBeInTheDocument();
@@ -115,7 +117,7 @@ describe('DestinationSearch', () => {
     fireEvent.change(input, { target: { value: 'x' } });
     fireEvent.submit(input.closest('form'));
 
-    expect(searchDestinations).not.toHaveBeenCalled();
+    expect(mocks.searchDestinations).not.toHaveBeenCalled();
     expect(screen.getByText('Where do you want to go?', { selector: '.field-error' })).toBeVisible();
   });
 });
