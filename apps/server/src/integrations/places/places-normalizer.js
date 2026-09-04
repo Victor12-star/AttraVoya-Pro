@@ -2,6 +2,11 @@ function featureProperties(feature) {
   return feature?.properties && typeof feature.properties === 'object' ? feature.properties : {};
 }
 
+function finiteNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 export function normalizeGeoapifyPlaceFeature(feature) {
   const properties = featureProperties(feature);
   const coordinates = Array.isArray(feature?.geometry?.coordinates)
@@ -19,15 +24,17 @@ export function normalizeGeoapifyPlaceFeature(feature) {
     addressLine2: properties.address_line2 ?? null,
     city: properties.city ?? properties.town ?? properties.village ?? null,
     state: properties.state ?? null,
+    stateCode: properties.state_code ?? null,
     postcode: properties.postcode ?? null,
     country: properties.country ?? null,
     countryCode: properties.country_code?.toUpperCase?.() ?? null,
-    latitude: Number(properties.lat ?? coordinates[1]),
-    longitude: Number(properties.lon ?? coordinates[0]),
+    latitude: finiteNumber(properties.lat ?? coordinates[1]),
+    longitude: finiteNumber(properties.lon ?? coordinates[0]),
+    resultType: properties.result_type ?? null,
+    confidence: finiteNumber(properties.rank?.confidence),
+    timeZone: properties.timezone?.name ?? null,
     categories: Array.isArray(properties.categories) ? properties.categories : [],
-    distanceMeters: Number.isFinite(Number(properties.distance))
-      ? Number(properties.distance)
-      : null,
+    distanceMeters: finiteNumber(properties.distance),
     website: properties.website ?? properties.datasource?.raw?.website ?? null,
     phone: properties.contact?.phone ?? properties.datasource?.raw?.phone ?? null,
     openingHours: properties.opening_hours ?? properties.datasource?.raw?.opening_hours ?? null,
