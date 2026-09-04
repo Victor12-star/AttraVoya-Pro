@@ -208,6 +208,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     };
   }, [destination, locale, selectedType]);
 
+  /** @param {string|null} nextType */
   function chooseType(nextType) {
     if (nextType === selectedType) return;
     setAccommodationState({ status: 'loading', data: null });
