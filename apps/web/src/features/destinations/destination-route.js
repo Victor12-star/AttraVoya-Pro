@@ -1,5 +1,6 @@
 const DESTINATION_CHILD_SEGMENTS = new Set([
   'attractions',
+  'beaches',
   'currency',
   'family',
   'language',
