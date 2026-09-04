@@ -6,6 +6,7 @@ export const PLACE_CATEGORY_GROUPS = Object.freeze({
   [GROUPS.CAFES]: ['catering.cafe'],
   [GROUPS.ATTRACTIONS]: ['tourism'],
   [GROUPS.MUSEUMS]: ['entertainment.museum'],
+  [GROUPS.BEACHES]: ['beach'],
   [GROUPS.ACCOMMODATION]: ['accommodation'],
   [GROUPS.HOTELS]: ['accommodation.hotel'],
   [GROUPS.HOSTELS]: ['accommodation.hostel'],

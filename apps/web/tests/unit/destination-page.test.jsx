@@ -106,6 +106,10 @@ describe('DestinationPage', () => {
       'href',
       expect.stringContaining('/destinations/stockholm-se/restaurants?'),
     );
+    expect(screen.getByRole('link', { name: 'Beaches' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/destinations/stockholm-se/beaches?'),
+    );
 
     expect(mocks.getWeather).toHaveBeenCalledWith({
       latitude: 59.3293,
