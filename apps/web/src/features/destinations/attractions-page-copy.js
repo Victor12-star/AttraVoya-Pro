@@ -17,7 +17,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
   Object.freeze({
     en: {
       title: 'Attractions in {destination}',
-      intro: 'Explore real places returned by the configured places provider near this destination.',
+      intro:
+        'Explore real places returned by the configured places provider near this destination.',
       back: 'Back to destination',
       searchArea: 'Within 10 km',
       results: 'Results',
@@ -28,7 +29,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     sv: {
       title: 'Sevärdheter i {destination}',
-      intro: 'Utforska verkliga platser som hämtas från den konfigurerade platsleverantören nära destinationen.',
+      intro:
+        'Utforska verkliga platser som hämtas från den konfigurerade platsleverantören nära destinationen.',
       back: 'Tillbaka till destinationen',
       searchArea: 'Inom 10 km',
       results: 'Resultat',
@@ -39,7 +41,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     es: {
       title: 'Atracciones en {destination}',
-      intro: 'Explora lugares reales devueltos por el proveedor de lugares configurado cerca de este destino.',
+      intro:
+        'Explora lugares reales devueltos por el proveedor de lugares configurado cerca de este destino.',
       back: 'Volver al destino',
       searchArea: 'En un radio de 10 km',
       results: 'Resultados',
@@ -50,7 +53,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     fr: {
       title: 'Attractions à {destination}',
-      intro: 'Découvrez des lieux réels renvoyés par le fournisseur de lieux configuré près de cette destination.',
+      intro:
+        'Découvrez des lieux réels renvoyés par le fournisseur de lieux configuré près de cette destination.',
       back: 'Retour à la destination',
       searchArea: 'Dans un rayon de 10 km',
       results: 'Résultats',
@@ -61,7 +65,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     de: {
       title: 'Sehenswürdigkeiten in {destination}',
-      intro: 'Entdecke reale Orte, die der konfigurierte Orte-Anbieter in der Nähe dieses Reiseziels liefert.',
+      intro:
+        'Entdecke reale Orte, die der konfigurierte Orte-Anbieter in der Nähe dieses Reiseziels liefert.',
       back: 'Zurück zum Reiseziel',
       searchArea: 'Im Umkreis von 10 km',
       results: 'Ergebnisse',
@@ -72,7 +77,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     it: {
       title: 'Attrazioni a {destination}',
-      intro: 'Esplora luoghi reali restituiti dal provider di luoghi configurato vicino a questa destinazione.',
+      intro:
+        'Esplora luoghi reali restituiti dal provider di luoghi configurato vicino a questa destinazione.',
       back: 'Torna alla destinazione',
       searchArea: 'Entro 10 km',
       results: 'Risultati',
@@ -83,7 +89,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     pt: {
       title: 'Atrações em {destination}',
-      intro: 'Explore locais reais devolvidos pelo fornecedor de locais configurado perto deste destino.',
+      intro:
+        'Explore locais reais devolvidos pelo fornecedor de locais configurado perto deste destino.',
       back: 'Voltar ao destino',
       searchArea: 'Num raio de 10 km',
       results: 'Resultados',
@@ -94,7 +101,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     pl: {
       title: 'Atrakcje w {destination}',
-      intro: 'Odkrywaj prawdziwe miejsca zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu tego celu podróży.',
+      intro:
+        'Odkrywaj prawdziwe miejsca zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu tego celu podróży.',
       back: 'Wróć do celu podróży',
       searchArea: 'W promieniu 10 km',
       results: 'Wyniki',
@@ -105,7 +113,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     nl: {
       title: 'Bezienswaardigheden in {destination}',
-      intro: 'Ontdek echte plaatsen die door de ingestelde plaatsenprovider nabij deze bestemming worden geleverd.',
+      intro:
+        'Ontdek echte plaatsen die door de ingestelde plaatsenprovider nabij deze bestemming worden geleverd.',
       back: 'Terug naar bestemming',
       searchArea: 'Binnen 10 km',
       results: 'Resultaten',
@@ -116,7 +125,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     no: {
       title: 'Attraksjoner i {destination}',
-      intro: 'Utforsk ekte steder som returneres av den konfigurerte stedsleverandøren nær dette reisemålet.',
+      intro:
+        'Utforsk ekte steder som returneres av den konfigurerte stedsleverandøren nær dette reisemålet.',
       back: 'Tilbake til reisemålet',
       searchArea: 'Innen 10 km',
       results: 'Resultater',
@@ -127,7 +137,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     da: {
       title: 'Seværdigheder i {destination}',
-      intro: 'Udforsk rigtige steder, som den konfigurerede stedsudbyder returnerer nær denne destination.',
+      intro:
+        'Udforsk rigtige steder, som den konfigurerede stedsudbyder returnerer nær denne destination.',
       back: 'Tilbage til destinationen',
       searchArea: 'Inden for 10 km',
       results: 'Resultater',
@@ -138,7 +149,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     fi: {
       title: 'Nähtävyydet kohteessa {destination}',
-      intro: 'Tutustu todellisiin paikkoihin, jotka määritetty paikkapalvelu palauttaa tämän kohteen läheltä.',
+      intro:
+        'Tutustu todellisiin paikkoihin, jotka määritetty paikkapalvelu palauttaa tämän kohteen läheltä.',
       back: 'Takaisin kohteeseen',
       searchArea: '10 km säteellä',
       results: 'Tulokset',
@@ -149,7 +161,8 @@ const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPage
     },
     tr: {
       title: '{destination} bölgesindeki gezilecek yerler',
-      intro: 'Bu varış noktasının yakınında yapılandırılmış yer sağlayıcısının döndürdüğü gerçek yerleri keşfedin.',
+      intro:
+        'Bu varış noktasının yakınında yapılandırılmış yer sağlayıcısının döndürdüğü gerçek yerleri keşfedin.',
       back: 'Varış noktasına dön',
       searchArea: '10 km içinde',
       results: 'Sonuçlar',
