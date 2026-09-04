@@ -75,7 +75,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'No se pudieron cargar los alojamientos en este momento.',
       website: 'Sitio web',
       distance: 'Distancia',
-      dataNotice: 'Solo datos de ubicación. Los precios y la disponibilidad en tiempo real aún no están conectados.',
+      dataNotice:
+        'Solo datos de ubicación. Los precios y la disponibilidad en tiempo real aún no están conectados.',
       filterLabel: 'Tipo de alojamiento',
       allTypes: 'Todos los alojamientos',
       types: {
@@ -97,7 +98,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Les hébergements ne peuvent pas être chargés pour le moment.',
       website: 'Site web',
       distance: 'Distance',
-      dataNotice: 'Données de localisation uniquement. Les prix et disponibilités en direct ne sont pas encore connectés.',
+      dataNotice:
+        'Données de localisation uniquement. Les prix et disponibilités en direct ne sont pas encore connectés.',
       filterLabel: 'Type d’hébergement',
       allTypes: 'Tous les hébergements',
       types: {
@@ -111,7 +113,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
     de: {
       eyebrow: 'Unterkünfte',
       title: 'Unterkünfte nahe {destination}',
-      intro: 'Entdecke echte Unterkünfte, die vom konfigurierten Unterkunftsanbieter geliefert werden.',
+      intro:
+        'Entdecke echte Unterkünfte, die vom konfigurierten Unterkunftsanbieter geliefert werden.',
       back: 'Zurück zum Reiseziel',
       searchArea: 'Im Umkreis von 10 km',
       results: 'Ergebnisse',
@@ -119,7 +122,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Unterkünfte können derzeit nicht geladen werden.',
       website: 'Webseite',
       distance: 'Entfernung',
-      dataNotice: 'Nur Standortdaten. Live-Zimmerpreise und Verfügbarkeit sind noch nicht verbunden.',
+      dataNotice:
+        'Nur Standortdaten. Live-Zimmerpreise und Verfügbarkeit sind noch nicht verbunden.',
       filterLabel: 'Unterkunftsart',
       allTypes: 'Alle Unterkünfte',
       types: {
@@ -141,7 +145,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Al momento non è possibile caricare gli alloggi.',
       website: 'Sito web',
       distance: 'Distanza',
-      dataNotice: 'Solo dati sulla posizione. Prezzi e disponibilità in tempo reale non sono ancora collegati.',
+      dataNotice:
+        'Solo dati sulla posizione. Prezzi e disponibilità in tempo reale non sono ancora collegati.',
       filterLabel: 'Tipo di alloggio',
       allTypes: 'Tutti gli alloggi',
       types: {
@@ -163,7 +168,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Não foi possível carregar os alojamentos neste momento.',
       website: 'Site',
       distance: 'Distância',
-      dataNotice: 'Apenas dados de localização. Preços e disponibilidade em tempo real ainda não estão ligados.',
+      dataNotice:
+        'Apenas dados de localização. Preços e disponibilidade em tempo real ainda não estão ligados.',
       filterLabel: 'Tipo de alojamento',
       allTypes: 'Todos os alojamentos',
       types: {
@@ -185,7 +191,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Nie można teraz wczytać noclegów.',
       website: 'Strona internetowa',
       distance: 'Odległość',
-      dataNotice: 'Tylko dane lokalizacyjne. Ceny i dostępność pokoi na żywo nie są jeszcze podłączone.',
+      dataNotice:
+        'Tylko dane lokalizacyjne. Ceny i dostępność pokoi na żywo nie są jeszcze podłączone.',
       filterLabel: 'Typ noclegu',
       allTypes: 'Wszystkie noclegi',
       types: {
@@ -199,7 +206,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
     nl: {
       eyebrow: 'Verblijven',
       title: 'Verblijven bij {destination}',
-      intro: 'Ontdek echte verblijfslocaties die door de ingestelde accommodatieprovider worden geleverd.',
+      intro:
+        'Ontdek echte verblijfslocaties die door de ingestelde accommodatieprovider worden geleverd.',
       back: 'Terug naar bestemming',
       searchArea: 'Binnen 10 km',
       results: 'Resultaten',
@@ -207,7 +215,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Verblijfslocaties kunnen nu niet worden geladen.',
       website: 'Website',
       distance: 'Afstand',
-      dataNotice: 'Alleen locatiegegevens. Live kamerprijzen en beschikbaarheid zijn nog niet aangesloten.',
+      dataNotice:
+        'Alleen locatiegegevens. Live kamerprijzen en beschikbaarheid zijn nog niet aangesloten.',
       filterLabel: 'Type verblijf',
       allTypes: 'Alle verblijven',
       types: {
@@ -251,7 +260,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Overnatning kan ikke indlæses lige nu.',
       website: 'Websted',
       distance: 'Afstand',
-      dataNotice: 'Kun placeringsdata. Live værelsespriser og tilgængelighed er endnu ikke tilsluttet.',
+      dataNotice:
+        'Kun placeringsdata. Live værelsespriser og tilgængelighed er endnu ikke tilsluttet.',
       filterLabel: 'Overnatningstype',
       allTypes: 'Alle overnatningssteder',
       types: {
@@ -273,7 +283,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Majoituspaikkoja ei voida ladata juuri nyt.',
       website: 'Verkkosivusto',
       distance: 'Etäisyys',
-      dataNotice: 'Vain sijaintitiedot. Huoneiden reaaliaikaisia hintoja ja saatavuutta ei ole vielä yhdistetty.',
+      dataNotice:
+        'Vain sijaintitiedot. Huoneiden reaaliaikaisia hintoja ja saatavuutta ei ole vielä yhdistetty.',
       filterLabel: 'Majoitustyyppi',
       allTypes: 'Kaikki majoitukset',
       types: {
@@ -287,7 +298,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
     tr: {
       eyebrow: 'Konaklama',
       title: '{destination} yakınındaki konaklama yerleri',
-      intro: 'Yapılandırılmış konaklama sağlayıcısının döndürdüğü gerçek konaklama yerlerini keşfedin.',
+      intro:
+        'Yapılandırılmış konaklama sağlayıcısının döndürdüğü gerçek konaklama yerlerini keşfedin.',
       back: 'Varış noktasına dön',
       searchArea: '10 km içinde',
       results: 'Sonuçlar',
@@ -383,7 +395,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: '현재 숙박시설을 불러올 수 없습니다.',
       website: '웹사이트',
       distance: '거리',
-      dataNotice: '위치 데이터만 제공합니다. 실시간 객실 가격과 예약 가능 여부는 아직 연결되지 않았습니다.',
+      dataNotice:
+        '위치 데이터만 제공합니다. 실시간 객실 가격과 예약 가능 여부는 아직 연결되지 않았습니다.',
       filterLabel: '숙박 유형',
       allTypes: '모든 숙박',
       types: {
