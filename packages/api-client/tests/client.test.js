@@ -45,6 +45,23 @@ describe('API client', () => {
     await expect(client.request('/api/v1/example')).resolves.toEqual({ ok: true });
   });
 
+  it('builds a provider-neutral destination search URL', async () => {
+    const fetchImpl = vi.fn(async (url) => {
+      expect(String(url)).toBe(
+        'http://localhost:5000/api/v1/destinations/search?query=Stockholm&language=sv&countryCode=SE&limit=8',
+      );
+      return new Response(JSON.stringify({ destinations: { results: [] } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    await expect(
+      client.searchDestinations({ query: 'Stockholm', language: 'sv', countryCode: 'SE', limit: 8 }),
+    ).resolves.toEqual({ destinations: { results: [] } });
+  });
+
   it('throws a network-safe error instead of leaking fetch details', async () => {
     const client = createApiClient({
       baseUrl: 'http://localhost:5000',
