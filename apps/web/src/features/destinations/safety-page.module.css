@@ -1,0 +1,217 @@
+.page {
+  min-height: 70vh;
+  padding-block: clamp(2rem, 5vw, 4.5rem);
+}
+
+.shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.backLink:hover {
+  color: var(--color-text);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  align-items: end;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero h1 {
+  margin: 0.45rem 0 0.75rem;
+  max-width: 18ch;
+  font-size: clamp(2rem, 5vw, 3.7rem);
+  line-height: 1.03;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.badges {
+  display: grid;
+  gap: 0.6rem;
+  min-width: min(100%, 15rem);
+}
+
+.badges span,
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-subtle);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.feedback,
+.stateShell {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  padding: clamp(2rem, 7vw, 4rem);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.stateShell h1 {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.stateShell p {
+  margin: 0;
+  max-width: 52ch;
+}
+
+.resultCount {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.resultCount strong {
+  color: var(--color-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.cardHeading h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.15rem;
+}
+
+.cardIcon {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+}
+
+.verifiedBadge {
+  width: fit-content;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.phoneRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  padding: 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.phoneRow strong {
+  margin-inline-end: auto;
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+}
+
+.provenance {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.provenance div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.provenance dt {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.provenance dd {
+  margin: 0;
+}
+
+.provenance a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: inherit;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.spin {
+  animation: safety-spin 0.9s linear infinite;
+}
+
+@keyframes safety-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}

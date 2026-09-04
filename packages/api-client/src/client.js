@@ -132,6 +132,7 @@ export function createApiClient(options) {
       ),
     convertCurrency: ({ amount, from, to }) =>
       request(`/api/v1/currency/convert?${toSearchParams({ amount, from, to })}`),
+    getEmergencyRecords: (query) => request(`/api/v1/emergency?${toSearchParams(query)}`),
     autocompletePlaces: (query) => request(`/api/v1/places/autocomplete?${toSearchParams(query)}`),
     getNearbyPlaces: (query) => request(`/api/v1/places/nearby?${toSearchParams(query)}`),
     getEvents: (query) => request(`/api/v1/events?${toSearchParams(query)}`),
