@@ -9,9 +9,9 @@ This file is the engineering handoff for continuing AttraVoya Pro without relyin
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Latest verified merged checkpoint before the current PR: Phase 7I merge commit `cf05786c12279bf884e99312539d9f116f0de92d`.
-- Phase 7I post-merge `develop` CI `#149` passed all five workflow jobs.
-- Current pull request: `#10` from `feature/phase-7j-nearby-destination` into `develop`.
+- Latest verified merged checkpoint before the current PR: Phase 7J merge commit `3f4dc70cf173d954d92a7a002813a1124eaae552`.
+- Phase 7J post-merge `develop` CI `#154` passed all five workflow jobs.
+- Current pull request: `#11` from `feature/phase-7k-safety-destination` into `develop`.
 
 Every vertical slice must follow this sequence:
 
@@ -80,56 +80,76 @@ Completed and merged through PR `#8` at `05162952c277388fc143b4d45a2d8e1d9475829
 
 ### Phase 7I — Family destination discovery
 
-Completed and merged through PR `#9` at:
+Completed and merged through PR `#9` at `cf05786c12279bf884e99312539d9f116f0de92d`.
 
-`cf05786c12279bf884e99312539d9f116f0de92d`
-
-Implemented:
-
-- real `/destinations/[slug]/family` customer experience
-- reuse of `/api/v1/places/nearby`; no fake dedicated Family provider
-- factual `PLAYGROUNDS`, `PARKS` and `ATTRACTIONS` discovery
-- 10 km radius and capped 12-result requests per category
-- defensive normalization, deduplication and distance ordering
-- child age bands `0–3`, `4–8`, `9–12`, `13–17` as planning context only
-- explicit guardrail that provider results are not verified for age suitability or child safety
-- no fabricated suitability, safety, supervision, accessibility, opening times, prices, ratings or availability
-- loading, success, empty, error and retry behavior
-- all 18 locales, RTL, responsive and reduced-motion styling
-- focused tests
+Implemented real `/destinations/[slug]/family` discovery using the existing provider-neutral places API, factual playground/park/attraction categories, bounded 10 km requests, defensive normalization, child age bands `0–3`, `4–8`, `9–12`, `13–17` as planning context only, honest failure states, all 18 locales, and explicit guardrails against fabricated age suitability, child safety, supervision, accessibility, opening times, prices, ratings or availability.
 
 Final-head PR CI `#148` and post-merge `develop` CI `#149` passed all five jobs.
 
 ### Phase 7J — Nearby destination discovery
 
-Current implementation is in PR `#10` from `feature/phase-7j-nearby-destination` into `develop`.
+Completed and merged through PR `#10` into `develop` at:
+
+`3f4dc70cf173d954d92a7a002813a1124eaae552`
 
 Implemented:
 
-- replaced the top-level `/nearby` shell with a real destination-aware nearby experience
-- reused the validated top-level destination-context parser
-- reused the existing provider-neutral `/api/v1/places/nearby` API instead of building a redundant Nearby backend
-- factual nearby categories: cafés, supermarkets, pharmacies, ATMs and parking
-- one selected category at a time to keep requests bounded and the page focused
-- 3 km search radius and capped 16-result request
-- browser calls only AttraVoya's shared API; no direct Geoapify call from the client
-- defensive result normalization, deduplication and distance ordering
-- genuine provider name, place name, address, distance and validated HTTP/HTTPS website only
-- no fabricated walking times, opening hours, prices, ratings, accessibility, safety, popularity, crowd levels or availability
-- category switching plus honest loading, success, empty, error and retry states
-- all 18 supported locales
-- RTL-compatible, responsive and reduced-motion-aware styling
-- focused Nearby UI tests
+- real destination-aware `/nearby` experience
+- validated destination context
+- existing provider-neutral `/api/v1/places/nearby` API only
+- factual cafés, supermarkets, pharmacies, ATMs and parking categories
+- one selected category per request
+- 3 km radius and capped 16-result request
+- defensive normalization, deduplication and distance ordering
+- genuine provider/name/address/distance/validated website fields only
+- no fabricated walking times, hours, prices, ratings, accessibility, safety, popularity, crowds or availability
+- category switching with loading, success, empty, error and retry states
+- all 18 locales, RTL, responsive and reduced-motion behavior
+- focused UI tests
 
-CI caught an initial malformed locale-map wrapper in `nearby-page-copy.js`; the file was replaced with the same 18 translations under a simpler typed `Object.freeze` declaration. This fixed both strict JavaScript and production-build parsing without weakening CI.
+Final-head PR CI `#153` and post-merge `develop` CI `#154` passed all five workflow jobs.
 
-Clean Phase 7J code checkpoint:
+### Phase 7K — Verified Safety destination foundation
 
-`c7554bc738f490c44623f7b0f9ca9a213eb533a8`
+Current implementation is in PR `#11` from `feature/phase-7k-safety-destination` into `develop`.
 
-Clean PR CI `#152` passed all five workflow jobs, including JavaScript, translations, provider smoke, ESLint, unit tests, normal Prettier, PostgreSQL/Prisma, dependency/secret checks, production builds and live-provider checks.
+The branch starts from the verified Phase 7J merge commit `3f4dc70cf173d954d92a7a002813a1124eaae552`.
 
-This documentation update creates a newer PR head. Do not merge PR `#10` based only on CI `#152`; require a new complete green CI run on the exact final head containing this handoff update.
+Implemented:
+
+- replaced `/destinations/[slug]/safety` unavailable shell with a real verified-emergency experience
+- activated the pre-existing but empty server `emergency` module as a public read-only path
+- reused the existing `EmergencyRecord` Prisma provenance model rather than inventing a parallel safety store
+- new strict `/api/v1/emergency?countryCode=XX` contract with ISO2 validation
+- repository filtering requires country match, `VERIFIED` status, `isPublished=true`, country-wide scope (`regionName=null`) and verification metadata
+- service-level defense in depth revalidates required fields, authoritative HTTP/HTTPS source URL and `lastVerifiedAt` before a record crosses the public contract
+- no emergency numbers are seeded, guessed, inferred from locale, or generated by AI
+- the existing database seed continues to explicitly exclude fake emergency numbers
+- shared API-client support for verified emergency records
+- destination Safety UI uses only validated destination country context
+- customer UI displays genuine service label, phone number, safe `tel:` action when possible, official source and last-verified date
+- mismatched response country context is rejected client-side instead of showing another country's contacts
+- honest empty state when AttraVoya has no verified published record
+- honest error/retry behavior without exposing backend details
+- basic emergency information remains public and subscription-independent
+- no crime score, neighborhood-safety rating, political-risk claim, medical-access claim, travel advisory or other unsupported safety assertion was added
+- all 18 locales, RTL-compatible/responsive/reduced-motion styling
+- focused server and web tests
+
+CI findings fixed without weakening the gate:
+
+- CI `#155` caught a checkJs inference issue where the async Safety state status widened to `string`; an explicit `Promise<SafetyState>` JSDoc return contract fixed it
+- CI `#156` then passed JavaScript, translations, provider smoke, lint, all tests, database, security, live-provider checks and production builds; only Prettier remained
+- a temporary CI formatting diagnostic was added solely to run Prettier on the three Safety UI files inside the runner, print the exact diff, restore the files, and leave the normal format check failing
+- the exact Prettier output was applied and the temporary diagnostic was completely removed; `.github/workflows/ci.yml` is back to its original blob and is not part of the final PR diff
+
+Clean Phase 7K code checkpoint:
+
+`6b27e62cefdfc15be327704903c2825ef7295b4d`
+
+Clean code CI `#164` passed all five workflow jobs, including JavaScript, all 18 translation checks, provider smoke tests, ESLint, all unit/integration tests, normal `prettier --check .`, PostgreSQL/Prisma verification, dependency/secret checks, production builds and live-provider checks.
+
+This handoff update creates a newer PR head. Do not merge PR `#11` based only on CI `#164`; require a new complete green CI run on the exact final head containing this documentation update.
 
 ## Live-provider verification status
 
@@ -148,35 +168,39 @@ Keyed provider checks are skipped when their GitHub Actions secrets are not conf
 
 Therefore Geoapify-backed destination slices are covered by shared-category, adapter/API/UI tests and production builds, but do not claim a real Geoapify network request was verified by CI unless the key is configured and the live check actually runs.
 
+The Safety slice is database-backed verified reference data, not a third-party live-provider lookup. A successful Safety test means the public filtering/provenance contract was verified; it does not mean emergency records exist for every country.
+
 ## Immediate next engineering step
 
-Finish Phase 7J safely:
+Finish Phase 7K safely:
 
-1. Require complete green GitHub CI on the exact final head of PR `#10` after this handoff update.
+1. Require complete green GitHub CI on the exact final head of PR `#11` after this handoff update.
 2. Fix any real failure without weakening CI.
-3. Confirm PR `#10` is mergeable and still points to the verified head.
-4. Merge PR `#10` into `develop` only after all five jobs are green.
+3. Confirm PR `#11` is mergeable and still points to that exact verified head.
+4. Merge PR `#11` into `develop` only after all five jobs are green.
 5. Verify the resulting `develop` push CI is fully green.
-6. Only then branch the next slice from that exact verified merge commit.
+6. Only then create the next feature branch from that exact verified merge commit.
 
 ## Recommended next slice
 
-### Phase 7K — Safety destination foundation
+### Phase 7L — Destination currency foundation
 
-Safety must be authoritative and conservative. Never generate emergency numbers or safety claims with AI.
+The destination Currency page is still an unavailable shell. The project already has country/currency reference data plus a provider-neutral currency service backed by Frankfurter, with `/api/v1/currency/rates` and `/api/v1/currency/convert`. Frankfurter is also one of the real network paths exercised by the live-provider CI.
 
 Suggested scope:
 
-1. Inspect the existing Safety destination shell, safety server module, reference-data models and admin safety tooling before changing code.
-2. Establish the authoritative data source/contract for official emergency numbers and country/city safety facts before exposing them to customers.
-3. Reuse validated destination context and country code; do not infer emergency numbers from locale, language or nearby categories.
-4. Clearly separate verified official facts from provider/news context and from generic travel guidance.
-5. Basic emergency/safety functionality must never be paywalled.
-6. Do not invent crime levels, neighborhood safety, medical access, political stability, emergency contacts, advisories or risk scores.
-7. Add source/provenance and last-verified metadata where authoritative facts are shown.
-8. Add honest unavailable states when verified data is missing rather than falling back to AI-generated facts.
-9. Preserve all 18 locales, RTL, accessibility, responsive behavior and reduced motion.
+1. Inspect the destination Currency shell, country reference endpoint, shared currency client and Frankfurter normalizer before changing code.
+2. Resolve the destination country's real configured currency/currencies from AttraVoya country reference data; never infer a currency from language or UI locale.
+3. Use only the existing AttraVoya currency API from the browser; never call Frankfurter directly from customer code.
+4. Show provider attribution/fetched date or other existing provenance fields returned by the normalized currency contract.
+5. Provide a small useful conversion experience where the traveller can enter an amount and choose source currency while the destination currency is clearly identified.
+6. Treat exchange rates as retrieved reference rates, not guaranteed card, cash, bank or bureau rates.
+7. Never invent exchange rates, fees, spreads, ATM costs, card acceptance, cash requirements or merchant payment behavior.
+8. Add honest loading, success, empty, error and retry states, including unsupported-currency handling.
+9. Preserve all 18 locales, country/language/currency separation, RTL, accessibility, responsive behavior and reduced motion.
 10. Add focused tests and require the complete CI gate before proceeding.
+
+After Currency is verified and merged, inspect the still-unavailable destination Language page as the likely next isolated slice, reusing country-language reference data and the existing LibreTranslate foundation without presenting machine translation as an official language fact.
 
 ## Product constraints that must not be forgotten
 
