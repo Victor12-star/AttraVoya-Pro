@@ -308,7 +308,7 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       sectionUnavailable: 'यह स्थान श्रेणी अस्थायी रूप से उपलब्ध नहीं है।',
       categories: { playgrounds: 'खेल के मैदान', parks: 'पार्क', attractions: 'आकर्षण' },
     },
-  }),
+  })
 );
 
 /** @param {string} locale */
