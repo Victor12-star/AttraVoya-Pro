@@ -23,6 +23,7 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { weatherRoutes } from './modules/weather/weather.routes.js';
 import { currencyRoutes } from './modules/currency/currency.routes.js';
 import { destinationsRoutes } from './modules/destinations/destinations.routes.js';
+import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
@@ -140,6 +141,11 @@ export async function buildApp(options = {}) {
   await app.register(destinationsRoutes, {
     prefix: `${API_PREFIX}/destinations`,
     provider: options.destinationsProvider ?? options.placesProvider,
+  });
+
+  await app.register(emergencyRoutes, {
+    prefix: `${API_PREFIX}/emergency`,
+    repository: options.emergencyRepository,
   });
 
   await app.register(placesRoutes, {
