@@ -11,9 +11,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { AccommodationPage } = await import(
-  '../../src/features/destinations/accommodation-page.jsx'
-);
+const { AccommodationPage } =
+  await import('../../src/features/destinations/accommodation-page.jsx');
 
 const messages = {
   common: {
