@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PLACE_CATEGORY_GROUPS } from '@attravoya/constants';
 
@@ -112,8 +112,8 @@ describe('FamilyDestinationPage', () => {
     const oldestBand = screen.getByRole('button', { name: '13–17' });
 
     expect(youngestBand).toHaveAttribute('aria-pressed', 'false');
-    youngestBand.click();
-    oldestBand.click();
+    fireEvent.click(youngestBand);
+    fireEvent.click(oldestBand);
     expect(youngestBand).toHaveAttribute('aria-pressed', 'true');
     expect(oldestBand).toHaveAttribute('aria-pressed', 'true');
   });
