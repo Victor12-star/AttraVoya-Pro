@@ -18,12 +18,16 @@ export function FeaturePage({ eyebrow, title, description, backLabel, children =
     <section className="feature-page">
       <div className="shell">
         <div className="feature-page__card">
-          <span className="eyebrow"><Info size={15} /> {eyebrow}</span>
+          <span className="eyebrow">
+            <Info size={15} /> {eyebrow}
+          </span>
           <h1>{title}</h1>
           <p>{description}</p>
           {children}
           <div className="feature-page__actions">
-            <Link className="button button--dark" href="/"><ArrowLeft size={17} /> {backLabel}</Link>
+            <Link className="button button--dark" href="/">
+              <ArrowLeft size={17} /> {backLabel}
+            </Link>
           </div>
         </div>
       </div>

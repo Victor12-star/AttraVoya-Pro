@@ -34,7 +34,9 @@ export function RecentSearches({ messages }) {
   return (
     <div className="recent-searches" aria-label={messages.recentSearches}>
       <div className="recent-searches__top">
-        <span><Clock3 size={15} /> {messages.recentSearches}</span>
+        <span>
+          <Clock3 size={15} /> {messages.recentSearches}
+        </span>
         <button
           type="button"
           onClick={() => {

@@ -1,6 +1,9 @@
 import { requireProviderCredential } from '../http/provider-credentials.js';
 import { PLACE_CATEGORY_GROUPS } from './place-categories.js';
-import { normalizeGeoapifyAutocomplete, normalizeGeoapifyFeatureCollection } from './places-normalizer.js';
+import {
+  normalizeGeoapifyAutocomplete,
+  normalizeGeoapifyFeatureCollection,
+} from './places-normalizer.js';
 
 const AUTOCOMPLETE_ENDPOINT = 'https://api.geoapify.com/v1/geocode/autocomplete';
 const PLACES_ENDPOINT = 'https://api.geoapify.com/v2/places';
@@ -25,8 +28,23 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
 
     /** @param {GeoapifyAutocompleteOptions} options */
     async autocomplete(options) {
-      const { query, limit = 8, language = 'en', countryCode, biasLatitude, biasLongitude } = options;
-      const cacheKey = ['autocomplete', query.toLowerCase(), limit, language, countryCode ?? '', biasLatitude ?? '', biasLongitude ?? ''].join(':');
+      const {
+        query,
+        limit = 8,
+        language = 'en',
+        countryCode,
+        biasLatitude,
+        biasLongitude,
+      } = options;
+      const cacheKey = [
+        'autocomplete',
+        query.toLowerCase(),
+        limit,
+        language,
+        countryCode ?? '',
+        biasLatitude ?? '',
+        biasLongitude ?? '',
+      ].join(':');
       const cached = cache?.get(cacheKey);
       if (cached) return cached;
 
@@ -50,11 +68,26 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
       return cache ? cache.set(cacheKey, result, Math.min(cacheTtlSeconds, 900)) : result;
     },
 
-    async searchNearby({ categoryGroup, latitude, longitude, radiusMeters = 5000, limit = 20, language = 'en' }) {
+    async searchNearby({
+      categoryGroup,
+      latitude,
+      longitude,
+      radiusMeters = 5000,
+      limit = 20,
+      language = 'en',
+    }) {
       const categories = PLACE_CATEGORY_GROUPS[categoryGroup];
       if (!categories) throw new TypeError(`Unsupported place category group: ${categoryGroup}`);
 
-      const cacheKey = ['nearby', categoryGroup, Number(latitude).toFixed(4), Number(longitude).toFixed(4), radiusMeters, limit, language].join(':');
+      const cacheKey = [
+        'nearby',
+        categoryGroup,
+        Number(latitude).toFixed(4),
+        Number(longitude).toFixed(4),
+        radiusMeters,
+        limit,
+        language,
+      ].join(':');
       const cached = cache?.get(cacheKey);
       if (cached) return cached;
 

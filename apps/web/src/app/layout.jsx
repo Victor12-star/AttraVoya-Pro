@@ -10,7 +10,8 @@ export const metadata = {
     default: 'AttraVoya Pro',
     template: '%s · AttraVoya Pro',
   },
-  description: 'Budget-aware destination discovery, trip planning, local travel tools and safety support.',
+  description:
+    'Budget-aware destination discovery, trip planning, local travel tools and safety support.',
   applicationName: 'AttraVoya Pro',
 };
 

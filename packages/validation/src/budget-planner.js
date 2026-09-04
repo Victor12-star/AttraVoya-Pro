@@ -27,7 +27,11 @@ export const createBudgetPlanRequestSchema = z
     minNights: z.number().int().min(1).max(90).default(2),
     maxNights: z.number().int().min(1).max(90).default(14),
     budgetAmount: z.number().positive().max(10_000_000),
-    budgetCurrencyCode: z.string().trim().length(3).transform((value) => value.toUpperCase()),
+    budgetCurrencyCode: z
+      .string()
+      .trim()
+      .length(3)
+      .transform((value) => value.toUpperCase()),
     adults: z.number().int().min(1).max(20).default(1),
     childrenAges: childrenAgesSchema.default([]),
     interests: z.array(z.string().trim().min(1).max(60)).max(20).default([]),
@@ -71,11 +75,7 @@ export const createBudgetPlanRequestSchema = z
       });
     }
 
-    if (
-      data.earliestDeparture &&
-      data.latestReturn &&
-      data.latestReturn < data.earliestDeparture
-    ) {
+    if (data.earliestDeparture && data.latestReturn && data.latestReturn < data.earliestDeparture) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Latest return must be on or after earliest departure',

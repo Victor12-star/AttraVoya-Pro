@@ -10,14 +10,5 @@
     "scripts/**/*.js",
     "packages/eslint-config/**/*.js"
   ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    ".expo",
-    ".turbo",
-    "dist",
-    "build",
-    "out",
-    "coverage"
-  ]
+  "exclude": ["node_modules", ".next", ".expo", ".turbo", "dist", "build", "out", "coverage"]
 }

@@ -23,11 +23,14 @@ export default function DashboardPage() {
     <section className="admin-card">
       <h1>Administration</h1>
       <p className="admin-muted">
-        Manage AttraVoya Pro platform data and operational controls from dedicated modules. Privileged API authorization remains the source of truth for every administrative action.
+        Manage AttraVoya Pro platform data and operational controls from dedicated modules.
+        Privileged API authorization remains the source of truth for every administrative action.
       </p>
       <div className="admin-section-grid">
         {SECTIONS.map(([label, href]) => (
-          <Link className="admin-section-link" href={href} key={href}>{label}</Link>
+          <Link className="admin-section-link" href={href} key={href}>
+            {label}
+          </Link>
         ))}
       </div>
     </section>

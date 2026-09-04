@@ -40,7 +40,12 @@ function clearSessionCookies(reply, env) {
   reply.clearCookie(AUTH_COOKIES.REFRESH, options);
 }
 
-export function createAuthController({ service, env, onVerificationRequested, onPasswordResetRequested }) {
+export function createAuthController({
+  service,
+  env,
+  onVerificationRequested,
+  onPasswordResetRequested,
+}) {
   return {
     async register(request, reply) {
       const result = await service.register(request.body);

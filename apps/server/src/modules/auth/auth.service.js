@@ -45,7 +45,8 @@ function publicUser(auth) {
 
 export function createAuthService({ repository, issueAccessToken, refreshSessionDays = 30 }) {
   if (!repository) throw new TypeError('Authentication repository is required.');
-  if (typeof issueAccessToken !== 'function') throw new TypeError('Access-token issuer is required.');
+  if (typeof issueAccessToken !== 'function')
+    throw new TypeError('Access-token issuer is required.');
 
   return {
     async register(input) {
@@ -101,7 +102,10 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
       // Run a real Argon2 verification only when a hash exists. We deliberately
       // return the same public error for unknown emails and wrong passwords to
       // avoid turning login into an account-enumeration endpoint.
-      const validPassword = await argon2.verify(user?.passwordHash ?? DUMMY_PASSWORD_HASH, password);
+      const validPassword = await argon2.verify(
+        user?.passwordHash ?? DUMMY_PASSWORD_HASH,
+        password,
+      );
 
       if (!user || user.deletedAt || !validPassword) {
         throw new AuthenticationError('Email or password is incorrect.', {

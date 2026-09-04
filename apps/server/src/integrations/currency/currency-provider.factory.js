@@ -10,15 +10,20 @@ const cache = createProviderCache();
 export function createCurrencyProvider(options = {}) {
   const providerName = options.providerName ?? env.CURRENCY_PROVIDER;
   const createProvider = CURRENCY_PROVIDER_REGISTRY[providerName];
-  if (!createProvider) throw new ProviderUnavailableError(`Currency provider '${providerName}' is not supported.`);
+  if (!createProvider)
+    throw new ProviderUnavailableError(`Currency provider '${providerName}' is not supported.`);
 
-  return assertCurrencyProvider(createProvider({
-    http: options.http ?? createProviderHttpClient({
-      provider: providerName,
-      timeoutMs: env.PROVIDER_TIMEOUT_MS,
-      retryMax: env.PROVIDER_RETRY_MAX,
+  return assertCurrencyProvider(
+    createProvider({
+      http:
+        options.http ??
+        createProviderHttpClient({
+          provider: providerName,
+          timeoutMs: env.PROVIDER_TIMEOUT_MS,
+          retryMax: env.PROVIDER_RETRY_MAX,
+        }),
+      cache: options.cache ?? cache,
+      cacheTtlSeconds: env.CURRENCY_CACHE_TTL_SECONDS,
     }),
-    cache: options.cache ?? cache,
-    cacheTtlSeconds: env.CURRENCY_CACHE_TTL_SECONDS,
-  }));
+  );
 }

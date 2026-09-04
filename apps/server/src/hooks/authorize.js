@@ -19,11 +19,7 @@ import { AuthenticationError, AuthorizationError } from '../errors/app-error.js'
  * @param {AuthorizationOptions} [options]
  */
 export function createAuthorizeHook(options = {}) {
-  const {
-    minimumRole,
-    allPermissions = [],
-    anyPermissions = [],
-  } = options;
+  const { minimumRole, allPermissions = [], anyPermissions = [] } = options;
 
   return async function authorize(request) {
     if (!request.auth) {
@@ -42,7 +38,10 @@ export function createAuthorizeHook(options = {}) {
       throw new AuthorizationError();
     }
 
-    if (anyPermissions.length > 0 && !anyPermissions.some((permission) => permissionSet.has(permission))) {
+    if (
+      anyPermissions.length > 0 &&
+      !anyPermissions.some((permission) => permissionSet.has(permission))
+    ) {
       throw new AuthorizationError();
     }
   };

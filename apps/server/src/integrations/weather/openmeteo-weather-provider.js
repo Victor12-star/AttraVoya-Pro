@@ -25,7 +25,9 @@ const DAILY_FIELDS = [
 function weatherCacheKey({ latitude, longitude, forecastDays, timezone }) {
   // Rounding keeps tiny GPS jitter from consuming new weather requests for
   // practically the same location while still preserving neighbourhood-level accuracy.
-  return [Number(latitude).toFixed(3), Number(longitude).toFixed(3), forecastDays, timezone].join(':');
+  return [Number(latitude).toFixed(3), Number(longitude).toFixed(3), forecastDays, timezone].join(
+    ':',
+  );
 }
 
 export function createOpenMeteoWeatherProvider({ http, cache, cacheTtlSeconds = 600 }) {

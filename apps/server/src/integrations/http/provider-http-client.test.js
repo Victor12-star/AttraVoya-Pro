@@ -14,11 +14,15 @@ describe('provider HTTP client', () => {
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
     const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 0 });
 
-    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({ ok: true });
+    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
+      ok: true,
+    });
   });
 
   it('does not retry rate-limit responses in a tight loop', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(429, { error: 'slow down' }, { 'retry-after': '60' }));
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(jsonResponse(429, { error: 'slow down' }, { 'retry-after': '60' }));
     const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 3 });
 
     await expect(client.requestJson('https://provider.example/data')).rejects.toMatchObject({
@@ -28,12 +32,15 @@ describe('provider HTTP client', () => {
   });
 
   it('retries transient GET failures before succeeding', async () => {
-    const fetchImpl = vi.fn()
+    const fetchImpl = vi
+      .fn()
       .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary' }))
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
     const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 1 });
 
-    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({ ok: true });
+    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
+      ok: true,
+    });
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });

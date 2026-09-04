@@ -1,4 +1,7 @@
-import { normalizeFrankfurterRates, normalizeFrankfurterSingleRate } from './currency-normalizer.js';
+import {
+  normalizeFrankfurterRates,
+  normalizeFrankfurterSingleRate,
+} from './currency-normalizer.js';
 
 const API_BASE = 'https://api.frankfurter.dev/v2';
 
@@ -53,7 +56,9 @@ export function createFrankfurterCurrencyProvider({ http, cache, cacheTtlSeconds
       const cacheKey = `pair:${base}:${quote}`;
       let rate = cache?.get(cacheKey);
       if (!rate) {
-        const payload = await http.requestJson(`${API_BASE}/rate/${encodeURIComponent(base)}/${encodeURIComponent(quote)}`);
+        const payload = await http.requestJson(
+          `${API_BASE}/rate/${encodeURIComponent(base)}/${encodeURIComponent(quote)}`,
+        );
         rate = normalizeFrankfurterSingleRate(payload, base, quote);
         cache?.set(cacheKey, rate, cacheTtlSeconds);
       }

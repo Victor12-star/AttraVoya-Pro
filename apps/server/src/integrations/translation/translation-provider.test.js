@@ -10,9 +10,12 @@ describe('LibreTranslate adapter', () => {
     const result = await provider.translate({ text: 'Hello', source: 'en', target: 'es' });
 
     expect(result.translatedText).toBe('Hola');
-    expect(http.requestJson).toHaveBeenCalledWith('http://localhost:5001/translate', expect.objectContaining({
-      method: 'POST',
-      retry: false,
-    }));
+    expect(http.requestJson).toHaveBeenCalledWith(
+      'http://localhost:5001/translate',
+      expect.objectContaining({
+        method: 'POST',
+        retry: false,
+      }),
+    );
   });
 });

@@ -59,7 +59,9 @@ async function main() {
     }
   }
 
-  console.log(`Translation check passed for ${expectedLocales.length} UI locales and ${sourceKeys.size} message keys.`);
+  console.log(
+    `Translation check passed for ${expectedLocales.length} UI locales and ${sourceKeys.size} message keys.`,
+  );
 }
 
 main().catch((error) => {

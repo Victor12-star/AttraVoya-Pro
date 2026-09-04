@@ -32,7 +32,6 @@ export const loginSchema = z
   })
   .strict();
 
-
 export const verifyEmailSchema = z
   .object({
     token: z.string().trim().min(20).max(512),

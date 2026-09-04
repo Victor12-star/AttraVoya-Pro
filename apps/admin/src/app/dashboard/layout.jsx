@@ -5,7 +5,9 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="admin-shell">
       <header className="admin-header">
-        <Link className="admin-brand" href="/dashboard">AttraVoya Pro Admin</Link>
+        <Link className="admin-brand" href="/dashboard">
+          AttraVoya Pro Admin
+        </Link>
         <nav className="admin-nav" aria-label="Admin navigation">
           <Link href="/dashboard/users">Users</Link>
           <Link href="/dashboard/destinations">Destinations</Link>

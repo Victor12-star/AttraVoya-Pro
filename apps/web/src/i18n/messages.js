@@ -11,7 +11,8 @@ export async function loadMessages(locale = DEFAULT_UI_LOCALE) {
   const normalizedLocale = normalizeLocale(locale);
 
   try {
-    return (await import(`../../messages/${normalizedLocale}.json`, { with: { type: 'json' } })).default;
+    return (await import(`../../messages/${normalizedLocale}.json`, { with: { type: 'json' } }))
+      .default;
   } catch {
     // English is the source locale and is always required by translation checks.
     return (await import('../../messages/en.json', { with: { type: 'json' } })).default;

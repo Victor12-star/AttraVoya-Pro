@@ -84,7 +84,6 @@ export class ServiceUnavailableError extends AppError {
   }
 }
 
-
 export class ExternalServiceError extends AppError {
   constructor(message = 'An external service could not complete the request.', options = {}) {
     super(message, {

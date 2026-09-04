@@ -1,7 +1,4 @@
-import {
-  ProviderResponseError,
-  ProviderUnavailableError,
-} from '../../errors/app-error.js';
+import { ProviderResponseError, ProviderUnavailableError } from '../../errors/app-error.js';
 import { mapProviderHttpError } from './provider-error-mapper.js';
 
 const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
@@ -50,7 +47,8 @@ export function createProviderHttpClient(options) {
 
   async function requestJson(url, options = {}) {
     const method = String(options.method ?? 'GET').toUpperCase();
-    const retriesAllowed = options.retry === false || !['GET', 'HEAD'].includes(method) ? 0 : retryMax;
+    const retriesAllowed =
+      options.retry === false || !['GET', 'HEAD'].includes(method) ? 0 : retryMax;
     let attempt = 0;
 
     while (true) {
@@ -62,7 +60,12 @@ export function createProviderHttpClient(options) {
         headers.set('Accept', 'application/json');
 
         let body = options.body;
-        if (body !== undefined && body !== null && !(body instanceof FormData) && typeof body !== 'string') {
+        if (
+          body !== undefined &&
+          body !== null &&
+          !(body instanceof FormData) &&
+          typeof body !== 'string'
+        ) {
           headers.set('Content-Type', 'application/json');
           body = JSON.stringify(body);
         }

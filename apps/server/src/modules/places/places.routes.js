@@ -8,6 +8,9 @@ export async function placesRoutes(app, options = {}) {
   const service = createPlacesService(provider);
   const controller = createPlacesController(service);
 
-  app.get('/autocomplete', { schema: placesSchemas.autocomplete, handler: controller.autocomplete });
+  app.get('/autocomplete', {
+    schema: placesSchemas.autocomplete,
+    handler: controller.autocomplete,
+  });
   app.get('/nearby', { schema: placesSchemas.nearby, handler: controller.nearby });
 }

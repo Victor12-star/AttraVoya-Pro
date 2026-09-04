@@ -19,7 +19,9 @@ import { Brand } from '../common/brand.jsx';
 function HeaderSelect({ icon, label, value, onChange, children }) {
   return (
     <label className="header-select" title={label}>
-      <span className="header-select__icon" aria-hidden="true">{icon}</span>
+      <span className="header-select__icon" aria-hidden="true">
+        {icon}
+      </span>
       <span className="sr-only">{label}</span>
       <select aria-label={label} value={value} onChange={onChange}>
         {children}
@@ -79,7 +81,9 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
 
         <nav className="desktop-nav" aria-label="Primary navigation">
           {navigation.map(([href, label]) => (
-            <Link href={href} key={href}>{label}</Link>
+            <Link href={href} key={href}>
+              {label}
+            </Link>
           ))}
         </nav>
 
@@ -91,7 +95,9 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
             onChange={changeLanguage}
           >
             {UI_LOCALES.map((item) => (
-              <option key={item.code} value={item.code}>{item.nativeName}</option>
+              <option key={item.code} value={item.code}>
+                {item.nativeName}
+              </option>
             ))}
           </HeaderSelect>
 
@@ -102,11 +108,18 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
             onChange={changeCurrency}
           >
             {currencyOptions.map((item) => (
-              <option key={item.code} value={item.code}>{item.code} · {item.label}</option>
+              <option key={item.code} value={item.code}>
+                {item.code} · {item.label}
+              </option>
             ))}
           </HeaderSelect>
 
-          <button className="icon-button" type="button" onClick={toggleTheme} aria-label="Toggle color theme">
+          <button
+            className="icon-button"
+            type="button"
+            onClick={toggleTheme}
+            aria-label="Toggle color theme"
+          >
             {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
@@ -130,15 +143,21 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
         <div className="mobile-nav-panel">
           <nav className="shell mobile-nav" aria-label="Mobile navigation">
             {navigation.map(([href, label]) => (
-              <Link href={href} key={href} onClick={() => setMobileOpen(false)}>{label}</Link>
+              <Link href={href} key={href} onClick={() => setMobileOpen(false)}>
+                {label}
+              </Link>
             ))}
-            <Link href="/nearby" onClick={() => setMobileOpen(false)}>{messages.navigation.nearby}</Link>
+            <Link href="/nearby" onClick={() => setMobileOpen(false)}>
+              {messages.navigation.nearby}
+            </Link>
             <div className="mobile-preferences">
               <label>
                 <span>{messages.common.chooseLanguage}</span>
                 <select value={locale} onChange={changeLanguage}>
                   {UI_LOCALES.map((item) => (
-                    <option key={item.code} value={item.code}>{item.nativeName}</option>
+                    <option key={item.code} value={item.code}>
+                      {item.nativeName}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -146,12 +165,18 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
                 <span>{messages.common.chooseCurrency}</span>
                 <select value={currency} onChange={changeCurrency}>
                   {currencyOptions.map((item) => (
-                    <option key={item.code} value={item.code}>{item.code} · {item.label}</option>
+                    <option key={item.code} value={item.code}>
+                      {item.code} · {item.label}
+                    </option>
                   ))}
                 </select>
               </label>
             </div>
-            <Link className="button button--dark" href="/login" onClick={() => setMobileOpen(false)}>
+            <Link
+              className="button button--dark"
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+            >
               {messages.navigation.signIn}
             </Link>
           </nav>

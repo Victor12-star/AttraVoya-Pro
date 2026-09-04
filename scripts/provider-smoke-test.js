@@ -19,10 +19,11 @@ async function main() {
   const transport = createProviderHttpClient({
     provider: 'smoke',
     retryMax: 0,
-    fetchImpl: async () => new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'content-type': 'application/json' },
-    }),
+    fetchImpl: async () =>
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
   });
   assert.deepEqual(await transport.requestJson('https://provider.invalid/smoke'), { ok: true });
 
@@ -42,13 +43,19 @@ async function main() {
       }),
     },
   });
-  const forecast = await weather.getForecast({ latitude: 59.33, longitude: 18.07, forecastDays: 1 });
+  const forecast = await weather.getForecast({
+    latitude: 59.33,
+    longitude: 18.07,
+    forecastDays: 1,
+  });
   assert.equal(forecast.current.temperatureC, 19);
   assert.equal(forecast.daily[0].temperatureMaxC, 21);
 
   const currency = createFrankfurterCurrencyProvider({
     cache: createProviderCache(),
-    http: { requestJson: async () => ({ date: '2026-09-03', base: 'SEK', quote: 'EUR', rate: 0.09 }) },
+    http: {
+      requestJson: async () => ({ date: '2026-09-03', base: 'SEK', quote: 'EUR', rate: 0.09 }),
+    },
   });
   const conversion = await currency.convert({ amount: 1000, from: 'SEK', to: 'EUR' });
   assert.equal(conversion.convertedAmount, 90);

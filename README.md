@@ -84,13 +84,13 @@ pnpm dev
 
 ## Local service ports
 
-| Service | Local address |
-| --- | --- |
-| Website | `http://localhost:3000` |
-| Admin | `http://localhost:3001` |
-| API | `http://localhost:5000` |
+| Service        | Local address           |
+| -------------- | ----------------------- |
+| Website        | `http://localhost:3000` |
+| Admin          | `http://localhost:3001` |
+| API            | `http://localhost:5000` |
 | LibreTranslate | `http://localhost:5001` |
-| PostgreSQL | `localhost:5432` |
+| PostgreSQL     | `localhost:5432`        |
 
 PostgreSQL and LibreTranslate are bound to `127.0.0.1` by Docker Compose so the local development services are not exposed directly to other machines on the network.
 
@@ -145,13 +145,12 @@ AttraVoya Pro includes all 249 ISO 3166-1 country codes in the shared localizati
 Run `pnpm translations:check` to verify that every enabled locale has the same message keys and no blank translations. Interface localization is separate from the traveller translation API; verified emergency information is separate from both.
 
 See `docs/localization.md`.
+
 ## Professional customer design foundation
 
 Phase 5A establishes the original AttraVoya Pro customer visual system: semantic light/dark themes, editorial travel layouts, Lucide icons, responsive search, a distinct budget-first entry path, mobile navigation, consent-gated recent searches, and translated authentication screens. The design deliberately avoids generic AI/SaaS visual patterns and does not use fabricated travel prices, ratings or statistics to make the interface look complete.
 
 See `docs/design-system.md`, `docs/accessibility.md`, and `PHASE-5A-REPORT.md`.
-
-
 
 ## Real provider platform — Phase 6A
 

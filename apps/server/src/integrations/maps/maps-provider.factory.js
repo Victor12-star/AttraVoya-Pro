@@ -10,16 +10,21 @@ const cache = createProviderCache({ maxEntries: 500 });
 export function createMapsProvider(options = {}) {
   const providerName = options.providerName ?? env.MAPS_PROVIDER;
   const createProvider = MAPS_PROVIDER_REGISTRY[providerName];
-  if (!createProvider) throw new ProviderUnavailableError(`Maps provider '${providerName}' is not supported.`);
+  if (!createProvider)
+    throw new ProviderUnavailableError(`Maps provider '${providerName}' is not supported.`);
 
-  return assertMapsProvider(createProvider({
-    http: options.http ?? createProviderHttpClient({
-      provider: providerName,
-      timeoutMs: env.PROVIDER_TIMEOUT_MS,
-      retryMax: env.PROVIDER_RETRY_MAX,
+  return assertMapsProvider(
+    createProvider({
+      http:
+        options.http ??
+        createProviderHttpClient({
+          provider: providerName,
+          timeoutMs: env.PROVIDER_TIMEOUT_MS,
+          retryMax: env.PROVIDER_RETRY_MAX,
+        }),
+      apiKey: options.apiKey ?? env.GEOAPIFY_API_KEY,
+      cache: options.cache ?? cache,
+      cacheTtlSeconds: env.PLACES_CACHE_TTL_SECONDS,
     }),
-    apiKey: options.apiKey ?? env.GEOAPIFY_API_KEY,
-    cache: options.cache ?? cache,
-    cacheTtlSeconds: env.PLACES_CACHE_TTL_SECONDS,
-  }));
+  );
 }

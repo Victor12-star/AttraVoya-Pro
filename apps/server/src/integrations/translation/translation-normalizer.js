@@ -20,9 +20,11 @@ export function normalizeLibreTranslateResult(payload, source, target) {
 
 export function normalizeLibreTranslateLanguages(payload) {
   if (!Array.isArray(payload)) return [];
-  return payload.map((language) => ({
-    code: language.code,
-    name: language.name,
-    targets: Array.isArray(language.targets) ? language.targets : [],
-  })).filter((language) => language.code && language.name);
+  return payload
+    .map((language) => ({
+      code: language.code,
+      name: language.name,
+      targets: Array.isArray(language.targets) ? language.targets : [],
+    }))
+    .filter((language) => language.code && language.name);
 }

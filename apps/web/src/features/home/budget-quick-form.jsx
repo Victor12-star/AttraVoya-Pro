@@ -46,17 +46,50 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
     <form className="budget-quick-form" onSubmit={submit}>
       <label>
         <span>{messages.budget.origin}</span>
-        <div className="input-with-icon"><MapPin size={18} /><input required value={origin} onChange={(event) => setOrigin(event.target.value)} /></div>
+        <div className="input-with-icon">
+          <MapPin size={18} />
+          <input required value={origin} onChange={(event) => setOrigin(event.target.value)} />
+        </div>
       </label>
       <label>
         <span>{messages.budget.totalBudget}</span>
-        <div className="input-with-icon"><WalletCards size={18} /><input required min="1" inputMode="decimal" type="number" value={budget} onChange={(event) => setBudget(event.target.value)} /><strong>{currency}</strong></div>
+        <div className="input-with-icon">
+          <WalletCards size={18} />
+          <input
+            required
+            min="1"
+            inputMode="decimal"
+            type="number"
+            value={budget}
+            onChange={(event) => setBudget(event.target.value)}
+          />
+          <strong>{currency}</strong>
+        </div>
       </label>
       <label>
         <span>{messages.search.travellers}</span>
         <div className="traveller-fields">
-          <span><Users size={17} /><input aria-label={messages.budget.adults} min="1" max="12" type="number" value={adults} onChange={(event) => setAdults(event.target.value)} /></span>
-          <span><input aria-label={messages.budget.children} min="0" max="12" type="number" value={children} onChange={(event) => setChildren(event.target.value)} /></span>
+          <span>
+            <Users size={17} />
+            <input
+              aria-label={messages.budget.adults}
+              min="1"
+              max="12"
+              type="number"
+              value={adults}
+              onChange={(event) => setAdults(event.target.value)}
+            />
+          </span>
+          <span>
+            <input
+              aria-label={messages.budget.children}
+              min="0"
+              max="12"
+              type="number"
+              value={children}
+              onChange={(event) => setChildren(event.target.value)}
+            />
+          </span>
         </div>
       </label>
       <button className="button button--dark budget-quick-form__button" type="submit">

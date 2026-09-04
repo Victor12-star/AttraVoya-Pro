@@ -10,8 +10,9 @@ import { PrismaPg } from '@prisma/adapter-pg';
 // Reuse a global slot so hot reload does not spawn duplicate pools.
 // The JSDoc cast satisfies the no-emit JS checker (globalThis has no
 // index signature), mirroring the official Prisma singleton pattern.
-const globalForPrisma =
-  /** @type {{ prisma?: import('@prisma/client').PrismaClient }} */ (globalThis);
+const globalForPrisma = /** @type {{ prisma?: import('@prisma/client').PrismaClient }} */ (
+  globalThis
+);
 
 function createClient() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });

@@ -17,7 +17,10 @@ function parseEnvFile(filePath) {
 
     const key = rawLine.slice(0, separator).trim();
     let value = rawLine.slice(separator + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       value = value.slice(1, -1);
     }
     values[key] = value;
@@ -37,7 +40,9 @@ const warnings = [];
 const requireValue = (key, minimumLength = 1) => {
   const value = env[key]?.trim();
   if (!value || value.length < minimumLength) {
-    errors.push(`${key} is required${minimumLength > 1 ? ` and must be at least ${minimumLength} characters` : ''}.`);
+    errors.push(
+      `${key} is required${minimumLength > 1 ? ` and must be at least ${minimumLength} characters` : ''}.`,
+    );
   }
 };
 

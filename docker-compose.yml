@@ -8,15 +8,15 @@ services:
     ports:
       # Bind to localhost only so the development database is not exposed
       # to other devices on the network.
-      - "127.0.0.1:5432:5432"
+      - '127.0.0.1:5432:5432'
     environment:
-      POSTGRES_DB: "${POSTGRES_DB:-attravoya}"
-      POSTGRES_USER: "${POSTGRES_USER:-attravoya}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before starting Docker}"
+      POSTGRES_DB: '${POSTGRES_DB:-attravoya}'
+      POSTGRES_USER: '${POSTGRES_USER:-attravoya}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before starting Docker}'
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-attravoya} -d ${POSTGRES_DB:-attravoya}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-attravoya} -d ${POSTGRES_DB:-attravoya}']
       interval: 5s
       timeout: 5s
       retries: 12
@@ -27,8 +27,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
   libretranslate:
     image: libretranslate/libretranslate:v1.9.6
@@ -37,23 +37,23 @@ services:
     ports:
       # LibreTranslate listens on 5000 inside the container. Mapping it to
       # 5001 keeps it separate from the AttraVoya API on localhost:5000.
-      - "127.0.0.1:5001:5000"
+      - '127.0.0.1:5001:5000'
     environment:
       ARGOS_CHUNK_TYPE: MINISBD
-      LT_BATCH_LIMIT: "25"
-      LT_CHAR_LIMIT: "5000"
-      LT_DISABLE_FILES_TRANSLATION: "true"
-      LT_DISABLE_WEB_UI: "true"
+      LT_BATCH_LIMIT: '25'
+      LT_CHAR_LIMIT: '5000'
+      LT_DISABLE_FILES_TRANSLATION: 'true'
+      LT_DISABLE_WEB_UI: 'true'
       LT_HOST: 0.0.0.0
-      LT_LOAD_ONLY: "${LIBRETRANSLATE_LOAD_ONLY:-en,sv,es,fr,de,it,pt,nl}"
-      LT_PORT: "5000"
-      LT_REQ_LIMIT: "60"
-      LT_THREADS: "${LIBRETRANSLATE_THREADS:-2}"
-      LT_UPDATE_MODELS: "false"
+      LT_LOAD_ONLY: '${LIBRETRANSLATE_LOAD_ONLY:-en,sv,es,fr,de,it,pt,nl}'
+      LT_PORT: '5000'
+      LT_REQ_LIMIT: '60'
+      LT_THREADS: '${LIBRETRANSLATE_THREADS:-2}'
+      LT_UPDATE_MODELS: 'false'
     volumes:
       - libretranslate_models:/home/libretranslate/.local:rw
     healthcheck:
-      test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
+      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
       interval: 30s
       timeout: 10s
       retries: 10
@@ -64,8 +64,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
 volumes:
   postgres_data:

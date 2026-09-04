@@ -72,7 +72,9 @@ async function checkLibreTranslate() {
 async function checkGeoapifyWhenConfigured() {
   const apiKey = process.env.GEOAPIFY_API_KEY?.trim();
   if (!apiKey) {
-    console.log('○ Geoapify live check skipped: GEOAPIFY_API_KEY is not configured in GitHub Secrets.');
+    console.log(
+      '○ Geoapify live check skipped: GEOAPIFY_API_KEY is not configured in GitHub Secrets.',
+    );
     return;
   }
 

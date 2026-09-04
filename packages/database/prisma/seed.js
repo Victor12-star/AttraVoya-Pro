@@ -77,9 +77,7 @@ async function seedGlobalLocalizationReference() {
     languageByCode.set(language.code, record);
   }
 
-  const currencyCodes = new Set(
-    COUNTRY_REFERENCE.flatMap((country) => country.currencyCodes),
-  );
+  const currencyCodes = new Set(COUNTRY_REFERENCE.flatMap((country) => country.currencyCodes));
 
   for (const code of currencyCodes) {
     const metadata = getCurrencyMetadata(code, 'en');
@@ -136,8 +134,7 @@ async function seedGlobalLocalizationReference() {
           },
         },
         update: {
-          isOfficial:
-            languageReference.isOfficial || languageReference.isRegionalOfficial,
+          isOfficial: languageReference.isOfficial || languageReference.isRegionalOfficial,
           isCommon:
             languageReference.isOfficial ||
             languageReference.isRegionalOfficial ||
@@ -147,8 +144,7 @@ async function seedGlobalLocalizationReference() {
         create: {
           countryId: country.id,
           languageId: language.id,
-          isOfficial:
-            languageReference.isOfficial || languageReference.isRegionalOfficial,
+          isOfficial: languageReference.isOfficial || languageReference.isRegionalOfficial,
           isCommon:
             languageReference.isOfficial ||
             languageReference.isRegionalOfficial ||

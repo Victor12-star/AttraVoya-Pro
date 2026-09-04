@@ -33,7 +33,11 @@ export function SearchExperience({ messages }) {
     }
 
     setError('');
-    rememberRecentSearch({ type: 'DESTINATION', label: cleanQuery, criteria: { query: cleanQuery } });
+    rememberRecentSearch({
+      type: 'DESTINATION',
+      label: cleanQuery,
+      criteria: { query: cleanQuery },
+    });
     router.push(`/search?mode=${encodeURIComponent(mode)}&q=${encodeURIComponent(cleanQuery)}`);
   }
 
@@ -76,7 +80,11 @@ export function SearchExperience({ messages }) {
           {messages.common.search}
         </button>
       </form>
-      {error ? <p className="field-error" id="search-error">{error}</p> : null}
+      {error ? (
+        <p className="field-error" id="search-error">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

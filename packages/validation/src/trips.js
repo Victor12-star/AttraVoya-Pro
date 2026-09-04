@@ -4,9 +4,7 @@
 import { z } from 'zod';
 
 /** ISO date string in yyyy-mm-dd form. */
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in yyyy-mm-dd format');
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in yyyy-mm-dd format');
 
 export const createTripSchema = z
   .object({

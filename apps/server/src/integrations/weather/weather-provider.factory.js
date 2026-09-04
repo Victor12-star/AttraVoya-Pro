@@ -14,13 +14,17 @@ export function createWeatherProvider(options = {}) {
     throw new ProviderUnavailableError(`Weather provider '${providerName}' is not supported.`);
   }
 
-  return assertWeatherProvider(createProvider({
-    http: options.http ?? createProviderHttpClient({
-      provider: providerName,
-      timeoutMs: env.PROVIDER_TIMEOUT_MS,
-      retryMax: env.PROVIDER_RETRY_MAX,
+  return assertWeatherProvider(
+    createProvider({
+      http:
+        options.http ??
+        createProviderHttpClient({
+          provider: providerName,
+          timeoutMs: env.PROVIDER_TIMEOUT_MS,
+          retryMax: env.PROVIDER_RETRY_MAX,
+        }),
+      cache: options.cache ?? cache,
+      cacheTtlSeconds: env.WEATHER_CACHE_TTL_SECONDS,
     }),
-    cache: options.cache ?? cache,
-    cacheTtlSeconds: env.WEATHER_CACHE_TTL_SECONDS,
-  }));
+  );
 }

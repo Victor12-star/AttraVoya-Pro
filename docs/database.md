@@ -33,7 +33,6 @@ Budget planning is a core AttraVoya domain, not a frontend calculator.
 
 `TripExpense` records actual spend during a trip. Comparing actual expenses with the current `BudgetPlan` enables the future Budget Guard to warn users early and suggest cheaper alternatives before they exceed their total budget.
 
-
 ### Accommodation choice and whole-trip value
 
 `TravelStayPreference` stores what the traveller actually wants from lodging rather than assuming every trip is a hotel stay. It can represent hotels, guest houses, bed & breakfasts, hostels, serviced apartments, aparthotels, short-term rentals, vacation homes, resorts, villas, cottages, campsites, and holiday parks. Required and preferred values are separated so the planner can respect must-haves without discarding a good trip because of a soft preference.

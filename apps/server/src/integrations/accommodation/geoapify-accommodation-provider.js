@@ -14,7 +14,14 @@ export function createGeoapifyAccommodationProvider({ placesProvider }) {
     name: 'geoapify',
     supportedTypes: Object.freeze(Object.keys(SUPPORTED_TYPE_GROUPS)),
 
-    async searchNearby({ latitude, longitude, radiusMeters = 5000, limit = 20, language = 'en', types = [] }) {
+    async searchNearby({
+      latitude,
+      longitude,
+      radiusMeters = 5000,
+      limit = 20,
+      language = 'en',
+      types = [],
+    }) {
       const requestedTypes = [...new Set(types)];
       const supportedRequestedTypes = requestedTypes.filter((type) => SUPPORTED_TYPE_GROUPS[type]);
       const unsupportedTypes = requestedTypes.filter((type) => !SUPPORTED_TYPE_GROUPS[type]);
@@ -39,8 +46,14 @@ export function createGeoapifyAccommodationProvider({ placesProvider }) {
         results.push(...response.results.map(normalizeAccommodationPlace));
       }
 
-      const deduplicated = [...new Map(results.map((place) => [place.externalId ?? `${place.latitude}:${place.longitude}:${place.name}`, place])).values()]
-        .slice(0, limit);
+      const deduplicated = [
+        ...new Map(
+          results.map((place) => [
+            place.externalId ?? `${place.latitude}:${place.longitude}:${place.name}`,
+            place,
+          ]),
+        ).values(),
+      ].slice(0, limit);
 
       return {
         provider: 'geoapify',

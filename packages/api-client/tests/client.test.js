@@ -4,17 +4,18 @@ import { ApiClientError, createApiClient } from '../src/index.js';
 
 describe('API client', () => {
   it('normalizes API errors and preserves request IDs', async () => {
-    const fetchImpl = vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid search.',
-            requestId: 'request-123',
-          },
-        }),
-        { status: 400, headers: { 'content-type': 'application/json' } },
-      ),
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Invalid search.',
+              requestId: 'request-123',
+            },
+          }),
+          { status: 400, headers: { 'content-type': 'application/json' } },
+        ),
     );
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
@@ -53,6 +54,8 @@ describe('API client', () => {
     });
 
     await expect(client.request('/api/v1/example')).rejects.toBeInstanceOf(ApiClientError);
-    await expect(client.request('/api/v1/example')).rejects.toMatchObject({ code: 'NETWORK_ERROR' });
+    await expect(client.request('/api/v1/example')).rejects.toMatchObject({
+      code: 'NETWORK_ERROR',
+    });
   });
 });

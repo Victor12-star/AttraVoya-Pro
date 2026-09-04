@@ -162,7 +162,6 @@ A feature is complete only when the applicable items are true:
 - automated tests;
 - no exposed secrets or unresolved critical errors.
 
-
 ## Current checkpoint — Phase 6A
 
 The first real provider platform is implemented: shared timeout/retry/error/cache infrastructure plus Open-Meteo, Frankfurter v2, LibreTranslate, Geoapify place/geocoding/routing foundations, and honest accommodation-location discovery. New provider routes are validated through shared Zod schemas and exposed through the shared API client. Live flight fares and live room prices remain deliberately unavailable rather than fabricated.

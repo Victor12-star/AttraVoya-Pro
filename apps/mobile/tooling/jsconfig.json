@@ -4,25 +4,10 @@
   "compilerOptions": {
     "baseUrl": "..",
     "maxNodeModuleJsDepth": 0,
-    "types": [
-      "node",
-      "react",
-      "react-native"
-    ],
+    "types": ["node", "react", "react-native"],
     "module": "ESNext",
     "moduleResolution": "Bundler"
   },
-  "include": [
-    "../app.config.js",
-    "../jest.config.js",
-    "../jest.setup.js"
-  ],
-  "exclude": [
-    "../node_modules",
-    "../.expo",
-    "../dist",
-    "../coverage",
-    "../android",
-    "../ios"
-  ]
+  "include": ["../app.config.js", "../jest.config.js", "../jest.setup.js"],
+  "exclude": ["../node_modules", "../.expo", "../dist", "../coverage", "../android", "../ios"]
 }

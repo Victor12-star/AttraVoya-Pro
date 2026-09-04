@@ -6,14 +6,7 @@ const ALLOWED_TYPES = new Set(['DESTINATION', 'FLIGHT', 'ACCOMMODATION', 'BUDGET
 
 const CRITERIA_KEYS = Object.freeze({
   DESTINATION: ['query', 'countryCode', 'destinationId'],
-  FLIGHT: [
-    'origin',
-    'destination',
-    'departureDate',
-    'returnDate',
-    'travellers',
-    'cabinClass',
-  ],
+  FLIGHT: ['origin', 'destination', 'departureDate', 'returnDate', 'travellers', 'cabinClass'],
   ACCOMMODATION: [
     'destinationId',
     'checkIn',
@@ -49,9 +42,7 @@ function sanitizeCriteria(type, criteria) {
   if (!criteria || typeof criteria !== 'object' || Array.isArray(criteria)) return {};
   const allowedKeys = CRITERIA_KEYS[type] ?? [];
   return Object.fromEntries(
-    allowedKeys
-      .filter((key) => Object.hasOwn(criteria, key))
-      .map((key) => [key, criteria[key]]),
+    allowedKeys.filter((key) => Object.hasOwn(criteria, key)).map((key) => [key, criteria[key]]),
   );
 }
 
@@ -73,7 +64,9 @@ export function rememberRecentSearch(search) {
   const normalized = {
     id: search.id ?? crypto.randomUUID(),
     type: search.type,
-    label: String(search.label ?? '').trim().slice(0, 200),
+    label: String(search.label ?? '')
+      .trim()
+      .slice(0, 200),
     criteria: sanitizeCriteria(search.type, search.criteria),
     lastUsedAt: new Date().toISOString(),
   };

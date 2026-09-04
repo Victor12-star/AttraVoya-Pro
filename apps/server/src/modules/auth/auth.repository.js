@@ -7,9 +7,7 @@ function mapAuthorizationContext(user) {
   const roles = user.roles.map(({ role }) => role.key);
   const permissions = [
     ...new Set(
-      user.roles.flatMap(({ role }) =>
-        role.permissions.map(({ permission }) => permission.key),
-      ),
+      user.roles.flatMap(({ role }) => role.permissions.map(({ permission }) => permission.key)),
     ),
   ];
 
@@ -144,19 +142,21 @@ export const authRepository = Object.freeze({
   },
 
   async findActiveSessionByRefreshHash(refreshTokenHash, now = new Date()) {
-    return prisma.authSession.findUnique({
-      where: { refreshTokenHash },
-      include: {
-        user: {
-          select: authorizationSelect,
+    return prisma.authSession
+      .findUnique({
+        where: { refreshTokenHash },
+        include: {
+          user: {
+            select: authorizationSelect,
+          },
         },
-      },
-    }).then((session) => {
-      if (!session || session.revokedAt || session.expiresAt <= now) return null;
-      const auth = mapAuthorizationContext(session.user);
-      if (!auth) return null;
-      return { ...session, auth };
-    });
+      })
+      .then((session) => {
+        if (!session || session.revokedAt || session.expiresAt <= now) return null;
+        const auth = mapAuthorizationContext(session.user);
+        if (!auth) return null;
+        return { ...session, auth };
+      });
   },
 
   async rotateSession({ sessionId, refreshTokenHash, lastUsedAt }) {

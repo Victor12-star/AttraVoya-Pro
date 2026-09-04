@@ -26,12 +26,16 @@ const stayNearPrioritySchema = z.enum(enumValues(STAY_NEAR_PRIORITIES));
 
 export const accommodationPreferencesSchema = z
   .object({
-    types: z.array(accommodationTypeSchema).min(1).max(15).default([
-      ACCOMMODATION_TYPES.HOTEL,
-      ACCOMMODATION_TYPES.GUEST_HOUSE,
-      ACCOMMODATION_TYPES.HOSTEL,
-      ACCOMMODATION_TYPES.SHORT_TERM_RENTAL,
-    ]),
+    types: z
+      .array(accommodationTypeSchema)
+      .min(1)
+      .max(15)
+      .default([
+        ACCOMMODATION_TYPES.HOTEL,
+        ACCOMMODATION_TYPES.GUEST_HOUSE,
+        ACCOMMODATION_TYPES.HOSTEL,
+        ACCOMMODATION_TYPES.SHORT_TERM_RENTAL,
+      ]),
     unitType: stayUnitTypeSchema.default(STAY_UNIT_TYPES.ANY),
     breakfast: preferenceLevelSchema.default(STAY_PREFERENCE_LEVELS.NOT_REQUIRED),
     kitchen: preferenceLevelSchema.default(STAY_PREFERENCE_LEVELS.NOT_REQUIRED),

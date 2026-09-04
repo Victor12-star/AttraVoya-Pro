@@ -10,7 +10,10 @@ export default function AdminError({ reset }) {
   return (
     <main role="alert" style={{ padding: '2rem', maxWidth: '48rem', margin: '0 auto' }}>
       <h1>Something went wrong</h1>
-      <p>The Admin workspace could not complete this request. No sensitive error details are shown here.</p>
+      <p>
+        The Admin workspace could not complete this request. No sensitive error details are shown
+        here.
+      </p>
       <button type="button" onClick={() => reset()}>
         Try again
       </button>

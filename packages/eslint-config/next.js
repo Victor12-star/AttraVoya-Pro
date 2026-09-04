@@ -14,15 +14,11 @@ const jsxA11yPlugin = requireFromHere('eslint-plugin-jsx-a11y');
 const jsxA11yRecommended = jsxA11yPlugin.configs?.recommended;
 
 if (!jsxA11yRecommended || Array.isArray(jsxA11yRecommended)) {
-  throw new TypeError(
-    'eslint-plugin-jsx-a11y is missing its recommended configuration.',
-  );
+  throw new TypeError('eslint-plugin-jsx-a11y is missing its recommended configuration.');
 }
 
 if (!jsxA11yRecommended.rules) {
-  throw new TypeError(
-    'eslint-plugin-jsx-a11y recommended configuration has no rules.',
-  );
+  throw new TypeError('eslint-plugin-jsx-a11y recommended configuration has no rules.');
 }
 
 const jsxA11y = fixupPluginRules(jsxA11yPlugin);

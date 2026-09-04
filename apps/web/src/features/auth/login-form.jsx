@@ -38,18 +38,30 @@ export function LoginForm({ messages }) {
     <form className="auth-form" onSubmit={submit}>
       <label>
         <span>{messages.email}</span>
-        <div className="auth-input"><Mail size={18} /><input name="email" type="email" autoComplete="email" required /></div>
+        <div className="auth-input">
+          <Mail size={18} />
+          <input name="email" type="email" autoComplete="email" required />
+        </div>
       </label>
       <label>
         <span>{messages.password}</span>
-        <div className="auth-input"><LockKeyhole size={18} /><input name="password" type="password" autoComplete="current-password" required /></div>
+        <div className="auth-input">
+          <LockKeyhole size={18} />
+          <input name="password" type="password" autoComplete="current-password" required />
+        </div>
       </label>
-      {error ? <p className="auth-error" role="alert">{error}</p> : null}
+      {error ? (
+        <p className="auth-error" role="alert">
+          {error}
+        </p>
+      ) : null}
       <button className="button button--dark auth-submit" type="submit" disabled={pending}>
         {pending ? messages.working : messages.signIn}
         {!pending ? <ArrowRight size={17} /> : null}
       </button>
-      <p className="auth-switch">{messages.newHere} <Link href="/register">{messages.createAccount}</Link></p>
+      <p className="auth-switch">
+        {messages.newHere} <Link href="/register">{messages.createAccount}</Link>
+      </p>
     </form>
   );
 }

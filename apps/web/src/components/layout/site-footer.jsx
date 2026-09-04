@@ -20,9 +20,15 @@ export function SiteFooter({ messages }) {
         </div>
         <div>
           <h2>{messages.safety.title}</h2>
-          <Link href="/safety"><ShieldCheck size={15} /> {messages.safety.verifiedEmergency}</Link>
-          <Link href="/language"><Languages size={15} /> {messages.common.chooseLanguage}</Link>
-          <Link href="/family"><HeartHandshake size={15} /> {messages.home.family}</Link>
+          <Link href="/safety">
+            <ShieldCheck size={15} /> {messages.safety.verifiedEmergency}
+          </Link>
+          <Link href="/language">
+            <Languages size={15} /> {messages.common.chooseLanguage}
+          </Link>
+          <Link href="/family">
+            <HeartHandshake size={15} /> {messages.home.family}
+          </Link>
         </div>
       </div>
       <div className="shell site-footer__bottom">

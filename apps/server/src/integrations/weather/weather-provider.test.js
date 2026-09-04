@@ -34,7 +34,11 @@ const payload = {
 describe('Open-Meteo adapter', () => {
   it('normalizes and caches weather responses', async () => {
     const http = { requestJson: vi.fn().mockResolvedValue(payload) };
-    const provider = createOpenMeteoWeatherProvider({ http, cache: createProviderCache(), cacheTtlSeconds: 600 });
+    const provider = createOpenMeteoWeatherProvider({
+      http,
+      cache: createProviderCache(),
+      cacheTtlSeconds: 600,
+    });
     const query = { latitude: 59.33, longitude: 18.07, forecastDays: 1, timezone: 'auto' };
 
     const first = await provider.getForecast(query);

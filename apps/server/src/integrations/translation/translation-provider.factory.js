@@ -10,15 +10,20 @@ const languageCache = createProviderCache({ maxEntries: 20 });
 export function createTranslationProvider(options = {}) {
   const providerName = options.providerName ?? env.TRANSLATION_PROVIDER;
   const createProvider = TRANSLATION_PROVIDER_REGISTRY[providerName];
-  if (!createProvider) throw new ProviderUnavailableError(`Translation provider '${providerName}' is not supported.`);
+  if (!createProvider)
+    throw new ProviderUnavailableError(`Translation provider '${providerName}' is not supported.`);
 
-  return assertTranslationProvider(createProvider({
-    http: options.http ?? createProviderHttpClient({
-      provider: providerName,
-      timeoutMs: env.PROVIDER_TIMEOUT_MS,
-      retryMax: env.PROVIDER_RETRY_MAX,
+  return assertTranslationProvider(
+    createProvider({
+      http:
+        options.http ??
+        createProviderHttpClient({
+          provider: providerName,
+          timeoutMs: env.PROVIDER_TIMEOUT_MS,
+          retryMax: env.PROVIDER_RETRY_MAX,
+        }),
+      baseUrl: options.baseUrl ?? env.LIBRETRANSLATE_URL,
+      languageCache: options.languageCache ?? languageCache,
     }),
-    baseUrl: options.baseUrl ?? env.LIBRETRANSLATE_URL,
-    languageCache: options.languageCache ?? languageCache,
-  }));
+  );
 }

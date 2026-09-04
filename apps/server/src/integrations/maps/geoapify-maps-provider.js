@@ -43,7 +43,10 @@ export function createGeoapifyMapsProvider({ http, apiKey, cache, cacheTtlSecond
 
     async route({ waypoints, mode = 'drive', language = 'en' }) {
       const url = new URL(ROUTING_ENDPOINT);
-      url.searchParams.set('waypoints', waypoints.map(({ latitude, longitude }) => `${latitude},${longitude}`).join('|'));
+      url.searchParams.set(
+        'waypoints',
+        waypoints.map(({ latitude, longitude }) => `${latitude},${longitude}`).join('|'),
+      );
       url.searchParams.set('mode', mode);
       url.searchParams.set('lang', language);
       url.searchParams.set('format', 'json');

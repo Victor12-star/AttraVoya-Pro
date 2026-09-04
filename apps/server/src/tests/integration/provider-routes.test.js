@@ -26,18 +26,32 @@ function baseOptions() {
     authRepository: {
       findAuthorizationContextByUserId: async () => null,
     },
-    weatherProvider: { getForecast: async (query) => ({ provider: 'test', current: { temperatureC: 20 }, query }) },
+    weatherProvider: {
+      getForecast: async (query) => ({ provider: 'test', current: { temperatureC: 20 }, query }),
+    },
     currencyProvider: {
       getRates: async ({ base }) => ({ provider: 'test', base, rates: [] }),
-      convert: async ({ amount, from, to }) => ({ provider: 'test', amount, from, to, convertedAmount: amount * 2 }),
+      convert: async ({ amount, from, to }) => ({
+        provider: 'test',
+        amount,
+        from,
+        to,
+        convertedAmount: amount * 2,
+      }),
     },
     placesProvider: {
       autocomplete: async ({ query }) => ({ provider: 'test', results: [{ name: query }] }),
       searchNearby: async ({ categoryGroup }) => ({ provider: 'test', categoryGroup, results: [] }),
     },
     translationProvider: {
-      translate: async ({ text, target }) => ({ provider: 'test', translatedText: `${text}-${target}` }),
-      getLanguages: async () => ({ provider: 'test', languages: [{ code: 'en', name: 'English', targets: ['sv'] }] }),
+      translate: async ({ text, target }) => ({
+        provider: 'test',
+        translatedText: `${text}-${target}`,
+      }),
+      getLanguages: async () => ({
+        provider: 'test',
+        languages: [{ code: 'en', name: 'English', targets: ['sv'] }],
+      }),
     },
     accommodationProvider: {
       searchNearby: async () => ({ provider: 'test', results: [], inventoryDataAvailable: false }),
@@ -50,23 +64,39 @@ describe('real-provider API contracts', () => {
     const app = await buildApp(baseOptions());
     apps.push(app);
 
-    const weather = await app.inject({ method: 'GET', url: '/api/v1/weather?latitude=59.33&longitude=18.07&forecastDays=3' });
+    const weather = await app.inject({
+      method: 'GET',
+      url: '/api/v1/weather?latitude=59.33&longitude=18.07&forecastDays=3',
+    });
     expect(weather.statusCode).toBe(200);
     expect(weather.json().weather.current.temperatureC).toBe(20);
 
-    const conversion = await app.inject({ method: 'GET', url: '/api/v1/currency/convert?amount=100&from=SEK&to=EUR' });
+    const conversion = await app.inject({
+      method: 'GET',
+      url: '/api/v1/currency/convert?amount=100&from=SEK&to=EUR',
+    });
     expect(conversion.statusCode).toBe(200);
     expect(conversion.json().conversion.convertedAmount).toBe(200);
 
-    const places = await app.inject({ method: 'GET', url: '/api/v1/places/autocomplete?query=Barcelona' });
+    const places = await app.inject({
+      method: 'GET',
+      url: '/api/v1/places/autocomplete?query=Barcelona',
+    });
     expect(places.statusCode).toBe(200);
     expect(places.json().places.results[0].name).toBe('Barcelona');
 
-    const translation = await app.inject({ method: 'POST', url: '/api/v1/translation', payload: { text: 'Hello', source: 'en', target: 'sv' } });
+    const translation = await app.inject({
+      method: 'POST',
+      url: '/api/v1/translation',
+      payload: { text: 'Hello', source: 'en', target: 'sv' },
+    });
     expect(translation.statusCode).toBe(200);
     expect(translation.headers['cache-control']).toBe('no-store');
 
-    const accommodation = await app.inject({ method: 'GET', url: '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE' });
+    const accommodation = await app.inject({
+      method: 'GET',
+      url: '/api/v1/accommodation/nearby?latitude=59.33&longitude=18.07&types=HOSTEL,GUEST_HOUSE',
+    });
     expect(accommodation.statusCode).toBe(200);
     expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(false);
   });

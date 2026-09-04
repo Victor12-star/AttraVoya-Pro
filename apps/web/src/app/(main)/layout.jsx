@@ -10,7 +10,11 @@ export default async function MainLayout({ children }) {
 
   return (
     <div className="app-shell">
-      <SiteHeader locale={locale} messages={messages} defaultCurrency={process.env.NEXT_PUBLIC_DEFAULT_CURRENCY ?? 'SEK'} />
+      <SiteHeader
+        locale={locale}
+        messages={messages}
+        defaultCurrency={process.env.NEXT_PUBLIC_DEFAULT_CURRENCY ?? 'SEK'}
+      />
       <main>{children}</main>
       <SiteFooter messages={messages} />
       <CookiePreferences messages={messages.cookies} />

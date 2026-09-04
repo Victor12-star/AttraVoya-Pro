@@ -38,7 +38,10 @@ export function normalizeLocale(value) {
 }
 
 export function isSupportedUiLocale(value) {
-  return UI_LOCALE_MAP.has(normalizeLocale(value)) && normalizeLocale(value) === String(value).trim().replace('_', '-').toLowerCase().split('-')[0];
+  return (
+    UI_LOCALE_MAP.has(normalizeLocale(value)) &&
+    normalizeLocale(value) === String(value).trim().replace('_', '-').toLowerCase().split('-')[0]
+  );
 }
 
 export function getUiLocale(value) {

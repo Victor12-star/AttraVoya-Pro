@@ -1,9 +1,9 @@
 import { COUNTRY_REFERENCE } from './country-reference.js';
 import { DEFAULT_UI_LOCALE, normalizeLocale } from './locales.js';
 
-export const CURRENCY_CODES = Object.freeze([
-  ...new Set(COUNTRY_REFERENCE.flatMap((country) => country.currencyCodes)),
-].sort());
+export const CURRENCY_CODES = Object.freeze(
+  [...new Set(COUNTRY_REFERENCE.flatMap((country) => country.currencyCodes))].sort(),
+);
 
 const CURRENCY_CODE_SET = new Set(CURRENCY_CODES);
 

@@ -9,7 +9,8 @@ export default async function PlanByBudgetPage({ searchParams }) {
 
   const origin = typeof params?.origin === 'string' ? params.origin.slice(0, 120) : '';
   const budget = typeof params?.budget === 'string' ? params.budget.slice(0, 30) : '';
-  const currency = typeof params?.currency === 'string' ? params.currency.slice(0, 3).toUpperCase() : '';
+  const currency =
+    typeof params?.currency === 'string' ? params.currency.slice(0, 3).toUpperCase() : '';
 
   return (
     <FeaturePage
@@ -20,8 +21,16 @@ export default async function PlanByBudgetPage({ searchParams }) {
     >
       {origin || budget ? (
         <div className="query-summary">
-          {origin ? <div><strong>{messages.budget.origin}:</strong> {origin}</div> : null}
-          {budget ? <div><strong>{messages.budget.totalBudget}:</strong> {budget} {currency}</div> : null}
+          {origin ? (
+            <div>
+              <strong>{messages.budget.origin}:</strong> {origin}
+            </div>
+          ) : null}
+          {budget ? (
+            <div>
+              <strong>{messages.budget.totalBudget}:</strong> {budget} {currency}
+            </div>
+          ) : null}
           <div>{messages.common.unavailable}</div>
         </div>
       ) : null}

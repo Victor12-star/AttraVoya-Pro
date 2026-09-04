@@ -10,24 +10,28 @@ const require = createRequire(import.meta.url);
 const requestedTargets = process.argv.slice(2);
 const targets = requestedTargets.length > 0 ? requestedTargets : ['.'];
 
-const configPaths = [...new Set(targets.map((target) => {
-  const resolvedTarget = path.resolve(process.cwd(), target);
+const configPaths = [
+  ...new Set(
+    targets.map((target) => {
+      const resolvedTarget = path.resolve(process.cwd(), target);
 
-  if (!fs.existsSync(resolvedTarget)) {
-    throw new Error(`JavaScript check target does not exist: ${target}`);
-  }
+      if (!fs.existsSync(resolvedTarget)) {
+        throw new Error(`JavaScript check target does not exist: ${target}`);
+      }
 
-  const targetStats = fs.statSync(resolvedTarget);
-  const configPath = targetStats.isDirectory()
-    ? path.join(resolvedTarget, 'jsconfig.json')
-    : resolvedTarget;
+      const targetStats = fs.statSync(resolvedTarget);
+      const configPath = targetStats.isDirectory()
+        ? path.join(resolvedTarget, 'jsconfig.json')
+        : resolvedTarget;
 
-  if (!fs.existsSync(configPath)) {
-    throw new Error(`No jsconfig.json found for JavaScript check target: ${target}`);
-  }
+      if (!fs.existsSync(configPath)) {
+        throw new Error(`No jsconfig.json found for JavaScript check target: ${target}`);
+      }
 
-  return fs.realpathSync(configPath);
-}))];
+      return fs.realpathSync(configPath);
+    }),
+  ),
+];
 
 let tscPath;
 try {
@@ -45,7 +49,14 @@ for (const configPath of configPaths) {
 
   const result = spawnSync(
     process.execPath,
-    [tscPath, '--project', configPath, '--noEmit', '--pretty', process.stdout.isTTY ? 'true' : 'false'],
+    [
+      tscPath,
+      '--project',
+      configPath,
+      '--noEmit',
+      '--pretty',
+      process.stdout.isTTY ? 'true' : 'false',
+    ],
     {
       cwd: path.dirname(configPath),
       stdio: 'inherit',
@@ -53,7 +64,9 @@ for (const configPath of configPaths) {
   );
 
   if (result.error) {
-    console.error(`Unable to run the JavaScript checker for ${displayPath}: ${result.error.message}`);
+    console.error(
+      `Unable to run the JavaScript checker for ${displayPath}: ${result.error.message}`,
+    );
     failed = true;
     continue;
   }

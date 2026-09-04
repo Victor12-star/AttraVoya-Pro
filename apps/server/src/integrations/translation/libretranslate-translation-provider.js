@@ -1,4 +1,7 @@
-import { normalizeLibreTranslateLanguages, normalizeLibreTranslateResult } from './translation-normalizer.js';
+import {
+  normalizeLibreTranslateLanguages,
+  normalizeLibreTranslateResult,
+} from './translation-normalizer.js';
 
 /**
  * @typedef {object} LibreTranslateProviderOptions

@@ -12,7 +12,11 @@ const environmentSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32),
   COOKIE_SECRET: z.string().min(32),
   DATA_ENCRYPTION_KEY: z.string().min(32),
-  JWT_ACCESS_TTL: z.string().trim().regex(/^\d+[smhd]$/, 'Use a duration such as 15m, 1h, or 1d').default('15m'),
+  JWT_ACCESS_TTL: z
+    .string()
+    .trim()
+    .regex(/^\d+[smhd]$/, 'Use a duration such as 15m, 1h, or 1d')
+    .default('15m'),
   AUTH_REFRESH_SESSION_DAYS: z.coerce.number().int().min(1).max(180).default(30),
   JWT_ISSUER: z.string().trim().min(1).default('attravoya-pro-api'),
   JWT_AUDIENCE: z.string().trim().min(1).default('attravoya-pro'),
@@ -62,7 +66,9 @@ export function loadEnvironment(source = process.env) {
   const result = environmentSchema.safeParse(source);
 
   if (!result.success) {
-    throw new Error(`Invalid AttraVoya Pro server environment:\n${formatEnvironmentErrors(result.error)}`);
+    throw new Error(
+      `Invalid AttraVoya Pro server environment:\n${formatEnvironmentErrors(result.error)}`,
+    );
   }
 
   return Object.freeze(result.data);

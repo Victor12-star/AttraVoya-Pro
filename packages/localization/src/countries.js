@@ -17,7 +17,7 @@ export function isKnownCountryCode(value) {
 
 export function getCountryReference(value) {
   const code = normalizeCountryCode(value);
-  return code ? COUNTRY_BY_ISO2.get(code) ?? null : null;
+  return code ? (COUNTRY_BY_ISO2.get(code) ?? null) : null;
 }
 
 export function getCountryDisplayName(countryCode, locale = DEFAULT_UI_LOCALE) {

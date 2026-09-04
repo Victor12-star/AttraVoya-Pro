@@ -6,35 +6,20 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**",
-        "build/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ],
+      "dependsOn": ["^lint"],
       "outputs": []
     },
     "check:js": {
-      "dependsOn": [
-        "^check:js"
-      ],
+      "dependsOn": ["^check:js"],
       "outputs": []
     },
     "test": {
-      "dependsOn": [
-        "^test"
-      ],
-      "outputs": [
-        "coverage/**"
-      ]
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
     },
     "test:watch": {
       "cache": false,
