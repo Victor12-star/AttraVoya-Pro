@@ -20,7 +20,8 @@ export default async function DestinationRoutePage({ params, searchParams }) {
         destination
           ? {
               ...destination,
-              countryDisplayName: getCountryDisplayName(destination.countryCode, locale),
+              countryDisplayName:
+                getCountryDisplayName(destination.countryCode, locale) ?? destination.countryCode,
             }
           : null
       }
