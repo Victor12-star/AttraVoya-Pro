@@ -21,12 +21,14 @@ import {
   ShieldCheck,
   Sparkles,
   ThermometerSun,
+  Utensils,
   Wind,
 } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
+import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import styles from './destination-page.module.css';
 
 /**
@@ -164,6 +166,7 @@ function FeatureLink({ href, icon: Icon, label }) {
  */
 export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
+  const restaurantsCopy = getRestaurantsPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
     /** @type {ProviderState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -244,6 +247,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'attractions'),
       icon: Sparkles,
       label: messages.navigation.thingsToDo,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'restaurants'),
+      icon: Utensils,
+      label: restaurantsCopy.eyebrow,
     },
     {
       href: buildDestinationContextHref('/nearby', destination),
