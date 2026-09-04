@@ -10,8 +10,9 @@ const cache = createProviderCache({ maxEntries: 500 });
 export function createMapsProvider(options = {}) {
   const providerName = options.providerName ?? env.MAPS_PROVIDER;
   const createProvider = MAPS_PROVIDER_REGISTRY[providerName];
-  if (!createProvider)
+  if (!createProvider) {
     throw new ProviderUnavailableError(`Maps provider '${providerName}' is not supported.`);
+  }
 
   return assertMapsProvider(
     createProvider({

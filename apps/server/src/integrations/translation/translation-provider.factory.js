@@ -10,8 +10,9 @@ const languageCache = createProviderCache({ maxEntries: 20 });
 export function createTranslationProvider(options = {}) {
   const providerName = options.providerName ?? env.TRANSLATION_PROVIDER;
   const createProvider = TRANSLATION_PROVIDER_REGISTRY[providerName];
-  if (!createProvider)
+  if (!createProvider) {
     throw new ProviderUnavailableError(`Translation provider '${providerName}' is not supported.`);
+  }
 
   return assertTranslationProvider(
     createProvider({

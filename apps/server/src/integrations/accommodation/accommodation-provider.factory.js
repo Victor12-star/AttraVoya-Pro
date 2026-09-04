@@ -7,10 +7,11 @@ import { ACCOMMODATION_PROVIDER_REGISTRY } from './accommodation-provider.regist
 export function createAccommodationProvider(options = {}) {
   const providerName = options.providerName ?? env.ACCOMMODATION_PROVIDER;
   const createProvider = ACCOMMODATION_PROVIDER_REGISTRY[providerName];
-  if (!createProvider)
+  if (!createProvider) {
     throw new ProviderUnavailableError(
       `Accommodation provider '${providerName}' is not supported.`,
     );
+  }
 
   return assertAccommodationProvider(
     createProvider({

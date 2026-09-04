@@ -45,8 +45,9 @@ function publicUser(auth) {
 
 export function createAuthService({ repository, issueAccessToken, refreshSessionDays = 30 }) {
   if (!repository) throw new TypeError('Authentication repository is required.');
-  if (typeof issueAccessToken !== 'function')
+  if (typeof issueAccessToken !== 'function') {
     throw new TypeError('Access-token issuer is required.');
+  }
 
   return {
     async register(input) {

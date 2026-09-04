@@ -10,8 +10,9 @@ const cache = createProviderCache({ maxEntries: 750 });
 export function createPlacesProvider(options = {}) {
   const providerName = options.providerName ?? env.PLACES_PROVIDER;
   const createProvider = PLACES_PROVIDER_REGISTRY[providerName];
-  if (!createProvider)
+  if (!createProvider) {
     throw new ProviderUnavailableError(`Places provider '${providerName}' is not supported.`);
+  }
 
   return assertPlacesProvider(
     createProvider({

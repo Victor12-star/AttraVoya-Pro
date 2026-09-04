@@ -1,5 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
+const BACKGROUND_COLOR = '#ffffff';
+
 /**
  * Neutral placeholder for mobile routes that are not connected yet.
  * It keeps Expo Router valid without inventing travel data or functionality.
@@ -19,7 +21,7 @@ export default function ScaffoldScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_COLOR,
   },
   content: {
     flex: 1,

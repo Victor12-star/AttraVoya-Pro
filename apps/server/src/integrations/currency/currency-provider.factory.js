@@ -10,8 +10,9 @@ const cache = createProviderCache();
 export function createCurrencyProvider(options = {}) {
   const providerName = options.providerName ?? env.CURRENCY_PROVIDER;
   const createProvider = CURRENCY_PROVIDER_REGISTRY[providerName];
-  if (!createProvider)
+  if (!createProvider) {
     throw new ProviderUnavailableError(`Currency provider '${providerName}' is not supported.`);
+  }
 
   return assertCurrencyProvider(
     createProvider({
