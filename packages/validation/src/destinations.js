@@ -49,6 +49,21 @@ export const destinationSearchQuerySchema = z
   })
   .strict();
 
+/**
+ * Destination overview input is based on the normalized destination selected
+ * by the traveller. Coordinates are required so downstream providers never
+ * have to guess which city with a duplicate name was intended.
+ */
+export const destinationOverviewQuerySchema = z
+  .object({
+    name: z.string().trim().min(1).max(120),
+    countryCode: destinationCountryCode,
+    latitude: z.coerce.number().min(-90).max(90),
+    longitude: z.coerce.number().min(-180).max(180),
+    language: destinationLanguageCode.default('en'),
+  })
+  .strict();
+
 /** Body schema for creating/updating a destination (admin only). */
 export const destinationUpsertSchema = z
   .object({
