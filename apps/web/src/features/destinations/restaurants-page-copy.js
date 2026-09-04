@@ -212,7 +212,8 @@ const RESTAURANTS_PAGE_COPY = /** @type {Readonly<Record<string, RestaurantsPage
     ja: {
       eyebrow: 'レストラン',
       title: '{destination}のレストラン',
-      intro: '設定済みの場所プロバイダーから返された、この目的地周辺の実在するレストランを探せます。',
+      intro:
+        '設定済みの場所プロバイダーから返された、この目的地周辺の実在するレストランを探せます。',
       back: '目的地に戻る',
       searchArea: '5 km以内',
       results: '結果',
