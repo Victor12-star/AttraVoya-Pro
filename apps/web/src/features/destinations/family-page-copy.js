@@ -23,7 +23,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
     en: {
       eyebrow: 'Family planning',
       title: 'Family places near {destination}',
-      intro: 'Explore real nearby playgrounds, parks and attractions returned by the configured places provider.',
+      intro:
+        'Explore real nearby playgrounds, parks and attractions returned by the configured places provider.',
       back: 'Back to destination',
       searchArea: 'Within 10 km',
       results: 'places found',
@@ -32,14 +33,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Website',
       distance: 'Distance',
       agePrompt: 'Children’s age bands',
-      ageNotice: 'Age selections organise your planning only. Provider results are not verified for age suitability or safety.',
+      ageNotice:
+        'Age selections organise your planning only. Provider results are not verified for age suitability or safety.',
       sectionUnavailable: 'This place category is temporarily unavailable.',
       categories: { playgrounds: 'Playgrounds', parks: 'Parks', attractions: 'Attractions' },
     },
     sv: {
       eyebrow: 'Familjeplanering',
       title: 'Familjeplatser nära {destination}',
-      intro: 'Utforska verkliga lekplatser, parker och sevärdheter från den konfigurerade platsleverantören.',
+      intro:
+        'Utforska verkliga lekplatser, parker och sevärdheter från den konfigurerade platsleverantören.',
       back: 'Tillbaka till destinationen',
       searchArea: 'Inom 10 km',
       results: 'platser hittades',
@@ -48,14 +51,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Webbplats',
       distance: 'Avstånd',
       agePrompt: 'Barnens åldersgrupper',
-      ageNotice: 'Åldersvalen organiserar bara planeringen. Leverantörens resultat är inte verifierade för ålderslämplighet eller säkerhet.',
+      ageNotice:
+        'Åldersvalen organiserar bara planeringen. Leverantörens resultat är inte verifierade för ålderslämplighet eller säkerhet.',
       sectionUnavailable: 'Den här platskategorin är tillfälligt otillgänglig.',
       categories: { playgrounds: 'Lekplatser', parks: 'Parker', attractions: 'Sevärdheter' },
     },
     es: {
       eyebrow: 'Planificación familiar',
       title: 'Lugares familiares cerca de {destination}',
-      intro: 'Explora parques infantiles, parques y atracciones reales del proveedor de lugares configurado.',
+      intro:
+        'Explora parques infantiles, parques y atracciones reales del proveedor de lugares configurado.',
       back: 'Volver al destino',
       searchArea: 'En un radio de 10 km',
       results: 'lugares encontrados',
@@ -64,14 +69,20 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Sitio web',
       distance: 'Distancia',
       agePrompt: 'Grupos de edad de los niños',
-      ageNotice: 'Las edades solo organizan la planificación. Los resultados del proveedor no están verificados por idoneidad de edad ni seguridad.',
+      ageNotice:
+        'Las edades solo organizan la planificación. Los resultados del proveedor no están verificados por idoneidad de edad ni seguridad.',
       sectionUnavailable: 'Esta categoría está temporalmente no disponible.',
-      categories: { playgrounds: 'Parques infantiles', parks: 'Parques', attractions: 'Atracciones' },
+      categories: {
+        playgrounds: 'Parques infantiles',
+        parks: 'Parques',
+        attractions: 'Atracciones',
+      },
     },
     fr: {
       eyebrow: 'Planification familiale',
       title: 'Lieux en famille près de {destination}',
-      intro: 'Découvrez de vraies aires de jeux, parcs et attractions renvoyés par le fournisseur configuré.',
+      intro:
+        'Découvrez de vraies aires de jeux, parcs et attractions renvoyés par le fournisseur configuré.',
       back: 'Retour à la destination',
       searchArea: 'Dans un rayon de 10 km',
       results: 'lieux trouvés',
@@ -80,7 +91,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Site web',
       distance: 'Distance',
       agePrompt: 'Tranches d’âge des enfants',
-      ageNotice: 'Les âges servent uniquement à organiser votre planification. Les résultats ne sont pas vérifiés quant à l’âge approprié ou à la sécurité.',
+      ageNotice:
+        'Les âges servent uniquement à organiser votre planification. Les résultats ne sont pas vérifiés quant à l’âge approprié ou à la sécurité.',
       sectionUnavailable: 'Cette catégorie de lieux est temporairement indisponible.',
       categories: { playgrounds: 'Aires de jeux', parks: 'Parcs', attractions: 'Attractions' },
     },
@@ -96,7 +108,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Webseite',
       distance: 'Entfernung',
       agePrompt: 'Altersgruppen der Kinder',
-      ageNotice: 'Die Altersauswahl dient nur zur Organisation der Planung. Anbieterergebnisse sind nicht auf Alterseignung oder Sicherheit geprüft.',
+      ageNotice:
+        'Die Altersauswahl dient nur zur Organisation der Planung. Anbieterergebnisse sind nicht auf Alterseignung oder Sicherheit geprüft.',
       sectionUnavailable: 'Diese Ortskategorie ist vorübergehend nicht verfügbar.',
       categories: { playgrounds: 'Spielplätze', parks: 'Parks', attractions: 'Attraktionen' },
     },
@@ -112,14 +125,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Sito web',
       distance: 'Distanza',
       agePrompt: 'Fasce d’età dei bambini',
-      ageNotice: 'Le età servono solo a organizzare la pianificazione. I risultati non sono verificati per idoneità all’età o sicurezza.',
+      ageNotice:
+        'Le età servono solo a organizzare la pianificazione. I risultati non sono verificati per idoneità all’età o sicurezza.',
       sectionUnavailable: 'Questa categoria è temporaneamente non disponibile.',
       categories: { playgrounds: 'Parchi giochi', parks: 'Parchi', attractions: 'Attrazioni' },
     },
     pt: {
       eyebrow: 'Planeamento familiar',
       title: 'Locais para famílias perto de {destination}',
-      intro: 'Explore parques infantis, parques e atrações reais devolvidos pelo fornecedor configurado.',
+      intro:
+        'Explore parques infantis, parques e atrações reais devolvidos pelo fornecedor configurado.',
       back: 'Voltar ao destino',
       searchArea: 'Num raio de 10 km',
       results: 'locais encontrados',
@@ -128,14 +143,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Site',
       distance: 'Distância',
       agePrompt: 'Faixas etárias das crianças',
-      ageNotice: 'As idades servem apenas para organizar o planeamento. Os resultados não são verificados quanto à adequação etária ou segurança.',
+      ageNotice:
+        'As idades servem apenas para organizar o planeamento. Os resultados não são verificados quanto à adequação etária ou segurança.',
       sectionUnavailable: 'Esta categoria está temporariamente indisponível.',
       categories: { playgrounds: 'Parques infantis', parks: 'Parques', attractions: 'Atrações' },
     },
     pl: {
       eyebrow: 'Planowanie rodzinne',
       title: 'Miejsca rodzinne w pobliżu {destination}',
-      intro: 'Odkrywaj prawdziwe place zabaw, parki i atrakcje zwrócone przez skonfigurowanego dostawcę.',
+      intro:
+        'Odkrywaj prawdziwe place zabaw, parki i atrakcje zwrócone przez skonfigurowanego dostawcę.',
       back: 'Wróć do celu podróży',
       searchArea: 'W promieniu 10 km',
       results: 'znalezionych miejsc',
@@ -144,7 +161,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Strona internetowa',
       distance: 'Odległość',
       agePrompt: 'Grupy wiekowe dzieci',
-      ageNotice: 'Wiek służy tylko do organizacji planowania. Wyniki dostawcy nie są zweryfikowane pod kątem wieku ani bezpieczeństwa.',
+      ageNotice:
+        'Wiek służy tylko do organizacji planowania. Wyniki dostawcy nie są zweryfikowane pod kątem wieku ani bezpieczeństwa.',
       sectionUnavailable: 'Ta kategoria jest tymczasowo niedostępna.',
       categories: { playgrounds: 'Place zabaw', parks: 'Parki', attractions: 'Atrakcje' },
     },
@@ -160,7 +178,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Website',
       distance: 'Afstand',
       agePrompt: 'Leeftijdsgroepen van kinderen',
-      ageNotice: 'Leeftijden organiseren alleen de planning. Resultaten zijn niet geverifieerd op geschiktheid voor een leeftijd of veiligheid.',
+      ageNotice:
+        'Leeftijden organiseren alleen de planning. Resultaten zijn niet geverifieerd op geschiktheid voor een leeftijd of veiligheid.',
       sectionUnavailable: 'Deze categorie is tijdelijk niet beschikbaar.',
       categories: { playgrounds: 'Speeltuinen', parks: 'Parken', attractions: 'Attracties' },
     },
@@ -176,7 +195,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Nettsted',
       distance: 'Avstand',
       agePrompt: 'Barnas aldersgrupper',
-      ageNotice: 'Aldersvalg organiserer bare planleggingen. Leverandørresultater er ikke verifisert for aldersegnethet eller sikkerhet.',
+      ageNotice:
+        'Aldersvalg organiserer bare planleggingen. Leverandørresultater er ikke verifisert for aldersegnethet eller sikkerhet.',
       sectionUnavailable: 'Denne stedskategorien er midlertidig utilgjengelig.',
       categories: { playgrounds: 'Lekeplasser', parks: 'Parker', attractions: 'Attraksjoner' },
     },
@@ -192,14 +212,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Websted',
       distance: 'Afstand',
       agePrompt: 'Børnenes aldersgrupper',
-      ageNotice: 'Aldersvalg organiserer kun planlægningen. Resultater er ikke verificeret for aldersegnethed eller sikkerhed.',
+      ageNotice:
+        'Aldersvalg organiserer kun planlægningen. Resultater er ikke verificeret for aldersegnethed eller sikkerhed.',
       sectionUnavailable: 'Denne stedkategori er midlertidigt utilgængelig.',
       categories: { playgrounds: 'Legepladser', parks: 'Parker', attractions: 'Attraktioner' },
     },
     fi: {
       eyebrow: 'Perhesuunnittelu',
       title: 'Perhekohteet lähellä kohdetta {destination}',
-      intro: 'Tutustu palveluntarjoajan palauttamiin todellisiin leikkipaikkoihin, puistoihin ja nähtävyyksiin.',
+      intro:
+        'Tutustu palveluntarjoajan palauttamiin todellisiin leikkipaikkoihin, puistoihin ja nähtävyyksiin.',
       back: 'Takaisin kohteeseen',
       searchArea: '10 km säteellä',
       results: 'paikkaa löytyi',
@@ -208,14 +230,16 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Verkkosivusto',
       distance: 'Etäisyys',
       agePrompt: 'Lasten ikäryhmät',
-      ageNotice: 'Ikävalinnat vain jäsentävät suunnittelua. Tuloksia ei ole vahvistettu ikäsopivuuden tai turvallisuuden osalta.',
+      ageNotice:
+        'Ikävalinnat vain jäsentävät suunnittelua. Tuloksia ei ole vahvistettu ikäsopivuuden tai turvallisuuden osalta.',
       sectionUnavailable: 'Tämä paikkaluokka ei ole tilapäisesti käytettävissä.',
       categories: { playgrounds: 'Leikkipaikat', parks: 'Puistot', attractions: 'Nähtävyydet' },
     },
     tr: {
       eyebrow: 'Aile planlaması',
       title: '{destination} yakınındaki aile yerleri',
-      intro: 'Yapılandırılmış sağlayıcıdan gerçek oyun alanlarını, parkları ve turistik yerleri keşfedin.',
+      intro:
+        'Yapılandırılmış sağlayıcıdan gerçek oyun alanlarını, parkları ve turistik yerleri keşfedin.',
       back: 'Varış noktasına dön',
       searchArea: '10 km içinde',
       results: 'yer bulundu',
@@ -224,9 +248,14 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'Web sitesi',
       distance: 'Mesafe',
       agePrompt: 'Çocukların yaş grupları',
-      ageNotice: 'Yaş seçimleri yalnızca planlamayı düzenler. Sonuçlar yaş uygunluğu veya güvenlik açısından doğrulanmamıştır.',
+      ageNotice:
+        'Yaş seçimleri yalnızca planlamayı düzenler. Sonuçlar yaş uygunluğu veya güvenlik açısından doğrulanmamıştır.',
       sectionUnavailable: 'Bu yer kategorisi geçici olarak kullanılamıyor.',
-      categories: { playgrounds: 'Oyun alanları', parks: 'Parklar', attractions: 'Gezilecek yerler' },
+      categories: {
+        playgrounds: 'Oyun alanları',
+        parks: 'Parklar',
+        attractions: 'Gezilecek yerler',
+      },
     },
     ar: {
       eyebrow: 'تخطيط العائلة',
@@ -240,7 +269,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'الموقع الإلكتروني',
       distance: 'المسافة',
       agePrompt: 'الفئات العمرية للأطفال',
-      ageNotice: 'تُستخدم الأعمار لتنظيم التخطيط فقط. نتائج المزود غير موثقة من حيث ملاءمة العمر أو السلامة.',
+      ageNotice:
+        'تُستخدم الأعمار لتنظيم التخطيط فقط. نتائج المزود غير موثقة من حيث ملاءمة العمر أو السلامة.',
       sectionUnavailable: 'فئة الأماكن هذه غير متاحة مؤقتًا.',
       categories: { playgrounds: 'ملاعب أطفال', parks: 'حدائق', attractions: 'معالم' },
     },
@@ -272,7 +302,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'ウェブサイト',
       distance: '距離',
       agePrompt: '子どもの年齢区分',
-      ageNotice: '年齢選択は計画整理のためだけに使われます。結果は年齢適合性や安全性を確認したものではありません。',
+      ageNotice:
+        '年齢選択は計画整理のためだけに使われます。結果は年齢適合性や安全性を確認したものではありません。',
       sectionUnavailable: 'この場所カテゴリは一時的に利用できません。',
       categories: { playgrounds: '遊び場', parks: '公園', attractions: '観光スポット' },
     },
@@ -288,7 +319,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: '웹사이트',
       distance: '거리',
       agePrompt: '어린이 연령대',
-      ageNotice: '연령 선택은 계획 정리에만 사용됩니다. 제공자 결과는 연령 적합성이나 안전성이 검증된 것이 아닙니다.',
+      ageNotice:
+        '연령 선택은 계획 정리에만 사용됩니다. 제공자 결과는 연령 적합성이나 안전성이 검증된 것이 아닙니다.',
       sectionUnavailable: '이 장소 카테고리는 일시적으로 사용할 수 없습니다.',
       categories: { playgrounds: '놀이터', parks: '공원', attractions: '명소' },
     },
@@ -304,7 +336,8 @@ const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */
       website: 'वेबसाइट',
       distance: 'दूरी',
       agePrompt: 'बच्चों के आयु समूह',
-      ageNotice: 'आयु चयन केवल योजना को व्यवस्थित करता है। प्रदाता के परिणाम आयु उपयुक्तता या सुरक्षा के लिए सत्यापित नहीं हैं।',
+      ageNotice:
+        'आयु चयन केवल योजना को व्यवस्थित करता है। प्रदाता के परिणाम आयु उपयुक्तता या सुरक्षा के लिए सत्यापित नहीं हैं।',
       sectionUnavailable: 'यह स्थान श्रेणी अस्थायी रूप से उपलब्ध नहीं है।',
       categories: { playgrounds: 'खेल के मैदान', parks: 'पार्क', attractions: 'आकर्षण' },
     },
