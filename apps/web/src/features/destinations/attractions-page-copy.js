@@ -1,0 +1,223 @@
+import { normalizeLocale } from '@attravoya/localization';
+
+/**
+ * @typedef {object} AttractionsPageCopy
+ * @property {string} title
+ * @property {string} intro
+ * @property {string} back
+ * @property {string} searchArea
+ * @property {string} results
+ * @property {string} noResults
+ * @property {string} unavailable
+ * @property {string} website
+ * @property {string} distance
+ */
+
+const ATTRACTIONS_PAGE_COPY = /** @type {Readonly<Record<string, AttractionsPageCopy>>} */ (
+  Object.freeze({
+    en: {
+      title: 'Attractions in {destination}',
+      intro: 'Explore real places returned by the configured places provider near this destination.',
+      back: 'Back to destination',
+      searchArea: 'Within 10 km',
+      results: 'Results',
+      noResults: 'No attractions were found in this search area.',
+      unavailable: 'Attractions could not be loaded right now.',
+      website: 'Website',
+      distance: 'Distance',
+    },
+    sv: {
+      title: 'Sevärdheter i {destination}',
+      intro: 'Utforska verkliga platser som hämtas från den konfigurerade platsleverantören nära destinationen.',
+      back: 'Tillbaka till destinationen',
+      searchArea: 'Inom 10 km',
+      results: 'Resultat',
+      noResults: 'Inga sevärdheter hittades i det här sökområdet.',
+      unavailable: 'Sevärdheterna kunde inte hämtas just nu.',
+      website: 'Webbplats',
+      distance: 'Avstånd',
+    },
+    es: {
+      title: 'Atracciones en {destination}',
+      intro: 'Explora lugares reales devueltos por el proveedor de lugares configurado cerca de este destino.',
+      back: 'Volver al destino',
+      searchArea: 'En un radio de 10 km',
+      results: 'Resultados',
+      noResults: 'No se encontraron atracciones en esta zona de búsqueda.',
+      unavailable: 'No se pudieron cargar las atracciones en este momento.',
+      website: 'Sitio web',
+      distance: 'Distancia',
+    },
+    fr: {
+      title: 'Attractions à {destination}',
+      intro: 'Découvrez des lieux réels renvoyés par le fournisseur de lieux configuré près de cette destination.',
+      back: 'Retour à la destination',
+      searchArea: 'Dans un rayon de 10 km',
+      results: 'Résultats',
+      noResults: 'Aucune attraction n’a été trouvée dans cette zone de recherche.',
+      unavailable: 'Les attractions ne peuvent pas être chargées pour le moment.',
+      website: 'Site web',
+      distance: 'Distance',
+    },
+    de: {
+      title: 'Sehenswürdigkeiten in {destination}',
+      intro: 'Entdecke reale Orte, die der konfigurierte Orte-Anbieter in der Nähe dieses Reiseziels liefert.',
+      back: 'Zurück zum Reiseziel',
+      searchArea: 'Im Umkreis von 10 km',
+      results: 'Ergebnisse',
+      noResults: 'In diesem Suchbereich wurden keine Sehenswürdigkeiten gefunden.',
+      unavailable: 'Sehenswürdigkeiten können derzeit nicht geladen werden.',
+      website: 'Webseite',
+      distance: 'Entfernung',
+    },
+    it: {
+      title: 'Attrazioni a {destination}',
+      intro: 'Esplora luoghi reali restituiti dal provider di luoghi configurato vicino a questa destinazione.',
+      back: 'Torna alla destinazione',
+      searchArea: 'Entro 10 km',
+      results: 'Risultati',
+      noResults: 'Nessuna attrazione trovata in questa area di ricerca.',
+      unavailable: 'Al momento non è possibile caricare le attrazioni.',
+      website: 'Sito web',
+      distance: 'Distanza',
+    },
+    pt: {
+      title: 'Atrações em {destination}',
+      intro: 'Explore locais reais devolvidos pelo fornecedor de locais configurado perto deste destino.',
+      back: 'Voltar ao destino',
+      searchArea: 'Num raio de 10 km',
+      results: 'Resultados',
+      noResults: 'Nenhuma atração foi encontrada nesta área de pesquisa.',
+      unavailable: 'Não foi possível carregar as atrações neste momento.',
+      website: 'Site',
+      distance: 'Distância',
+    },
+    pl: {
+      title: 'Atrakcje w {destination}',
+      intro: 'Odkrywaj prawdziwe miejsca zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu tego celu podróży.',
+      back: 'Wróć do celu podróży',
+      searchArea: 'W promieniu 10 km',
+      results: 'Wyniki',
+      noResults: 'Nie znaleziono atrakcji w tym obszarze wyszukiwania.',
+      unavailable: 'Nie można teraz wczytać atrakcji.',
+      website: 'Strona internetowa',
+      distance: 'Odległość',
+    },
+    nl: {
+      title: 'Bezienswaardigheden in {destination}',
+      intro: 'Ontdek echte plaatsen die door de ingestelde plaatsenprovider nabij deze bestemming worden geleverd.',
+      back: 'Terug naar bestemming',
+      searchArea: 'Binnen 10 km',
+      results: 'Resultaten',
+      noResults: 'Er zijn geen bezienswaardigheden gevonden in dit zoekgebied.',
+      unavailable: 'Bezienswaardigheden kunnen nu niet worden geladen.',
+      website: 'Website',
+      distance: 'Afstand',
+    },
+    no: {
+      title: 'Attraksjoner i {destination}',
+      intro: 'Utforsk ekte steder som returneres av den konfigurerte stedsleverandøren nær dette reisemålet.',
+      back: 'Tilbake til reisemålet',
+      searchArea: 'Innen 10 km',
+      results: 'Resultater',
+      noResults: 'Ingen attraksjoner ble funnet i dette søkeområdet.',
+      unavailable: 'Attraksjonene kan ikke lastes inn akkurat nå.',
+      website: 'Nettsted',
+      distance: 'Avstand',
+    },
+    da: {
+      title: 'Seværdigheder i {destination}',
+      intro: 'Udforsk rigtige steder, som den konfigurerede stedsudbyder returnerer nær denne destination.',
+      back: 'Tilbage til destinationen',
+      searchArea: 'Inden for 10 km',
+      results: 'Resultater',
+      noResults: 'Der blev ikke fundet nogen seværdigheder i dette søgeområde.',
+      unavailable: 'Seværdighederne kan ikke indlæses lige nu.',
+      website: 'Websted',
+      distance: 'Afstand',
+    },
+    fi: {
+      title: 'Nähtävyydet kohteessa {destination}',
+      intro: 'Tutustu todellisiin paikkoihin, jotka määritetty paikkapalvelu palauttaa tämän kohteen läheltä.',
+      back: 'Takaisin kohteeseen',
+      searchArea: '10 km säteellä',
+      results: 'Tulokset',
+      noResults: 'Tältä hakualueelta ei löytynyt nähtävyyksiä.',
+      unavailable: 'Nähtävyyksiä ei voida ladata juuri nyt.',
+      website: 'Verkkosivusto',
+      distance: 'Etäisyys',
+    },
+    tr: {
+      title: '{destination} bölgesindeki gezilecek yerler',
+      intro: 'Bu varış noktasının yakınında yapılandırılmış yer sağlayıcısının döndürdüğü gerçek yerleri keşfedin.',
+      back: 'Varış noktasına dön',
+      searchArea: '10 km içinde',
+      results: 'Sonuçlar',
+      noResults: 'Bu arama alanında gezilecek yer bulunamadı.',
+      unavailable: 'Gezilecek yerler şu anda yüklenemiyor.',
+      website: 'Web sitesi',
+      distance: 'Mesafe',
+    },
+    ar: {
+      title: 'معالم في {destination}',
+      intro: 'استكشف أماكن حقيقية يعرضها مزود الأماكن المهيأ بالقرب من هذه الوجهة.',
+      back: 'العودة إلى الوجهة',
+      searchArea: 'ضمن 10 كم',
+      results: 'النتائج',
+      noResults: 'لم يتم العثور على معالم في منطقة البحث هذه.',
+      unavailable: 'يتعذر تحميل المعالم الآن.',
+      website: 'الموقع الإلكتروني',
+      distance: 'المسافة',
+    },
+    zh: {
+      title: '{destination}的景点',
+      intro: '探索由已配置地点提供商返回的该目的地附近真实地点。',
+      back: '返回目的地',
+      searchArea: '10 公里范围内',
+      results: '结果',
+      noResults: '此搜索区域内未找到景点。',
+      unavailable: '目前无法加载景点。',
+      website: '网站',
+      distance: '距离',
+    },
+    ja: {
+      title: '{destination}の観光スポット',
+      intro: '設定済みの場所プロバイダーから返された、この目的地周辺の実在する場所を探せます。',
+      back: '目的地に戻る',
+      searchArea: '10 km以内',
+      results: '結果',
+      noResults: 'この検索範囲では観光スポットが見つかりませんでした。',
+      unavailable: '現在、観光スポットを読み込めません。',
+      website: 'ウェブサイト',
+      distance: '距離',
+    },
+    ko: {
+      title: '{destination}의 관광 명소',
+      intro: '설정된 장소 제공자가 반환한 이 목적지 주변의 실제 장소를 둘러보세요.',
+      back: '목적지로 돌아가기',
+      searchArea: '10 km 이내',
+      results: '결과',
+      noResults: '이 검색 지역에서 관광 명소를 찾지 못했습니다.',
+      unavailable: '현재 관광 명소를 불러올 수 없습니다.',
+      website: '웹사이트',
+      distance: '거리',
+    },
+    hi: {
+      title: '{destination} में आकर्षण',
+      intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता से मिले वास्तविक स्थान देखें।',
+      back: 'गंतव्य पर वापस जाएँ',
+      searchArea: '10 किमी के भीतर',
+      results: 'परिणाम',
+      noResults: 'इस खोज क्षेत्र में कोई आकर्षण नहीं मिला।',
+      unavailable: 'अभी आकर्षण लोड नहीं किए जा सकते।',
+      website: 'वेबसाइट',
+      distance: 'दूरी',
+    },
+  })
+);
+
+/** @param {string} locale */
+export function getAttractionsPageCopy(locale) {
+  const normalizedLocale = normalizeLocale(locale);
+  return ATTRACTIONS_PAGE_COPY[normalizedLocale] ?? ATTRACTIONS_PAGE_COPY.en;
+}
