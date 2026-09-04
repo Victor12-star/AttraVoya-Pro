@@ -32,6 +32,23 @@ import {
 } from './destination-route.js';
 import styles from './destination-page.module.css';
 
+/**
+ * @typedef {object} DestinationPageDestination
+ * @property {string|null|undefined} provider
+ * @property {string|null|undefined} externalId
+ * @property {string} name
+ * @property {string|null|undefined} state
+ * @property {string} countryCode
+ * @property {string} countryDisplayName
+ * @property {number} latitude
+ * @property {number} longitude
+ * @property {string|null|undefined} timeZone
+ * @property {string} slug
+ */
+
+/** @typedef {{status: 'idle'|'loading'|'success'|'empty'|'error', data: any}} ProviderState */
+
+/** @param {string|null|undefined} provider */
 function providerDisplayName(provider) {
   const value = String(provider ?? '').trim().toLowerCase();
   if (value === 'geoapify') return 'Geoapify';
@@ -40,6 +57,7 @@ function providerDisplayName(provider) {
   return value ? value.charAt(0).toUpperCase() + value.slice(1) : null;
 }
 
+/** @param {any} photo */
 function pexelsImageSource(photo) {
   const candidate =
     photo?.sources?.large2x ??
@@ -49,23 +67,30 @@ function pexelsImageSource(photo) {
   if (!candidate) return null;
 
   try {
-    const url = new URL(candidate);
-    return url.protocol === 'https:' && url.hostname === 'images.pexels.com' ? candidate : null;
+    const url = new URL(String(candidate));
+    return url.protocol === 'https:' && url.hostname === 'images.pexels.com' ? String(candidate) : null;
   } catch {
     return null;
   }
 }
 
+/** @param {unknown} value */
 function finiteNumber(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
 
+/**
+ * @param {Intl.NumberFormat} numberFormatter
+ * @param {unknown} value
+ * @param {string} unit
+ */
 function measurement(numberFormatter, value, unit) {
   const number = finiteNumber(value);
   return number === null ? '—' : `${numberFormatter.format(number)} ${unit}`;
 }
 
+/** @param {{href: string, icon: any, label: string}} props */
 function FeatureLink({ href, icon: Icon, label }) {
   return (
     <Link className={styles.featureLink} href={href}>
@@ -78,10 +103,20 @@ function FeatureLink({ href, icon: Icon, label }) {
   );
 }
 
+/**
+ * @param {object} props
+ * @param {DestinationPageDestination|null} props.destination
+ * @param {string} [props.locale]
+ * @param {any} props.messages
+ */
 export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
-  const [weatherState, setWeatherState] = useState({ status: 'idle', data: null });
-  const [imageState, setImageState] = useState({ status: 'idle', data: null });
+  const [weatherState, setWeatherState] = useState(
+    /** @type {ProviderState} */ ({ status: 'idle', data: null }),
+  );
+  const [imageState, setImageState] = useState(
+    /** @type {ProviderState} */ ({ status: 'idle', data: null }),
+  );
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
@@ -97,12 +132,14 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     setWeatherState({ status: 'loading', data: null });
 
     try {
-      const response = await apiClient.getWeather({
-        latitude: destination.latitude,
-        longitude: destination.longitude,
-        forecastDays: 4,
-        timezone: destination.timeZone ?? 'auto',
-      });
+      const response = /** @type {any} */ (
+        await apiClient.getWeather({
+          latitude: destination.latitude,
+          longitude: destination.longitude,
+          forecastDays: 4,
+          timezone: destination.timeZone ?? 'auto',
+        })
+      );
       const weather = response?.weather ?? null;
       const temperature = finiteNumber(weather?.current?.temperatureC);
       setWeatherState({
@@ -119,11 +156,13 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     setImageState({ status: 'loading', data: null });
 
     try {
-      const response = await apiClient.searchImages({
-        query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
-        orientation: 'landscape',
-        perPage: 1,
-      });
+      const response = /** @type {any} */ (
+        await apiClient.searchImages({
+          query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
+          orientation: 'landscape',
+          perPage: 1,
+        })
+      );
       const images = response?.images ?? null;
       const photo = images?.photos?.[0] ?? null;
       const source = pexelsImageSource(photo);
