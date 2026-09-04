@@ -70,7 +70,15 @@ function normalizeRecord(record) {
   const sourceUrl = safeSourceUrl(record?.sourceUrl);
   const lastVerifiedAt = isoDate(record?.lastVerifiedAt);
 
-  if (!id || !service || !serviceLabel || !phoneNumber || !sourceName || !sourceUrl || !lastVerifiedAt) {
+  if (
+    !id ||
+    !service ||
+    !serviceLabel ||
+    !phoneNumber ||
+    !sourceName ||
+    !sourceUrl ||
+    !lastVerifiedAt
+  ) {
     return null;
   }
 
@@ -181,8 +189,13 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
             <p>{copy.intro}</p>
           </div>
           <div className={styles.badges} aria-label={copy.verifiedOnly}>
-            <span><CheckCircle2 size={16} aria-hidden="true" />{copy.verifiedOnly}</span>
-            <span>{copy.countryWide} · {destination.countryDisplayName}</span>
+            <span>
+              <CheckCircle2 size={16} aria-hidden="true" />
+              {copy.verifiedOnly}
+            </span>
+            <span>
+              {copy.countryWide} · {destination.countryDisplayName}
+            </span>
           </div>
         </header>
 
@@ -198,7 +211,11 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
             <ShieldCheck size={29} aria-hidden="true" />
             <strong>{messages.common.unavailable}</strong>
             <span>{copy.unavailable}</span>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>
@@ -209,7 +226,11 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
           <div className={styles.feedback} role="status">
             <ShieldCheck size={29} aria-hidden="true" />
             <span>{copy.noRecords}</span>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>
@@ -218,15 +239,22 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
 
         {state.status === 'success' ? (
           <>
-            <p className={styles.resultCount}><strong>{records.length}</strong> {copy.recordsFound}</p>
+            <p className={styles.resultCount}>
+              <strong>{records.length}</strong> {copy.recordsFound}
+            </p>
             <div className={styles.grid} aria-live="polite">
               {records.map((record) => (
                 <article className={styles.card} key={record.id}>
                   <div className={styles.cardHeading}>
-                    <span className={styles.cardIcon} aria-hidden="true"><ShieldCheck size={20} /></span>
+                    <span className={styles.cardIcon} aria-hidden="true">
+                      <ShieldCheck size={20} />
+                    </span>
                     <div>
                       <h2>{record.serviceLabel}</h2>
-                      <span className={styles.verifiedBadge}><CheckCircle2 size={14} aria-hidden="true" />{copy.verifiedOnly}</span>
+                      <span className={styles.verifiedBadge}>
+                        <CheckCircle2 size={14} aria-hidden="true" />
+                        {copy.verifiedOnly}
+                      </span>
                     </div>
                   </div>
 
@@ -234,7 +262,12 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
                     <Phone size={19} aria-hidden="true" />
                     <strong>{record.phoneNumber}</strong>
                     {record.phoneHref ? (
-                      <a className="button button--accent button--compact" href={record.phoneHref}>{copy.call}</a>
+                      <a
+                        className="button button--accent button--compact"
+                        href={record.phoneHref}
+                      >
+                        {copy.call}
+                      </a>
                     ) : null}
                   </div>
 
@@ -243,7 +276,8 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
                       <dt>{copy.source}</dt>
                       <dd>
                         <a href={record.sourceUrl} target="_blank" rel="noreferrer">
-                          {record.sourceName}<ExternalLink size={13} aria-hidden="true" />
+                          {record.sourceName}
+                          <ExternalLink size={13} aria-hidden="true" />
                         </a>
                       </dd>
                     </div>
