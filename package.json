@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "for file in apps/web/src/features/destinations/beaches-page-copy.js apps/web/src/features/destinations/beaches-page.jsx apps/web/tests/unit/beaches-page.test.jsx; do echo \"=== $file ===\"; prettier \"$file\" | diff -u \"$file\" - || true; done; exit 1",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
