@@ -113,8 +113,7 @@ const SAFETY_PAGE_COPY = Object.freeze({
     recordsFound: 'contatti verificati',
     noRecords:
       'AttraVoya non dispone ancora di contatti di emergenza nazionali verificati per questa destinazione.',
-    unavailable:
-      'Le informazioni di emergenza verificate non possono essere caricate al momento.',
+    unavailable: 'Le informazioni di emergenza verificate non possono essere caricate al momento.',
   },
   pt: {
     eyebrow: 'Segurança e emergência',
@@ -240,15 +239,13 @@ const SAFETY_PAGE_COPY = Object.freeze({
     source: 'المصدر الرسمي',
     lastVerified: 'آخر تحقق',
     recordsFound: 'جهات اتصال موثقة',
-    noRecords:
-      'لا تتوفر بعد في AttraVoya جهات اتصال طوارئ موثقة على مستوى الدولة لهذه الوجهة.',
+    noRecords: 'لا تتوفر بعد في AttraVoya جهات اتصال طوارئ موثقة على مستوى الدولة لهذه الوجهة.',
     unavailable: 'تعذر تحميل معلومات الطوارئ الموثقة الآن.',
   },
   zh: {
     eyebrow: '安全与紧急情况',
     title: '{destination}的已核实紧急联系方式',
-    intro:
-      '仅显示经权威来源核实并已发布的全国性记录。AttraVoya 绝不会生成紧急电话号码。',
+    intro: '仅显示经权威来源核实并已发布的全国性记录。AttraVoya 绝不会生成紧急电话号码。',
     back: '返回目的地',
     countryWide: '全国联系方式',
     verifiedOnly: '仅限已核实记录',
@@ -271,8 +268,7 @@ const SAFETY_PAGE_COPY = Object.freeze({
     source: '公式情報源',
     lastVerified: '最終確認',
     recordsFound: '件の確認済み連絡先',
-    noRecords:
-      'この目的地について、AttraVoya には確認済みの全国緊急連絡先がまだありません。',
+    noRecords: 'この目的地について、AttraVoya には確認済みの全国緊急連絡先がまだありません。',
     unavailable: '確認済みの緊急情報を現在読み込めません。',
   },
   ko: {
