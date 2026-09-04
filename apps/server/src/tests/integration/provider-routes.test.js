@@ -120,9 +120,9 @@ describe('real-provider API contracts', () => {
     let providerCalled = false;
     const options = baseOptions();
     options.eventsProvider = {
-      searchEvents: async () => {
+      searchEvents: async (query) => {
         providerCalled = true;
-        return { provider: 'test', events: [] };
+        return { provider: 'test', events: [], query };
       },
     };
 
