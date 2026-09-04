@@ -146,9 +146,7 @@ async function checkNewsDataWhenConfigured() {
 async function checkPexelsWhenConfigured() {
   const apiKey = process.env.PEXELS_API_KEY?.trim();
   if (!apiKey) {
-    console.log(
-      '○ Pexels live check skipped: PEXELS_API_KEY is not configured in GitHub Secrets.',
-    );
+    console.log('○ Pexels live check skipped: PEXELS_API_KEY is not configured in GitHub Secrets.');
     return;
   }
 
