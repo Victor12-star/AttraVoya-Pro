@@ -80,7 +80,9 @@ describe('AttractionsPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Attractions in Stockholm', level: 1 }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Vasa Museum', level: 2 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Vasa Museum', level: 2 }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Waterfront viewpoint')).toBeInTheDocument();
     expect(screen.getByText('1.4 km')).toBeInTheDocument();
     expect(screen.getByText('Geoapify')).toBeInTheDocument();
@@ -126,7 +128,9 @@ describe('AttractionsPage', () => {
     expect(screen.queryByText(/secret provider details/i)).not.toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Retry' }).click();
-    expect(await screen.findByRole('heading', { name: 'Vasa Museum', level: 2 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Vasa Museum', level: 2 }),
+    ).toBeInTheDocument();
     expect(mocks.getNearbyPlaces).toHaveBeenCalledTimes(2);
   });
 
