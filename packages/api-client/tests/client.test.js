@@ -58,7 +58,12 @@ describe('API client', () => {
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
     await expect(
-      client.searchDestinations({ query: 'Stockholm', language: 'sv', countryCode: 'SE', limit: 8 }),
+      client.searchDestinations({
+        query: 'Stockholm',
+        language: 'sv',
+        countryCode: 'SE',
+        limit: 8,
+      }),
     ).resolves.toEqual({ destinations: { results: [] } });
   });
 

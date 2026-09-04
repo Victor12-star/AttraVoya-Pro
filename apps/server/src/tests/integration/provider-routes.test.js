@@ -190,7 +190,10 @@ describe('real-provider API contracts', () => {
     const app = await buildApp(options);
     apps.push(app);
 
-    const response = await app.inject({ method: 'GET', url: '/api/v1/destinations/search?query=S' });
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/destinations/search?query=S',
+    });
     expect(response.statusCode).toBe(400);
     expect(providerCalled).toBe(false);
   });
