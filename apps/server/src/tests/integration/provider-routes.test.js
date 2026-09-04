@@ -56,11 +56,18 @@ function baseOptions() {
     accommodationProvider: {
       searchNearby: async () => ({ provider: 'test', results: [], inventoryDataAvailable: false }),
     },
+    eventsProvider: {
+      searchEvents: async (query) => ({
+        provider: 'test',
+        events: [{ externalId: 'event-1', name: 'Stockholm Live' }],
+        query,
+      }),
+    },
   };
 }
 
 describe('real-provider API contracts', () => {
-  it('validates and serves weather, currency, places, translation, and accommodation routes', async () => {
+  it('validates and serves weather, currency, places, translation, accommodation, and events routes', async () => {
     const app = await buildApp(baseOptions());
     apps.push(app);
 
@@ -99,5 +106,35 @@ describe('real-provider API contracts', () => {
     });
     expect(accommodation.statusCode).toBe(200);
     expect(accommodation.json().accommodation.inventoryDataAvailable).toBe(false);
+
+    const events = await app.inject({
+      method: 'GET',
+      url: '/api/v1/events?city=Stockholm&countryCode=SE&size=5',
+    });
+    expect(events.statusCode).toBe(200);
+    expect(events.json().events.events[0].name).toBe('Stockholm Live');
+    expect(events.json().events.query.countryCode).toBe('SE');
+  });
+
+  it('rejects invalid event coordinate pairs before calling the provider', async () => {
+    let providerCalled = false;
+    const options = baseOptions();
+    options.eventsProvider = {
+      searchEvents: async () => {
+        providerCalled = true;
+        return { provider: 'test', events: [] };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/events?latitude=59.33',
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(providerCalled).toBe(false);
   });
 });
