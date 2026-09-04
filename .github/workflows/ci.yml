@@ -72,18 +72,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      # Temporary repair step: the repository was intentionally upgraded to a
-      # patched Next.js release after the original lockfile was generated.
-      # Export the regenerated lockfile so it can be committed, then CI will
-      # return to --frozen-lockfile for deterministic installs.
-      - name: Upload regenerated lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: pnpm-lock-regenerated
-          path: pnpm-lock.yaml
-          retention-days: 1
+        run: pnpm install --frozen-lockfile
 
       - name: Validate environment contract
         run: pnpm env:check
@@ -148,7 +137,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: pnpm db:generate
@@ -187,7 +176,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: pnpm db:generate
@@ -217,7 +206,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Start local LibreTranslate
         run: |
@@ -275,7 +264,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Run this independently of the dependency audit so a dependency finding
       # never prevents us from checking the repository for accidentally committed secrets.
