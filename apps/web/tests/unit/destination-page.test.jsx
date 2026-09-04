@@ -102,6 +102,10 @@ describe('DestinationPage', () => {
       'href',
       'https://www.pexels.com',
     );
+    expect(screen.getByRole('link', { name: 'Restaurants' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/destinations/stockholm-se/restaurants?'),
+    );
 
     expect(mocks.getWeather).toHaveBeenCalledWith({
       latitude: 59.3293,
