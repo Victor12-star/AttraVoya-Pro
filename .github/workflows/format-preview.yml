@@ -1,0 +1,38 @@
+name: Format preview
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Show exact Prettier patch
+        run: |
+          pnpm exec prettier --write \
+            apps/server/src/integrations/email/resend-email-provider.test.js \
+            apps/server/src/modules/auth/auth.routes.js \
+            apps/web/src/i18n/auth-recovery-messages.js
+          git diff -- \
+            apps/server/src/integrations/email/resend-email-provider.test.js \
+            apps/server/src/modules/auth/auth.routes.js \
+            apps/web/src/i18n/auth-recovery-messages.js
