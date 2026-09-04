@@ -262,10 +262,7 @@ export function SafetyDestinationPage({ destination, locale = 'en', messages }) 
                     <Phone size={19} aria-hidden="true" />
                     <strong>{record.phoneNumber}</strong>
                     {record.phoneHref ? (
-                      <a
-                        className="button button--accent button--compact"
-                        href={record.phoneHref}
-                      >
+                      <a className="button button--accent button--compact" href={record.phoneHref}>
                         {copy.call}
                       </a>
                     ) : null}
