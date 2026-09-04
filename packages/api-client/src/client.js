@@ -124,6 +124,7 @@ export function createApiClient(options) {
     forgotPassword: (email) =>
       request('/api/v1/auth/forgot-password', { method: 'POST', body: { email } }),
     resetPassword: (body) => request('/api/v1/auth/reset-password', { method: 'POST', body }),
+    searchDestinations: (query) => request(`/api/v1/destinations/search?${toSearchParams(query)}`),
     getWeather: (query) => request(`/api/v1/weather?${toSearchParams(query)}`),
     getCurrencyRates: ({ base = 'EUR', quotes = [] } = {}) =>
       request(

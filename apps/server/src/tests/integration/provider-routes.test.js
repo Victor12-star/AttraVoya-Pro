@@ -40,7 +40,26 @@ function baseOptions() {
       }),
     },
     placesProvider: {
-      autocomplete: async ({ query }) => ({ provider: 'test', results: [{ name: query }] }),
+      autocomplete: async ({ query, type }) =>
+        type === 'city'
+          ? {
+              provider: 'test',
+              results: [
+                {
+                  provider: 'test',
+                  externalId: 'stockholm',
+                  name: query,
+                  city: query,
+                  formattedAddress: `${query}, Sweden`,
+                  country: 'Sweden',
+                  countryCode: 'SE',
+                  latitude: 59.3293,
+                  longitude: 18.0686,
+                  resultType: 'city',
+                },
+              ],
+            }
+          : { provider: 'test', results: [{ name: query }] },
       searchNearby: async ({ categoryGroup }) => ({ provider: 'test', categoryGroup, results: [] }),
     },
     translationProvider: {
@@ -99,6 +118,18 @@ describe('real-provider API contracts', () => {
     expect(conversion.statusCode).toBe(200);
     expect(conversion.json().conversion.convertedAmount).toBe(200);
 
+    const destinations = await app.inject({
+      method: 'GET',
+      url: '/api/v1/destinations/search?query=Stockholm&language=sv&limit=8',
+    });
+    expect(destinations.statusCode).toBe(200);
+    expect(destinations.json().destinations.results[0]).toMatchObject({
+      name: 'Stockholm',
+      countryCode: 'SE',
+      latitude: 59.3293,
+      longitude: 18.0686,
+    });
+
     const places = await app.inject({
       method: 'GET',
       url: '/api/v1/places/autocomplete?query=Barcelona',
@@ -144,6 +175,27 @@ describe('real-provider API contracts', () => {
     expect(images.statusCode).toBe(200);
     expect(images.json().images.photos[0].alt).toBe('Stockholm waterfront');
     expect(images.json().images.query.orientation).toBe('landscape');
+  });
+
+  it('rejects short destination queries before calling the provider', async () => {
+    let providerCalled = false;
+    const options = baseOptions();
+    options.destinationsProvider = {
+      autocomplete: async () => {
+        providerCalled = true;
+        return { provider: 'test', results: [] };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/destinations/search?query=S',
+    });
+    expect(response.statusCode).toBe(400);
+    expect(providerCalled).toBe(false);
   });
 
   it('rejects invalid event coordinate pairs before calling the provider', async () => {
