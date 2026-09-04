@@ -137,6 +137,13 @@ describe('real-provider API contracts', () => {
     expect(places.statusCode).toBe(200);
     expect(places.json().places.results[0].name).toBe('Barcelona');
 
+    const beaches = await app.inject({
+      method: 'GET',
+      url: '/api/v1/places/nearby?categoryGroup=beaches&latitude=41.3874&longitude=2.1686&radiusMeters=20000&limit=24&language=en',
+    });
+    expect(beaches.statusCode).toBe(200);
+    expect(beaches.json().places.categoryGroup).toBe('beaches');
+
     const translation = await app.inject({
       method: 'POST',
       url: '/api/v1/translation',
