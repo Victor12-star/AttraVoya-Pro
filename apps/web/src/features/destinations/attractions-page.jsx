@@ -308,7 +308,10 @@ export function AttractionsPage({ destination, locale = 'en', messages }) {
 
                   <div className={styles.cardFooter}>
                     {distance ? (
-                      <span className={styles.distance} aria-label={`${copy.distance}: ${distance}`}>
+                      <span
+                        className={styles.distance}
+                        aria-label={`${copy.distance}: ${distance}`}
+                      >
                         <Navigation size={15} aria-hidden="true" />
                         {distance}
                       </span>
