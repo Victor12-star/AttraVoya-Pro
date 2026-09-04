@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   BedDouble,
@@ -90,6 +90,58 @@ function measurement(numberFormatter, value, unit) {
   return number === null ? '—' : `${numberFormatter.format(number)} ${unit}`;
 }
 
+/**
+ * Fetch and normalize the destination weather state without mutating React state.
+ * @param {DestinationPageDestination} destination
+ * @returns {Promise<ProviderState>}
+ */
+async function requestWeather(destination) {
+  try {
+    const response = /** @type {any} */ (
+      await apiClient.getWeather({
+        latitude: destination.latitude,
+        longitude: destination.longitude,
+        forecastDays: 4,
+        timezone: destination.timeZone ?? 'auto',
+      })
+    );
+    const weather = response?.weather ?? null;
+    const temperature = finiteNumber(weather?.current?.temperatureC);
+    return {
+      status: weather && temperature !== null ? 'success' : 'empty',
+      data: weather,
+    };
+  } catch {
+    return { status: 'error', data: null };
+  }
+}
+
+/**
+ * Fetch and normalize a Pexels destination image without mutating React state.
+ * @param {DestinationPageDestination} destination
+ * @returns {Promise<ProviderState>}
+ */
+async function requestImage(destination) {
+  try {
+    const response = /** @type {any} */ (
+      await apiClient.searchImages({
+        query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
+        orientation: 'landscape',
+        perPage: 1,
+      })
+    );
+    const images = response?.images ?? null;
+    const photo = images?.photos?.[0] ?? null;
+    const source = pexelsImageSource(photo);
+    return {
+      status: photo && source ? 'success' : 'empty',
+      data: photo && source ? { images, photo, source } : null,
+    };
+  } catch {
+    return { status: 'error', data: null };
+  }
+}
+
 /** @param {{href: string, icon: any, label: string}} props */
 function FeatureLink({ href, icon: Icon, label }) {
   return (
@@ -133,66 +185,32 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     [locale],
   );
 
-  const loadWeather = useCallback(async () => {
-    if (!destination) return;
-
-    try {
-      const response = /** @type {any} */ (
-        await apiClient.getWeather({
-          latitude: destination.latitude,
-          longitude: destination.longitude,
-          forecastDays: 4,
-          timezone: destination.timeZone ?? 'auto',
-        })
-      );
-      const weather = response?.weather ?? null;
-      const temperature = finiteNumber(weather?.current?.temperatureC);
-      setWeatherState({
-        status: weather && temperature !== null ? 'success' : 'empty',
-        data: weather,
-      });
-    } catch {
-      setWeatherState({ status: 'error', data: null });
-    }
-  }, [destination]);
-
-  const loadImage = useCallback(async () => {
-    if (!destination) return;
-
-    try {
-      const response = /** @type {any} */ (
-        await apiClient.searchImages({
-          query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
-          orientation: 'landscape',
-          perPage: 1,
-        })
-      );
-      const images = response?.images ?? null;
-      const photo = images?.photos?.[0] ?? null;
-      const source = pexelsImageSource(photo);
-      setImageState({
-        status: photo && source ? 'success' : 'empty',
-        data: photo && source ? { images, photo, source } : null,
-      });
-    } catch {
-      setImageState({ status: 'error', data: null });
-    }
-  }, [destination]);
-
   useEffect(() => {
     if (!destination) return;
-    void loadWeather();
-    void loadImage();
-  }, [destination, loadImage, loadWeather]);
+    let active = true;
+
+    void requestWeather(destination).then((nextState) => {
+      if (active) setWeatherState(nextState);
+    });
+    void requestImage(destination).then((nextState) => {
+      if (active) setImageState(nextState);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [destination]);
 
   function retryWeather() {
+    if (!destination) return;
     setWeatherState({ status: 'loading', data: null });
-    void loadWeather();
+    void requestWeather(destination).then(setWeatherState);
   }
 
   function retryImage() {
+    if (!destination) return;
     setImageState({ status: 'loading', data: null });
-    void loadImage();
+    void requestImage(destination).then(setImageState);
   }
 
   if (!destination) {
