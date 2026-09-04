@@ -16,6 +16,7 @@ const PLACES_ENDPOINT = 'https://api.geoapify.com/v2/places';
  * @property {string} [countryCode]
  * @property {number} [biasLatitude]
  * @property {number} [biasLongitude]
+ * @property {'city'|'country'|'state'|'postcode'|'street'|'amenity'|'locality'} [type]
  */
 
 export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeconds = 3600 }) {
@@ -35,6 +36,7 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
         countryCode,
         biasLatitude,
         biasLongitude,
+        type,
       } = options;
       const cacheKey = [
         'autocomplete',
@@ -44,6 +46,7 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
         countryCode ?? '',
         biasLatitude ?? '',
         biasLongitude ?? '',
+        type ?? '',
       ].join(':');
       const cached = cache?.get(cacheKey);
       if (cached) return cached;
@@ -54,6 +57,7 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
       url.searchParams.set('limit', String(limit));
       url.searchParams.set('lang', language);
       url.searchParams.set('apiKey', key());
+      if (type) url.searchParams.set('type', type);
       if (countryCode) url.searchParams.set('filter', `countrycode:${countryCode.toLowerCase()}`);
       if (Number.isFinite(biasLatitude) && Number.isFinite(biasLongitude)) {
         url.searchParams.set('bias', `proximity:${biasLongitude},${biasLatitude}`);
