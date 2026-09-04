@@ -1,5 +1,9 @@
-import { destinationSearchQuerySchema } from '@attravoya/validation';
+import {
+  destinationOverviewQuerySchema,
+  destinationSearchQuerySchema,
+} from '@attravoya/validation';
 
 export const destinationsSchemas = Object.freeze({
   search: { querystring: destinationSearchQuerySchema },
+  overview: { querystring: destinationOverviewQuerySchema },
 });
