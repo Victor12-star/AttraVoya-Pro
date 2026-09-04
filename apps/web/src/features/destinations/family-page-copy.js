@@ -1,0 +1,351 @@
+import { normalizeLocale } from '@attravoya/localization';
+
+/**
+ * @typedef {object} FamilyPageCopy
+ * @property {string} eyebrow
+ * @property {string} title
+ * @property {string} intro
+ * @property {string} back
+ * @property {string} searchArea
+ * @property {string} results
+ * @property {string} unavailable
+ * @property {string} noResults
+ * @property {string} website
+ * @property {string} distance
+ * @property {string} agePrompt
+ * @property {string} ageNotice
+ * @property {string} sectionUnavailable
+ * @property {Readonly<Record<string, string>>} categories
+ */
+
+const FAMILY_PAGE_COPY = /** @type {Readonly<Record<string, FamilyPageCopy>>} */ (
+  Object.freeze({
+    en: {
+      eyebrow: 'Family planning',
+      title: 'Family places near {destination}',
+      intro:
+        'Explore real nearby playgrounds, parks and attractions returned by the configured places provider.',
+      back: 'Back to destination',
+      searchArea: 'Within 10 km',
+      results: 'places found',
+      unavailable: 'Family place data could not be loaded right now.',
+      noResults: 'No family-planning places were found in this search area.',
+      website: 'Website',
+      distance: 'Distance',
+      agePrompt: 'Children’s age bands',
+      ageNotice:
+        'Age selections organise your planning only. Provider results are not verified for age suitability or safety.',
+      sectionUnavailable: 'This place category is temporarily unavailable.',
+      categories: { playgrounds: 'Playgrounds', parks: 'Parks', attractions: 'Attractions' },
+    },
+    sv: {
+      eyebrow: 'Familjeplanering',
+      title: 'Familjeplatser nära {destination}',
+      intro:
+        'Utforska verkliga lekplatser, parker och sevärdheter från den konfigurerade platsleverantören.',
+      back: 'Tillbaka till destinationen',
+      searchArea: 'Inom 10 km',
+      results: 'platser hittades',
+      unavailable: 'Familjeplatser kunde inte hämtas just nu.',
+      noResults: 'Inga platser för familjeplanering hittades i det här området.',
+      website: 'Webbplats',
+      distance: 'Avstånd',
+      agePrompt: 'Barnens åldersgrupper',
+      ageNotice:
+        'Åldersvalen organiserar bara planeringen. Leverantörens resultat är inte verifierade för ålderslämplighet eller säkerhet.',
+      sectionUnavailable: 'Den här platskategorin är tillfälligt otillgänglig.',
+      categories: { playgrounds: 'Lekplatser', parks: 'Parker', attractions: 'Sevärdheter' },
+    },
+    es: {
+      eyebrow: 'Planificación familiar',
+      title: 'Lugares familiares cerca de {destination}',
+      intro:
+        'Explora parques infantiles, parques y atracciones reales del proveedor de lugares configurado.',
+      back: 'Volver al destino',
+      searchArea: 'En un radio de 10 km',
+      results: 'lugares encontrados',
+      unavailable: 'No se pudieron cargar los lugares familiares en este momento.',
+      noResults: 'No se encontraron lugares para la planificación familiar en esta zona.',
+      website: 'Sitio web',
+      distance: 'Distancia',
+      agePrompt: 'Grupos de edad de los niños',
+      ageNotice:
+        'Las edades solo organizan la planificación. Los resultados del proveedor no están verificados por idoneidad de edad ni seguridad.',
+      sectionUnavailable: 'Esta categoría está temporalmente no disponible.',
+      categories: {
+        playgrounds: 'Parques infantiles',
+        parks: 'Parques',
+        attractions: 'Atracciones',
+      },
+    },
+    fr: {
+      eyebrow: 'Planification familiale',
+      title: 'Lieux en famille près de {destination}',
+      intro:
+        'Découvrez de vraies aires de jeux, parcs et attractions renvoyés par le fournisseur configuré.',
+      back: 'Retour à la destination',
+      searchArea: 'Dans un rayon de 10 km',
+      results: 'lieux trouvés',
+      unavailable: 'Les lieux pour les familles ne peuvent pas être chargés pour le moment.',
+      noResults: 'Aucun lieu de planification familiale n’a été trouvé dans cette zone.',
+      website: 'Site web',
+      distance: 'Distance',
+      agePrompt: 'Tranches d’âge des enfants',
+      ageNotice:
+        'Les âges servent uniquement à organiser votre planification. Les résultats ne sont pas vérifiés quant à l’âge approprié ou à la sécurité.',
+      sectionUnavailable: 'Cette catégorie de lieux est temporairement indisponible.',
+      categories: { playgrounds: 'Aires de jeux', parks: 'Parcs', attractions: 'Attractions' },
+    },
+    de: {
+      eyebrow: 'Familienplanung',
+      title: 'Familienorte nahe {destination}',
+      intro: 'Entdecke echte Spielplätze, Parks und Attraktionen des konfigurierten Anbieters.',
+      back: 'Zurück zum Reiseziel',
+      searchArea: 'Im Umkreis von 10 km',
+      results: 'Orte gefunden',
+      unavailable: 'Familienorte können derzeit nicht geladen werden.',
+      noResults: 'In diesem Suchbereich wurden keine Orte für die Familienplanung gefunden.',
+      website: 'Webseite',
+      distance: 'Entfernung',
+      agePrompt: 'Altersgruppen der Kinder',
+      ageNotice:
+        'Die Altersauswahl dient nur zur Organisation der Planung. Anbieterergebnisse sind nicht auf Alterseignung oder Sicherheit geprüft.',
+      sectionUnavailable: 'Diese Ortskategorie ist vorübergehend nicht verfügbar.',
+      categories: { playgrounds: 'Spielplätze', parks: 'Parks', attractions: 'Attraktionen' },
+    },
+    it: {
+      eyebrow: 'Pianificazione familiare',
+      title: 'Luoghi per famiglie vicino a {destination}',
+      intro: 'Scopri veri parchi giochi, parchi e attrazioni restituiti dal provider configurato.',
+      back: 'Torna alla destinazione',
+      searchArea: 'Entro 10 km',
+      results: 'luoghi trovati',
+      unavailable: 'I luoghi per famiglie non possono essere caricati al momento.',
+      noResults: 'Nessun luogo per la pianificazione familiare trovato in questa zona.',
+      website: 'Sito web',
+      distance: 'Distanza',
+      agePrompt: 'Fasce d’età dei bambini',
+      ageNotice:
+        'Le età servono solo a organizzare la pianificazione. I risultati non sono verificati per idoneità all’età o sicurezza.',
+      sectionUnavailable: 'Questa categoria è temporaneamente non disponibile.',
+      categories: { playgrounds: 'Parchi giochi', parks: 'Parchi', attractions: 'Attrazioni' },
+    },
+    pt: {
+      eyebrow: 'Planeamento familiar',
+      title: 'Locais para famílias perto de {destination}',
+      intro:
+        'Explore parques infantis, parques e atrações reais devolvidos pelo fornecedor configurado.',
+      back: 'Voltar ao destino',
+      searchArea: 'Num raio de 10 km',
+      results: 'locais encontrados',
+      unavailable: 'Os locais para famílias não podem ser carregados agora.',
+      noResults: 'Não foram encontrados locais para planeamento familiar nesta área.',
+      website: 'Site',
+      distance: 'Distância',
+      agePrompt: 'Faixas etárias das crianças',
+      ageNotice:
+        'As idades servem apenas para organizar o planeamento. Os resultados não são verificados quanto à adequação etária ou segurança.',
+      sectionUnavailable: 'Esta categoria está temporariamente indisponível.',
+      categories: { playgrounds: 'Parques infantis', parks: 'Parques', attractions: 'Atrações' },
+    },
+    pl: {
+      eyebrow: 'Planowanie rodzinne',
+      title: 'Miejsca rodzinne w pobliżu {destination}',
+      intro:
+        'Odkrywaj prawdziwe place zabaw, parki i atrakcje zwrócone przez skonfigurowanego dostawcę.',
+      back: 'Wróć do celu podróży',
+      searchArea: 'W promieniu 10 km',
+      results: 'znalezionych miejsc',
+      unavailable: 'Nie można teraz wczytać miejsc rodzinnych.',
+      noResults: 'W tym obszarze nie znaleziono miejsc do planowania rodzinnego.',
+      website: 'Strona internetowa',
+      distance: 'Odległość',
+      agePrompt: 'Grupy wiekowe dzieci',
+      ageNotice:
+        'Wiek służy tylko do organizacji planowania. Wyniki dostawcy nie są zweryfikowane pod kątem wieku ani bezpieczeństwa.',
+      sectionUnavailable: 'Ta kategoria jest tymczasowo niedostępna.',
+      categories: { playgrounds: 'Place zabaw', parks: 'Parki', attractions: 'Atrakcje' },
+    },
+    nl: {
+      eyebrow: 'Gezinsplanning',
+      title: 'Gezinsplekken bij {destination}',
+      intro: 'Ontdek echte speeltuinen, parken en attracties van de ingestelde aanbieder.',
+      back: 'Terug naar bestemming',
+      searchArea: 'Binnen 10 km',
+      results: 'plekken gevonden',
+      unavailable: 'Gezinsplekken kunnen nu niet worden geladen.',
+      noResults: 'Er zijn geen plekken voor gezinsplanning gevonden in dit gebied.',
+      website: 'Website',
+      distance: 'Afstand',
+      agePrompt: 'Leeftijdsgroepen van kinderen',
+      ageNotice:
+        'Leeftijden organiseren alleen de planning. Resultaten zijn niet geverifieerd op geschiktheid voor een leeftijd of veiligheid.',
+      sectionUnavailable: 'Deze categorie is tijdelijk niet beschikbaar.',
+      categories: { playgrounds: 'Speeltuinen', parks: 'Parken', attractions: 'Attracties' },
+    },
+    no: {
+      eyebrow: 'Familieplanlegging',
+      title: 'Familieplasser nær {destination}',
+      intro: 'Utforsk ekte lekeplasser, parker og attraksjoner fra den konfigurerte leverandøren.',
+      back: 'Tilbake til reisemålet',
+      searchArea: 'Innen 10 km',
+      results: 'steder funnet',
+      unavailable: 'Familiesteder kan ikke lastes inn akkurat nå.',
+      noResults: 'Ingen steder for familieplanlegging ble funnet i dette området.',
+      website: 'Nettsted',
+      distance: 'Avstand',
+      agePrompt: 'Barnas aldersgrupper',
+      ageNotice:
+        'Aldersvalg organiserer bare planleggingen. Leverandørresultater er ikke verifisert for aldersegnethet eller sikkerhet.',
+      sectionUnavailable: 'Denne stedskategorien er midlertidig utilgjengelig.',
+      categories: { playgrounds: 'Lekeplasser', parks: 'Parker', attractions: 'Attraksjoner' },
+    },
+    da: {
+      eyebrow: 'Familieplanlægning',
+      title: 'Familiesteder nær {destination}',
+      intro: 'Udforsk rigtige legepladser, parker og attraktioner fra den konfigurerede udbyder.',
+      back: 'Tilbage til destinationen',
+      searchArea: 'Inden for 10 km',
+      results: 'steder fundet',
+      unavailable: 'Familiesteder kan ikke indlæses lige nu.',
+      noResults: 'Der blev ikke fundet steder til familieplanlægning i dette område.',
+      website: 'Websted',
+      distance: 'Afstand',
+      agePrompt: 'Børnenes aldersgrupper',
+      ageNotice:
+        'Aldersvalg organiserer kun planlægningen. Resultater er ikke verificeret for aldersegnethed eller sikkerhed.',
+      sectionUnavailable: 'Denne stedkategori er midlertidigt utilgængelig.',
+      categories: { playgrounds: 'Legepladser', parks: 'Parker', attractions: 'Attraktioner' },
+    },
+    fi: {
+      eyebrow: 'Perhesuunnittelu',
+      title: 'Perhekohteet lähellä kohdetta {destination}',
+      intro:
+        'Tutustu palveluntarjoajan palauttamiin todellisiin leikkipaikkoihin, puistoihin ja nähtävyyksiin.',
+      back: 'Takaisin kohteeseen',
+      searchArea: '10 km säteellä',
+      results: 'paikkaa löytyi',
+      unavailable: 'Perhekohteita ei voida ladata juuri nyt.',
+      noResults: 'Tältä alueelta ei löytynyt perhesuunnittelun paikkoja.',
+      website: 'Verkkosivusto',
+      distance: 'Etäisyys',
+      agePrompt: 'Lasten ikäryhmät',
+      ageNotice:
+        'Ikävalinnat vain jäsentävät suunnittelua. Tuloksia ei ole vahvistettu ikäsopivuuden tai turvallisuuden osalta.',
+      sectionUnavailable: 'Tämä paikkaluokka ei ole tilapäisesti käytettävissä.',
+      categories: { playgrounds: 'Leikkipaikat', parks: 'Puistot', attractions: 'Nähtävyydet' },
+    },
+    tr: {
+      eyebrow: 'Aile planlaması',
+      title: '{destination} yakınındaki aile yerleri',
+      intro:
+        'Yapılandırılmış sağlayıcıdan gerçek oyun alanlarını, parkları ve turistik yerleri keşfedin.',
+      back: 'Varış noktasına dön',
+      searchArea: '10 km içinde',
+      results: 'yer bulundu',
+      unavailable: 'Aile yerleri şu anda yüklenemiyor.',
+      noResults: 'Bu alanda aile planlaması için yer bulunamadı.',
+      website: 'Web sitesi',
+      distance: 'Mesafe',
+      agePrompt: 'Çocukların yaş grupları',
+      ageNotice:
+        'Yaş seçimleri yalnızca planlamayı düzenler. Sonuçlar yaş uygunluğu veya güvenlik açısından doğrulanmamıştır.',
+      sectionUnavailable: 'Bu yer kategorisi geçici olarak kullanılamıyor.',
+      categories: {
+        playgrounds: 'Oyun alanları',
+        parks: 'Parklar',
+        attractions: 'Gezilecek yerler',
+      },
+    },
+    ar: {
+      eyebrow: 'تخطيط العائلة',
+      title: 'أماكن للعائلة بالقرب من {destination}',
+      intro: 'استكشف ملاعب الأطفال والحدائق والمعالم الحقيقية التي يعيدها مزود الأماكن المهيأ.',
+      back: 'العودة إلى الوجهة',
+      searchArea: 'ضمن 10 كم',
+      results: 'أماكن تم العثور عليها',
+      unavailable: 'تعذر تحميل أماكن العائلة الآن.',
+      noResults: 'لم يتم العثور على أماكن لتخطيط العائلة في هذه المنطقة.',
+      website: 'الموقع الإلكتروني',
+      distance: 'المسافة',
+      agePrompt: 'الفئات العمرية للأطفال',
+      ageNotice:
+        'تُستخدم الأعمار لتنظيم التخطيط فقط. نتائج المزود غير موثقة من حيث ملاءمة العمر أو السلامة.',
+      sectionUnavailable: 'فئة الأماكن هذه غير متاحة مؤقتًا.',
+      categories: { playgrounds: 'ملاعب أطفال', parks: 'حدائق', attractions: 'معالم' },
+    },
+    zh: {
+      eyebrow: '家庭规划',
+      title: '{destination}附近的家庭地点',
+      intro: '浏览由已配置地点服务商返回的真实游乐场、公园和景点。',
+      back: '返回目的地',
+      searchArea: '10 公里内',
+      results: '个地点',
+      unavailable: '目前无法加载家庭地点。',
+      noResults: '此区域没有找到用于家庭规划的地点。',
+      website: '网站',
+      distance: '距离',
+      agePrompt: '儿童年龄段',
+      ageNotice: '年龄选择仅用于整理行程。服务商结果未验证年龄适宜性或安全性。',
+      sectionUnavailable: '此地点类别暂时不可用。',
+      categories: { playgrounds: '游乐场', parks: '公园', attractions: '景点' },
+    },
+    ja: {
+      eyebrow: '家族旅行の計画',
+      title: '{destination}周辺の家族向け候補',
+      intro: '設定された場所プロバイダーが返す実在の遊び場、公園、観光スポットを確認できます。',
+      back: '目的地に戻る',
+      searchArea: '10 km以内',
+      results: '件の場所',
+      unavailable: '家族向け候補を現在読み込めません。',
+      noResults: 'この範囲では家族旅行の計画候補が見つかりませんでした。',
+      website: 'ウェブサイト',
+      distance: '距離',
+      agePrompt: '子どもの年齢区分',
+      ageNotice:
+        '年齢選択は計画整理のためだけに使われます。結果は年齢適合性や安全性を確認したものではありません。',
+      sectionUnavailable: 'この場所カテゴリは一時的に利用できません。',
+      categories: { playgrounds: '遊び場', parks: '公園', attractions: '観光スポット' },
+    },
+    ko: {
+      eyebrow: '가족 여행 계획',
+      title: '{destination} 주변 가족 여행 장소',
+      intro: '설정된 장소 제공자가 반환한 실제 놀이터, 공원, 명소를 확인하세요.',
+      back: '목적지로 돌아가기',
+      searchArea: '10km 이내',
+      results: '개 장소',
+      unavailable: '현재 가족 여행 장소를 불러올 수 없습니다.',
+      noResults: '이 지역에서 가족 여행 계획 장소를 찾지 못했습니다.',
+      website: '웹사이트',
+      distance: '거리',
+      agePrompt: '어린이 연령대',
+      ageNotice:
+        '연령 선택은 계획 정리에만 사용됩니다. 제공자 결과는 연령 적합성이나 안전성이 검증된 것이 아닙니다.',
+      sectionUnavailable: '이 장소 카테고리는 일시적으로 사용할 수 없습니다.',
+      categories: { playgrounds: '놀이터', parks: '공원', attractions: '명소' },
+    },
+    hi: {
+      eyebrow: 'परिवार योजना',
+      title: '{destination} के पास परिवार के लिए स्थान',
+      intro: 'कॉन्फ़िगर किए गए स्थान प्रदाता से मिले वास्तविक खेल के मैदान, पार्क और आकर्षण देखें।',
+      back: 'गंतव्य पर वापस जाएँ',
+      searchArea: '10 किमी के भीतर',
+      results: 'स्थान मिले',
+      unavailable: 'परिवार के स्थान अभी लोड नहीं किए जा सकते।',
+      noResults: 'इस क्षेत्र में परिवार योजना के लिए कोई स्थान नहीं मिला।',
+      website: 'वेबसाइट',
+      distance: 'दूरी',
+      agePrompt: 'बच्चों के आयु समूह',
+      ageNotice:
+        'आयु चयन केवल योजना को व्यवस्थित करता है। प्रदाता के परिणाम आयु उपयुक्तता या सुरक्षा के लिए सत्यापित नहीं हैं।',
+      sectionUnavailable: 'यह स्थान श्रेणी अस्थायी रूप से उपलब्ध नहीं है।',
+      categories: { playgrounds: 'खेल के मैदान', parks: 'पार्क', attractions: 'आकर्षण' },
+    },
+  })
+);
+
+/** @param {string} locale */
+export function getFamilyPageCopy(locale) {
+  const normalized = normalizeLocale(locale);
+  return FAMILY_PAGE_COPY[normalized] ?? FAMILY_PAGE_COPY.en;
+}
