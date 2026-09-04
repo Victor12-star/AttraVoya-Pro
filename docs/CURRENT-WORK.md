@@ -9,8 +9,10 @@ This file exists so a new ChatGPT conversation can continue the project from the
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- `develop` checkpoint before the Phase 7C pull request: `fb33a821b0e9a3bb83fce62013d2a772f9f5bac1`
-- Phase 7C pull request: `#3` from `feature/phase-7c-destination-page` into `develop`.
+- Verified Phase 7C merge checkpoint on `develop`: `1f2028242323d438efc0b8d88dddcaf9c32c88c0`.
+- Phase 7C pull request `#3` is merged.
+- The post-merge `develop` CI run for Phase 7C (`CI #109`) completed successfully.
+- Current Phase 7D pull request: `#4` from `feature/phase-7d-attractions-discovery` into `develop`.
 
 ## Quality rule
 
@@ -57,7 +59,7 @@ Provider adapters already implemented include:
 - Pexels destination imagery
 - Resend transactional email
 
-Provider secrets stay server-side. No fake live travel prices, availability, emergency facts, ratings, or provider data may be shown.
+Provider secrets stay server-side. No fake live travel prices, availability, emergency facts, ratings, opening times or provider data may be shown.
 
 ## Latest customer vertical slices
 
@@ -101,7 +103,9 @@ The Phase 7B branch CI completed successfully before merge (`CI #96`).
 
 ### Phase 7C — Destination page foundation
 
-Implementation is in pull request `#3` from `feature/phase-7c-destination-page` into `develop`.
+Merged through pull request `#3` into `develop` at:
+
+`1f2028242323d438efc0b8d88dddcaf9c32c88c0`
 
 Implemented:
 
@@ -115,40 +119,81 @@ Implemented:
 - responsive and RTL-safe destination-page styling
 - localized destination-page copy
 - destination route/page/search-selection unit tests
-- strict JavaScript, React lint and formatting compliance fixes discovered by CI
+- strict JavaScript, React lint and formatting compliance
 
-Phase 7C must not be treated as merged until pull request `#3` has a fully green GitHub CI run on its final head commit. Do not bypass this gate.
-
-## Important current limitation
-
-Geoapify adapter behavior is covered by automated tests, but the real Geoapify network call is not live-verified in GitHub until `GEOAPIFY_API_KEY` is added to GitHub Actions Secrets.
-
-The same rule applies to other keyed providers if their secrets are not configured. Pexels imagery must remain honestly unavailable when its configured key/provider is unavailable; do not substitute fake destination imagery.
-
-## Next engineering step
-
-After Phase 7C pull request `#3` is merged into `develop`, create a fresh feature branch before modifying code.
-
-Recommended next slice:
+The Phase 7C final pull-request CI and post-merge `develop` CI both passed before work continued.
 
 ### Phase 7D — Destination attractions discovery foundation
 
-Continue Phase 7's destination vertical one narrow slice at a time. Start with attractions before expanding into restaurants, beaches or shopping.
+Implementation is in pull request `#4` from `feature/phase-7d-attractions-discovery` into `develop`.
+
+Implemented:
+
+- real `/destinations/[slug]/attractions` customer experience
+- reuse of the existing provider-neutral `/api/v1/places/nearby` backend contract rather than creating a duplicate attractions endpoint
+- existing Geoapify places adapter with the `attractions` category group
+- validated destination coordinates carried forward from the Phase 7C route contract
+- 10 km search radius and a capped 24-result request
+- defensive client rendering of normalized provider results
+- deduplication and distance ordering of returned places
+- name, address, distance, provider and website shown only when genuine provider data exists
+- external website links accepted only for valid HTTP/HTTPS URLs
+- no fabricated ratings, opening times, ticket prices, popularity, accessibility facts or availability
+- loading, success, empty, error and retry states
+- localized attractions copy for all 18 supported UI locales
+- responsive, RTL-safe and reduced-motion-aware styling
+- unit tests covering provider calls, real result rendering, unsafe website rejection, empty state, provider failure/retry and malformed destination state
+
+The Phase 7D code checkpoint `c8ea1b60e12bce2cdc9e632af4577fbb274e95c8` passed the complete pull-request CI gate (`CI #116`), including JavaScript checks, translations, provider smoke tests, ESLint, unit tests, Prettier, PostgreSQL/Prisma, dependency/secret checks and production builds.
+
+This handoff update creates a newer Phase 7D head, so pull request `#4` must receive a new fully green CI run on its final head before merge. Do not merge based only on `CI #116`.
+
+## Live-provider verification status
+
+The `CI #116` live-provider job verified these real network paths successfully:
+
+- Open-Meteo
+- Frankfurter
+- the CI-hosted LibreTranslate service
+
+The following keyed provider checks were skipped because their GitHub Actions secrets are not configured:
+
+- Geoapify: `GEOAPIFY_API_KEY`
+- Ticketmaster: `TICKETMASTER_API_KEY`
+- NewsData: `NEWSDATA_API_KEY`
+- Pexels: `PEXELS_API_KEY`
+
+Therefore Phase 7D Geoapify behavior is covered by automated adapter/API/UI tests and production builds, but the real Geoapify network call is not yet live-verified in GitHub CI. Do not claim otherwise.
+
+## Next engineering step
+
+First finish Phase 7D safely:
+
+1. Wait for a fully green GitHub CI run on the final head of pull request `#4`.
+2. Merge pull request `#4` into `develop` only after that gate passes.
+3. Verify the resulting `develop` push CI is also green.
+4. Create a fresh feature branch from that verified `develop` checkpoint before modifying code for the next slice.
+
+Recommended next slice:
+
+### Phase 7E — Destination restaurants discovery foundation
+
+Continue Phase 7's destination vertical one narrow slice at a time.
 
 Suggested scope:
 
-1. Reuse the validated destination selection/coordinate contract from Phase 7C.
-2. Add a provider-neutral attractions discovery service through the existing Geoapify places adapter rather than calling providers directly from the browser.
-3. Define a strict attraction query/response contract and validate coordinates, categories, radius and result limits before provider calls.
-4. Normalize and deduplicate provider results and reject malformed rows.
-5. Build the selected destination's `/attractions` experience with real provider results only.
-6. Show useful reference fields that genuinely exist, such as name, category, distance/location and provider attribution where available.
-7. Do not invent ratings, opening hours, ticket prices, popularity, accessibility facts or availability when the provider does not supply them.
+1. Reuse the validated destination selection and coordinate contract from Phase 7C.
+2. Reuse the existing provider-neutral `/api/v1/places/nearby` API and Geoapify places adapter rather than calling providers directly from the browser.
+3. Use the existing `restaurants` place category group with strict radius/result-limit validation.
+4. Normalize, deduplicate and safely render real provider results only.
+5. Build the selected destination's `/restaurants` experience.
+6. Show only fields that genuinely exist, such as name, address/location, distance, cuisine/category or website when actually supplied by the provider contract.
+7. Do not invent ratings, menus, prices, opening hours, booking availability or popularity.
 8. Add loading, success, empty, error and retry behavior.
-9. Preserve localization, RTL, accessibility and responsive behavior.
-10. Add API/service/UI tests and run the complete GitHub CI gate before proceeding to the next destination slice.
+9. Preserve all 18 UI locales, RTL, accessibility and responsive behavior.
+10. Add focused tests and run the complete GitHub CI gate before proceeding.
 
-After attractions passes its full gate, continue restaurants, beaches/shopping, accommodation, family, nearby and safety as separate coherent slices according to the Phase 7 working plan.
+After restaurants passes its full gate, continue beaches/shopping, accommodation, family, nearby and safety as separate coherent slices according to the Phase 7 working plan.
 
 ## Product constraints that must not be forgotten
 
