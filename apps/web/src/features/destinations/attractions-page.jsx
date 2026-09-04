@@ -185,7 +185,6 @@ export function AttractionsPage({ destination, locale = 'en', messages }) {
     if (!destination) return;
     let active = true;
 
-    setAttractionsState({ status: 'loading', data: null });
     void requestAttractions(destination, locale).then((nextState) => {
       if (active) setAttractionsState(nextState);
     });
