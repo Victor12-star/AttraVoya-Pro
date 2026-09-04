@@ -1,17 +1,28 @@
-import { FeaturePage } from '../../../components/common/feature-page.jsx';
-import { getRequestLocale } from '../../../i18n/request-locale.js';
-import { loadMessages } from '../../../i18n/messages.js';
+import { getCountryDisplayName } from '@attravoya/localization';
 
-export default async function Page() {
-  const locale = await getRequestLocale();
+import { NearbyDestinationPage } from '../../../features/destinations/nearby-page.jsx';
+import { parseDestinationContext } from '../../../features/destinations/destination-context.js';
+import { loadMessages } from '../../../i18n/messages.js';
+import { getRequestLocale } from '../../../i18n/request-locale.js';
+
+export default async function NearbyRoutePage({ searchParams }) {
+  const [resolvedSearchParams, locale] = await Promise.all([searchParams, getRequestLocale()]);
   const messages = await loadMessages(locale);
+  const destination = parseDestinationContext(resolvedSearchParams);
 
   return (
-    <FeaturePage
-      eyebrow={messages.navigation.nearby}
-      title={messages.navigation.nearby}
-      description={messages.home.local}
-      backLabel={messages.navigation.explore}
+    <NearbyDestinationPage
+      destination={
+        destination
+          ? {
+              ...destination,
+              countryDisplayName:
+                getCountryDisplayName(destination.countryCode, locale) ?? destination.countryCode,
+            }
+          : null
+      }
+      locale={locale}
+      messages={messages}
     />
   );
 }
