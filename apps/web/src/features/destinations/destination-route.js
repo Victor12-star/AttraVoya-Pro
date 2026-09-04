@@ -3,6 +3,7 @@ const DESTINATION_CHILD_SEGMENTS = new Set([
   'currency',
   'family',
   'language',
+  'restaurants',
   'safety',
 ]);
 
