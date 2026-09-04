@@ -48,7 +48,7 @@ Status: core schema established and continuing to evolve before first migration.
 
 ## Phase 3 — Backend security architecture
 
-Status: core authentication/session foundation implemented; runtime integration verification remains pending on the target environment.
+Status: core authentication/session foundation implemented; CI runtime coverage now verifies the main security foundation, with later hardening still planned in the final security gate.
 
 - stable API error contract;
 - JWT access-token verification;
@@ -57,6 +57,7 @@ Status: core authentication/session foundation implemented; runtime integration 
 - authentication endpoints and secure refresh sessions;
 - route-specific brute-force/rate limits;
 - email verification and password reset foundation;
+- resend-verification flow and transactional email failure handling;
 - security tests for auth and permission bypass.
 
 **Learn:** route → validation → controller → service → repository → database,
@@ -64,11 +65,11 @@ authentication vs authorization, JWT, session, RBAC.
 
 ## Phase 4 — Global localization foundation
 
-Status: Phase 4A shared reference/message/API foundation implemented; locale-prefixed page routing and visual language selector continue with the customer design shell.
+Status: Phase 4A shared reference/message/API foundation implemented; customer auth recovery copy also covers all 18 supported UI locales.
 
 - global ISO country data;
 - country/language/currency preferences kept separate;
-- Next.js locale routing and full interface dictionaries;
+- Next.js locale-aware interface dictionaries;
 - language selector in the main header;
 - localized country names;
 - Arabic/right-to-left layout;
@@ -78,30 +79,40 @@ Status: Phase 4A shared reference/message/API foundation implemented; locale-pre
 
 ## Phase 5 — Professional design system
 
-Status: Phase 5A customer design shell implemented; full Next.js browser/build verification awaits the target Linux SWC/Node 24 + pnpm runtime.
+Status: Phase 5A customer design shell implemented and production builds now pass in GitHub CI.
 
 - original AttraVoya Pro visual identity based on modern professional travel UX research;
 - typography, spacing, colors, radius, surfaces, shadows and motion tokens;
 - Light/Dark/System themes;
 - Lucide icons for web/admin/mobile;
 - accessible buttons, forms, search, menus, dialogs, cards and feedback states;
+- working login/register/verification/password-recovery forms;
 - no AI-generated icons or generic AI-template aesthetic.
 
 **Learn:** design tokens, reusable components, responsive design, accessibility.
 
 ## Phase 6 — Real provider platform
 
-Status: Phase 6A core provider infrastructure and the first real development adapters are implemented; full runtime integration tests remain pending on the target Node 24 + pnpm + Docker environment.
+Status: Phase 6A + 6B provider batch implemented and verified through CI.
 
-- provider contracts, factories, registries and normalizers;
+- shared provider contracts, factories, registries and normalizers;
 - caching, deduplication, timeouts and controlled retries;
-- Geoapify, Open-Meteo, Frankfurter and local LibreTranslate first;
-- Ticketmaster, NewsData, Pexels and Resend next;
+- Geoapify places/geocoding/routing/accommodation-location discovery;
+- Open-Meteo weather;
+- Frankfurter currency;
+- local LibreTranslate traveller translation;
+- Ticketmaster events;
+- NewsData traveller-relevant news;
+- Pexels destination imagery with attribution metadata;
+- Resend transactional email for verification and password reset;
+- production requires real transactional-email configuration;
 - flights/live room prices remain explicitly unavailable until a real approved provider exists.
 
 **Learn:** adapter pattern, API normalization, rate limits, caching, failure isolation.
 
 ## Phase 7 — Customer website vertical slices
+
+Status: next active phase.
 
 Build each feature end-to-end instead of creating disconnected pages:
 
@@ -162,6 +173,14 @@ A feature is complete only when the applicable items are true:
 - automated tests;
 - no exposed secrets or unresolved critical errors.
 
-## Current checkpoint — Phase 6A
+## Current checkpoint — Phase 6B complete
 
-The first real provider platform is implemented: shared timeout/retry/error/cache infrastructure plus Open-Meteo, Frankfurter v2, LibreTranslate, Geoapify place/geocoding/routing foundations, and honest accommodation-location discovery. New provider routes are validated through shared Zod schemas and exposed through the shared API client. Live flight fares and live room prices remain deliberately unavailable rather than fabricated.
+The planned no-cost development provider layer is now complete: Geoapify,
+Open-Meteo, Frankfurter, LibreTranslate, Ticketmaster, NewsData.io, Pexels and
+Resend are behind provider-neutral server adapters. Authentication now has usable
+verification, resend-verification, forgot-password and reset-password web flows.
+GitHub CI is the merge gate for JavaScript checks, translations, provider smoke
+tests, lint, unit/integration tests, PostgreSQL/Prisma, dependency/secret checks,
+live no-cost providers and production builds.
+
+Next work starts Phase 7 with a real global destination search vertical slice.

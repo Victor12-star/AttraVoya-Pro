@@ -60,6 +60,27 @@ function formatEnvironmentErrors(error) {
     .join('\n');
 }
 
+function validateProductionEmailConfiguration(environment) {
+  if (environment.NODE_ENV !== 'production') return;
+
+  if (environment.EMAIL_PROVIDER !== 'resend') {
+    throw new Error(
+      "Invalid AttraVoya Pro server environment:\nEMAIL_PROVIDER: production currently requires 'resend' for account verification and password reset.",
+    );
+  }
+
+  const missing = [
+    !environment.RESEND_API_KEY?.trim() ? 'RESEND_API_KEY' : null,
+    !environment.EMAIL_FROM?.trim() ? 'EMAIL_FROM' : null,
+  ].filter(Boolean);
+
+  if (missing.length) {
+    throw new Error(
+      `Invalid AttraVoya Pro server environment:\n${missing.join(', ')}: required in production for transactional authentication email.`,
+    );
+  }
+}
+
 /**
  * Validate security-sensitive configuration once during process startup.
  * Failing early is safer than allowing the API to boot with missing secrets
@@ -74,6 +95,7 @@ export function loadEnvironment(source = process.env) {
     );
   }
 
+  validateProductionEmailConfiguration(result.data);
   return Object.freeze(result.data);
 }
 

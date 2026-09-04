@@ -1,39 +1,44 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { ArrowRight, LockKeyhole, Mail } from 'lucide-react';
+import { ArrowRight, LockKeyhole } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 
-export function RegisterForm({ messages, recoveryMessages }) {
+export function ResetPasswordForm({ authMessages, messages }) {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token') ?? '';
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [error, setError] = useState(token ? '' : messages.resetInvalid);
 
   async function submit(event) {
     event.preventDefault();
+    if (!token) {
+      setError(messages.resetInvalid);
+      return;
+    }
+
     const form = new FormData(event.currentTarget);
     const password = String(form.get('password') ?? '');
     const confirmPassword = String(form.get('confirmPassword') ?? '');
-
-    setError('');
-    setSuccess('');
     if (password !== confirmPassword) {
-      setError(messages.registerFailed);
+      setError(messages.passwordMismatch);
       return;
     }
 
     setPending(true);
+    setSuccess('');
+    setError('');
+
     try {
-      await apiClient.register({
-        email: String(form.get('email') ?? '').trim(),
-        password,
-      });
+      await apiClient.resetPassword({ token, password });
+      setSuccess(messages.resetSuccess);
       event.currentTarget.reset();
-      setSuccess(messages.registered);
     } catch {
-      setError(messages.registerFailed);
+      setError(messages.resetInvalid);
     } finally {
       setPending(false);
     }
@@ -42,59 +47,53 @@ export function RegisterForm({ messages, recoveryMessages }) {
   return (
     <form className="auth-form" onSubmit={submit}>
       <label>
-        <span>{messages.email}</span>
-        <div className="auth-input">
-          <Mail size={18} />
-          <input name="email" type="email" autoComplete="email" required />
-        </div>
-      </label>
-      <label>
-        <span>{messages.password}</span>
+        <span>{messages.newPassword}</span>
         <div className="auth-input">
           <LockKeyhole size={18} />
           <input
             name="password"
             type="password"
-            minLength={8}
             autoComplete="new-password"
+            minLength={8}
+            maxLength={128}
             required
           />
         </div>
       </label>
       <label>
-        <span>{messages.confirmPassword}</span>
+        <span>{messages.confirmNewPassword}</span>
         <div className="auth-input">
           <LockKeyhole size={18} />
           <input
             name="confirmPassword"
             type="password"
-            minLength={8}
             autoComplete="new-password"
+            minLength={8}
+            maxLength={128}
             required
           />
         </div>
       </label>
+      {success ? (
+        <p className="auth-success" role="status">
+          {success}
+        </p>
+      ) : null}
       {error ? (
         <p className="auth-error" role="alert">
           {error}
         </p>
       ) : null}
-      {success ? (
-        <>
-          <p className="auth-success" role="status">
-            {success}
-          </p>
-          <p className="auth-switch">
-            <Link href="/verify-email">{recoveryMessages.resendPrompt}</Link>
-          </p>
-        </>
-      ) : null}
-      <button className="button button--dark auth-submit" type="submit" disabled={pending}>
-        {pending ? messages.working : messages.createAccount}
+      <button
+        className="button button--dark auth-submit"
+        type="submit"
+        disabled={pending || !token || Boolean(success)}
+      >
+        {pending ? authMessages.working : messages.resetButton}
         {!pending ? <ArrowRight size={17} /> : null}
       </button>
       <p className="auth-switch">
-        {messages.alreadyAccount} <Link href="/login">{messages.signIn}</Link>
+        <Link href="/login">{messages.backToSignIn}</Link>
       </p>
     </form>
   );

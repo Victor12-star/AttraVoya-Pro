@@ -99,8 +99,16 @@ export const authRepository = Object.freeze({
   },
 
   async createEmailVerificationToken({ userId, tokenHash, expiresAt }) {
-    return prisma.emailVerificationToken.create({
-      data: { userId, tokenHash, expiresAt },
+    // Keep only the newest verification link usable. This limits the exposure
+    // window when a traveller requests another email after losing an older one.
+    return prisma.$transaction(async (tx) => {
+      await tx.emailVerificationToken.updateMany({
+        where: { userId, usedAt: null },
+        data: { usedAt: new Date() },
+      });
+      return tx.emailVerificationToken.create({
+        data: { userId, tokenHash, expiresAt },
+      });
     });
   },
 

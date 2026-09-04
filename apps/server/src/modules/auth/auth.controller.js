@@ -49,12 +49,24 @@ export function createAuthController({
   return {
     async register(request, reply) {
       const result = await service.register(request.body);
+      let verificationDelivery = onVerificationRequested ? 'sent' : 'not_configured';
 
       if (onVerificationRequested) {
-        await onVerificationRequested({
-          email: result.user.email,
-          token: result.verificationToken,
-        });
+        try {
+          await onVerificationRequested({
+            email: result.user.email,
+            token: result.verificationToken,
+          });
+        } catch (error) {
+          // Account creation has already committed. Returning a 5xx here would
+          // encourage the traveller to retry registration and hit a duplicate
+          // account. Report delivery state instead and allow resend-verification.
+          verificationDelivery = 'failed';
+          request.log.warn(
+            { err: error, userId: result.user.id },
+            'Verification email delivery failed after account creation',
+          );
+        }
       }
 
       return reply.status(201).send({
@@ -63,7 +75,33 @@ export function createAuthController({
           email: result.user.email,
           emailVerified: Boolean(result.user.emailVerifiedAt),
         },
-        message: 'Account created. Please verify your email before signing in.',
+        verificationDelivery,
+        message:
+          verificationDelivery === 'sent'
+            ? 'Account created. Please verify your email before signing in.'
+            : 'Account created. Request a new verification email before signing in.',
+      });
+    },
+
+    async resendVerification(request, reply) {
+      const result = await service.resendVerification(request.body.email);
+
+      if (result.verificationToken && result.email && onVerificationRequested) {
+        try {
+          await onVerificationRequested({
+            email: result.email,
+            token: result.verificationToken,
+          });
+        } catch (error) {
+          // Keep the public response generic. Provider failures are logged
+          // without the raw one-time verification token or email address.
+          request.log.warn({ err: error }, 'Verification email resend failed');
+        }
+      }
+
+      return reply.send({
+        message:
+          'If the account exists and still needs verification, a new verification email will be sent.',
       });
     },
 
@@ -98,11 +136,15 @@ export function createAuthController({
       const result = await service.forgotPassword(request.body.email);
 
       if (result.resetToken && onPasswordResetRequested) {
-        await onPasswordResetRequested({ email: request.body.email, token: result.resetToken });
+        try {
+          await onPasswordResetRequested({ email: request.body.email, token: result.resetToken });
+        } catch (error) {
+          // The response remains identical whether the address exists or mail
+          // delivery succeeds, preventing account enumeration through errors.
+          request.log.warn({ err: error }, 'Password-reset email delivery failed');
+        }
       }
 
-      // Keep this response identical whether the account exists or not to stop
-      // the endpoint being used to discover registered email addresses.
       return reply.send({
         message: 'If an account exists for that email, password-reset instructions will be sent.',
       });

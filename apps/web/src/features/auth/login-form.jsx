@@ -7,7 +7,7 @@ import { ArrowRight, LockKeyhole, Mail } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 
-export function LoginForm({ messages }) {
+export function LoginForm({ messages, recoveryMessages }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -50,6 +50,9 @@ export function LoginForm({ messages }) {
           <input name="password" type="password" autoComplete="current-password" required />
         </div>
       </label>
+      <p className="auth-switch">
+        <Link href="/forgot-password">{recoveryMessages.forgotLink}</Link>
+      </p>
       {error ? (
         <p className="auth-error" role="alert">
           {error}

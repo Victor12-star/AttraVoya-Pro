@@ -10,6 +10,7 @@ import { createLibreTranslateProvider } from '../apps/server/src/integrations/tr
 import { createTicketmasterEventsProvider } from '../apps/server/src/integrations/events/ticketmaster-events-provider.js';
 import { createNewsDataNewsProvider } from '../apps/server/src/integrations/news/newsdata-news-provider.js';
 import { createPexelsImageProvider } from '../apps/server/src/integrations/images/pexels-image-provider.js';
+import { createResendEmailProvider } from '../apps/server/src/integrations/email/resend-email-provider.js';
 
 /**
  * Dependency-light provider smoke test.
@@ -138,6 +139,19 @@ async function main() {
   assert.equal(imageResult.provider, 'pexels');
   assert.equal(imageResult.photos[0].alt, 'Test destination');
   assert.equal(imageResult.attribution.providerLinkRequired, true);
+
+  const email = createResendEmailProvider({
+    apiKey: 'smoke-key',
+    from: 'AttraVoya Pro <hello@example.test>',
+    webUrl: 'https://attravoya.example',
+    http: { requestJson: async () => ({ id: 'smoke-email' }) },
+  });
+  const emailResult = await email.sendVerificationEmail({
+    to: 'traveller@example.test',
+    token: 'smoke-token',
+  });
+  assert.equal(emailResult.provider, 'resend');
+  assert.equal(emailResult.messageId, 'smoke-email');
 
   console.log('Provider smoke tests passed. No external API calls were made.');
 }

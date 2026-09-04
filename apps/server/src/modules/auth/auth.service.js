@@ -49,6 +49,16 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
     throw new TypeError('Access-token issuer is required.');
   }
 
+  async function createVerificationTokenForUser(userId) {
+    const verificationToken = createOpaqueToken();
+    await repository.createEmailVerificationToken({
+      userId,
+      tokenHash: hashToken(verificationToken),
+      expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
+    });
+    return verificationToken;
+  }
+
   return {
     async register(input) {
       const existing = await repository.findUserByEmailForLogin(input.email);
@@ -75,16 +85,25 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
         throw error;
       }
 
-      const verificationToken = createOpaqueToken();
-      await repository.createEmailVerificationToken({
-        userId: user.id,
-        tokenHash: hashToken(verificationToken),
-        expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS),
-      });
+      const verificationToken = await createVerificationTokenForUser(user.id);
 
       // The raw token is returned only to the application layer so the email
       // provider can send it. It must never be logged or stored in PostgreSQL.
       return { user, verificationToken };
+    },
+
+    async resendVerification(email) {
+      const user = await repository.findUserByEmailForLogin(email);
+      if (!user || user.deletedAt || user.emailVerifiedAt) {
+        // Keep the public response indistinguishable for unknown, deleted and
+        // already-verified accounts to prevent email-address enumeration.
+        return { email: null, verificationToken: null };
+      }
+
+      return {
+        email: user.email,
+        verificationToken: await createVerificationTokenForUser(user.id),
+      };
     },
 
     async verifyEmail(token) {

@@ -106,6 +106,7 @@ export async function buildApp(options = {}) {
   await app.register(authRoutes, {
     prefix: `${API_PREFIX}/auth`,
     repository: options.authRepository,
+    emailProvider: options.emailProvider,
     onVerificationRequested: options.onVerificationRequested,
     onPasswordResetRequested: options.onPasswordResetRequested,
   });
