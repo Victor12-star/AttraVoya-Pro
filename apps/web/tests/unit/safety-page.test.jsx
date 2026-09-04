@@ -11,9 +11,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { SafetyDestinationPage } = await import(
-  '../../src/features/destinations/safety-page.jsx'
-);
+const { SafetyDestinationPage } = await import('../../src/features/destinations/safety-page.jsx');
 
 const messages = {
   common: {
@@ -63,9 +61,7 @@ describe('SafetyDestinationPage', () => {
   });
 
   it('shows only the verified emergency records returned by AttraVoya', async () => {
-    render(
-      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
       screen.getByRole('heading', {
@@ -90,9 +86,7 @@ describe('SafetyDestinationPage', () => {
       emergency: { countryCode: 'SE', records: [] },
     });
 
-    render(
-      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
       await screen.findByText(
@@ -107,9 +101,7 @@ describe('SafetyDestinationPage', () => {
       .mockRejectedValueOnce(new Error('private database detail'))
       .mockResolvedValueOnce(emergencyResponse());
 
-    render(
-      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Verified emergency information could not be loaded right now.',
@@ -131,9 +123,7 @@ describe('SafetyDestinationPage', () => {
       },
     });
 
-    render(
-      <SafetyDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<SafetyDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.queryByText('112')).not.toBeInTheDocument();
