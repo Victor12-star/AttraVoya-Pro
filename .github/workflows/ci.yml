@@ -96,10 +96,7 @@ jobs:
         run: pnpm test
 
       - name: Check formatting
-        run: |
-          pnpm exec prettier --write apps/web/src/features/destinations/accommodation-page-copy.js apps/web/tests/unit/accommodation-page.test.jsx
-          git diff -- apps/web/src/features/destinations/accommodation-page-copy.js apps/web/tests/unit/accommodation-page.test.jsx
-          exit 1
+        run: pnpm format:check
 
   database:
     name: PostgreSQL and Prisma verification
