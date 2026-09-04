@@ -140,6 +140,8 @@ export async function buildApp(options = {}) {
   await app.register(destinationsRoutes, {
     prefix: `${API_PREFIX}/destinations`,
     provider: options.destinationsProvider ?? options.placesProvider,
+    weatherProvider: options.destinationWeatherProvider ?? options.weatherProvider,
+    imageProvider: options.destinationImageProvider ?? options.imageProvider,
   });
 
   await app.register(placesRoutes, {
