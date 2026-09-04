@@ -17,7 +17,9 @@ function normalizeClassification(classification) {
 function selectImage(images) {
   if (!Array.isArray(images) || images.length === 0) return null;
 
-  const candidates = images.filter((image) => typeof image?.url === 'string' && image.url.length > 0);
+  const candidates = images.filter(
+    (image) => typeof image?.url === 'string' && image.url.length > 0,
+  );
   if (candidates.length === 0) return null;
 
   const selected = [...candidates].sort((left, right) => {
