@@ -1,4 +1,10 @@
-const DESTINATION_CHILD_SEGMENTS = new Set(['attractions', 'currency', 'family', 'language', 'safety']);
+const DESTINATION_CHILD_SEGMENTS = new Set([
+  'attractions',
+  'currency',
+  'family',
+  'language',
+  'safety',
+]);
 
 /**
  * @typedef {object} DestinationSelection
