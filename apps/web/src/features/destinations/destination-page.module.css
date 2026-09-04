@@ -1,0 +1,368 @@
+.page {
+  padding-block: 44px 96px;
+}
+
+.shell {
+  display: grid;
+  gap: 24px;
+}
+
+.backLink {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--text-primary);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  min-height: 480px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.imagePanel {
+  position: relative;
+  min-height: 440px;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+.imageShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 52%, rgb(0 0 0 / 38%));
+  pointer-events: none;
+}
+
+.imageState {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text-secondary);
+  padding: 28px;
+  text-align: center;
+}
+
+.attribution {
+  position: absolute;
+  inset-inline-start: 16px;
+  inset-block-end: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 62%);
+  padding: 7px 11px;
+  color: white;
+  font-size: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.attribution a {
+  color: inherit;
+}
+
+.destinationCard {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: clamp(28px, 5vw, 58px);
+}
+
+.destinationCard h1 {
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 82px);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  overflow-wrap: anywhere;
+}
+
+.locationLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.metaRow span {
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  padding: 7px 10px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherCard {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(0, 1.45fr);
+  align-items: center;
+  gap: 22px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.weatherHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weatherHeading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.weatherHeading span:not(.weatherIcon) {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.weatherIcon,
+.featureIcon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  color: var(--brand-secondary);
+}
+
+.weatherIcon {
+  width: 46px;
+  height: 46px;
+}
+
+.weatherState {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.weatherGrid {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) repeat(2, minmax(130px, 0.8fr));
+  gap: 12px;
+}
+
+.temperatureBlock,
+.weatherMetric {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  padding: 16px;
+}
+
+.temperatureBlock {
+  display: grid;
+  gap: 7px;
+}
+
+.temperatureBlock > strong {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.temperatureBlock span,
+.weatherMetric span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.temperatureBlock span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weatherMetric {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 5px 8px;
+}
+
+.weatherMetric > svg {
+  grid-row: 1 / span 2;
+  color: var(--brand-secondary);
+}
+
+.weatherMetric strong {
+  font-size: 15px;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.featureLink {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: 15px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.featureLink:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.featureArrow {
+  color: var(--text-muted);
+}
+
+.emptyShell {
+  min-height: 62vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.emptyShell h1,
+.emptyShell p {
+  margin: 0;
+}
+
+.emptyShell h1 {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5vw, 60px);
+  font-weight: 500;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featureLink {
+    transition: none;
+  }
+
+  .featureLink:hover {
+    transform: none;
+  }
+
+  .spin {
+    animation: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .imagePanel {
+    min-height: 360px;
+  }
+
+  .weatherCard {
+    grid-template-columns: 1fr;
+  }
+
+  .featureGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .page {
+    padding-block: 28px 72px;
+  }
+
+  .imagePanel {
+    min-height: 280px;
+  }
+
+  .destinationCard {
+    padding: 26px 20px 30px;
+  }
+
+  .weatherGrid,
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featureLink {
+    min-height: 76px;
+  }
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCircle2, LoaderCircle, MapPin, RefreshCw, Search } from 'lucide-react';
 
@@ -7,6 +8,7 @@ import { getCountryDisplayName } from '@attravoya/localization';
 
 import { apiClient } from '../../lib/api-client.js';
 import { rememberRecentSearch } from '../../lib/recent-searches.js';
+import { buildDestinationHref } from './destination-route.js';
 import styles from './destination-search.module.css';
 
 const MIN_QUERY_LENGTH = 2;
@@ -14,6 +16,7 @@ const RESULT_LIMIT = 8;
 
 /**
  * @typedef {object} DestinationResult
+ * @property {string|null|undefined} provider
  * @property {string|null|undefined} externalId
  * @property {string} name
  * @property {string|null|undefined} state
@@ -21,12 +24,13 @@ const RESULT_LIMIT = 8;
  * @property {string} countryCode
  * @property {number} latitude
  * @property {number} longitude
+ * @property {string|null|undefined} timeZone
  */
 
 /** @param {DestinationResult} result */
 function destinationResultId(result) {
   return (
-    result.externalId ??
+    (result.externalId ? `${result.provider ?? 'unknown'}:${result.externalId}` : null) ??
     [result.name, result.countryCode, result.latitude, result.longitude].filter(Boolean).join(':')
   );
 }
@@ -48,6 +52,7 @@ function destinationLabel(result, locale) {
  * AttraVoya API and renders the normalized destination contract.
  */
 export function DestinationSearch({ initialQuery = '', locale = 'en', messages }) {
+  const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [results, setResults] = useState(/** @type {DestinationResult[]} */ ([]));
@@ -128,8 +133,12 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
         query: submittedQuery || query.trim(),
         countryCode: result.countryCode,
         destinationId: result.externalId ?? undefined,
+        provider: result.provider ?? undefined,
+        latitude: result.latitude,
+        longitude: result.longitude,
       },
     });
+    router.push(buildDestinationHref(result));
   }
 
   return (
