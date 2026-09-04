@@ -26,10 +26,7 @@ import {
 
 import { apiClient } from '../../lib/api-client.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
-import {
-  buildDestinationChildHref,
-  buildDestinationContextHref,
-} from './destination-route.js';
+import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
 import styles from './destination-page.module.css';
 
 /**
@@ -50,7 +47,9 @@ import styles from './destination-page.module.css';
 
 /** @param {string|null|undefined} provider */
 function providerDisplayName(provider) {
-  const value = String(provider ?? '').trim().toLowerCase();
+  const value = String(provider ?? '')
+    .trim()
+    .toLowerCase();
   if (value === 'geoapify') return 'Geoapify';
   if (value === 'openmeteo') return 'Open-Meteo';
   if (value === 'pexels') return 'Pexels';
@@ -68,7 +67,9 @@ function pexelsImageSource(photo) {
 
   try {
     const url = new URL(String(candidate));
-    return url.protocol === 'https:' && url.hostname === 'images.pexels.com' ? String(candidate) : null;
+    return url.protocol === 'https:' && url.hostname === 'images.pexels.com'
+      ? String(candidate)
+      : null;
   } catch {
     return null;
   }
@@ -291,14 +292,17 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
                 <Image
                   className={styles.heroImage}
                   src={imageData.source}
-                  alt={imageData.photo.alt ?? `${destination.name}, ${destination.countryDisplayName}`}
+                  alt={
+                    imageData.photo.alt ?? `${destination.name}, ${destination.countryDisplayName}`
+                  }
                   fill
                   priority
                   sizes="(max-width: 900px) 100vw, 58vw"
                 />
                 <div className={styles.imageShade} aria-hidden="true" />
                 <div className={styles.attribution}>
-                  {imageData.photo.photographer?.profileUrl && imageData.photo.photographer?.name ? (
+                  {imageData.photo.photographer?.profileUrl &&
+                  imageData.photo.photographer?.name ? (
                     <a
                       href={imageData.photo.photographer.profileUrl}
                       target="_blank"
@@ -308,7 +312,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
                     </a>
                   ) : null}
                   {imageData.images.attribution?.providerUrl ? (
-                    <a href={imageData.images.attribution.providerUrl} target="_blank" rel="noreferrer">
+                    <a
+                      href={imageData.images.attribution.providerUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       Pexels
                     </a>
                   ) : null}
@@ -349,7 +357,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
             </p>
             <div className={styles.metaRow}>
               <span>
-                {coordinateFormatter.format(destination.latitude)}, {' '}
+                {coordinateFormatter.format(destination.latitude)},{' '}
                 {coordinateFormatter.format(destination.longitude)}
               </span>
               {sourceName ? <span>{sourceName}</span> : null}
@@ -412,7 +420,9 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
               <div className={styles.weatherMetric}>
                 <CloudRain size={19} aria-hidden="true" />
                 <span>{copy.precipitation}</span>
-                <strong>{measurement(numberFormatter, currentWeather.precipitationMm, 'mm')}</strong>
+                <strong>
+                  {measurement(numberFormatter, currentWeather.precipitationMm, 'mm')}
+                </strong>
               </div>
             </div>
           ) : null}
