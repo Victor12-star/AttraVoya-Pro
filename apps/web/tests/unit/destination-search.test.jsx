@@ -16,9 +16,8 @@ vi.mock('../../src/lib/recent-searches.js', () => ({
   rememberRecentSearch: mocks.rememberRecentSearch,
 }));
 
-const { DestinationSearch } = await import(
-  '../../src/features/destinations/destination-search.jsx'
-);
+const { DestinationSearch } =
+  await import('../../src/features/destinations/destination-search.jsx');
 
 const messages = {
   navigation: { explore: 'Explore' },
@@ -118,6 +117,8 @@ describe('DestinationSearch', () => {
     fireEvent.submit(input.closest('form'));
 
     expect(mocks.searchDestinations).not.toHaveBeenCalled();
-    expect(screen.getByText('Where do you want to go?', { selector: '.field-error' })).toBeVisible();
+    expect(
+      screen.getByText('Where do you want to go?', { selector: '.field-error' }),
+    ).toBeVisible();
   });
 });

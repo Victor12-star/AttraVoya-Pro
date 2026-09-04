@@ -161,11 +161,7 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
                 />
               </div>
             </label>
-            <button
-              className="button button--accent"
-              type="submit"
-              disabled={status === 'loading'}
-            >
+            <button className="button button--accent" type="submit" disabled={status === 'loading'}>
               {status === 'loading' ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
               ) : (
