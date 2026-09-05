@@ -64,11 +64,15 @@ describe('NewsDestinationPage', () => {
   it('loads destination news through the shared API contract and renders factual provider fields', async () => {
     render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(screen.getByRole('heading', { name: 'News about Stockholm', level: 1 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'News about Stockholm', level: 1 }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole('heading', { name: 'Stockholm travel update', level: 3 }),
     ).toBeInTheDocument();
-    expect(screen.getByText('A factual provider description about Stockholm travel.')).toBeInTheDocument();
+    expect(
+      screen.getByText('A factual provider description about Stockholm travel.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Example News')).toBeInTheDocument();
     expect(screen.getByText('tourism')).toBeInTheDocument();
     expect(screen.getByText('Provider results may be delayed')).toBeInTheDocument();
