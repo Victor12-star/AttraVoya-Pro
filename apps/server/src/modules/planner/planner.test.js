@@ -88,9 +88,7 @@ function createPlannerRepository(overrides = {}) {
     findOriginCityById: vi.fn(async () => ({ id: 'city-1' })),
     findOriginAirportById: vi.fn(async () => ({ id: 'airport-1', cityId: 'city-1' })),
     createOwnedRequest: vi.fn(async () => storedRequest()),
-    listOwnedRequests: vi.fn(async (userId) =>
-      userId === 'user-1' ? [storedRequest()] : [],
-    ),
+    listOwnedRequests: vi.fn(async (userId) => (userId === 'user-1' ? [storedRequest()] : [])),
     findOwnedRequestById: vi.fn(async ({ userId, requestId }) =>
       userId === 'user-1' && requestId === 'plan-request-1' ? storedRequest() : null,
     ),
@@ -254,7 +252,10 @@ describe('budget planner requests', () => {
     });
     expect(currencyResponse.statusCode).toBe(400);
     expect(currencyResponse.json()).toMatchObject({
-      error: { code: 'VALIDATION_ERROR', message: 'The selected budget currency is not supported.' },
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'The selected budget currency is not supported.',
+      },
     });
 
     const mismatchRepository = createPlannerRepository({
@@ -269,7 +270,10 @@ describe('budget planner requests', () => {
     });
     expect(mismatchResponse.statusCode).toBe(400);
     expect(mismatchResponse.json()).toMatchObject({
-      error: { code: 'VALIDATION_ERROR', message: 'The selected origin city and airport do not match.' },
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'The selected origin city and airport do not match.',
+      },
     });
   });
 });
