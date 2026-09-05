@@ -98,6 +98,24 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
+      - name: Format Phase 8A diagnostic files
+        run: >-
+          pnpm exec prettier --write
+          apps/web/src/features/planner/budget-planner-copy.js
+          apps/web/src/features/planner/budget-planner-page.jsx
+          apps/web/tests/unit/budget-planner-page.test.jsx
+
+      - name: Upload Phase 8A formatter artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-8a-prettier-output
+          path: |
+            apps/web/src/features/planner/budget-planner-copy.js
+            apps/web/src/features/planner/budget-planner-page.jsx
+            apps/web/tests/unit/budget-planner-page.test.jsx
+          if-no-files-found: error
+          retention-days: 1
+
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-latest
