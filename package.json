@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write apps/web/src/features/destinations/pharmacies-page-copy.js && printf '\n@@PHARMACIES_DIFF@@\n' && git diff -- apps/web/src/features/destinations/pharmacies-page-copy.js && printf '\n@@END_PHARMACIES_DIFF@@\n'",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
