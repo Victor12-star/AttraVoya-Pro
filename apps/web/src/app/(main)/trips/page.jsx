@@ -1,17 +1,15 @@
-import { FeaturePage } from '../../../components/common/feature-page.jsx';
+import { BudgetPlannerPage } from '../../../features/planner/budget-planner-page.jsx';
+import { getBudgetPlannerCopy } from '../../../features/planner/budget-planner-copy.js';
 import { getRequestLocale } from '../../../i18n/request-locale.js';
-import { loadMessages } from '../../../i18n/messages.js';
 
-export default async function Page() {
+export default async function TripsPage() {
   const locale = await getRequestLocale();
-  const messages = await loadMessages(locale);
+  const copy = getBudgetPlannerCopy(locale);
 
   return (
-    <FeaturePage
-      eyebrow={messages.navigation.trips}
-      title={messages.navigation.trips}
-      description={messages.home.budgetDescription}
-      backLabel={messages.navigation.explore}
+    <BudgetPlannerPage
+      copy={copy}
+      defaultCurrency={process.env.NEXT_PUBLIC_DEFAULT_CURRENCY ?? 'SEK'}
     />
   );
 }
