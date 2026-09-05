@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --write apps/web/tests/unit/museums-page.test.jsx && printf '\n@@MUSEUMS_DIFF@@\n' && git diff -- apps/web/tests/unit/museums-page.test.jsx && printf '\n@@END_MUSEUMS_DIFF@@\n'",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
