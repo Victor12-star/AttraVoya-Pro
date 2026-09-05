@@ -215,6 +215,12 @@ async function requestCurrencyContext(countryCode) {
   }
 }
 
+/**
+ * @param {number} amount
+ * @param {string} from
+ * @param {string} to
+ * @returns {Promise<ConversionState>}
+ */
 async function requestConversion(amount, from, to) {
   try {
     const response = await apiClient.convertCurrency({ amount, from, to });
