@@ -4,7 +4,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   en: {
     eyebrow: 'Cafés',
     title: 'Cafés near {destination}',
-    intro: 'Browse places categorized as cafés by the configured places provider near this destination.',
+    intro:
+      'Browse places categorized as cafés by the configured places provider near this destination.',
     back: 'Back to destination',
     results: 'Nearby cafés',
     noResults: 'No cafés were found in this search area.',
@@ -17,7 +18,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   sv: {
     eyebrow: 'Kaféer',
     title: 'Kaféer nära {destination}',
-    intro: 'Se platser som den konfigurerade platsleverantören kategoriserar som kaféer nära destinationen.',
+    intro:
+      'Se platser som den konfigurerade platsleverantören kategoriserar som kaféer nära destinationen.',
     back: 'Tillbaka till destinationen',
     results: 'Kaféer i närheten',
     noResults: 'Inga kaféer hittades i sökområdet.',
@@ -30,7 +32,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   es: {
     eyebrow: 'Cafés',
     title: 'Cafés cerca de {destination}',
-    intro: 'Consulta lugares que el proveedor configurado clasifica como cafés cerca de este destino.',
+    intro:
+      'Consulta lugares que el proveedor configurado clasifica como cafés cerca de este destino.',
     back: 'Volver al destino',
     results: 'Cafés cercanos',
     noResults: 'No se encontraron cafés en esta zona de búsqueda.',
@@ -43,7 +46,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   fr: {
     eyebrow: 'Cafés',
     title: 'Cafés près de {destination}',
-    intro: 'Consultez les lieux classés comme cafés par le fournisseur configuré près de cette destination.',
+    intro:
+      'Consultez les lieux classés comme cafés par le fournisseur configuré près de cette destination.',
     back: 'Retour à la destination',
     results: 'Cafés à proximité',
     noResults: 'Aucun café n’a été trouvé dans cette zone de recherche.',
@@ -56,7 +60,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   de: {
     eyebrow: 'Cafés',
     title: 'Cafés nahe {destination}',
-    intro: 'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Cafés einordnet.',
+    intro:
+      'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Cafés einordnet.',
     back: 'Zurück zum Reiseziel',
     results: 'Cafés in der Nähe',
     noResults: 'In diesem Suchgebiet wurden keine Cafés gefunden.',
@@ -69,7 +74,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   it: {
     eyebrow: 'Caffè',
     title: 'Caffè vicino a {destination}',
-    intro: 'Consulta i luoghi classificati come caffè dal fornitore configurato vicino a questa destinazione.',
+    intro:
+      'Consulta i luoghi classificati come caffè dal fornitore configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     results: 'Caffè nelle vicinanze',
     noResults: 'Nessun caffè è stato trovato in questa area di ricerca.',
@@ -82,7 +88,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   pt: {
     eyebrow: 'Cafés',
     title: 'Cafés perto de {destination}',
-    intro: 'Consulte locais classificados como cafés pelo fornecedor configurado perto deste destino.',
+    intro:
+      'Consulte locais classificados como cafés pelo fornecedor configurado perto deste destino.',
     back: 'Voltar ao destino',
     results: 'Cafés próximos',
     noResults: 'Não foram encontrados cafés nesta área de pesquisa.',
@@ -95,7 +102,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   pl: {
     eyebrow: 'Kawiarnie',
     title: 'Kawiarnie w pobliżu {destination}',
-    intro: 'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako kawiarnie w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako kawiarnie w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     results: 'Kawiarnie w pobliżu',
     noResults: 'W tym obszarze wyszukiwania nie znaleziono kawiarni.',
@@ -108,7 +116,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   nl: {
     eyebrow: 'Cafés',
     title: 'Cafés bij {destination}',
-    intro: 'Bekijk plaatsen die de ingestelde locatiesprovider als cafés classificeert nabij deze bestemming.',
+    intro:
+      'Bekijk plaatsen die de ingestelde locatiesprovider als cafés classificeert nabij deze bestemming.',
     back: 'Terug naar bestemming',
     results: 'Cafés in de buurt',
     noResults: 'Er zijn geen cafés gevonden in dit zoekgebied.',
@@ -121,7 +130,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   no: {
     eyebrow: 'Kafeer',
     title: 'Kafeer nær {destination}',
-    intro: 'Se steder som den konfigurerte stedsleverandøren kategoriserer som kafeer nær dette reisemålet.',
+    intro:
+      'Se steder som den konfigurerte stedsleverandøren kategoriserer som kafeer nær dette reisemålet.',
     back: 'Tilbake til reisemålet',
     results: 'Kafeer i nærheten',
     noResults: 'Ingen kafeer ble funnet i dette søkeområdet.',
@@ -134,7 +144,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   da: {
     eyebrow: 'Caféer',
     title: 'Caféer nær {destination}',
-    intro: 'Se steder, som den konfigurerede stedudbyder kategoriserer som caféer nær denne destination.',
+    intro:
+      'Se steder, som den konfigurerede stedudbyder kategoriserer som caféer nær denne destination.',
     back: 'Tilbage til destinationen',
     results: 'Caféer i nærheden',
     noResults: 'Der blev ikke fundet caféer i dette søgeområde.',
@@ -147,7 +158,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   fi: {
     eyebrow: 'Kahvilat',
     title: 'Kahvilat lähellä kohdetta {destination}',
-    intro: 'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee kahviloiksi tämän kohteen lähellä.',
+    intro:
+      'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee kahviloiksi tämän kohteen lähellä.',
     back: 'Takaisin kohteeseen',
     results: 'Lähellä olevat kahvilat',
     noResults: 'Tältä hakualueelta ei löytynyt kahviloita.',
@@ -160,7 +172,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   tr: {
     eyebrow: 'Kafeler',
     title: '{destination} yakınındaki kafeler',
-    intro: 'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında kafe olarak sınıflandırdığı yerleri görüntüleyin.',
+    intro:
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında kafe olarak sınıflandırdığı yerleri görüntüleyin.',
     back: 'Hedefe dön',
     results: 'Yakındaki kafeler',
     noResults: 'Bu arama alanında kafe bulunamadı.',
@@ -225,7 +238,8 @@ const CAFES_PAGE_COPY = Object.freeze({
   hi: {
     eyebrow: 'कैफ़े',
     title: '{destination} के पास कैफ़े',
-    intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा कैफ़े के रूप में वर्गीकृत स्थान देखें।',
+    intro:
+      'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा कैफ़े के रूप में वर्गीकृत स्थान देखें।',
     back: 'गंतव्य पर वापस जाएँ',
     results: 'आस-पास के कैफ़े',
     noResults: 'इस खोज क्षेत्र में कोई कैफ़े नहीं मिला।',
