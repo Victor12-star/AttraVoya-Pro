@@ -1,19 +1,5 @@
 const POLICY_KEY = 'attravoya-budget-envelope-v1';
 
-// These weights are a transparent product-planning heuristic, not market data.
-// They divide only the traveller's own spendable budget so later provider-backed
-// recommendation work has explicit category targets without inventing prices.
-const BASE_TARGETS = Object.freeze([
-  Object.freeze({ category: 'FLIGHTS', weightPercent: 30 }),
-  Object.freeze({ category: 'ACCOMMODATION', weightPercent: 32 }),
-  Object.freeze({ category: 'FOOD', weightPercent: 15 }),
-  Object.freeze({ category: 'LOCAL_TRANSPORT', weightPercent: 8 }),
-  Object.freeze({ category: 'ACTIVITIES', weightPercent: 7 }),
-  Object.freeze({ category: 'CHILDREN_ACTIVITIES', weightPercent: 3 }),
-  Object.freeze({ category: 'AIRPORT_TRANSFER', weightPercent: 3 }),
-  Object.freeze({ category: 'TRAVEL_INSURANCE', weightPercent: 2 }),
-]);
-
 function decimalToScaledInteger(value, scaleDigits, label) {
   const normalized = String(value ?? '').trim();
   if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
@@ -41,27 +27,38 @@ function formatScaledInteger(value, scaleDigits) {
 }
 
 function buildTargets({ spendableCents, hasChildren }) {
-  const weights = BASE_TARGETS.map((target) => ({ ...target }));
-  if (!hasChildren) {
-    const childTarget = weights.find((target) => target.category === 'CHILDREN_ACTIVITIES');
-    const activitiesTarget = weights.find((target) => target.category === 'ACTIVITIES');
-    activitiesTarget.weightPercent += childTarget.weightPercent;
-    childTarget.weightPercent = 0;
-  }
+  const activitiesPercent = hasChildren ? 7 : 10;
+  const childrenActivitiesPercent = hasChildren ? 3 : 0;
+
+  // These weights are a transparent product-planning heuristic, not market data.
+  // They divide only the traveller's own spendable budget so later provider-backed
+  // recommendation work has explicit category targets without inventing prices.
+  /** @type {{category: string, weightPercent: number}[]} */
+  const weights = [
+    { category: 'FLIGHTS', weightPercent: 30 },
+    { category: 'ACCOMMODATION', weightPercent: 32 },
+    { category: 'FOOD', weightPercent: 15 },
+    { category: 'LOCAL_TRANSPORT', weightPercent: 8 },
+    { category: 'ACTIVITIES', weightPercent: activitiesPercent },
+    { category: 'CHILDREN_ACTIVITIES', weightPercent: childrenActivitiesPercent },
+    { category: 'AIRPORT_TRANSFER', weightPercent: 3 },
+    { category: 'TRAVEL_INSURANCE', weightPercent: 2 },
+  ];
 
   const targets = weights.map((target) => ({
     ...target,
     amountCents: Math.floor((spendableCents * target.weightPercent) / 100),
   }));
-
   const assignedCents = targets.reduce((sum, target) => sum + target.amountCents, 0);
   const roundingRemainder = spendableCents - assignedCents;
-  if (roundingRemainder > 0) {
-    const accommodation = targets.find((target) => target.category === 'ACCOMMODATION');
-    accommodation.amountCents += roundingRemainder;
-  }
 
-  return targets;
+  // Put unavoidable integer-cent rounding into one stable category so the target
+  // amounts always add back to the exact spendable budget.
+  return targets.map((target) =>
+    target.category === 'ACCOMMODATION'
+      ? { ...target, amountCents: target.amountCents + roundingRemainder }
+      : target,
+  );
 }
 
 export function buildBudgetEnvelope(record) {
