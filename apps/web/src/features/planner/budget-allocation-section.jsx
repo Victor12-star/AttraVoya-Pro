@@ -16,6 +16,32 @@ import { ApiClientError } from '@attravoya/api-client';
 import { apiClient } from '../../lib/api-client.js';
 import styles from './budget-allocation-section.module.css';
 
+/**
+ * @typedef {object} PlannerBrief
+ * @property {string} id
+ * @property {{label?: string|null}|null|undefined} origin
+ * @property {{amount?: string|null, currencyCode?: string|null}|null|undefined} budget
+ */
+
+/**
+ * @typedef {object} BudgetTarget
+ * @property {string} category
+ * @property {string} amount
+ * @property {string} percentOfSpendable
+ * @property {string} basis
+ */
+
+/**
+ * @typedef {object} BudgetAllocation
+ * @property {string} requestId
+ * @property {string} currencyCode
+ * @property {string} totalBudget
+ * @property {{category: string, amount: string, percentOfTotal: string, basis: string}} safetyReserve
+ * @property {string} spendableBudget
+ * @property {BudgetTarget[]} targets
+ * @property {{kind: string, liveDataUsed: boolean, providerDataUsed: boolean}} provenance
+ */
+
 const TARGET_CATEGORIES = new Set([
   'FLIGHTS',
   'ACCOMMODATION',
@@ -99,11 +125,11 @@ function briefLabel(request, fallback) {
 }
 
 export function BudgetAllocationSection({ copy, locale, plannerCopy }) {
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState(/** @type {PlannerBrief[]} */ ([]));
   const [briefState, setBriefState] = useState('loading');
   const [selectedRequestId, setSelectedRequestId] = useState('');
   const [allocationState, setAllocationState] = useState('idle');
-  const [allocation, setAllocation] = useState(null);
+  const [allocation, setAllocation] = useState(/** @type {BudgetAllocation|null} */ (null));
   const briefSequence = useRef(0);
   const allocationSequence = useRef(0);
 
