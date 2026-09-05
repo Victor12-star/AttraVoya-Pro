@@ -22,7 +22,20 @@ import { apiClient } from '../../lib/api-client.js';
 import { readPreferences } from '../../lib/preferences.js';
 import styles from './budget-planner-page.module.css';
 
+/**
+ * @typedef {object} PlannerDraft
+ * @property {string} id
+ * @property {{label?: string|null}|null|undefined} origin
+ * @property {{flexible?: boolean, fixedDeparture?: string|null, fixedReturn?: string|null, earliestDeparture?: string|null, latestReturn?: string|null}|null|undefined} dates
+ * @property {{amount?: string|null, currencyCode?: string|null}|null|undefined} budget
+ * @property {{adults?: number, childrenAges?: number[]}|null|undefined} travellers
+ * @property {string} status
+ */
+
+/** @type {string[]} */
 const LODGING_TYPES = Object.values(ACCOMMODATION_TYPES).filter((type) => type !== 'OTHER');
+
+/** @type {string[]} */
 const DEFAULT_LODGING = [
   ACCOMMODATION_TYPES.HOTEL,
   ACCOMMODATION_TYPES.GUEST_HOUSE,
@@ -43,6 +56,7 @@ function parseChildrenAges(value) {
   return values.map((item) => Number(item));
 }
 
+/** @param {PlannerDraft} request */
 function formatDateRange(request, copy) {
   if (request?.dates?.flexible) {
     const window = [request.dates.earliestDeparture, request.dates.latestReturn].filter(Boolean);
@@ -59,7 +73,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
   const [familyFriendly, setFamilyFriendly] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitState, setSubmitState] = useState({ type: 'idle', message: '' });
-  const [drafts, setDrafts] = useState([]);
+  const [drafts, setDrafts] = useState(/** @type {PlannerDraft[]} */ ([]));
   const [draftState, setDraftState] = useState('loading');
 
   useEffect(() => {
@@ -244,11 +258,25 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 )}
                 <label>
                   <span>{copy.minNights}</span>
-                  <input name="minNights" type="number" min="1" max="90" defaultValue="2" required />
+                  <input
+                    name="minNights"
+                    type="number"
+                    min="1"
+                    max="90"
+                    defaultValue="2"
+                    required
+                  />
                 </label>
                 <label>
                   <span>{copy.maxNights}</span>
-                  <input name="maxNights" type="number" min="1" max="90" defaultValue="14" required />
+                  <input
+                    name="maxNights"
+                    type="number"
+                    min="1"
+                    max="90"
+                    defaultValue="14"
+                    required
+                  />
                 </label>
               </div>
             </fieldset>
@@ -264,7 +292,9 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                   <span>{copy.currency}</span>
                   <select value={currency} onChange={(event) => setCurrency(event.target.value)}>
                     {CURRENCY_CODES.map((code) => (
-                      <option key={code} value={code}>{code}</option>
+                      <option key={code} value={code}>
+                        {code}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -292,7 +322,12 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 </label>
                 <label>
                   <span>{copy.children}</span>
-                  <input name="childrenAges" type="text" inputMode="numeric" placeholder={copy.childrenHint} />
+                  <input
+                    name="childrenAges"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={copy.childrenHint}
+                  />
                 </label>
               </div>
             </fieldset>
@@ -306,7 +341,9 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 <span>{copy.comfort}</span>
                 <select name="comfortLevel" defaultValue="VALUE">
                   {Object.entries(copy.comfortLevels).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -343,7 +380,9 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 role={submitState.type === 'success' ? 'status' : 'alert'}
               >
                 <span>{submitState.message}</span>
-                {submitState.type === 'auth' ? <Link href="/login">{copy.signInLink}</Link> : null}
+                {submitState.type === 'auth' ? (
+                  <Link href="/login">{copy.signInLink}</Link>
+                ) : null}
               </div>
             ) : null}
 
@@ -422,9 +461,18 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                         <span>{request.status}</span>
                       </div>
                       <div className={styles.draftMeta}>
-                        <span><CircleDollarSign size={15} />{request.budget?.amount} {request.budget?.currencyCode}</span>
-                        <span><Users size={15} />{travellerCount}</span>
-                        <span><CalendarDays size={15} />{formatDateRange(request, copy)}</span>
+                        <span>
+                          <CircleDollarSign size={15} />
+                          {request.budget?.amount} {request.budget?.currencyCode}
+                        </span>
+                        <span>
+                          <Users size={15} />
+                          {travellerCount}
+                        </span>
+                        <span>
+                          <CalendarDays size={15} />
+                          {formatDateRange(request, copy)}
+                        </span>
                       </div>
                     </li>
                   );
