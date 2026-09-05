@@ -7,8 +7,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: { getEvents: mocks.getEvents },
 }));
 
-const { EventsDestinationPage } =
-  await import('../../src/features/destinations/events-page.jsx');
+const { EventsDestinationPage } = await import('../../src/features/destinations/events-page.jsx');
 
 const messages = {
   common: { loading: 'Loading…', unavailable: 'Temporarily unavailable', retry: 'Retry' },
@@ -73,8 +72,12 @@ describe('EventsDestinationPage', () => {
   it('loads provider events near the destination and renders only normalized factual fields', async () => {
     render(<EventsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(screen.getByRole('heading', { name: 'Events near Stockholm', level: 1 })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Stockholm Live', level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Events near Stockholm', level: 1 }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm Live', level: 3 }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Oct 10, 2026/)).toBeInTheDocument();
     expect(screen.getByText(/Arena · Example street 1 · Stockholm/)).toBeInTheDocument();
     expect(screen.getByText('Music · Rock')).toBeInTheDocument();
@@ -125,7 +128,9 @@ describe('EventsDestinationPage', () => {
 
     render(<EventsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(await screen.findByRole('heading', { name: 'Safe Event', level: 3 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Safe Event', level: 3 }),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Wrong Country Event')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Event details' })).not.toBeInTheDocument();
   });
@@ -152,7 +157,9 @@ describe('EventsDestinationPage', () => {
 
     screen.getByRole('button', { name: 'Retry' }).click();
     await waitFor(() => expect(mocks.getEvents).toHaveBeenCalledTimes(2));
-    expect(await screen.findByRole('heading', { name: 'Stockholm Live', level: 3 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm Live', level: 3 }),
+    ).toBeInTheDocument();
   });
 
   it('renders an invalid destination state without calling the provider', () => {

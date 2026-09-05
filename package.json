@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --write apps/web/src/features/destinations/events-page-copy.js apps/web/src/features/destinations/events-page.jsx apps/web/tests/unit/events-page.test.jsx && echo EVENTS_COPY_BASE64 && base64 -w0 apps/web/src/features/destinations/events-page-copy.js && echo && echo EVENTS_PAGE_BASE64 && base64 -w0 apps/web/src/features/destinations/events-page.jsx && echo && echo EVENTS_TEST_BASE64 && base64 -w0 apps/web/tests/unit/events-page.test.jsx && echo && git checkout -- apps/web/src/features/destinations/events-page-copy.js apps/web/src/features/destinations/events-page.jsx apps/web/tests/unit/events-page.test.jsx && exit 1",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",

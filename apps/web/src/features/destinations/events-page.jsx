@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CalendarDays, ExternalLink, LoaderCircle, MapPin, RefreshCw } from 'lucide-react';
+import {
+  ArrowLeft,
+  CalendarDays,
+  ExternalLink,
+  LoaderCircle,
+  MapPin,
+  RefreshCw,
+} from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { buildDestinationHref } from './destination-route.js';
@@ -273,7 +280,11 @@ export function EventsDestinationPage({ destination, locale = 'en', messages }) 
         {state.status === 'error' ? (
           <div className={styles.feedback} role="status">
             <strong>{copy.unavailable}</strong>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>

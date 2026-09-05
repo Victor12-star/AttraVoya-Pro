@@ -17,12 +17,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Provider checked',
     dateTbd: 'Date to be announced',
     dateUnavailable: 'Date unavailable',
-    disclaimer: 'Event details come from the configured provider and can change. AttraVoya does not claim live ticket inventory, prices, ratings, popularity, or availability.',
+    disclaimer:
+      'Event details come from the configured provider and can change. AttraVoya does not claim live ticket inventory, prices, ratings, popularity, or availability.',
   },
   sv: {
     eyebrow: 'Evenemang',
     title: 'Evenemang nära {destination}',
-    intro: 'Utforska verkliga evenemang som returneras av den konfigurerade evenemangsleverantören nära destinationen.',
+    intro:
+      'Utforska verkliga evenemang som returneras av den konfigurerade evenemangsleverantören nära destinationen.',
     back: 'Tillbaka till destinationen',
     searchArea: 'Inom 50 km',
     results: 'Kommande evenemang',
@@ -35,12 +37,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Leverantören kontrollerad',
     dateTbd: 'Datum meddelas senare',
     dateUnavailable: 'Datum saknas',
-    disclaimer: 'Evenemangsuppgifter kommer från den konfigurerade leverantören och kan ändras. AttraVoya gör inga anspråk på livebiljettlager, priser, betyg, popularitet eller tillgänglighet.',
+    disclaimer:
+      'Evenemangsuppgifter kommer från den konfigurerade leverantören och kan ändras. AttraVoya gör inga anspråk på livebiljettlager, priser, betyg, popularitet eller tillgänglighet.',
   },
   es: {
     eyebrow: 'Eventos',
     title: 'Eventos cerca de {destination}',
-    intro: 'Explora eventos reales devueltos por el proveedor de eventos configurado cerca de este destino.',
+    intro:
+      'Explora eventos reales devueltos por el proveedor de eventos configurado cerca de este destino.',
     back: 'Volver al destino',
     searchArea: 'En un radio de 50 km',
     results: 'Próximos eventos',
@@ -53,12 +57,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Proveedor comprobado',
     dateTbd: 'Fecha por anunciar',
     dateUnavailable: 'Fecha no disponible',
-    disclaimer: 'Los detalles proceden del proveedor configurado y pueden cambiar. AttraVoya no afirma disponer de inventario de entradas en vivo, precios, valoraciones, popularidad ni disponibilidad.',
+    disclaimer:
+      'Los detalles proceden del proveedor configurado y pueden cambiar. AttraVoya no afirma disponer de inventario de entradas en vivo, precios, valoraciones, popularidad ni disponibilidad.',
   },
   fr: {
     eyebrow: 'Événements',
     title: 'Événements près de {destination}',
-    intro: 'Découvrez les événements réels renvoyés par le fournisseur configuré près de cette destination.',
+    intro:
+      'Découvrez les événements réels renvoyés par le fournisseur configuré près de cette destination.',
     back: 'Retour à la destination',
     searchArea: 'Dans un rayon de 50 km',
     results: 'Événements à venir',
@@ -71,12 +77,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Fournisseur vérifié',
     dateTbd: 'Date à annoncer',
     dateUnavailable: 'Date indisponible',
-    disclaimer: 'Les détails proviennent du fournisseur configuré et peuvent changer. AttraVoya ne revendique aucun stock de billets en direct, prix, note, popularité ou disponibilité.',
+    disclaimer:
+      'Les détails proviennent du fournisseur configuré et peuvent changer. AttraVoya ne revendique aucun stock de billets en direct, prix, note, popularité ou disponibilité.',
   },
   de: {
     eyebrow: 'Veranstaltungen',
     title: 'Veranstaltungen nahe {destination}',
-    intro: 'Entdecke reale Veranstaltungen, die der konfigurierte Veranstaltungsanbieter in der Nähe dieses Reiseziels zurückgibt.',
+    intro:
+      'Entdecke reale Veranstaltungen, die der konfigurierte Veranstaltungsanbieter in der Nähe dieses Reiseziels zurückgibt.',
     back: 'Zurück zum Reiseziel',
     searchArea: 'Im Umkreis von 50 km',
     results: 'Bevorstehende Veranstaltungen',
@@ -89,12 +97,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Anbieter geprüft',
     dateTbd: 'Datum wird noch bekannt gegeben',
     dateUnavailable: 'Datum nicht verfügbar',
-    disclaimer: 'Veranstaltungsdetails stammen vom konfigurierten Anbieter und können sich ändern. AttraVoya macht keine Angaben zu Live-Ticketbestand, Preisen, Bewertungen, Popularität oder Verfügbarkeit.',
+    disclaimer:
+      'Veranstaltungsdetails stammen vom konfigurierten Anbieter und können sich ändern. AttraVoya macht keine Angaben zu Live-Ticketbestand, Preisen, Bewertungen, Popularität oder Verfügbarkeit.',
   },
   it: {
     eyebrow: 'Eventi',
     title: 'Eventi vicino a {destination}',
-    intro: 'Esplora eventi reali restituiti dal fornitore di eventi configurato vicino a questa destinazione.',
+    intro:
+      'Esplora eventi reali restituiti dal fornitore di eventi configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     searchArea: 'Entro 50 km',
     results: 'Prossimi eventi',
@@ -107,12 +117,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Fornitore controllato',
     dateTbd: 'Data da annunciare',
     dateUnavailable: 'Data non disponibile',
-    disclaimer: 'I dettagli provengono dal fornitore configurato e possono cambiare. AttraVoya non dichiara inventario biglietti in tempo reale, prezzi, valutazioni, popolarità o disponibilità.',
+    disclaimer:
+      'I dettagli provengono dal fornitore configurato e possono cambiare. AttraVoya non dichiara inventario biglietti in tempo reale, prezzi, valutazioni, popolarità o disponibilità.',
   },
   pt: {
     eyebrow: 'Eventos',
     title: 'Eventos perto de {destination}',
-    intro: 'Explore eventos reais devolvidos pelo fornecedor de eventos configurado perto deste destino.',
+    intro:
+      'Explore eventos reais devolvidos pelo fornecedor de eventos configurado perto deste destino.',
     back: 'Voltar ao destino',
     searchArea: 'Num raio de 50 km',
     results: 'Próximos eventos',
@@ -125,12 +137,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Fornecedor verificado',
     dateTbd: 'Data a anunciar',
     dateUnavailable: 'Data indisponível',
-    disclaimer: 'Os detalhes vêm do fornecedor configurado e podem mudar. A AttraVoya não afirma ter inventário de bilhetes em tempo real, preços, classificações, popularidade ou disponibilidade.',
+    disclaimer:
+      'Os detalhes vêm do fornecedor configurado e podem mudar. A AttraVoya não afirma ter inventário de bilhetes em tempo real, preços, classificações, popularidade ou disponibilidade.',
   },
   pl: {
     eyebrow: 'Wydarzenia',
     title: 'Wydarzenia w pobliżu {destination}',
-    intro: 'Przeglądaj rzeczywiste wydarzenia zwrócone przez skonfigurowanego dostawcę w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj rzeczywiste wydarzenia zwrócone przez skonfigurowanego dostawcę w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     searchArea: 'W promieniu 50 km',
     results: 'Nadchodzące wydarzenia',
@@ -143,12 +157,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Dostawca sprawdzony',
     dateTbd: 'Data zostanie ogłoszona',
     dateUnavailable: 'Data niedostępna',
-    disclaimer: 'Szczegóły wydarzeń pochodzą od skonfigurowanego dostawcy i mogą się zmienić. AttraVoya nie deklaruje bieżącego stanu biletów, cen, ocen, popularności ani dostępności.',
+    disclaimer:
+      'Szczegóły wydarzeń pochodzą od skonfigurowanego dostawcy i mogą się zmienić. AttraVoya nie deklaruje bieżącego stanu biletów, cen, ocen, popularności ani dostępności.',
   },
   nl: {
     eyebrow: 'Evenementen',
     title: 'Evenementen bij {destination}',
-    intro: 'Bekijk echte evenementen die door de ingestelde evenementenprovider in de buurt van deze bestemming worden teruggegeven.',
+    intro:
+      'Bekijk echte evenementen die door de ingestelde evenementenprovider in de buurt van deze bestemming worden teruggegeven.',
     back: 'Terug naar bestemming',
     searchArea: 'Binnen 50 km',
     results: 'Aankomende evenementen',
@@ -161,12 +177,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Provider gecontroleerd',
     dateTbd: 'Datum wordt later bekendgemaakt',
     dateUnavailable: 'Datum niet beschikbaar',
-    disclaimer: 'Evenementdetails komen van de ingestelde provider en kunnen wijzigen. AttraVoya claimt geen live ticketvoorraad, prijzen, beoordelingen, populariteit of beschikbaarheid.',
+    disclaimer:
+      'Evenementdetails komen van de ingestelde provider en kunnen wijzigen. AttraVoya claimt geen live ticketvoorraad, prijzen, beoordelingen, populariteit of beschikbaarheid.',
   },
   no: {
     eyebrow: 'Arrangementer',
     title: 'Arrangementer nær {destination}',
-    intro: 'Utforsk ekte arrangementer returnert av den konfigurerte arrangementsleverandøren nær reisemålet.',
+    intro:
+      'Utforsk ekte arrangementer returnert av den konfigurerte arrangementsleverandøren nær reisemålet.',
     back: 'Tilbake til reisemålet',
     searchArea: 'Innen 50 km',
     results: 'Kommende arrangementer',
@@ -179,12 +197,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Leverandør kontrollert',
     dateTbd: 'Dato kunngjøres senere',
     dateUnavailable: 'Dato utilgjengelig',
-    disclaimer: 'Arrangementsdetaljer kommer fra den konfigurerte leverandøren og kan endres. AttraVoya hevder ikke sanntids billettbeholdning, priser, vurderinger, popularitet eller tilgjengelighet.',
+    disclaimer:
+      'Arrangementsdetaljer kommer fra den konfigurerte leverandøren og kan endres. AttraVoya hevder ikke sanntids billettbeholdning, priser, vurderinger, popularitet eller tilgjengelighet.',
   },
   da: {
     eyebrow: 'Begivenheder',
     title: 'Begivenheder nær {destination}',
-    intro: 'Udforsk rigtige begivenheder returneret af den konfigurerede begivenhedsudbyder nær destinationen.',
+    intro:
+      'Udforsk rigtige begivenheder returneret af den konfigurerede begivenhedsudbyder nær destinationen.',
     back: 'Tilbage til destinationen',
     searchArea: 'Inden for 50 km',
     results: 'Kommende begivenheder',
@@ -197,12 +217,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Udbyder kontrolleret',
     dateTbd: 'Dato annonceres senere',
     dateUnavailable: 'Dato ikke tilgængelig',
-    disclaimer: 'Begivenhedsdetaljer kommer fra den konfigurerede udbyder og kan ændres. AttraVoya hævder ikke live billetbeholdning, priser, vurderinger, popularitet eller tilgængelighed.',
+    disclaimer:
+      'Begivenhedsdetaljer kommer fra den konfigurerede udbyder og kan ændres. AttraVoya hævder ikke live billetbeholdning, priser, vurderinger, popularitet eller tilgængelighed.',
   },
   fi: {
     eyebrow: 'Tapahtumat',
     title: 'Tapahtumat lähellä kohdetta {destination}',
-    intro: 'Tutustu todellisiin tapahtumiin, jotka määritetty tapahtumapalvelu palauttaa tämän kohteen läheltä.',
+    intro:
+      'Tutustu todellisiin tapahtumiin, jotka määritetty tapahtumapalvelu palauttaa tämän kohteen läheltä.',
     back: 'Takaisin kohteeseen',
     searchArea: '50 km säteellä',
     results: 'Tulevat tapahtumat',
@@ -215,12 +237,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Palvelu tarkistettu',
     dateTbd: 'Päivä ilmoitetaan myöhemmin',
     dateUnavailable: 'Päivä ei saatavilla',
-    disclaimer: 'Tapahtumatiedot tulevat määritetyltä palveluntarjoajalta ja voivat muuttua. AttraVoya ei väitä näyttävänsä reaaliaikaista lippuvarastoa, hintoja, arvioita, suosiota tai saatavuutta.',
+    disclaimer:
+      'Tapahtumatiedot tulevat määritetyltä palveluntarjoajalta ja voivat muuttua. AttraVoya ei väitä näyttävänsä reaaliaikaista lippuvarastoa, hintoja, arvioita, suosiota tai saatavuutta.',
   },
   tr: {
     eyebrow: 'Etkinlikler',
     title: '{destination} yakınındaki etkinlikler',
-    intro: 'Bu hedefin yakınında yapılandırılmış etkinlik sağlayıcısının döndürdüğü gerçek etkinlikleri keşfedin.',
+    intro:
+      'Bu hedefin yakınında yapılandırılmış etkinlik sağlayıcısının döndürdüğü gerçek etkinlikleri keşfedin.',
     back: 'Hedefe dön',
     searchArea: '50 km içinde',
     results: 'Yaklaşan etkinlikler',
@@ -233,7 +257,8 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'Sağlayıcı kontrol edildi',
     dateTbd: 'Tarih daha sonra açıklanacak',
     dateUnavailable: 'Tarih kullanılamıyor',
-    disclaimer: 'Etkinlik ayrıntıları yapılandırılmış sağlayıcıdan gelir ve değişebilir. AttraVoya canlı bilet envanteri, fiyat, puan, popülerlik veya müsaitlik iddiasında bulunmaz.',
+    disclaimer:
+      'Etkinlik ayrıntıları yapılandırılmış sağlayıcıdan gelir ve değişebilir. AttraVoya canlı bilet envanteri, fiyat, puan, popülerlik veya müsaitlik iddiasında bulunmaz.',
   },
   ar: {
     eyebrow: 'الفعاليات',
@@ -251,7 +276,8 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'تم التحقق من المزود',
     dateTbd: 'سيُعلن التاريخ لاحقًا',
     dateUnavailable: 'التاريخ غير متاح',
-    disclaimer: 'تأتي تفاصيل الفعاليات من المزود المُعد وقد تتغير. لا تدّعي AttraVoya توفر مخزون تذاكر مباشر أو أسعار أو تقييمات أو شعبية أو إتاحة.',
+    disclaimer:
+      'تأتي تفاصيل الفعاليات من المزود المُعد وقد تتغير. لا تدّعي AttraVoya توفر مخزون تذاكر مباشر أو أسعار أو تقييمات أو شعبية أو إتاحة.',
   },
   zh: {
     eyebrow: '活动',
@@ -269,7 +295,8 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: '提供商检查时间',
     dateTbd: '日期待公布',
     dateUnavailable: '日期不可用',
-    disclaimer: '活动详情来自已配置的提供商，可能发生变化。AttraVoya 不声称提供实时票务库存、价格、评分、热度或可用性。',
+    disclaimer:
+      '活动详情来自已配置的提供商，可能发生变化。AttraVoya 不声称提供实时票务库存、价格、评分、热度或可用性。',
   },
   ja: {
     eyebrow: 'イベント',
@@ -287,7 +314,8 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'プロバイダー確認日時',
     dateTbd: '日程は後日発表',
     dateUnavailable: '日程情報なし',
-    disclaimer: 'イベント詳細は設定されたプロバイダーから取得され、変更される場合があります。AttraVoya はリアルタイムのチケット在庫、価格、評価、人気度、空き状況を保証しません。',
+    disclaimer:
+      'イベント詳細は設定されたプロバイダーから取得され、変更される場合があります。AttraVoya はリアルタイムのチケット在庫、価格、評価、人気度、空き状況を保証しません。',
   },
   ko: {
     eyebrow: '이벤트',
@@ -305,12 +333,14 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: '제공자 확인 시간',
     dateTbd: '날짜 추후 발표',
     dateUnavailable: '날짜 정보 없음',
-    disclaimer: '이벤트 상세 정보는 설정된 제공자에서 오며 변경될 수 있습니다. AttraVoya는 실시간 티켓 재고, 가격, 평점, 인기 또는 이용 가능 여부를 주장하지 않습니다.',
+    disclaimer:
+      '이벤트 상세 정보는 설정된 제공자에서 오며 변경될 수 있습니다. AttraVoya는 실시간 티켓 재고, 가격, 평점, 인기 또는 이용 가능 여부를 주장하지 않습니다.',
   },
   hi: {
     eyebrow: 'कार्यक्रम',
     title: '{destination} के पास कार्यक्रम',
-    intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए कार्यक्रम प्रदाता द्वारा लौटाए गए वास्तविक कार्यक्रम देखें।',
+    intro:
+      'इस गंतव्य के पास कॉन्फ़िगर किए गए कार्यक्रम प्रदाता द्वारा लौटाए गए वास्तविक कार्यक्रम देखें।',
     back: 'गंतव्य पर वापस जाएँ',
     searchArea: '50 किमी के भीतर',
     results: 'आगामी कार्यक्रम',
@@ -323,7 +353,8 @@ const EVENTS_PAGE_COPY = Object.freeze({
     providerChecked: 'प्रदाता जाँच समय',
     dateTbd: 'तारीख बाद में घोषित होगी',
     dateUnavailable: 'तारीख उपलब्ध नहीं',
-    disclaimer: 'कार्यक्रम विवरण कॉन्फ़िगर किए गए प्रदाता से आते हैं और बदल सकते हैं। AttraVoya लाइव टिकट इन्वेंटरी, कीमत, रेटिंग, लोकप्रियता या उपलब्धता का दावा नहीं करता।',
+    disclaimer:
+      'कार्यक्रम विवरण कॉन्फ़िगर किए गए प्रदाता से आते हैं और बदल सकते हैं। AttraVoya लाइव टिकट इन्वेंटरी, कीमत, रेटिंग, लोकप्रियता या उपलब्धता का दावा नहीं करता।',
   },
 });
 
