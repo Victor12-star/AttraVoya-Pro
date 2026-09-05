@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
+  Banknote,
   BedDouble,
   BusFront,
   CalendarDays,
@@ -37,6 +38,7 @@ import {
 
 import { apiClient } from '../../lib/api-client.js';
 import { getAirportsPageCopy } from './airports-page-copy.js';
+import { getAtmsPageCopy } from './atms-page-copy.js';
 import { getBeachesPageCopy } from './beaches-page-copy.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
@@ -187,6 +189,7 @@ function FeatureLink({ href, icon: Icon, label }) {
 export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
   const airportsCopy = getAirportsPageCopy(locale);
+  const atmsCopy = getAtmsPageCopy(locale);
   const beachesCopy = getBeachesPageCopy(locale);
   const eventsCopy = getEventsPageCopy(locale);
   const hospitalsCopy = getHospitalsPageCopy(locale);
@@ -332,6 +335,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'supermarkets'),
       icon: ShoppingCart,
       label: supermarketsCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'atms'),
+      icon: Banknote,
+      label: atmsCopy.eyebrow,
     },
     {
       href: buildDestinationContextHref('/nearby', destination),
