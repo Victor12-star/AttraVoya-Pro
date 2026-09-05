@@ -1,0 +1,384 @@
+.page {
+  min-height: 100%;
+  padding: 40px 0 72px;
+}
+
+.shell {
+  display: grid;
+  gap: 28px;
+}
+
+.backLink {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--text-primary);
+}
+
+.hero {
+  max-width: 760px;
+}
+
+.hero h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2rem, 5vw, 3.7rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.searchPanel,
+.routePanel {
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-soft);
+}
+
+.searchPanel {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+}
+
+.routePanel {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+
+.startCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--surface-muted);
+}
+
+.startCard svg {
+  flex: 0 0 auto;
+}
+
+.startCard div {
+  display: grid;
+  gap: 3px;
+}
+
+.startCard span,
+.modeField span,
+.routeSummary span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.startCard strong {
+  font-size: 1rem;
+}
+
+.searchForm {
+  display: grid;
+  gap: 9px;
+}
+
+.searchForm label,
+.modeField > span {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.searchRow input,
+.modeField select {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font: inherit;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.searchRow input {
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+.modeField select {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.searchRow input:focus,
+.modeField select:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-strong) 18%, transparent);
+}
+
+.searchState {
+  min-height: 24px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.stateLine,
+.retryLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.results {
+  display: grid;
+  gap: 12px;
+}
+
+.results h2,
+.routeHeading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.resultList {
+  display: grid;
+  gap: 8px;
+}
+
+.placeButton {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.placeButton:hover,
+.placeButton:focus-visible,
+.placeButtonSelected {
+  border-color: var(--accent-strong);
+  background: var(--surface-muted);
+}
+
+.placeButton:hover {
+  transform: translateY(-1px);
+}
+
+.placeButton span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.placeButton strong,
+.placeButton small {
+  overflow-wrap: anywhere;
+}
+
+.placeButton small {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.routeHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.routeIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--surface-muted);
+}
+
+.modeField {
+  display: grid;
+  gap: 8px;
+}
+
+.selectedRoute {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--surface-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selectedRoute span:last-child {
+  text-align: end;
+}
+
+.routePrompt,
+.disclaimer {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.routePrompt {
+  padding: 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 16px;
+}
+
+.routeState {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+}
+
+.routeSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.routeSummary div {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 15px;
+  background: var(--surface-base);
+}
+
+.routeSummary strong {
+  overflow-wrap: anywhere;
+  font-size: 0.96rem;
+}
+
+.disclaimer {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+}
+
+.emptyShell {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 620px;
+  padding-top: 70px;
+}
+
+.emptyShell h1 {
+  margin: 0;
+}
+
+.spin {
+  animation: transportSpin 900ms linear infinite;
+}
+
+@keyframes transportSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .routePanel {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding-top: 24px;
+  }
+
+  .searchPanel,
+  .routePanel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .searchRow {
+    grid-template-columns: 1fr;
+  }
+
+  .searchRow button {
+    width: 100%;
+  }
+
+  .routeSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placeButton,
+  .searchRow input,
+  .modeField select {
+    transition: none;
+  }
+
+  .placeButton:hover {
+    transform: none;
+  }
+
+  .spin {
+    animation: none;
+  }
+}

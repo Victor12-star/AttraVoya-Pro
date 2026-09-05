@@ -290,7 +290,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       label: messages.common.chooseLanguage,
     },
     {
-      href: buildDestinationContextHref('/transport', destination),
+      href: buildDestinationChildHref(destination, 'transport'),
       icon: BusFront,
       label: copy.transport,
     },

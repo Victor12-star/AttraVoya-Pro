@@ -89,6 +89,26 @@ export const placesNearbyQuerySchema = z
   })
   .strict();
 
+export const mapsRouteQuerySchema = z
+  .object({
+    startLatitude: latitude,
+    startLongitude: longitude,
+    endLatitude: latitude,
+    endLongitude: longitude,
+    mode: z.enum(['drive', 'walk', 'bicycle']).default('walk'),
+    language: languageCode.default('en'),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.startLatitude === value.endLatitude && value.startLongitude === value.endLongitude) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['endLatitude'],
+        message: 'Route start and destination must be different points',
+      });
+    }
+  });
+
 export const translationBodySchema = z
   .object({
     text: z.string().trim().min(1).max(3000),

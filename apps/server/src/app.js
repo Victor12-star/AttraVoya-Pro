@@ -25,6 +25,7 @@ import { currencyRoutes } from './modules/currency/currency.routes.js';
 import { destinationsRoutes } from './modules/destinations/destinations.routes.js';
 import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
+import { mapsRoutes } from './modules/maps/maps.routes.js';
 import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
 import { eventsRoutes } from './modules/events/events.routes.js';
@@ -151,6 +152,11 @@ export async function buildApp(options = {}) {
   await app.register(placesRoutes, {
     prefix: `${API_PREFIX}/places`,
     provider: options.placesProvider,
+  });
+
+  await app.register(mapsRoutes, {
+    prefix: `${API_PREFIX}/maps`,
+    provider: options.mapsProvider,
   });
 
   await app.register(translationRoutes, {
