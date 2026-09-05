@@ -9,9 +9,10 @@ This file is the engineering handoff for continuing AttraVoya Pro without relyin
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Latest verified merged checkpoint before the current PR: Phase 7M squash merge `5550c835b18ec2596c0b5f17264bf82325924cf3`.
-- Phase 7M post-merge `develop` CI `#183` passed all five workflow jobs.
-- Current pull request: `#14` from `feature/phase-7n-destination-transport` into `develop`.
+- Latest verified merged checkpoint before the current PR: Phase 7N merge `2eafc1f745ea347b52af695d2980fc9ef7dcba01`.
+- Phase 7N post-merge `develop` CI `#190` passed.
+- Current feature branch: `feature/phase-7o-destination-events`.
+- Current pull request: `#15` from `feature/phase-7o-destination-events` into `develop`.
 
 Every vertical slice must follow this sequence:
 
@@ -61,8 +62,9 @@ Completed and merged destination slices:
 - Phase 7K — Verified Safety destination foundation
 - Phase 7L — Destination currency and exchange
 - Phase 7M — Destination Language foundation
+- Phase 7N — Destination transport foundation
 
-Important verified later checkpoints:
+Important verified checkpoints:
 
 - Phase 7G merged at `ff40f33f257ba2e2cb8688d65912e01aebd76403`; PR CI `#133` and post-merge CI `#134` green.
 - Phase 7H merged at `05162952c277388fc143b4d45a2d8e1d94758294`; PR CI `#140` and post-merge CI `#141` green.
@@ -71,129 +73,108 @@ Important verified later checkpoints:
 - Phase 7K merged at `2a6706dc9df52bcf35ddd844ac0a3a6fd2d9674f`; final PR CI `#165` and post-merge CI `#166` green.
 - Phase 7L merged through PR `#12` by squash at `52da70966f08c03cd9b241d4e026ed334b6a1713`; final PR CI `#174` and post-merge `develop` CI `#175` green.
 - Phase 7M merged through PR `#13` by squash at `5550c835b18ec2596c0b5f17264bf82325924cf3`; final PR CI `#182` and post-merge `develop` CI `#183` green.
+- Phase 7N merged through PR `#14` at `2eafc1f745ea347b52af695d2980fc9ef7dcba01`; post-merge `develop` CI `#190` green.
 
-### Phase 7M — Destination Language foundation
+## Phase 7O — Destination events discovery
 
-Completed and merged.
+Current implementation is in PR `#15` from `feature/phase-7o-destination-events` into `develop`.
 
-Key behavior now in `develop`:
+The branch starts from the verified Phase 7N merge commit:
 
-- real destination-aware Language experience
-- factual language data comes only from AttraVoya country reference data
-- official/common status is never inferred from translation support or UI locale
-- provider-neutral translation endpoints reused; browser never calls LibreTranslate directly
-- optional machine translation appears only for provider-supported destination languages
-- malformed/mismatched translation responses are rejected
-- machine translation is clearly non-authoritative
-- all 18 locales, RTL, responsive and reduced-motion support
-
-### Phase 7N — Destination transport foundation
-
-Current implementation is in PR `#14` from `feature/phase-7n-destination-transport` into `develop`.
-
-The branch starts from the verified Phase 7M merge commit:
-
-`5550c835b18ec2596c0b5f17264bf82325924cf3`
+`2eafc1f745ea347b52af695d2980fc9ef7dcba01`
 
 Implemented:
 
-- replaced the destination Transport shell with a real destination-aware routing experience
-- added provider-neutral public route `GET /api/v1/maps/route`
-- reused the existing server-side Geoapify maps/routing adapter; browser never calls Geoapify directly
-- shared validation accepts exactly two route points and only `walk`, `bicycle`, or `drive`
-- identical start/end points and unsupported modes are rejected before the provider is called
-- public response is intentionally conservative: provider, checked/fetched time, travel mode, distance and duration
-- raw provider legs/geometry are not exposed in this first customer slice
-- user searches a real place in the destination country through the existing provider-neutral places API, selects a provider result, then explicitly requests a route
-- destination-country mismatches and malformed place/route responses are rejected defensively
-- changing travel mode recalculates the selected route
-- honest loading, empty, error and retry states
-- route distance/time are clearly labeled as provider-calculated planning values
-- no claims of live traffic, public-transport timetables, fares, ticket prices, disruptions, accessibility or service availability
-- all 18 locales, RTL compatibility, responsive behavior, accessible controls and reduced-motion support
-- focused Maps API, API-client and Transport UI tests
+- added destination route `/destinations/[slug]/events`
+- added Events entry point from the destination experience
+- reused the existing provider-neutral Events backend and shared `apiClient.getEvents(...)`
+- browser code never calls Ticketmaster directly and Ticketmaster credentials stay server-side
+- event searches use the selected destination latitude/longitude, restrict to the destination country, search within 50 km, request up to 20 events, sort upcoming events by date ascending, and use the active locale
+- UI renders only normalized factual provider data: event name, provider date/time when supplied, venue, address/city, provider classifications, provider identity, safe event URL, and provider checked/fetched time
+- no ticket prices, live ticket inventory, ratings, popularity, availability or booking guarantees are invented or implied
+- explicit customer disclaimer explains those provider limitations
+- unsafe event URLs such as `javascript:` are rejected
+- events whose returned country does not match the selected destination country are rejected
+- honest loading, success, empty, provider-error, retry and invalid-destination states
+- all 18 supported UI locales are present and Arabic RTL behavior remains supported
+- focused Events UI tests cover real normalized rendering, `apiClient.getEvents()` contract, country mismatch filtering, unsafe URL rejection, honest empty/error states, retry, invalid destination handling, and absence of unsupported fake price data
 
-CI findings/fixes:
+### Phase 7O CI findings and fixes
 
-- initial strict JavaScript failure was fixed by making the non-null destination and async return contracts explicit
-- the isolated Maps test exposed eager environment loading; `maps.routes.js` now lazy-loads the real maps provider factory only when no provider is injected, preserving production behavior and improving testability
-- CI `#186` then passed JavaScript, translations, provider smoke, ESLint, all tests, PostgreSQL/Prisma, dependency/secret checks, production builds and live-provider checks; only Prettier failed on four files
-- a temporary formatter diagnostic used repository Prettier `3.9.6` to print the exact four-file diff
-- exact formatter output was applied to `transport-page-copy.js`, `transport-page.jsx`, `transport-page.test.jsx` and `provider-requests.js`
-- the temporary diagnostic was removed and root `package.json` was restored byte-for-byte to original blob `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c`, with normal `prettier --check .`
+- CI `#191` failed at strict JavaScript because `Intl.DateTimeFormat` options using `dateStyle` and `timeStyle` were inferred as generic strings; explicit formatter-option typing fixed this without runtime behavior changes.
+- CI `#192` then exposed a unit-test bug: the test rejected any UI text containing the word `price`, even though the truthful safety disclaimer legitimately contains `prices`.
+- The test was corrected to inject unsupported fake provider value `SEK 999` and verify that specific value is not rendered. Do not revert to `queryByText(/price/i)`.
+- CI `#193` passed all functional gates and failed only repository Prettier on three Phase 7O files.
+- A controlled diagnostic used repository Prettier `3.9.6` to determine the exact mechanical formatting changes.
+- CI `#195` confirmed JavaScript, translations, provider smoke, ESLint and unit tests were green; only the formatting check failed on the diagnostic head.
+- Final mechanical formatting was applied to `events-page-copy.js`, `events-page.jsx`, and `events-page.test.jsx`.
+- Root `package.json` is restored to the normal script: `"format:check": "prettier --check ."`.
+- No temporary formatter diagnostic command may be merged.
 
-Clean Phase 7N code checkpoint before this handoff update:
+Clean Phase 7O code checkpoint before this handoff update:
 
-`965dc114ad9a5983c0b6f31e2dc35899715b0b4b`
+`21c920ccec6f1bf9376513d3179372eaab82c79a`
 
-Clean code CI `#188` passed all five workflow jobs, including strict JavaScript, translation checks, provider smoke tests, ESLint, all unit/integration tests, normal repository-wide Prettier, PostgreSQL/Prisma verification, dependency/secret checks, production builds and live-provider checks.
+PR CI `#196` on that checkpoint passed all five top-level jobs:
 
-This documentation update creates a newer PR head. Do not merge PR `#14` based only on CI `#188`; require a new complete green CI run on the exact final head containing this handoff update.
+- Code quality and unit tests
+- PostgreSQL and Prisma verification
+- Production builds
+- Live no-cost provider checks
+- Dependency and secret checks
+
+The code-quality job passed environment validation, Prisma generation, strict JavaScript, translations, provider smoke tests, ESLint, unit tests, and the normal repository-wide Prettier check.
+
+This documentation update creates a newer PR head. Do not merge PR `#15` based only on CI `#196`; require a new complete green CI run on the exact final head containing this handoff update.
 
 ## Live-provider verification status
 
-The live-provider CI currently verifies these real network paths:
+The live-provider CI currently verifies real network paths that do not depend on missing keyed-provider secrets, including:
 
 - Open-Meteo
 - Frankfurter
 - CI-hosted LibreTranslate
 
-Keyed provider checks are skipped when their GitHub Actions secrets are not configured, including:
+Keyed provider checks may be skipped when their GitHub Actions secrets are not configured, including:
 
 - Geoapify (`GEOAPIFY_API_KEY`)
 - Ticketmaster (`TICKETMASTER_API_KEY`)
 - NewsData (`NEWSDATA_API_KEY`)
 - Pexels (`PEXELS_API_KEY`)
+- Resend where applicable
 
-Therefore Phase 7N routing is covered by validation, adapter/API/UI tests and production builds, but **do not claim a real Geoapify routing network request was verified by GitHub CI** unless `GEOAPIFY_API_KEY` is configured and the live check actually runs.
+Therefore Phase 7O has adapter/API/UI/test and production-build coverage, but **do not claim a real Ticketmaster network request was verified by GitHub CI** unless `TICKETMASTER_API_KEY` is configured and the live-provider job actually confirms it.
 
-Likewise, a passing live-provider job does not prove Ticketmaster, NewsData or Pexels networking when their keys are absent.
+A passing live-provider job does not by itself prove keyed-provider networking when the relevant secret is absent.
 
-Safety remains database-backed verified reference data, not a third-party live-provider lookup.
+Safety remains database-backed verified reference data, not an AI-generated fact source.
 
 ## Immediate next engineering step
 
-Finish Phase 7N safely:
+Finish Phase 7O safely:
 
-1. Require complete green GitHub CI on the exact final head of PR `#14` after this handoff update.
+1. Require complete green GitHub CI on the exact final head of PR `#15` after this handoff update.
 2. Fix any real failure without weakening CI.
-3. Confirm PR `#14` is mergeable and still points to that exact verified head.
-4. Merge PR `#14` into `develop` only after all five jobs are green, using expected-head protection.
-5. Verify the resulting `develop` push CI is fully green.
-6. Only then create the next feature branch from that exact verified merge commit.
+3. Recheck PR `#15`:
+   - base is `develop`
+   - head is `feature/phase-7o-destination-events`
+   - PR is mergeable
+   - all checks are green on the exact current head
+4. Merge PR `#15` into `develop` using the normal merge method and expected-head SHA protection.
+5. Verify `develop` points to the resulting merge commit.
+6. Verify the resulting `develop` push CI is fully green across all five top-level jobs.
+7. Only then mark Phase 7O complete and choose/start the next phase from that exact verified `develop` commit.
 
-## Recommended next slice
-
-### Phase 7O — Destination events discovery
-
-Repository inspection shows the provider-neutral Events backend and API-client exposure already exist:
-
-- server route: `GET /api/v1/events`
-- existing Ticketmaster provider adapter/factory/service
-- shared event-query validation already supports city/country/coordinates/date range, pagination and sorting
-- shared API client already exposes `getEvents(query)`
-
-There is not yet a destination Events card/slice in the current destination feature grid, so the next narrow customer slice should reuse this existing backend rather than create duplicate Ticketmaster logic.
-
-Suggested Phase 7O scope:
-
-1. Start from the exact verified post-merge Phase 7N `develop` commit.
-2. Inspect the existing Events normalizer/provider response and public schema before rendering fields.
-3. Add a destination-aware `/destinations/[slug]/events` route and destination feature entry point.
-4. Query through AttraVoya's existing `/api/v1/events` contract only; provider secrets remain server-side.
-5. Use validated destination city/country/coordinates and active locale where supported.
-6. Display only real normalized provider fields actually returned; do not invent ticket availability, prices, popularity, ratings, age suitability, opening times or event status.
-7. Validate external URLs before rendering them and reject malformed/mismatched provider data.
-8. Add honest loading, success, empty, error and retry states.
-9. Preserve all 18 locales, RTL, accessibility, responsive behavior and reduced motion.
-10. Add focused provider/API/UI tests and require the complete CI gate before merge.
-
-Ticket purchasing, live ticket inventory/prices, recommendations and richer event detail should remain separate provider-backed slices unless the inspected provider contract genuinely supports them.
+Do not create a new Phase 7O branch and do not redo completed Phase 7O work.
 
 ## Product constraints that must not be forgotten
 
 - Budget-first trip planning is a core differentiator.
+- The user should eventually be able to enter a total budget and receive realistic destination/trip options that fit it.
+- Budget allocation should cover flights, accommodation, food, local transportation, activities, children's activities, airport transfers, and a contingency/safety margin.
+- Real provider data must always be distinguished from estimates.
 - Cheapest room is not necessarily cheapest total trip.
+- Accommodation support should include legitimate lodging types beyond hotels, including guest houses, B&Bs, hostels, apartments, serviced apartments, aparthotels, vacation rentals, family rooms, budget hotels, resorts and campsites.
 - Family travel must use children's ages: `0–3`, `4–8`, `9–12`, `13–17`.
 - Basic emergency/safety functionality is never paywalled.
 - Official emergency numbers must come from authoritative verified data, never AI.
@@ -201,6 +182,7 @@ Ticket purchasing, live ticket inventory/prices, recommendations and richer even
 - Frontend visibility is never an authorization boundary.
 - Use JavaScript only unless the product owner explicitly approves TypeScript.
 - Use Lucide icons consistently.
+- Maintain mobile responsiveness, localization, RTL support, accessibility, strong security and scalable architecture.
 - Avoid generic AI-template visuals, fake testimonials, fake statistics and fake live data.
 - Whole-app language support and country/language/currency separation must remain intact.
 - All new async UI features need loading, success, empty, error and retry behavior where useful.
@@ -211,6 +193,6 @@ Ticket purchasing, live ticket inventory/prices, recommendations and richer even
 
 Tell ChatGPT:
 
-> Continue AttraVoya Pro from `docs/CURRENT-WORK.md` in GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, inspect `develop`, then continue the next unfinished phase. Keep the rule that every slice must pass GitHub CI before proceeding.
+> Continue AttraVoya Pro from `docs/CURRENT-WORK.md` in GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, inspect the current `develop` branch and any active feature PR, then continue only from the exact unfinished checkpoint. Keep the rule that every final feature head and post-merge `develop` CI must be completely green before proceeding.
 
 The repository and this handoff are the source of truth if chat memory and Git history ever disagree.
