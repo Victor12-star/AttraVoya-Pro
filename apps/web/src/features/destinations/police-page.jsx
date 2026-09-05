@@ -138,11 +138,7 @@ async function requestPolicePlaces(destination, locale) {
     );
     const places = response?.places ?? null;
     const provider = textValue(places?.provider, 40)?.toLowerCase() ?? null;
-    const policePlaces = normalizePolicePlaces(
-      places?.results,
-      destination.countryCode,
-      provider,
-    );
+    const policePlaces = normalizePolicePlaces(places?.results, destination.countryCode, provider);
 
     return {
       status: policePlaces.length ? 'success' : 'empty',
