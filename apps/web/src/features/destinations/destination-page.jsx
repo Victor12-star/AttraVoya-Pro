@@ -27,6 +27,7 @@ import {
   Shield,
   ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   ThermometerSun,
   Utensils,
@@ -47,6 +48,7 @@ import { getPharmaciesPageCopy } from './pharmacies-page-copy.js';
 import { getPolicePageCopy } from './police-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import { getShoppingPageCopy } from './shopping-page-copy.js';
+import { getSupermarketsPageCopy } from './supermarkets-page-copy.js';
 import styles from './destination-page.module.css';
 
 /**
@@ -194,6 +196,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const policeCopy = getPolicePageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
   const shoppingCopy = getShoppingPageCopy(locale);
+  const supermarketsCopy = getSupermarketsPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
     /** @type {ProviderState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -324,6 +327,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'shopping'),
       icon: ShoppingBag,
       label: shoppingCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'supermarkets'),
+      icon: ShoppingCart,
+      label: supermarketsCopy.eyebrow,
     },
     {
       href: buildDestinationContextHref('/nearby', destination),
