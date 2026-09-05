@@ -18,6 +18,7 @@ import {
   LoaderCircle,
   MapPin,
   Navigation,
+  Newspaper,
   RefreshCw,
   ShieldCheck,
   ShoppingBag,
@@ -33,6 +34,7 @@ import { getBeachesPageCopy } from './beaches-page-copy.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
 import { getEventsPageCopy } from './events-page-copy.js';
+import { getNewsPageCopy } from './news-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import { getShoppingPageCopy } from './shopping-page-copy.js';
 import styles from './destination-page.module.css';
@@ -174,6 +176,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
   const beachesCopy = getBeachesPageCopy(locale);
   const eventsCopy = getEventsPageCopy(locale);
+  const newsCopy = getNewsPageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
   const shoppingCopy = getShoppingPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
@@ -261,6 +264,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'events'),
       icon: CalendarDays,
       label: eventsCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'news'),
+      icon: Newspaper,
+      label: newsCopy.eyebrow,
     },
     {
       href: buildDestinationChildHref(destination, 'restaurants'),
