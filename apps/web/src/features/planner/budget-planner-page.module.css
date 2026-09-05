@@ -1,0 +1,394 @@
+.page {
+  padding-block: 44px 96px;
+}
+
+.shell {
+  display: grid;
+  gap: 24px;
+}
+
+.hero,
+.formCard,
+.draftsCard {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  border-radius: var(--radius-xl);
+  padding: clamp(28px, 5vw, 52px);
+}
+
+.hero h1 {
+  max-width: 840px;
+  margin: 10px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.hero p {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  padding: 9px 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.65fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.formCard,
+.draftsCard {
+  border-radius: var(--radius-xl);
+  padding: clamp(22px, 4vw, 34px);
+}
+
+.formCard {
+  display: grid;
+  gap: 24px;
+}
+
+.draftsCard {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 18px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sectionHeading svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--brand-secondary);
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.sectionHeading p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.fieldset {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+
+.fieldset legend {
+  padding-inline: 6px;
+  font-weight: 800;
+}
+
+.fieldFull,
+.gridTwo label,
+.gridThree label,
+.formCard > label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.formCard input,
+.formCard select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.formCard input:focus-visible,
+.formCard select:focus-visible,
+.formCard button:focus-visible,
+.formCard a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gridTwo,
+.gridThree {
+  display: grid;
+  gap: 14px;
+}
+
+.gridTwo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gridThree {
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.segmented label,
+.checkOption,
+.familyOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.segmented input,
+.checkOption input,
+.familyOption input {
+  width: 17px;
+  min-height: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+}
+
+.checkGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.checkOption {
+  min-width: 0;
+  font-size: 13px;
+}
+
+.checkOption span {
+  overflow-wrap: anywhere;
+}
+
+.familyOption {
+  width: fit-content;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hint,
+.privacy {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.privacy svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.success,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.success {
+  background: var(--surface-muted);
+}
+
+.error {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.success a,
+.error a {
+  font-weight: 800;
+}
+
+.state {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  padding: 22px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.state p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.draftList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.draft {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 15px;
+}
+
+.draftTop {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.draftTop strong {
+  overflow-wrap: anywhere;
+}
+
+.draftTop > span {
+  border-radius: 999px;
+  background: var(--surface-muted);
+  padding: 4px 7px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.draftMeta {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.draftMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .hero,
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    align-items: start;
+  }
+
+  .heroBadge {
+    width: fit-content;
+  }
+
+  .draftsCard {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding-block: 28px 72px;
+  }
+
+  .hero,
+  .formCard,
+  .draftsCard {
+    padding: 22px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 12vw, 54px);
+  }
+
+  .gridTwo,
+  .gridThree,
+  .segmented,
+  .checkGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .familyOption {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
