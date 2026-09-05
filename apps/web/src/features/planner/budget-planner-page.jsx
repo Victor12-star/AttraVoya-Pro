@@ -19,7 +19,6 @@ import { CURRENCY_CODES } from '@attravoya/localization';
 import { createBudgetPlanRequestSchema } from '@attravoya/validation';
 
 import { apiClient } from '../../lib/api-client.js';
-import { readPreferences } from '../../lib/preferences.js';
 import styles from './budget-planner-page.module.css';
 
 /**
@@ -76,13 +75,6 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
   const [drafts, setDrafts] = useState(/** @type {PlannerDraft[]} */ ([]));
   const [draftState, setDraftState] = useState('loading');
 
-  useEffect(() => {
-    const stored = readPreferences();
-    if (stored.currency && CURRENCY_CODES.includes(stored.currency)) {
-      setCurrency(stored.currency);
-    }
-  }, []);
-
   const loadDrafts = useCallback(async () => {
     setDraftState('loading');
     try {
@@ -96,8 +88,25 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
   }, []);
 
   useEffect(() => {
-    void loadDrafts();
-  }, [loadDrafts]);
+    let active = true;
+
+    apiClient
+      .listBudgetPlanRequests()
+      .then((response) => {
+        if (!active) return;
+        setDrafts(Array.isArray(response?.requests) ? response.requests : []);
+        setDraftState('success');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setDrafts([]);
+        setDraftState(error instanceof ApiClientError && error.status === 401 ? 'auth' : 'error');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const selectedLodging = useMemo(() => new Set(lodgingTypes), [lodgingTypes]);
 
