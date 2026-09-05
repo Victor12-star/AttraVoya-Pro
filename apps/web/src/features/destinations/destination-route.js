@@ -5,6 +5,7 @@ const DESTINATION_CHILD_SEGMENTS = new Set([
   'events',
   'family',
   'language',
+  'news',
   'restaurants',
   'safety',
   'shopping',
