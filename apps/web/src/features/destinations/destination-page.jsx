@@ -15,6 +15,7 @@ import {
   Compass,
   HeartHandshake,
   Hospital,
+  Landmark,
   Languages,
   LoaderCircle,
   MapPin,
@@ -38,6 +39,7 @@ import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
 import { getEventsPageCopy } from './events-page-copy.js';
 import { getHospitalsPageCopy } from './hospitals-page-copy.js';
+import { getMuseumsPageCopy } from './museums-page-copy.js';
 import { getNewsPageCopy } from './news-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import { getShoppingPageCopy } from './shopping-page-copy.js';
@@ -182,6 +184,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const beachesCopy = getBeachesPageCopy(locale);
   const eventsCopy = getEventsPageCopy(locale);
   const hospitalsCopy = getHospitalsPageCopy(locale);
+  const museumsCopy = getMuseumsPageCopy(locale);
   const newsCopy = getNewsPageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
   const shoppingCopy = getShoppingPageCopy(locale);
@@ -285,6 +288,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'hospitals'),
       icon: Hospital,
       label: hospitalsCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'museums'),
+      icon: Landmark,
+      label: museumsCopy.eyebrow,
     },
     {
       href: buildDestinationChildHref(destination, 'restaurants'),

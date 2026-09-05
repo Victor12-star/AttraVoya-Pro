@@ -14,7 +14,7 @@ This file is the permanent handoff point for continuing development safely in a 
 ## Product rules that must stay true
 
 - Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
-- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, or provider results.
+- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, museum exhibitions, ticket prices, accessibility, or provider results.
 - Clearly distinguish provider-returned facts from estimates or static reference data.
 - Keep provider credentials server-side.
 - Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
@@ -26,73 +26,77 @@ This file is the permanent handoff point for continuing development safely in a 
 
 ### Phase 7P — Destination News Discovery
 
-Merged through PR #16 into `develop`.
-
-- Merge commit: `7ba5f58dc0c5585274ac2cb1a0cfed3818ef3697`
-- Final PR-head CI: #208 — all five top-level jobs passed.
-- Post-merge `develop` CI: #209 — all five top-level jobs passed.
-- The News route uses the provider-neutral News API and does not call NewsData from the browser.
-- `NEWSDATA_API_KEY` was not present in CI, so this must not be described as live keyed NewsData verification.
-
-After Phase 7P, cleanup checkpoint `16f28cee864f0ea473d9d297c8744c363a91e8e3` passed all five jobs in CI #211.
+- PR #16 merged into `develop`.
+- Merge commit: `7ba5f58dc0c5585274ac2cb1a0cfed3818ef3697`.
+- Final PR CI #208 and post-merge `develop` CI #209 passed all five top-level jobs.
+- Uses the provider-neutral News API; the browser does not call NewsData directly.
+- `NEWSDATA_API_KEY` was absent in CI, so this is not live keyed NewsData verification.
 
 ### Phase 7Q — Destination Airports Discovery
 
-Merged through PR #17 into `develop`.
-
-- Final clean PR head: `c50b98d819f42b86018abb2f2bc712a89618902b`
-- Final PR-head CI: #218 — all five top-level jobs passed, including normal repository-wide `prettier --check .`.
-- Squash merge commit: `889b26ec520571c073ef2d1821348f31e628ed0e`
-- Post-merge `develop` CI: #219 — all five top-level jobs passed.
-- Airport discovery uses `apiClient.getNearbyPlaces(...)` with `PLACE_CATEGORY_GROUPS.AIRPORTS`; the browser does not call Geoapify directly.
-- The UI renders only supported provider facts and does not invent airport codes, terminal data, airline schedules, live flights, fares, transfer prices, availability, or “main/best/cheapest airport” claims.
-- `GEOAPIFY_API_KEY` was not present in CI, so Phase 7Q must not be described as live keyed Geoapify verification.
-
-## Current phase
+- PR #17 merged into `develop`.
+- Final PR head: `c50b98d819f42b86018abb2f2bc712a89618902b`.
+- Final PR CI #218 passed all five jobs.
+- Squash merge commit: `889b26ec520571c073ef2d1821348f31e628ed0e`.
+- Post-merge `develop` CI #219 passed all five jobs.
+- Uses provider-neutral nearby places and does not invent airport codes, terminals, schedules, live flights, fares, transfer prices, availability, or main/best/cheapest-airport claims.
+- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
 ### Phase 7R — Destination Hospitals Discovery
 
-Branch: `feature/phase-7r-destination-hospitals`
+- PR #18 merged into `develop`.
+- Final PR head: `89366de9b3669ad79639c152f5ebbe5fffb4d74f`.
+- Final PR CI #225 passed all five jobs.
+- Squash merge commit: `3eab22ab9d636ae055378d25cd04e76754f75a40`.
+- Post-merge `develop` CI #226 passed all five jobs.
+- Hospital discovery uses provider-neutral nearby places and links to verified Safety & emergency contacts.
+- It does not invent or infer emergency-department status, medical services, opening hours, waiting times, capacity, quality, ratings, or availability.
+- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
-PR: #18 — `Phase 7R: destination hospitals discovery`
+## Current phase
 
-Base checkpoint: `889b26ec520571c073ef2d1821348f31e628ed0e` — verified Phase 7Q `develop` merge.
+### Phase 7S — Destination Museums Discovery
+
+Branch: `feature/phase-7s-destination-museums`
+
+PR: #19 — `Phase 7S: destination museums discovery`
+
+Base checkpoint: `3eab22ab9d636ae055378d25cd04e76754f75a40` — verified Phase 7R `develop` merge.
 
 Implemented:
 
-- `/destinations/[slug]/hospitals` route.
-- Hospitals entry point in the destination feature grid using the Lucide `Hospital` icon.
-- `hospitals` added to the strict destination child-route allowlist.
+- `/destinations/[slug]/museums` route.
+- Museums entry point in the destination feature grid using the Lucide `Landmark` icon.
+- `museums` added to the strict destination child-route allowlist.
 - Reuses `apiClient.getNearbyPlaces(...)` and the existing provider-neutral places backend; browser code never calls Geoapify directly.
-- Uses `PLACE_CATEGORY_GROUPS.HOSPITALS` with a 20 km search radius, result limit of 20, destination coordinates, and the active UI locale.
-- Renders only normalized provider facts used by this slice: hospital/place name, formatted address, distance, provider, provider fetched/checked time, and HTTPS website when present.
-- Rejects invalid coordinates, duplicate records, mismatched country rows, mismatched provider rows, and unsafe website URLs.
-- Links users to the existing verified Safety & emergency contacts route without treating nearby-place data as emergency guidance.
-- Does not invent or infer emergency-department status, medical services, opening hours, waiting times, capacity, quality, ratings, phone availability, or medical availability.
+- Uses `PLACE_CATEGORY_GROUPS.MUSEUMS`, already mapped by the Geoapify adapter to `entertainment.museum`.
+- Uses a 15 km search radius, result limit of 24, destination coordinates, and the active UI locale.
+- Renders only normalized provider facts used by this slice: museum/place name, formatted address, distance, provider/check time, and HTTPS website when present.
+- Rejects invalid coordinates, duplicate rows, mismatched countries, mismatched providers, and unsafe website URLs.
+- Does not invent or infer exhibitions, opening hours, ticket prices, accessibility, ratings, or availability, even if unexpected provider payload fields contain them.
 - Honest loading, success, empty, provider-error, retry, and invalid-destination states.
 - Copy is provided for all 18 supported UI locales.
-- Focused tests cover the hospital page, provider-neutral API request contract, strict child route, destination dashboard entry point, unsupported medical-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, and invalid destination behavior.
+- Focused tests cover the Museums page, exact provider-neutral API request, unsupported-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
 
 Verification history:
 
-- Initial functional PR head `5142627bc3ca52cc810d73eac433723b6c317fab` ran CI #220. Production builds, PostgreSQL/Prisma, dependency/secret checks, live no-cost provider checks, JavaScript checks, translations, provider smoke tests, ESLint, and all unit tests passed. The only failure was repository formatting for `apps/web/src/features/destinations/hospitals-page-copy.js`.
-- Branch-only diagnostic commits `96d62c1fc075c468a084d4e31c52bd055002ce0f` and `3bec60e03d6e238516da0560fe62ba49ac41c618` were used only to capture Prettier 3.9.6 output. They are diagnostic history and must never be treated as merge-ready formatter configuration.
-- CI #222 confirmed the exact Prettier changes were mechanical line wrapping only; no localized text or behavior changed.
-- Exact Prettier output was applied to the hospital copy, producing blob `b011dca53d33512b12b73995360a0cd01db232cd`.
-- Root `package.json` was restored to the standard `"format:check": "prettier --check ."`.
-- Clean Phase 7R code checkpoint before this handoff update: `be4b1f880392d369b6e1140fdc6b02f6c2cbe327`.
-- CI #224 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and unit tests.
-- CI environment validation reports `GEOAPIFY_API_KEY` is not configured. Provider smoke tests make no external API calls. Therefore do not claim that Phase 7R performed a live keyed Geoapify hospital request in CI.
+- Initial functional head `20df84863b363c6563c115d0fc8b7c348dd17d2f` ran CI #227. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only Prettier flagged `apps/web/tests/unit/museums-page.test.jsx`.
+- Manual formatting head `767c2fc65cee88113d5d3bd1eda5db3b9a006733` ran CI #228. All functional/build/security checks again passed; Prettier still flagged only the same test file.
+- Branch-only diagnostic head `b6d2e3ff269d3cace3300f38687707c352fbeacc` ran CI #229 solely to capture Prettier 3.9.6 output. The diagnostic showed one remaining mechanical change: keep the dynamic Museums-page import on one line. The diagnostic configuration must never be merged.
+- Exact Prettier output was applied and root `package.json` restored to `"format:check": "prettier --check ."`.
+- Clean Phase 7S code checkpoint before this handoff update: `40bbf50333a116c1e780f5fad15efa382ac6e509`.
+- CI #231 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and 98 web unit tests.
+- `GEOAPIFY_API_KEY` is not configured in GitHub Actions, so Phase 7S must not be described as a live keyed Geoapify museum request.
 
 ### Required next steps
 
 1. This handoff update changes the PR head, so run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` still contains `"format:check": "prettier --check ."`.
-3. Verify PR #18 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #18 using expected-head protection.
+3. Verify PR #19 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #19 using expected-head protection.
 5. Verify the resulting merge commit is the `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
-7. Only after that post-merge gate is green, mark Phase 7R complete and choose/start Phase 7S from the verified `develop` checkpoint.
+7. Only after that post-merge gate is green, mark Phase 7S complete and choose/start Phase 7T from the verified `develop` checkpoint.
 
 ## CI interpretation rule
 
