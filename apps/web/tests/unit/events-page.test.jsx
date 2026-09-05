@@ -39,6 +39,7 @@ function eventResponse(overrides = {}) {
           externalId: 'event-1',
           name: 'Stockholm Live',
           url: 'https://www.ticketmaster.se/event/event-1',
+          price: 'SEK 999',
           start: {
             dateTime: '2026-10-10T18:00:00Z',
             localDate: '2026-10-10',
@@ -81,7 +82,7 @@ describe('EventsDestinationPage', () => {
       'href',
       'https://www.ticketmaster.se/event/event-1',
     );
-    expect(screen.queryByText(/price/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('SEK 999')).not.toBeInTheDocument();
 
     expect(mocks.getEvents).toHaveBeenCalledWith({
       countryCode: 'SE',
