@@ -7,9 +7,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: { getNearbyPlaces: mocks.getNearbyPlaces },
 }));
 
-const { SupermarketsDestinationPage } = await import(
-  '../../src/features/destinations/supermarkets-page.jsx'
-);
+const { SupermarketsDestinationPage } =
+  await import('../../src/features/destinations/supermarkets-page.jsx');
 
 const messages = {
   common: { loading: 'Loading…', unavailable: 'Temporarily unavailable', retry: 'Retry' },
@@ -69,7 +68,9 @@ describe('SupermarketsDestinationPage', () => {
   });
 
   it('loads nearby supermarkets through the provider-neutral places API and renders only supported location facts', async () => {
-    render(<SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(
       screen.getByRole('heading', { name: 'Supermarkets near Stockholm', level: 1 }),
@@ -140,7 +141,9 @@ describe('SupermarketsDestinationPage', () => {
       }),
     );
 
-    render(<SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(
       await screen.findByRole('heading', { name: 'Safe Supermarket', level: 3 }),
@@ -153,7 +156,9 @@ describe('SupermarketsDestinationPage', () => {
   it('shows an honest empty state when no matching supermarkets are returned', async () => {
     mocks.getNearbyPlaces.mockResolvedValue(supermarketResponse({ results: [] }));
 
-    render(<SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(
       await screen.findByText('No supermarkets were found in this search area.'),
@@ -165,7 +170,9 @@ describe('SupermarketsDestinationPage', () => {
       .mockRejectedValueOnce(new Error('secret supermarket provider detail'))
       .mockResolvedValueOnce(supermarketResponse());
 
-    render(<SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />);
+    render(
+      <SupermarketsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Supermarkets could not be loaded right now.',
