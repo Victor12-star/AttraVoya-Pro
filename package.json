@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --write apps/web/src/features/destinations/airports-page-copy.js apps/web/src/features/destinations/airports-page.jsx apps/web/tests/unit/airports-page.test.jsx && printf '\\n@@AIRPORTS_COPY@@\\n' && base64 -w0 apps/web/src/features/destinations/airports-page-copy.js && printf '\\n@@AIRPORTS_PAGE@@\\n' && base64 -w0 apps/web/src/features/destinations/airports-page.jsx && printf '\\n@@AIRPORTS_TEST@@\\n' && base64 -w0 apps/web/tests/unit/airports-page.test.jsx && printf '\\n@@END_AIRPORTS_FORMAT@@\\n'",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
