@@ -228,9 +228,13 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
             <p>{copy.intro}</p>
           </div>
           <div className={styles.heroMeta}>
-            {state.data && state.data.realtimeGuaranteed === false ? <span>{copy.delayed}</span> : null}
+            {state.data && state.data.realtimeGuaranteed === false ? (
+              <span>{copy.delayed}</span>
+            ) : null}
             {provider ? <span>{provider}</span> : null}
-            {validFetchedAt ? <span>{`${copy.providerChecked}: ${dateFormatter.format(fetchedAt)}`}</span> : null}
+            {validFetchedAt ? (
+              <span>{`${copy.providerChecked}: ${dateFormatter.format(fetchedAt)}`}</span>
+            ) : null}
           </div>
         </header>
 
@@ -251,7 +255,11 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
         {state.status === 'error' ? (
           <div className={styles.feedback} role="status">
             <strong>{copy.unavailable}</strong>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>
@@ -267,7 +275,9 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
               {state.data.articles.map((article) => (
                 <article className={styles.card} key={article.key}>
                   <div className={styles.cardHeading}>
-                    <span className={styles.cardIcon} aria-hidden="true"><Newspaper size={20} /></span>
+                    <span className={styles.cardIcon} aria-hidden="true">
+                      <Newspaper size={20} />
+                    </span>
                     <div>
                       <span className={styles.date}>
                         {article.publishedAt
@@ -278,7 +288,9 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
                     </div>
                   </div>
 
-                  {article.description ? <p className={styles.description}>{article.description}</p> : null}
+                  {article.description ? (
+                    <p className={styles.description}>{article.description}</p>
+                  ) : null}
 
                   {article.sourceName ? (
                     <div className={styles.metaText}>
