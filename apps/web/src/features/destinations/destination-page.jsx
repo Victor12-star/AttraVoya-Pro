@@ -10,6 +10,7 @@ import {
   BusFront,
   CalendarDays,
   CameraOff,
+  CircleParking,
   CloudRain,
   CloudSun,
   Coins,
@@ -46,6 +47,7 @@ import { getEventsPageCopy } from './events-page-copy.js';
 import { getHospitalsPageCopy } from './hospitals-page-copy.js';
 import { getMuseumsPageCopy } from './museums-page-copy.js';
 import { getNewsPageCopy } from './news-page-copy.js';
+import { getParkingPageCopy } from './parking-page-copy.js';
 import { getPharmaciesPageCopy } from './pharmacies-page-copy.js';
 import { getPolicePageCopy } from './police-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
@@ -195,6 +197,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const hospitalsCopy = getHospitalsPageCopy(locale);
   const museumsCopy = getMuseumsPageCopy(locale);
   const newsCopy = getNewsPageCopy(locale);
+  const parkingCopy = getParkingPageCopy(locale);
   const pharmaciesCopy = getPharmaciesPageCopy(locale);
   const policeCopy = getPolicePageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
@@ -340,6 +343,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'atms'),
       icon: Banknote,
       label: atmsCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'parking'),
+      icon: CircleParking,
+      label: parkingCopy.eyebrow,
     },
     {
       href: buildDestinationContextHref('/nearby', destination),
