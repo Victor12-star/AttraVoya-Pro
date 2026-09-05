@@ -69,6 +69,9 @@ describe('destination route contract', () => {
     expect(buildDestinationChildHref(stockholm, 'pharmacies')).toContain(
       '/destinations/stockholm-se/pharmacies?',
     );
+    expect(buildDestinationChildHref(stockholm, 'police')).toContain(
+      '/destinations/stockholm-se/police?',
+    );
     expect(buildDestinationChildHref(stockholm, 'museums')).toContain(
       '/destinations/stockholm-se/museums?',
     );
