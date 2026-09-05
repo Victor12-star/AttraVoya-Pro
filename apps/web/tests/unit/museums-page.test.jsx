@@ -148,7 +148,9 @@ describe('MuseumsDestinationPage', () => {
 
     render(<MuseumsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(await screen.findByText('No museums were found in this search area.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('No museums were found in this search area.'),
+    ).toBeInTheDocument();
   });
 
   it('keeps provider errors private and exposes a working retry', async () => {
