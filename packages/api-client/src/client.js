@@ -151,5 +151,7 @@ export function createApiClient(options) {
     listBudgetPlanRequests: () => request('/api/v1/planner/requests'),
     getBudgetPlanRequest: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}`),
+    getBudgetAllocation: (requestId) =>
+      request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/allocation`),
   };
 }

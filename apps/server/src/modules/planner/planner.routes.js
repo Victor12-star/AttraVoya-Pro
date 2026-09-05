@@ -20,6 +20,11 @@ export async function plannerRoutes(app, options = {}) {
   );
   app.get('/', authenticated, controller.listRequests);
   app.get(
+    '/:requestId/allocation',
+    { ...authenticated, schema: plannerSchemas.getRequest },
+    controller.getAllocation,
+  );
+  app.get(
     '/:requestId',
     { ...authenticated, schema: plannerSchemas.getRequest },
     controller.getRequest,

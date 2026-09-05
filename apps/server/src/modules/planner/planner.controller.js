@@ -29,5 +29,13 @@ export function createPlannerController(service) {
       });
       return sendPrivate(reply, { planRequest });
     },
+
+    async getAllocation(request, reply) {
+      const allocation = await service.getAllocation({
+        userId: authenticatedUserId(request),
+        requestId: request.params.requestId,
+      });
+      return sendPrivate(reply, { allocation });
+    },
   };
 }
