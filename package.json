@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "for f in apps/web/src/features/destinations/cafes-page-copy.js apps/web/tests/unit/cafes-page.test.jsx apps/web/tests/unit/destination-page.test.jsx; do prettier \"$f\" | diff -u \"$f\" - || true; done",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
