@@ -20,8 +20,7 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     preferenceApplied: 'Your saved currency preference is used when the provider supports it.',
     disclaimer:
       'Reference rates are indicative. Your bank, card issuer, cash exchange office or payment provider may use different rates and fees.',
-    noCurrency:
-      'AttraVoya does not have destination currency reference data for this country yet.',
+    noCurrency: 'AttraVoya does not have destination currency reference data for this country yet.',
     ratesUnavailable:
       'The destination currency is known, but indicative exchange rates are unavailable from the configured provider right now.',
     conversionUnavailable: 'The conversion could not be loaded. No estimate was invented.',
@@ -93,13 +92,15 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     indicative: 'Taux indicatif',
     provider: 'Fournisseur du taux',
     rateDate: 'Date du taux',
-    preferenceApplied: 'Votre devise enregistrée est utilisée lorsque le fournisseur la prend en charge.',
+    preferenceApplied:
+      'Votre devise enregistrée est utilisée lorsque le fournisseur la prend en charge.',
     disclaimer:
       'Les taux de référence sont indicatifs. Votre banque, émetteur de carte, bureau de change ou prestataire de paiement peut appliquer des taux et frais différents.',
     noCurrency: 'AttraVoya ne dispose pas encore de données de devise de référence pour ce pays.',
     ratesUnavailable:
       'La devise de destination est connue, mais les taux indicatifs sont indisponibles auprès du fournisseur configuré.',
-    conversionUnavailable: 'La conversion n’a pas pu être chargée. Aucune estimation n’a été inventée.',
+    conversionUnavailable:
+      'La conversion n’a pas pu être chargée. Aucune estimation n’a été inventée.',
     invalidAmount: 'Saisissez un montant supérieur à 0 et inférieur ou égal à 100 000 000.',
   },
   de: {
@@ -118,13 +119,15 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     indicative: 'Indikativer Kurs',
     provider: 'Kursanbieter',
     rateDate: 'Kursdatum',
-    preferenceApplied: 'Deine gespeicherte Währung wird verwendet, wenn der Anbieter sie unterstützt.',
+    preferenceApplied:
+      'Deine gespeicherte Währung wird verwendet, wenn der Anbieter sie unterstützt.',
     disclaimer:
       'Referenzkurse sind indikativ. Bank, Kartenanbieter, Wechselstube oder Zahlungsdienst können andere Kurse und Gebühren verwenden.',
     noCurrency: 'AttraVoya hat für dieses Land noch keine Währungsreferenzdaten.',
     ratesUnavailable:
       'Die Zielwährung ist bekannt, aber indikative Wechselkurse sind derzeit beim konfigurierten Anbieter nicht verfügbar.',
-    conversionUnavailable: 'Die Umrechnung konnte nicht geladen werden. Es wurde keine Schätzung erfunden.',
+    conversionUnavailable:
+      'Die Umrechnung konnte nicht geladen werden. Es wurde keine Schätzung erfunden.',
     invalidAmount: 'Gib einen Betrag größer als 0 und höchstens 100.000.000 ein.',
   },
   it: {
@@ -146,10 +149,12 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     preferenceApplied: 'La valuta salvata viene usata quando il fornitore la supporta.',
     disclaimer:
       'I tassi di riferimento sono indicativi. Banca, emittente della carta, ufficio cambio o fornitore di pagamento possono applicare tassi e commissioni diversi.',
-    noCurrency: 'AttraVoya non dispone ancora di dati di riferimento sulla valuta per questo paese.',
+    noCurrency:
+      'AttraVoya non dispone ancora di dati di riferimento sulla valuta per questo paese.',
     ratesUnavailable:
       'La valuta della destinazione è nota, ma i tassi indicativi non sono disponibili dal fornitore configurato.',
-    conversionUnavailable: 'Impossibile caricare la conversione. Non è stata inventata alcuna stima.',
+    conversionUnavailable:
+      'Impossibile caricare la conversione. Non è stata inventata alcuna stima.',
     invalidAmount: 'Inserisci un importo maggiore di 0 e non superiore a 100.000.000.',
   },
   pt: {
@@ -174,7 +179,8 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     noCurrency: 'A AttraVoya ainda não tem dados de referência de moeda para este país.',
     ratesUnavailable:
       'A moeda do destino é conhecida, mas as taxas indicativas não estão disponíveis no fornecedor configurado.',
-    conversionUnavailable: 'Não foi possível carregar a conversão. Nenhuma estimativa foi inventada.',
+    conversionUnavailable:
+      'Não foi possível carregar a conversão. Nenhuma estimativa foi inventada.',
     invalidAmount: 'Introduza um montante superior a 0 e não superior a 100 000 000.',
   },
   pl: {
@@ -218,7 +224,8 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     indicative: 'Indicatieve koers',
     provider: 'Koersleverancier',
     rateDate: 'Koersdatum',
-    preferenceApplied: 'Je opgeslagen valuta wordt gebruikt wanneer de leverancier die ondersteunt.',
+    preferenceApplied:
+      'Je opgeslagen valuta wordt gebruikt wanneer de leverancier die ondersteunt.',
     disclaimer:
       'Referentiekoersen zijn indicatief. Je bank, kaartuitgever, wisselkantoor of betalingsprovider kan andere koersen en kosten gebruiken.',
     noCurrency: 'AttraVoya heeft nog geen valutareferentiegegevens voor dit land.',
@@ -394,15 +401,15 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     disclaimer:
       '参考レートは目安です。銀行、カード発行会社、両替所、決済事業者では異なるレートや手数料が適用される場合があります。',
     noCurrency: 'AttraVoya には、この国の通貨参照データがまだありません。',
-    ratesUnavailable: '目的地の通貨は判明していますが、設定された提供元から参考レートを取得できません。',
+    ratesUnavailable:
+      '目的地の通貨は判明していますが、設定された提供元から参考レートを取得できません。',
     conversionUnavailable: '換算結果を読み込めませんでした。推定値は作成していません。',
     invalidAmount: '0 より大きく 100,000,000 以下の金額を入力してください。',
   },
   ko: {
     eyebrow: '통화',
     title: '{destination}의 통화 및 환율',
-    intro:
-      '목적지 통화를 확인하고 AttraVoya를 통해 가져온 Frankfurter 참고 환율로 환산하세요.',
+    intro: '목적지 통화를 확인하고 AttraVoya를 통해 가져온 Frankfurter 참고 환율로 환산하세요.',
     back: '목적지로 돌아가기',
     destinationCurrencies: '목적지 통화',
     primary: '주요',
@@ -418,7 +425,8 @@ const CURRENCY_PAGE_COPY = Object.freeze({
     disclaimer:
       '참고 환율은 안내용입니다. 은행, 카드 발급사, 환전소 또는 결제 제공자가 다른 환율과 수수료를 적용할 수 있습니다.',
     noCurrency: 'AttraVoya에는 아직 이 국가의 목적지 통화 참조 데이터가 없습니다.',
-    ratesUnavailable: '목적지 통화는 확인되었지만 현재 설정된 제공자에서 참고 환율을 가져올 수 없습니다.',
+    ratesUnavailable:
+      '목적지 통화는 확인되었지만 현재 설정된 제공자에서 참고 환율을 가져올 수 없습니다.',
     conversionUnavailable: '환산 결과를 불러올 수 없습니다. 추정값을 만들어내지 않았습니다.',
     invalidAmount: '0보다 크고 100,000,000 이하인 금액을 입력하세요.',
   },
