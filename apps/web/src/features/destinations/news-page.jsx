@@ -36,9 +36,17 @@ function validDateTime(value) {
   return text && Number.isFinite(Date.parse(text)) ? text : null;
 }
 
-/** @param {unknown} value */
+/**
+ * @param {unknown} value
+ * @returns {string[]}
+ */
 function textArray(value) {
-  return Array.isArray(value) ? value.map(textValue).filter(Boolean) : [];
+  if (!Array.isArray(value)) return [];
+  return value.reduce((items, item) => {
+    const text = textValue(item);
+    if (text) items.push(text);
+    return items;
+  }, /** @type {string[]} */ ([]));
 }
 
 /** @param {unknown} value */
