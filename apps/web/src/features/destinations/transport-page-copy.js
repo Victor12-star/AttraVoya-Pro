@@ -334,8 +334,7 @@ const TRANSPORT_PAGE_COPY = Object.freeze({
   fi: {
     eyebrow: 'Liikkuminen',
     title: 'Liikkuminen kohteessa {destination}',
-    intro:
-      'Hae oikea paikka kohdemaasta ja laske palveluntarjoajan reitti kohteen keskustasta.',
+    intro: 'Hae oikea paikka kohdemaasta ja laske palveluntarjoajan reitti kohteen keskustasta.',
     back: 'Takaisin kohteeseen',
     start: 'Lähtö',
     centre: 'Kohteen {destination} keskusta',
@@ -453,8 +452,7 @@ const TRANSPORT_PAGE_COPY = Object.freeze({
   ja: {
     eyebrow: '交通',
     title: '{destination}での移動',
-    intro:
-      '目的地の国にある実在の場所を検索し、目的地中心部からプロバイダーのルートを計算します。',
+    intro: '目的地の国にある実在の場所を検索し、目的地中心部からプロバイダーのルートを計算します。',
     back: '目的地に戻る',
     start: '出発',
     centre: '{destination}中心部',
@@ -483,8 +481,7 @@ const TRANSPORT_PAGE_COPY = Object.freeze({
   ko: {
     eyebrow: '교통',
     title: '{destination}에서 이동하기',
-    intro:
-      '목적지 국가의 실제 장소를 검색하고 목적지 중심에서 제공자 경로를 계산합니다.',
+    intro: '목적지 국가의 실제 장소를 검색하고 목적지 중심에서 제공자 경로를 계산합니다.',
     back: '목적지로 돌아가기',
     start: '출발',
     centre: '{destination} 중심',

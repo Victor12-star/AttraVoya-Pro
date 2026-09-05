@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --write apps/web/src/features/destinations/transport-page-copy.js apps/web/src/features/destinations/transport-page.jsx apps/web/tests/unit/transport-page.test.jsx packages/validation/src/provider-requests.js && git diff -- apps/web/src/features/destinations/transport-page-copy.js apps/web/src/features/destinations/transport-page.jsx apps/web/tests/unit/transport-page.test.jsx packages/validation/src/provider-requests.js && git checkout -- apps/web/src/features/destinations/transport-page-copy.js apps/web/src/features/destinations/transport-page.jsx apps/web/tests/unit/transport-page.test.jsx packages/validation/src/provider-requests.js && exit 1",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",

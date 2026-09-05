@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import {
-  ArrowLeft,
-  LoaderCircle,
-  MapPin,
-  RefreshCw,
-  Route,
-  Search,
-} from 'lucide-react';
+import { ArrowLeft, LoaderCircle, MapPin, RefreshCw, Route, Search } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { buildDestinationHref } from './destination-route.js';

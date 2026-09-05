@@ -13,9 +13,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { TransportDestinationPage } = await import(
-  '../../src/features/destinations/transport-page.jsx'
-);
+const { TransportDestinationPage } =
+  await import('../../src/features/destinations/transport-page.jsx');
 
 const messages = {
   common: {

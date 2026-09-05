@@ -100,10 +100,7 @@ export const mapsRouteQuerySchema = z
   })
   .strict()
   .superRefine((value, context) => {
-    if (
-      value.startLatitude === value.endLatitude &&
-      value.startLongitude === value.endLongitude
-    ) {
+    if (value.startLatitude === value.endLatitude && value.startLongitude === value.endLongitude) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['endLatitude'],
