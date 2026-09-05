@@ -10,17 +10,22 @@ This file is the permanent handoff point for continuing development safely in a 
 - Rule: every feature slice must pass the full GitHub Actions CI gate on the exact final PR head before merge.
 - Rule: after merge, verify the resulting `develop` push CI before starting the next slice.
 - Never merge a diagnostic or temporary CI configuration.
+- JavaScript only unless the owner explicitly approves TypeScript.
 
 ## Product rules that must stay true
 
+- AttraVoya is budget-first: a traveller can enter the total budget, origin, dates/flexibility, travellers/children, interests, comfort level, accommodation preferences, and preferred currency, then receive feasible plans that stay within that budget.
 - Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
-- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, prescription availability, pharmacist availability, police staffing/response availability, supermarket stock/product availability, ATM operational/cash/card/network/currency/deposit/fee/limit/accessibility claims, parking occupancy/availability/prices/restrictions/permits/payment methods/opening hours/reservations/EV charging/vehicle limits/security/accessibility claims, café opening/menu/item/price/reservation/seating/Wi-Fi/rating/review/wait-time/dietary/delivery/takeaway/payment/accessibility/service claims, museum exhibitions, ticket prices, accessibility, or provider results.
-- Clearly distinguish provider-returned facts from estimates or static reference data.
+- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, police response availability, accommodation inventory, attraction availability, café facts, or provider results.
+- Clearly distinguish provider-returned facts from estimates or static reference data. Future planner estimates must retain explicit provenance.
 - Keep provider credentials server-side.
 - Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
 - Keep public travel data honest when provider keys are absent: show unavailable/empty states rather than fabricated content.
 - Keep all supported UI locales working, including Arabic RTL behavior.
 - Verified emergency contacts remain authoritative Safety data and must not be replaced by inferred place-provider medical or police-service information.
+- Basic safety must never be paywalled; premium access must never imply admin privileges.
+- Frontend visibility is not an authorization boundary. Protected persistence and private traveller data must be enforced on the server.
+- Private travel intent and budget data should not be stored in public/shared caches.
 
 ## Completed integration checkpoints
 
@@ -38,7 +43,6 @@ This file is the permanent handoff point for continuing development safely in a 
 - Final PR CI #218 passed all five jobs.
 - Squash merge commit: `889b26ec520571c073ef2d1821348f31e628ed0e`.
 - Post-merge `develop` CI #219 passed all five jobs.
-- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
 ### Phase 7R — Destination Hospitals Discovery
 
@@ -92,57 +96,81 @@ This file is the permanent handoff point for continuing development safely in a 
 
 - PR #24 merged into `develop`.
 - Final PR head: `eed293b09a5a85c9861d77cb56e80d77cca6a7ba`.
-- Final PR CI #268 passed all five top-level jobs.
+- Final PR CI #268 passed all five jobs.
 - Squash merge commit: `6aba31facf49ff7f2d62ea384645cc73efcc2055`.
-- Post-merge `develop` CI #269 passed all five top-level jobs.
-- Parking discovery uses `apiClient.getNearbyPlaces(...)` with `PLACE_CATEGORY_GROUPS.PARKING`, mapped by the Geoapify adapter to `parking`.
-- It renders only normalized location facts and does not invent occupancy or live-space availability, prices, restrictions, permits, payment methods, opening/access hours, reservations, EV charging, vehicle/height limits, security, or accessibility claims.
-- A temporary branch-only formatter diagnostic was removed before the final PR head; root `format:check` was `prettier --check .` in the merged result.
-- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
-
-## Current phase
+- Post-merge `develop` CI #269 passed all five jobs.
 
 ### Phase 7Y — Destination Cafés Discovery
 
-Branch: `feature/phase-7y-destination-cafes`
+- PR #25 merged into `develop`.
+- Final PR head: `1d93092f370bd9a52fce843808e8b68f36392c90`.
+- Final PR CI #276 passed all five top-level jobs.
+- Squash merge commit: `f5ab4082af2e33289650ec6e9c1d5bb799b4932d`.
+- Post-merge `develop` CI #277 passed all five top-level jobs.
+- This completed the thin standalone destination-category series. Do not create another near-duplicate category page unless a genuinely distinct product need appears.
+- `GEOAPIFY_API_KEY` was absent in CI; provider smoke tests did not make a live keyed Geoapify request.
 
-PR: #25 — `Phase 7Y: destination cafés discovery`
+## Current phase
 
-Base checkpoint: `6aba31facf49ff7f2d62ea384645cc73efcc2055` — verified Phase 7X `develop` merge.
+### Phase 7Z — Budget Planner Request Foundation
+
+Branch: `feature/phase-7z-budget-planner-request-foundation`
+
+PR: #26 — `Phase 7Z: budget planner request foundation`
+
+Base checkpoint: `f5ab4082af2e33289650ec6e9c1d5bb799b4932d` — verified Phase 7Y `develop` merge.
+
+Reason for this phase:
+
+- The existing Prisma schema already contains the correct planner domain: `TravelPlanRequest`, `TravelStayPreference`, recommendations, versioned `BudgetPlan`, pricing provenance, trips, and actual expenses.
+- Therefore the correct architecture is to activate that domain rather than create a second budget model or parallel planner.
+- Phase 7Z intentionally establishes the secure traveller-owned planning brief before recommendation generation or provider pricing.
 
 Implemented:
 
-- `/destinations/[slug]/cafes` route using the shared strict destination selection/parser contract.
-- Cafés entry point in the destination feature grid using the Lucide `Coffee` icon.
-- `cafes` added to the strict destination child-route allowlist.
-- Reuses `apiClient.getNearbyPlaces(...)` and the existing provider-neutral places backend; browser code never calls Geoapify directly.
-- Uses `PLACE_CATEGORY_GROUPS.CAFES`, mapped by the Geoapify adapter to `catering.cafe`.
-- Uses a 10 km search radius, result limit of 24, destination coordinates, and the active UI locale.
-- Renders only normalized provider facts used by this slice: café/place name, formatted address, distance, provider/check time, and HTTPS website when present.
-- Rejects invalid coordinates, duplicate rows, mismatched countries, mismatched providers, and unsafe website URLs.
-- Does not invent, infer, or display opening hours/open-now status, menus/items, prices, reservations, seating/space availability, Wi-Fi, ratings/reviews, wait times, dietary suitability, delivery/takeaway, payment methods, accessibility, or service availability, even if unexpected provider payload fields contain those values.
-- Honest loading, success, empty, provider-error, retry, and invalid-destination states.
-- Copy is provided for all 18 supported UI locales.
-- Focused tests cover the Café page, exact provider-neutral API request, unsupported-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
+- Protected `POST /api/v1/planner/requests` endpoint to persist a planning brief.
+- Protected `GET /api/v1/planner/requests` endpoint to list only the authenticated traveller's requests.
+- Protected `GET /api/v1/planner/requests/:requestId` endpoint with owner-scoped lookup; another user's request resolves as 404 rather than leaking existence.
+- Existing PostgreSQL-backed authentication hook is required before planner persistence/read access.
+- Planner responses use `Cache-Control: private, no-store` because the payload contains private travel intent and budget information.
+- Reuses existing `TravelPlanRequest` and `TravelStayPreference` Prisma models. No duplicate planner schema and no migration were added.
+- Reuses shared `createBudgetPlanRequestSchema` plus accommodation preference validation.
+- Strengthens date-mode validation so fixed-date and flexible-window fields cannot be silently mixed.
+- Enforces traveller-count limits before persistence.
+- Normalizes the budget currency code and validates it against stored currency reference data.
+- Validates optional target destination as an existing `PUBLISHED` destination.
+- Validates optional origin city and airport references and rejects mismatched city/airport combinations.
+- Persists new requests as `DRAFT` only.
+- Maps Prisma Decimal/date values into stable API-safe strings and date values without exposing ownership metadata or database internals.
+- Shared API client now exposes create/list/get planner-request methods for web and mobile consumers.
+- Focused tests cover unauthenticated rejection, valid persistence/defaults, owner isolation, contradictory dates, traveller limits, unsupported currency, inconsistent origin references, and shared API-client behavior.
+
+Deliberate boundary:
+
+- Phase 7Z does not generate destination recommendations.
+- It does not allocate the budget across flights, accommodation, food, local transport, activities, children's activities, transfers, and reserve yet.
+- It does not fetch or claim fares, accommodation availability/prices, attraction prices, or any other live provider pricing.
+- Recommendation generation and budget allocation must build on this verified request foundation and preserve explicit estimate/provider provenance.
 
 Verification history:
 
-- Initial implementation head `6feede2b68e655509deba4ad5c6c262ea0550864` ran PR CI #270. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only repository-wide Prettier flagged three files: `cafes-page-copy.js`, `cafes-page.test.jsx`, and `destination-page.test.jsx`.
-- Branch-only diagnostic head `c54a7e57b5e627c76e18993aaeaf9e16bf3e4d23` ran CI #271 solely to capture exact Prettier 3.9.6 output. The diagnostic showed mechanical locale-line wrapping, one assertion-line collapse, and one missing final newline. The diagnostic configuration is not a valid merge candidate.
-- Exact formatter output was applied in commits `b39ba6317af58bd947394d5a347e8ce7fced8834`, `8e3dd1dcf0ac4fda4d34e77dd738e25251842a94`, and `cfbcfe0c00b8cc41c4a4b98fff502736cd71ff34`.
-- Root `package.json` was restored exactly to `"format:check": "prettier --check ."` in clean code checkpoint `8f32077d3b3746a164a00a979580a935287d0bd4`; its package blob is the normal `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c`.
-- Clean-code CI #275 on exact head `8f32077d3b3746a164a00a979580a935287d0bd4` passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and the complete unit-test suite. The web suite contains 128 passing tests across 28 files.
-- `GEOAPIFY_API_KEY` is not configured in GitHub Actions. Provider smoke tests make no external Geoapify request. Therefore Phase 7Y must not be described as a live keyed Geoapify café request.
+- Initial implementation head `ae2c3752fabb6fcd9a2ebae35eaa46513e9d1f24` ran PR CI #278. Production build, PostgreSQL/Prisma, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all functional tests passed; only repository-wide Prettier failed on six files.
+- Branch-only formatter diagnostic head `2a658e08672fc883d463b588e3d5e9003f0d18b0` ran CI #279 to print exact Prettier 3.9.6 rewrites. It was diagnostic only and is not a valid merge candidate.
+- Exact formatter output was applied mechanically to `apps/server/src/app.js`, planner routes/service/tests, `packages/api-client/src/client.js`, and `packages/validation/src/budget-planner.js` without changing planner behavior.
+- Root `package.json` was restored byte-for-byte to the normal `"format:check": "prettier --check ."` blob `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c`.
+- Clean-code checkpoint: `00a36d18af661cce66aacea9a21e1cb3387238bb`.
+- Clean-code PR CI #287 on exact head `00a36d18af661cce66aacea9a21e1cb3387238bb` passed all five top-level CI jobs, including repository-wide Prettier.
 
 ### Required next steps
 
-1. This handoff update changes the PR head, so run the complete five-job PR CI on the exact new documentation head.
-2. Confirm root `package.json` still contains `"format:check": "prettier --check ."`.
-3. Verify PR #25 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #25 using expected-head protection.
-5. Verify the resulting merge commit is the `develop` head.
+1. This handoff update changes PR #26's head. Run the complete five-job PR CI on the exact new documentation head.
+2. Confirm root `package.json` blob remains `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c` with `"format:check": "prettier --check ."`.
+3. Verify PR #26 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #26 using expected-head protection.
+5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
-7. Only after that post-merge gate is green, mark Phase 7Y complete and inspect the current product/provider roadmap before selecting the next slice. Do not create a duplicate standalone page for functionality already covered by Family, Accommodation, Nearby, Restaurants, Shopping, or another verified destination feature.
+7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
+8. Best next product direction: expose the verified planner request foundation through a real authenticated budget-planner web flow, then add deterministic budget allocation/provenance before any recommendation-ranking logic. Do not jump directly to fake/live pricing.
 
 ## CI interpretation rule
 
