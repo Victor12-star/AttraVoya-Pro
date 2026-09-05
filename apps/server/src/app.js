@@ -31,6 +31,7 @@ import { accommodationRoutes } from './modules/accommodation/accommodation.route
 import { eventsRoutes } from './modules/events/events.routes.js';
 import { newsRoutes } from './modules/news/news.routes.js';
 import { imagesRoutes } from './modules/images/images.routes.js';
+import { plannerRoutes } from './modules/planner/planner.routes.js';
 
 export async function buildApp(options = {}) {
   const app = Fastify({
@@ -182,6 +183,11 @@ export async function buildApp(options = {}) {
   await app.register(imagesRoutes, {
     prefix: `${API_PREFIX}/images`,
     provider: options.imageProvider,
+  });
+
+  await app.register(plannerRoutes, {
+    prefix: `${API_PREFIX}/planner/requests`,
+    repository: options.plannerRepository,
   });
 
   return app;
