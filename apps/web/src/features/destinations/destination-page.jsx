@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   BedDouble,
   BusFront,
+  CalendarDays,
   CameraOff,
   CloudRain,
   CloudSun,
@@ -31,6 +32,7 @@ import { apiClient } from '../../lib/api-client.js';
 import { getBeachesPageCopy } from './beaches-page-copy.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
+import { getEventsPageCopy } from './events-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import { getShoppingPageCopy } from './shopping-page-copy.js';
 import styles from './destination-page.module.css';
@@ -171,6 +173,7 @@ function FeatureLink({ href, icon: Icon, label }) {
 export function DestinationPage({ destination, locale = 'en', messages }) {
   const copy = getDestinationPageCopy(locale);
   const beachesCopy = getBeachesPageCopy(locale);
+  const eventsCopy = getEventsPageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
   const shoppingCopy = getShoppingPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
@@ -253,6 +256,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'attractions'),
       icon: Sparkles,
       label: messages.navigation.thingsToDo,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'events'),
+      icon: CalendarDays,
+      label: eventsCopy.eyebrow,
     },
     {
       href: buildDestinationChildHref(destination, 'restaurants'),
