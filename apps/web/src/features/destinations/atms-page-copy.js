@@ -173,7 +173,7 @@ const ATMS_PAGE_COPY = Object.freeze({
     eyebrow: "ATM'ler",
     title: "{destination} yakınındaki ATM'ler",
     intro:
-      "Yapılandırılmış yer sağlayıcısının bu hedefin yakınında ATM olarak sınıflandırdığı yerleri görüntüleyin.",
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında ATM olarak sınıflandırdığı yerleri görüntüleyin.',
     back: 'Hedefe dön',
     results: "Yakındaki ATM'ler",
     noResults: 'Bu arama alanında ATM bulunamadı.',
@@ -212,8 +212,7 @@ const ATMS_PAGE_COPY = Object.freeze({
   ja: {
     eyebrow: 'ATM',
     title: '{destination}周辺のATM',
-    intro:
-      '設定済みの場所プロバイダーがこの目的地の近くでATMとして分類した場所を確認できます。',
+    intro: '設定済みの場所プロバイダーがこの目的地の近くでATMとして分類した場所を確認できます。',
     back: '目的地に戻る',
     results: '近くのATM',
     noResults: 'この検索範囲ではATMが見つかりませんでした。',
