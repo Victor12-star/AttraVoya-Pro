@@ -14,7 +14,7 @@ This file is the permanent handoff point for continuing development safely in a 
 ## Product rules that must stay true
 
 - Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
-- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, prescription availability, pharmacist availability, police staffing/response availability, museum exhibitions, ticket prices, accessibility, or provider results.
+- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, prescription availability, pharmacist availability, police staffing/response availability, supermarket stock/product availability, museum exhibitions, ticket prices, accessibility, or provider results.
 - Clearly distinguish provider-returned facts from estimates or static reference data.
 - Keep provider credentials server-side.
 - Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
@@ -75,50 +75,60 @@ This file is the permanent handoff point for continuing development safely in a 
 - It does not invent or infer medication stock, prescription or pharmacist availability, opening status, medication prices, services, medical advice, or suitability for urgent care.
 - `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
-## Current phase
-
 ### Phase 7U — Destination Police Stations Discovery
 
-Branch: `feature/phase-7u-destination-police`
+- PR #21 merged into `develop`.
+- Final PR head: `ed8b4cc9dee6ed51b1521bfede4f5502f964848c`.
+- Final PR CI #247 passed all five jobs.
+- Squash merge commit: `fca97e230bb97ab2d36818d5a9c943a106b557a6`.
+- Post-merge `develop` CI #248 passed all five jobs.
+- Police discovery uses the provider-neutral nearby places API and links to verified Safety & emergency contacts.
+- It does not invent or infer station type, opening status, staffing, response availability, phone availability, emergency handling, or walk-in availability.
+- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
-PR: #21 — `Phase 7U: destination police stations discovery`
+## Current phase
 
-Base checkpoint: `173b79c783639e1ae1257a44e985ab10a3ec44db` — verified Phase 7T `develop` merge.
+### Phase 7V — Destination Supermarkets Discovery
+
+Branch: `feature/phase-7v-destination-supermarkets`
+
+PR: #22 — `Phase 7V: destination supermarkets discovery`
+
+Base checkpoint: `fca97e230bb97ab2d36818d5a9c943a106b557a6` — verified Phase 7U `develop` merge.
 
 Implemented:
 
-- `/destinations/[slug]/police` route.
-- Police stations entry point in the destination feature grid using a Lucide shield icon.
-- `police` added to the strict destination child-route allowlist.
+- `/destinations/[slug]/supermarkets` route.
+- Supermarkets entry point in the destination feature grid using the Lucide `ShoppingCart` icon.
+- `supermarkets` added to the strict destination child-route allowlist.
 - Reuses `apiClient.getNearbyPlaces(...)` and the existing provider-neutral places backend; browser code never calls Geoapify directly.
-- Uses `PLACE_CATEGORY_GROUPS.POLICE`, already mapped by the Geoapify adapter to `service.police`.
-- Uses a 15 km search radius, result limit of 20, destination coordinates, and the active UI locale.
-- Renders only normalized provider facts used by this slice: police-place name, formatted address, distance, provider/check time, and HTTPS website when present.
+- Uses `PLACE_CATEGORY_GROUPS.SUPERMARKETS`, mapped by the Geoapify adapter to `commercial.supermarket`.
+- Uses a 10 km search radius, result limit of 24, destination coordinates, and the active UI locale.
+- Renders only normalized provider facts used by this slice: supermarket/place name, formatted address, distance, provider/check time, and HTTPS website when present.
 - Rejects invalid coordinates, duplicate rows, mismatched countries, mismatched providers, and unsafe website URLs.
-- Links to the existing verified Safety & emergency route for authoritative emergency contacts.
-- Does not invent, infer, or display station type, opening status, staffing, response availability, phone availability, emergency handling, or walk-in availability, even if unexpected provider payload fields contain those values.
+- Does not invent, infer, or display opening status, stock, product availability, prices, promotions, delivery, collection, queues, or payment methods, even if unexpected provider payload fields contain those values.
 - Honest loading, success, empty, provider-error, retry, and invalid-destination states.
 - Copy is provided for all 18 supported UI locales.
-- Focused tests cover the Police page, exact provider-neutral API request, unsupported police-service-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
+- Focused tests cover the Supermarkets page, exact provider-neutral API request, unsupported retail-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
 
 Verification history:
 
-- Initial implementation head `461a16c13b7c34d17dcb9f77ed6a02220eef789b` ran CI #243. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only Prettier flagged `apps/web/src/features/destinations/police-page.jsx`.
-- Branch-only diagnostic head `1c66f1c1f10defb12515171a74b34de62a915bf2` ran CI #244 solely to capture Prettier 3.9.6 output. The exact diff was one mechanical change: collapse the `normalizePolicePlaces(...)` call to one line. The diagnostic configuration must never be merged.
-- The exact formatting output was applied and root `package.json` restored to `"format:check": "prettier --check ."`.
-- Clean Phase 7U code checkpoint before this handoff update: `fba4b93afe388e95fea9230ea6085c23c8888c43`.
-- CI #246 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and 108 web unit tests.
-- `GEOAPIFY_API_KEY` is not configured in GitHub Actions. Provider smoke tests make no external API calls. Therefore Phase 7U must not be described as a live keyed Geoapify police request.
+- Initial implementation head `94001971ddd7b982ba984cdad8a25081faa633bd` ran CI #249. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only repository-wide Prettier flagged `apps/web/src/features/destinations/supermarkets-page-copy.js` and `apps/web/tests/unit/supermarkets-page.test.jsx`.
+- Branch-only diagnostic head `ac5302ab12fd5871b2e83279b84326badd5cc8b7` ran CI #250 solely to capture Prettier 3.9.6 output. It showed mechanical wrapping of long localized `intro` strings and JSX/import wrapping in the focused test only. This diagnostic configuration must never be merged.
+- Exact formatter output was applied in commits `5d5876d11dcef2ce7e6b735064a4a24c83af3f5d` and `d5541a9670ab74667c1d1a56000f94e63a700045` without changing localized text or behavior.
+- Root `package.json` was restored to `"format:check": "prettier --check ."` in clean code checkpoint `53cd03980523e79b8d1e14381e57184b81128ffa`.
+- CI #253 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and the complete unit-test suite.
+- `GEOAPIFY_API_KEY` is not configured in GitHub Actions. Provider smoke tests make no external API calls. Therefore Phase 7V must not be described as a live keyed Geoapify supermarket request.
 
 ### Required next steps
 
 1. This handoff update changes the PR head, so run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` still contains `"format:check": "prettier --check ."`.
-3. Verify PR #21 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #21 using expected-head protection.
+3. Verify PR #22 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #22 using expected-head protection.
 5. Verify the resulting merge commit is the `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
-7. Only after that post-merge gate is green, mark Phase 7U complete and choose/start the next uncovered destination slice from the verified `develop` checkpoint.
+7. Only after that post-merge gate is green, mark Phase 7V complete and choose/start the next uncovered provider-backed destination slice from the verified `develop` checkpoint.
 
 ## CI interpretation rule
 
