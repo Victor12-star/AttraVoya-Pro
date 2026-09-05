@@ -163,7 +163,9 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
       const response = await apiClient.createBudgetPlanRequest(parsed.data);
       const saved = response?.planRequest;
       if (!saved?.id) throw new Error('Missing saved planning request.');
-      setDrafts((current) => [saved, ...current.filter((item) => item.id !== saved.id)].slice(0, 20));
+      setDrafts((current) =>
+        [saved, ...current.filter((item) => item.id !== saved.id)].slice(0, 20),
+      );
       setDraftState('success');
       setSubmitState({ type: 'success', message: copy.saved });
     } catch (error) {
@@ -389,9 +391,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 role={submitState.type === 'success' ? 'status' : 'alert'}
               >
                 <span>{submitState.message}</span>
-                {submitState.type === 'auth' ? (
-                  <Link href="/login">{copy.signInLink}</Link>
-                ) : null}
+                {submitState.type === 'auth' ? <Link href="/login">{copy.signInLink}</Link> : null}
               </div>
             ) : null}
 

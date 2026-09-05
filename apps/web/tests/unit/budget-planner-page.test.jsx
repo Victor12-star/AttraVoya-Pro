@@ -20,10 +20,8 @@ vi.mock('../../src/lib/preferences.js', () => ({
   readPreferences: mocks.readPreferences,
 }));
 
-const { BudgetPlannerPage } =
-  await import('../../src/features/planner/budget-planner-page.jsx');
-const { getBudgetPlannerCopy } =
-  await import('../../src/features/planner/budget-planner-copy.js');
+const { BudgetPlannerPage } = await import('../../src/features/planner/budget-planner-page.jsx');
+const { getBudgetPlannerCopy } = await import('../../src/features/planner/budget-planner-copy.js');
 
 const copy = getBudgetPlannerCopy('en');
 
@@ -71,7 +69,9 @@ describe('BudgetPlannerPage', () => {
     expect(screen.getByText('Destination is open', { selector: 'span' })).toBeInTheDocument();
     expect(await screen.findByText('No saved planning briefs yet.')).toBeInTheDocument();
     expect(mocks.listBudgetPlanRequests).toHaveBeenCalledTimes(1);
-    expect(screen.getByText(/does not claim live fares, prices, availability/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not claim live fares, prices, availability/i),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/best destination/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/live price/i)).not.toBeInTheDocument();
   });
@@ -149,7 +149,9 @@ describe('BudgetPlannerPage', () => {
 
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
 
-    expect(await screen.findByText('Sign in to save and view private planning briefs.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Sign in to save and view private planning briefs.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('private server detail')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
 

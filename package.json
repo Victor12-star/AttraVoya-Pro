@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "for f in apps/web/src/features/planner/budget-planner-copy.js apps/web/src/features/planner/budget-planner-page.jsx apps/web/tests/unit/budget-planner-page.test.jsx; do echo PRETTIER_FILE:$f; prettier \"$f\" | base64 -w0; echo; echo PRETTIER_END:$f; done",
+    "format:check": "prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
