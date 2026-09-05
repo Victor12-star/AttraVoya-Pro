@@ -146,5 +146,10 @@ export function createApiClient(options) {
       const params = toSearchParams(query);
       return request(`/api/v1/accommodation/nearby?${params}`);
     },
+    createBudgetPlanRequest: (body) =>
+      request('/api/v1/planner/requests', { method: 'POST', body }),
+    listBudgetPlanRequests: () => request('/api/v1/planner/requests'),
+    getBudgetPlanRequest: (requestId) =>
+      request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}`),
   };
 }

@@ -49,6 +49,14 @@ export const createBudgetPlanRequestSchema = z
       });
     }
 
+    if (data.adults + data.childrenAges.length > 20) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A planning request supports up to 20 travellers in total',
+        path: ['childrenAges'],
+      });
+    }
+
     const hasFixedDates = Boolean(data.fixedDeparture || data.fixedReturn);
     if (hasFixedDates && !(data.fixedDeparture && data.fixedReturn)) {
       context.addIssue({
@@ -80,6 +88,30 @@ export const createBudgetPlanRequestSchema = z
         code: z.ZodIssueCode.custom,
         message: 'Latest return must be on or after earliest departure',
         path: ['latestReturn'],
+      });
+    }
+
+    if (!data.flexibleDates && !(data.fixedDeparture && data.fixedReturn)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Fixed travel dates are required when date flexibility is disabled',
+        path: ['fixedDeparture'],
+      });
+    }
+
+    if (!data.flexibleDates && hasFlexibleWindow) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A flexible date window cannot be used when date flexibility is disabled',
+        path: ['earliestDeparture'],
+      });
+    }
+
+    if (data.flexibleDates && hasFixedDates) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Fixed dates cannot be used when date flexibility is enabled',
+        path: ['fixedDeparture'],
       });
     }
   });
