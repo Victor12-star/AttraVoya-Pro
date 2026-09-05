@@ -13,7 +13,11 @@ export async function plannerRoutes(app, options = {}) {
   // Planner drafts contain private travel intent and budget information. Persisted
   // requests therefore require current authenticated account state, even though
   // public destination browsing remains available without an account.
-  app.post('/', { ...authenticated, schema: plannerSchemas.createRequest }, controller.createRequest);
+  app.post(
+    '/',
+    { ...authenticated, schema: plannerSchemas.createRequest },
+    controller.createRequest,
+  );
   app.get('/', authenticated, controller.listRequests);
   app.get(
     '/:requestId',
