@@ -8,7 +8,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
 }));
 
 const { ParkingDestinationPage } = await import(
-  '../../src/features/destinations/parking-page.jsx'
+  '../../src/features/destinations/parking-page.jsx',
 );
 
 const messages = {
