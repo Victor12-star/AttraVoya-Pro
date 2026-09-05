@@ -9,10 +9,10 @@ This file is the engineering handoff for continuing AttraVoya Pro without relyin
 - GitHub: `Victor12-star/AttraVoya-Pro`
 - Working integration branch: `develop`
 - `main` is not the day-to-day development branch.
-- Latest verified merged checkpoint before the current PR: Phase 7N merge `2eafc1f745ea347b52af695d2980fc9ef7dcba01`.
-- Phase 7N post-merge `develop` CI `#190` passed.
-- Current feature branch: `feature/phase-7o-destination-events`.
-- Current pull request: `#15` from `feature/phase-7o-destination-events` into `develop`.
+- Latest verified merged checkpoint before the current PR: Phase 7O merge `7706560de4ff989ec6d26226b04ee8287d977c7f`.
+- Phase 7O post-merge `develop` CI `#198` passed all five top-level jobs.
+- Current feature branch: `feature/phase-7p-destination-news`.
+- Current pull request: `#16` from `feature/phase-7p-destination-news` into `develop`.
 
 Every vertical slice must follow this sequence:
 
@@ -43,7 +43,7 @@ Provider adapters already implemented include:
 - Pexels destination imagery
 - Resend transactional email
 
-Provider secrets stay server-side. Never invent live travel prices, availability, emergency facts, ratings, opening times, exchange rates, safety claims, language facts, transport facts, event availability, or other provider data.
+Provider secrets stay server-side. Never invent live travel prices, availability, emergency facts, ratings, opening times, exchange rates, safety claims, language facts, transport facts, event availability, news accuracy, or other provider data.
 
 ## Phase 7 destination progress
 
@@ -63,6 +63,7 @@ Completed and merged destination slices:
 - Phase 7L — Destination currency and exchange
 - Phase 7M — Destination Language foundation
 - Phase 7N — Destination transport foundation
+- Phase 7O — Destination events discovery
 
 Important verified checkpoints:
 
@@ -74,48 +75,53 @@ Important verified checkpoints:
 - Phase 7L merged through PR `#12` by squash at `52da70966f08c03cd9b241d4e026ed334b6a1713`; final PR CI `#174` and post-merge `develop` CI `#175` green.
 - Phase 7M merged through PR `#13` by squash at `5550c835b18ec2596c0b5f17264bf82325924cf3`; final PR CI `#182` and post-merge `develop` CI `#183` green.
 - Phase 7N merged through PR `#14` at `2eafc1f745ea347b52af695d2980fc9ef7dcba01`; post-merge `develop` CI `#190` green.
+- Phase 7O merged through PR `#15` at `7706560de4ff989ec6d26226b04ee8287d977c7f`; final PR CI `#197` and post-merge `develop` CI `#198` green.
 
-## Phase 7O — Destination events discovery
+## Phase 7P — Destination news discovery
 
-Current implementation is in PR `#15` from `feature/phase-7o-destination-events` into `develop`.
+Current implementation is in PR `#16` from `feature/phase-7p-destination-news` into `develop`.
 
-The branch starts from the verified Phase 7N merge commit:
+The branch starts from the verified Phase 7O merge commit:
 
-`2eafc1f745ea347b52af695d2980fc9ef7dcba01`
+`7706560de4ff989ec6d26226b04ee8287d977c7f`
 
 Implemented:
 
-- added destination route `/destinations/[slug]/events`
-- added Events entry point from the destination experience
-- reused the existing provider-neutral Events backend and shared `apiClient.getEvents(...)`
-- browser code never calls Ticketmaster directly and Ticketmaster credentials stay server-side
-- event searches use the selected destination latitude/longitude, restrict to the destination country, search within 50 km, request up to 20 events, sort upcoming events by date ascending, and use the active locale
-- UI renders only normalized factual provider data: event name, provider date/time when supplied, venue, address/city, provider classifications, provider identity, safe event URL, and provider checked/fetched time
-- no ticket prices, live ticket inventory, ratings, popularity, availability or booking guarantees are invented or implied
-- explicit customer disclaimer explains those provider limitations
-- unsafe event URLs such as `javascript:` are rejected
-- events whose returned country does not match the selected destination country are rejected
-- honest loading, success, empty, provider-error, retry and invalid-destination states
-- all 18 supported UI locales are present and Arabic RTL behavior remains supported
-- focused Events UI tests cover real normalized rendering, `apiClient.getEvents()` contract, country mismatch filtering, unsafe URL rejection, honest empty/error states, retry, invalid destination handling, and absence of unsupported fake price data
+- added destination route `/destinations/[slug]/news`
+- added a localized News entry point to the destination feature grid
+- added `news` to the strict destination child-route allowlist and covered it in the route-contract test
+- reused the existing provider-neutral News backend and shared `apiClient.getNews(...)`
+- browser code never calls NewsData directly and NewsData credentials stay server-side
+- requests use the selected destination name and country code, the active UI language, and a free-tier-safe result size of 10
+- UI renders only normalized factual provider fields such as title, provider description, publication time when supplied, source, category, provider identity, safe article URL, and provider checked/fetched time
+- duplicate provider rows are rejected
+- rows with a definite two-letter country-code mismatch are rejected
+- article/provider mismatches are rejected
+- unsafe article URLs such as `javascript:` are rejected; rendered external article links must use HTTPS
+- injected unsupported fields such as ratings or destination safety scores are deliberately not rendered
+- the UI explicitly discloses that provider results may be delayed and are not guaranteed real-time or breaking news
+- the UI does not treat news coverage as a destination safety rating and does not claim article accuracy has been independently verified by AttraVoya
+- honest loading, success, empty, provider-error, retry and invalid-destination states are implemented
+- all 18 supported UI locales are present and Arabic RTL behavior remains supported by the existing app localization system
+- responsive News page styling follows the established destination-slice patterns
+- focused News tests cover the shared API request contract, normalized factual rendering, delayed-result disclosure, HTTPS safety, country mismatch filtering, duplicate rejection, unsupported rating/safety-field omission, empty state, provider-error privacy, retry, and invalid destination handling
 
-### Phase 7O CI findings and fixes
+### Phase 7P CI findings and fixes
 
-- CI `#191` failed at strict JavaScript because `Intl.DateTimeFormat` options using `dateStyle` and `timeStyle` were inferred as generic strings; explicit formatter-option typing fixed this without runtime behavior changes.
-- CI `#192` then exposed a unit-test bug: the test rejected any UI text containing the word `price`, even though the truthful safety disclaimer legitimately contains `prices`.
-- The test was corrected to inject unsupported fake provider value `SEK 999` and verify that specific value is not rendered. Do not revert to `queryByText(/price/i)`.
-- CI `#193` passed all functional gates and failed only repository Prettier on three Phase 7O files.
-- A controlled diagnostic used repository Prettier `3.9.6` to determine the exact mechanical formatting changes.
-- CI `#195` confirmed JavaScript, translations, provider smoke, ESLint and unit tests were green; only the formatting check failed on the diagnostic head.
-- Final mechanical formatting was applied to `events-page-copy.js`, `events-page.jsx`, and `events-page.test.jsx`.
+- CI `#199` failed strict JavaScript because normalized provider text arrays were inferred as `(string | null)[]`; `textArray(...)` was changed to use an explicitly typed `string[]` accumulator without changing runtime/provider behavior.
+- CI `#200` then exposed an integration guard: the new `news` route had not yet been added to `DESTINATION_CHILD_SEGMENTS`. The allowlist was corrected and the route-contract test now explicitly covers the News child route.
+- CI `#202` passed JavaScript, translations, provider smoke tests, ESLint, unit tests, PostgreSQL/Prisma, dependency/secret checks, live no-cost-provider checks, and the production build; its remaining code-quality failure was only repository Prettier on three Phase 7P files.
+- A controlled temporary formatter diagnostic used repository Prettier `3.9.6` to obtain the exact mechanical formatting diff for `news-page-copy.js`, `news-page.jsx`, and `news-page.test.jsx`.
+- CI `#203` confirmed all functional checks and tests were green on the diagnostic head; its formatting failure was intentional so the exact formatter diff could be captured.
+- The exact mechanical Prettier output was then applied to those three Phase 7P files.
 - Root `package.json` is restored to the normal script: `"format:check": "prettier --check ."`.
-- No temporary formatter diagnostic command may be merged.
+- No temporary formatter diagnostic command remains in the intended final branch state.
 
-Clean Phase 7O code checkpoint before this handoff update:
+Clean Phase 7P code checkpoint before this handoff update:
 
-`21c920ccec6f1bf9376513d3179372eaab82c79a`
+`b4b01bcaf0fbc744567a063fc9eccaab5f3f2bcd`
 
-PR CI `#196` on that checkpoint passed all five top-level jobs:
+PR CI `#207` on that exact clean code checkpoint passed all five top-level jobs:
 
 - Code quality and unit tests
 - PostgreSQL and Prisma verification
@@ -123,9 +129,9 @@ PR CI `#196` on that checkpoint passed all five top-level jobs:
 - Live no-cost provider checks
 - Dependency and secret checks
 
-The code-quality job passed environment validation, Prisma generation, strict JavaScript, translations, provider smoke tests, ESLint, unit tests, and the normal repository-wide Prettier check.
+The code-quality job passed environment validation, Prisma generation, strict JavaScript, translations, provider smoke tests, ESLint, all unit tests, and the normal repository-wide Prettier check.
 
-This documentation update creates a newer PR head. Do not merge PR `#15` based only on CI `#196`; require a new complete green CI run on the exact final head containing this handoff update.
+This documentation update creates a newer PR head. Do not merge PR `#16` based only on CI `#207`; require a new complete green CI run on the exact final head containing this handoff update.
 
 ## Live-provider verification status
 
@@ -143,7 +149,7 @@ Keyed provider checks may be skipped when their GitHub Actions secrets are not c
 - Pexels (`PEXELS_API_KEY`)
 - Resend where applicable
 
-Therefore Phase 7O has adapter/API/UI/test and production-build coverage, but **do not claim a real Ticketmaster network request was verified by GitHub CI** unless `TICKETMASTER_API_KEY` is configured and the live-provider job actually confirms it.
+Therefore Phase 7P has adapter/API/UI/test and production-build coverage, but **do not claim a real NewsData network request was verified by GitHub CI** unless `NEWSDATA_API_KEY` is configured and the live-provider job actually confirms it.
 
 A passing live-provider job does not by itself prove keyed-provider networking when the relevant secret is absent.
 
@@ -151,21 +157,21 @@ Safety remains database-backed verified reference data, not an AI-generated fact
 
 ## Immediate next engineering step
 
-Finish Phase 7O safely:
+Finish Phase 7P safely:
 
-1. Require complete green GitHub CI on the exact final head of PR `#15` after this handoff update.
+1. Require complete green GitHub CI on the exact final head of PR `#16` after this handoff update.
 2. Fix any real failure without weakening CI.
-3. Recheck PR `#15`:
+3. Recheck PR `#16`:
    - base is `develop`
-   - head is `feature/phase-7o-destination-events`
+   - head is `feature/phase-7p-destination-news`
    - PR is mergeable
    - all checks are green on the exact current head
-4. Merge PR `#15` into `develop` using the normal merge method and expected-head SHA protection.
+4. Merge PR `#16` into `develop` using the normal merge method and expected-head SHA protection.
 5. Verify `develop` points to the resulting merge commit.
 6. Verify the resulting `develop` push CI is fully green across all five top-level jobs.
-7. Only then mark Phase 7O complete and choose/start the next phase from that exact verified `develop` commit.
+7. Only then mark Phase 7P complete and choose/start the next coherent phase from that exact verified `develop` commit.
 
-Do not create a new Phase 7O branch and do not redo completed Phase 7O work.
+Do not create another Phase 7P branch and do not redo completed Phase 7P work.
 
 ## Product constraints that must not be forgotten
 
