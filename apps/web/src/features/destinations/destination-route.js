@@ -1,5 +1,6 @@
 const DESTINATION_CHILD_SEGMENTS = new Set([
   'airports',
+  'atms',
   'attractions',
   'beaches',
   'currency',
