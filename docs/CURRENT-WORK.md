@@ -17,7 +17,7 @@ This file is the permanent handoff point for continuing development safely in a 
 - AttraVoya is budget-first: a traveller can enter the total budget, origin, dates/flexibility, travellers/children, interests, comfort level, accommodation preferences, and preferred currency, then receive feasible plans that stay within that budget.
 - Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
 - Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, police response availability, accommodation inventory, attraction availability, café facts, or provider results.
-- Clearly distinguish provider-returned facts from estimates or static reference data. Future planner estimates must retain explicit provenance.
+- Clearly distinguish provider-returned facts from estimates, planning targets, or static reference data. Future planner estimates must retain explicit provenance.
 - Keep provider credentials server-side.
 - Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
 - Keep public travel data honest when provider keys are absent: show unavailable/empty states rather than fabricated content.
@@ -123,68 +123,87 @@ This file is the permanent handoff point for continuing development safely in a 
 - Cross-user request access resolves as 404 rather than leaking existence.
 - Phase 7Z intentionally did not invent destination recommendations, prices, availability, or budget allocations.
 
-## Current phase
-
 ### Phase 8A — Budget Planner Web Request Flow
 
-Branch: `feature/phase-8a-budget-planner-web-flow`
+- PR #27 merged into `develop`.
+- Final PR head: `bfa7f232d2c89d5c9cf14f2ddeb5f66a73ba3bb1`.
+- Final PR CI #299 passed all five top-level jobs.
+- Squash merge commit: `33012b6b9fa2035de1b10c0698d08b542e1740b9`.
+- Post-merge `develop` CI #300 passed all five top-level jobs on that exact merge SHA.
+- Replaced the `/trips` placeholder with the first real authenticated budget-planner workflow.
+- Collects origin, fixed/flexible dates, stay length, total budget/currency, safety reserve, adults/children ages, interests, comfort level, broad lodging preferences, and family-friendly preference.
+- Uses shared browser validation while the server remains authoritative.
+- Loads and saves owner-scoped private planning briefs with loading, empty, authentication, unavailable/error, retry, saving, success, and validation states.
+- Uses same-site cookie authentication; no second browser token store was introduced.
+- Responsive UI uses existing design tokens, Lucide icons, reduced-motion support, and planner copy for all 18 supported UI locales.
+- Phase 8A intentionally does not generate destination recommendations, fares, accommodation prices/inventory, availability, or budget allocations.
 
-PR: #27 — `Phase 8A: budget planner web request flow`
+## Current phase
 
-Base checkpoint: `5fcd174a252913e1f0aa6ba47e5b3057518531fd` — verified Phase 7Z `develop` merge.
+### Phase 8B — Deterministic Budget Allocation Envelope
+
+Branch: `feature/phase-8b-budget-allocation-envelope`
+
+PR: #28 — `Phase 8B: deterministic budget allocation envelope`
+
+Base checkpoint: `33012b6b9fa2035de1b10c0698d08b542e1740b9` — verified Phase 8A `develop` merge with post-merge CI #300 green.
 
 Reason for this phase:
 
-- The secure planner-request API now exists, but `/trips` was still a placeholder.
-- Phase 8A turns that route into the first real budget-first traveller workflow while keeping recommendation generation and price claims out until provenance-aware planning exists.
-- Provider-search IDs are not treated as persisted internal destination IDs. Open-destination requests therefore remain genuinely open instead of fabricating database references.
+- The traveller can now save a real planning brief, but AttraVoya still needs a transparent budget envelope before recommendation ranking or provider pricing is introduced.
+- The existing Prisma domain already has `TravelPlanRecommendation`, versioned `BudgetPlan`, `BudgetLine`, pricing basis, confidence, and fit-status structures for later provider-backed planning.
+- `BudgetPlan` currently belongs to a recommendation or trip rather than directly to a planning request, so Phase 8B deliberately derives a request-owned envelope instead of forcing planning targets into price-estimate persistence prematurely.
+- The Prisma migration directory currently contains only `.gitkeep`; this slice therefore makes no schema or migration change.
 
 Implemented:
 
-- Replaced the `/trips` placeholder with a real budget planner form.
-- Collects origin label, fixed or flexible dates, minimum/maximum nights, total budget, preferred currency, safety reserve, adults, children ages, interests, comfort level, lodging types, and family-friendly preference.
-- Uses shared `createBudgetPlanRequestSchema` in the browser before submission while keeping the server authoritative.
-- Persists planning briefs through the authenticated shared API client and the Phase 7Z backend endpoints.
-- Loads the signed-in traveller's recent private planning briefs.
-- Includes loading, empty, authentication, unavailable/error, retry, saving, success, and validation states.
-- A 401 presents a sign-in action rather than exposing API internals.
-- Uses same-site cookie authentication; no second browser token store was introduced.
-- Responsive UI uses existing design tokens, Lucide icons, and reduced-motion support.
-- Planner copy exists for all 18 supported UI locales with invariant option vocabulary safely falling back to English where appropriate.
-- Focused tests cover honest rendering, exact fixed-date submission, client validation before persistence, authentication handling, private draft loading, outage retry, and absence of invented recommendation/price claims.
+- Added protected `GET /api/v1/planner/requests/:requestId/allocation`.
+- Reuses owner-scoped `findOwnedRequestById`; another traveller receives 404 rather than existence disclosure.
+- Allocation responses use `Cache-Control: private, no-store` because they are derived from private budget/travel intent.
+- Added a pure deterministic allocation engine using integer money math for stable two-decimal totals.
+- Takes the traveller's saved safety-reserve percentage from the total budget first, then allocates only the remaining spendable budget.
+- Versioned planning policy key: `attravoya-budget-envelope-v1`, policy version `1`.
+- Spendable-budget targets are deliberately transparent product heuristics:
+  - Flights: 30%
+  - Accommodation: 32%
+  - Food: 15%
+  - Local transport: 8%
+  - Activities: 7%
+  - Children's activities: 3%
+  - Airport transfer: 3%
+  - Travel insurance: 2%
+- When no children are present, the 3% children's-activity target is set to zero and moved to general activities, making activities 10% while preserving the exact spendable total.
+- Integer-cent rounding remainder is assigned deterministically to accommodation so all target amounts always add back to the exact spendable budget.
+- The API labels the reserve as `USER_INPUT_DERIVED` and category allocations as `PLANNING_TARGET`.
+- Provenance explicitly states `liveDataUsed: false` and `providerDataUsed: false`.
+- Shared API client exposes `getBudgetAllocation(requestId)` and URL-encodes the request ID.
+- Focused server/API-client tests verify exact allocation totals, child/no-child behavior, authentication, owner isolation, private caching, provenance, and encoded request IDs.
 
-Deliberate boundary:
+Data-honesty boundary:
 
-- Phase 8A stores and reviews a traveller's private planning brief only.
-- It does not generate destination recommendations.
-- It does not claim flight fares, accommodation prices/inventory, attraction prices, availability, or live budget feasibility.
-- It does not yet allocate the total budget across flights, accommodation, food, local transport, activities, children's activities, airport transfers, or contingency reserve.
-- The next planner slice should add a deterministic budget envelope/allocation foundation with explicit estimate/provenance semantics before any recommendation-ranking logic.
+- These amounts divide only the traveller's own entered budget after their chosen safety reserve.
+- They are not fares, prices, quotes, availability, or destination-specific cost estimates.
+- Phase 8B does not call flight, accommodation, activity, transport, or other pricing providers.
+- Phase 8B does not persist these planning targets as `BudgetLine` price estimates because the database pricing-basis semantics are reserved for later provenance-aware recommendation/trip planning.
+- Future provider-backed costs must be compared against these targets and retain their own live/verified/estimate provenance rather than silently replacing the distinction.
 
 Verification history:
 
-- Initial implementation CI exposed strict-JavaScript state-inference problems (`never[]` draft inference and an overly narrow lodging array). These were fixed with explicit JavaScript/JSDoc domain types; no `any` escape or type-check weakening was used.
-- CI #291 then reached ESLint and identified `react-hooks/set-state-in-effect` violations. The planner was restructured rather than disabling the rule: currency starts from the server-provided default, and initial draft state changes occur from the asynchronous API completion path while retry behavior remains intact.
-- Functional head `5cf3380fe49c5b012a8cac5abd8b8c6c61d5a51f` ran CI #292. Production build, PostgreSQL/Prisma, dependency/secret, live no-cost-provider checks, strict JavaScript, translations, provider smoke, ESLint, and all tests passed. Only repository-wide Prettier failed on three Phase 8A files.
-- Temporary formatter diagnostics #293, #294, #295, and formatter-recovery #296 were branch-only diagnostic runs and are not valid merge candidates. They were used only to capture/apply exact Prettier 3.9.6 output.
-- Exact Prettier output was applied to `budget-planner-copy.js`, `budget-planner-page.jsx`, and `budget-planner-page.test.jsx` without changing planner behavior.
-- All temporary formatter/CI diagnostic configuration was removed.
-- Root `package.json` is restored byte-for-byte to canonical blob `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c` with `"format:check": "prettier --check ."`.
-- `.github/workflows/ci.yml` is restored byte-for-byte to canonical blob `31c6b4a781f69852eaeeb2fe5fe115b265feedc8`.
-- Clean Phase 8A diff against the base contains exactly five intended files: `/trips` route, planner copy, planner component, planner CSS, and planner tests.
-- Clean-code checkpoint: `a73dd8c2676f22e819a6c618b0f8d9dc1f4bd291`.
-- Clean-code PR CI #298 on exact head `a73dd8c2676f22e819a6c618b0f8d9dc1f4bd291` passed all five top-level CI jobs, including 133 web tests and canonical repository-wide Prettier.
+- Initial implementation head `05ed2ba30b48479122671d96867fe7b9438fa768` opened PR #28 and ran CI #301. PostgreSQL/Prisma and dependency/secret checks passed; code quality stopped at strict JavaScript before tests/Prettier because frozen literal target weights produced narrow numeric types and `.find()` targets were considered possibly undefined.
+- Strict-JavaScript fix head `b2279ba35e8909ba03c3ab3dd3f86fb715641cce` replaced mutable `.find()` logic with explicit numeric planning weights and a category-based rounding pass. CI #302 passed strict JavaScript, translations, provider smoke, PostgreSQL/Prisma, dependency/secret, and live-provider checks. ESLint then rejected the decimal parser regex under `security/detect-unsafe-regex`; tests and Prettier correctly did not run after lint failed.
+- Security/lint fix head `303e7d0ea1e90680e455bbe9bfd3eef4c9090f9b` removed the regex entirely and uses bounded character-by-character decimal validation instead.
+- Clean-code PR CI #303 on exact head `303e7d0ea1e90680e455bbe9bfd3eef4c9090f9b` passed all five top-level CI jobs, including strict JavaScript, translations, provider smoke, ESLint, all unit tests, repository-wide Prettier, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks.
 
 ### Required next steps
 
-1. This handoff update changes PR #27's head. Run the complete five-job PR CI on the exact new documentation head.
+1. This handoff update changes PR #28's head. Run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` remains canonical with `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical workflow.
-3. Verify PR #27 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #27 using expected-head protection.
+3. Verify PR #28 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #28 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
 7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
-8. Best next product direction: deterministic budget-envelope/allocation logic with explicit estimate/provenance semantics before recommendation ranking or any live-price claim.
+8. Best next product direction: Phase 8C should expose the verified allocation envelope in the `/trips` UI with localized category labels, clear planning-target/provenance wording, and loading/error/retry/auth states. Do not present targets as live or estimated market prices, and do not start recommendation ranking until that distinction is safely visible to users.
 
 ## CI interpretation rule
 
