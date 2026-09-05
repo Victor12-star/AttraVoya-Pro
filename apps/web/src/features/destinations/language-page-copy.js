@@ -10,7 +10,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     languagesTitle: 'Languages used in the destination country',
     official: 'Official',
     common: 'Common',
-    noLanguages: 'AttraVoya does not have destination-language reference data for this country yet.',
+    noLanguages:
+      'AttraVoya does not have destination-language reference data for this country yet.',
     referenceUnavailable: 'Destination-language reference data could not be loaded right now.',
     translatorTitle: 'Machine translation helper',
     translatorIntro:
@@ -82,7 +83,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Traducción automática',
     provider: 'Proveedor de traducción',
     fetchedAt: 'Proveedor comprobado',
-    supportUnavailable: 'No se pudo comprobar ahora la compatibilidad de idiomas de traducción automática.',
+    supportUnavailable:
+      'No se pudo comprobar ahora la compatibilidad de idiomas de traducción automática.',
     unsupported:
       'El proveedor de traducción automática configurado no admite actualmente ninguno de los idiomas del destino indicados.',
     invalidText: 'Introduce entre 1 y 3.000 caracteres antes de traducir.',
@@ -100,8 +102,10 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     languagesTitle: 'Langues utilisées dans le pays de destination',
     official: 'Officielle',
     common: 'Courante',
-    noLanguages: 'AttraVoya ne dispose pas encore de données linguistiques de référence pour ce pays.',
-    referenceUnavailable: 'Les données linguistiques de référence ne peuvent pas être chargées actuellement.',
+    noLanguages:
+      'AttraVoya ne dispose pas encore de données linguistiques de référence pour ce pays.',
+    referenceUnavailable:
+      'Les données linguistiques de référence ne peuvent pas être chargées actuellement.',
     translatorTitle: 'Aide de traduction automatique',
     translatorIntro:
       'Traduisez une courte phrase vers une langue de destination prise en charge. La traduction automatique peut être inexacte et ne constitue pas une source officielle.',
@@ -112,11 +116,13 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Traduction automatique',
     provider: 'Fournisseur de traduction',
     fetchedAt: 'Fournisseur vérifié',
-    supportUnavailable: 'La prise en charge linguistique du fournisseur ne peut pas être vérifiée actuellement.',
+    supportUnavailable:
+      'La prise en charge linguistique du fournisseur ne peut pas être vérifiée actuellement.',
     unsupported:
       'Le fournisseur de traduction automatique configuré ne prend actuellement en charge aucune des langues de destination répertoriées.',
     invalidText: 'Saisissez entre 1 et 3 000 caractères avant de traduire.',
-    translationUnavailable: 'La traduction n’a pas pu être chargée. Aucune traduction n’a été inventée.',
+    translationUnavailable:
+      'La traduction n’a pas pu être chargée. Aucune traduction n’a été inventée.',
     privacy:
       'Le texte saisi par le voyageur est envoyé via AttraVoya au fournisseur configuré et n’est pas mis en cache par cette route de traduction.',
     detectedLanguage: 'Langue source détectée',
@@ -142,11 +148,13 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Maschinelle Übersetzung',
     provider: 'Übersetzungsanbieter',
     fetchedAt: 'Anbieter geprüft',
-    supportUnavailable: 'Die Sprachunterstützung für maschinelle Übersetzung kann derzeit nicht geprüft werden.',
+    supportUnavailable:
+      'Die Sprachunterstützung für maschinelle Übersetzung kann derzeit nicht geprüft werden.',
     unsupported:
       'Der konfigurierte Anbieter unterstützt derzeit keine der aufgeführten Zielsprachen.',
     invalidText: 'Gib vor dem Übersetzen zwischen 1 und 3.000 Zeichen ein.',
-    translationUnavailable: 'Die Übersetzung konnte nicht geladen werden. Es wurde keine Übersetzung erfunden.',
+    translationUnavailable:
+      'Die Übersetzung konnte nicht geladen werden. Es wurde keine Übersetzung erfunden.',
     privacy:
       'Vom Reisenden eingegebener Text wird über AttraVoya an den konfigurierten Anbieter gesendet und von dieser Übersetzungsroute nicht zwischengespeichert.',
     detectedLanguage: 'Erkannte Ausgangssprache',
@@ -160,8 +168,10 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     languagesTitle: 'Lingue usate nel paese di destinazione',
     official: 'Ufficiale',
     common: 'Comune',
-    noLanguages: 'AttraVoya non dispone ancora di dati linguistici di riferimento per questo paese.',
-    referenceUnavailable: 'I dati linguistici di riferimento non possono essere caricati al momento.',
+    noLanguages:
+      'AttraVoya non dispone ancora di dati linguistici di riferimento per questo paese.',
+    referenceUnavailable:
+      'I dati linguistici di riferimento non possono essere caricati al momento.',
     translatorTitle: 'Aiuto per la traduzione automatica',
     translatorIntro:
       'Traduci una breve frase in una lingua della destinazione supportata. La traduzione automatica può essere imprecisa e non è una fonte linguistica ufficiale.',
@@ -172,11 +182,13 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Traduzione automatica',
     provider: 'Fornitore di traduzione',
     fetchedAt: 'Fornitore controllato',
-    supportUnavailable: 'Il supporto linguistico della traduzione automatica non può essere controllato al momento.',
+    supportUnavailable:
+      'Il supporto linguistico della traduzione automatica non può essere controllato al momento.',
     unsupported:
       'Il fornitore di traduzione automatica configurato non supporta attualmente nessuna delle lingue della destinazione elencate.',
     invalidText: 'Inserisci tra 1 e 3.000 caratteri prima di tradurre.',
-    translationUnavailable: 'Impossibile caricare la traduzione. Non è stata inventata alcuna traduzione.',
+    translationUnavailable:
+      'Impossibile caricare la traduzione. Non è stata inventata alcuna traduzione.',
     privacy:
       'Il testo inserito dal viaggiatore viene inviato tramite AttraVoya al fornitore configurato e non viene memorizzato nella cache da questa rotta di traduzione.',
     detectedLanguage: 'Lingua di origine rilevata',
@@ -202,7 +214,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Tradução automática',
     provider: 'Fornecedor de tradução',
     fetchedAt: 'Fornecedor verificado',
-    supportUnavailable: 'Não foi possível verificar agora o suporte de idiomas da tradução automática.',
+    supportUnavailable:
+      'Não foi possível verificar agora o suporte de idiomas da tradução automática.',
     unsupported:
       'O fornecedor de tradução automática configurado não suporta atualmente nenhum dos idiomas do destino listados.',
     invalidText: 'Introduza entre 1 e 3.000 caracteres antes de traduzir.',
@@ -262,7 +275,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     machineTranslation: 'Machinevertaling',
     provider: 'Vertaalprovider',
     fetchedAt: 'Provider gecontroleerd',
-    supportUnavailable: 'Ondersteuning voor machinevertaaltalen kan momenteel niet worden gecontroleerd.',
+    supportUnavailable:
+      'Ondersteuning voor machinevertaaltalen kan momenteel niet worden gecontroleerd.',
     unsupported:
       'De ingestelde machinevertaalprovider ondersteunt momenteel geen van de vermelde bestemmingstalen.',
     invalidText: 'Voer vóór het vertalen tussen 1 en 3.000 tekens in.',
@@ -423,8 +437,7 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
   zh: {
     eyebrow: '语言',
     title: '{destination}的语言',
-    intro:
-      '查看真实的目的地语言参考数据，并在已配置的提供商支持目的地语言时使用可选的机器翻译。',
+    intro: '查看真实的目的地语言参考数据，并在已配置的提供商支持目的地语言时使用可选的机器翻译。',
     back: '返回目的地',
     languagesTitle: '目的地国家使用的语言',
     official: '官方',
@@ -444,7 +457,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     unsupported: '已配置的机器翻译提供商目前不支持任何列出的目的地语言。',
     invalidText: '翻译前请输入 1 到 3,000 个字符。',
     translationUnavailable: '无法加载翻译。系统没有编造翻译。',
-    privacy: '旅行者输入的文本会通过 AttraVoya 发送到已配置的翻译提供商，此翻译路由不会缓存该文本。',
+    privacy:
+      '旅行者输入的文本会通过 AttraVoya 发送到已配置的翻译提供商，此翻译路由不会缓存该文本。',
     detectedLanguage: '检测到的源语言',
   },
   ja: {
@@ -527,7 +541,8 @@ const LANGUAGE_PAGE_COPY = Object.freeze({
     provider: 'अनुवाद प्रदाता',
     fetchedAt: 'प्रदाता जाँच समय',
     supportUnavailable: 'मशीन अनुवाद की भाषा सहायता अभी जाँची नहीं जा सकी।',
-    unsupported: 'कॉन्फ़िगर किया गया मशीन अनुवाद प्रदाता अभी सूचीबद्ध किसी भी गंतव्य भाषा का समर्थन नहीं करता।',
+    unsupported:
+      'कॉन्फ़िगर किया गया मशीन अनुवाद प्रदाता अभी सूचीबद्ध किसी भी गंतव्य भाषा का समर्थन नहीं करता।',
     invalidText: 'अनुवाद से पहले 1 से 3,000 अक्षर दर्ज करें।',
     translationUnavailable: 'अनुवाद लोड नहीं हो सका। कोई अनुवाद गढ़ा नहीं गया।',
     privacy:
