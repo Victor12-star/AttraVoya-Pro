@@ -17,7 +17,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   sv: {
     eyebrow: 'Flygplatser',
     title: 'Flygplatser nära {destination}',
-    intro: 'Utforska flygplatser som den konfigurerade platsleverantören returnerar nära destinationen.',
+    intro:
+      'Utforska flygplatser som den konfigurerade platsleverantören returnerar nära destinationen.',
     back: 'Tillbaka till destinationen',
     results: 'Flygplatser i närheten',
     noResults: 'Inga flygplatser hittades i sökområdet.',
@@ -30,7 +31,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   es: {
     eyebrow: 'Aeropuertos',
     title: 'Aeropuertos cerca de {destination}',
-    intro: 'Consulta aeropuertos devueltos por el proveedor de lugares configurado cerca de este destino.',
+    intro:
+      'Consulta aeropuertos devueltos por el proveedor de lugares configurado cerca de este destino.',
     back: 'Volver al destino',
     results: 'Aeropuertos cercanos',
     noResults: 'No se encontraron aeropuertos en esta zona de búsqueda.',
@@ -43,7 +45,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   fr: {
     eyebrow: 'Aéroports',
     title: 'Aéroports près de {destination}',
-    intro: 'Consultez les aéroports renvoyés par le fournisseur de lieux configuré près de cette destination.',
+    intro:
+      'Consultez les aéroports renvoyés par le fournisseur de lieux configuré près de cette destination.',
     back: 'Retour à la destination',
     results: 'Aéroports à proximité',
     noResults: 'Aucun aéroport n’a été trouvé dans cette zone de recherche.',
@@ -56,7 +59,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   de: {
     eyebrow: 'Flughäfen',
     title: 'Flughäfen nahe {destination}',
-    intro: 'Sieh dir Flughäfen an, die der konfigurierte Orteanbieter in der Nähe dieses Reiseziels zurückgibt.',
+    intro:
+      'Sieh dir Flughäfen an, die der konfigurierte Orteanbieter in der Nähe dieses Reiseziels zurückgibt.',
     back: 'Zurück zum Reiseziel',
     results: 'Flughäfen in der Nähe',
     noResults: 'In diesem Suchgebiet wurden keine Flughäfen gefunden.',
@@ -69,7 +73,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   it: {
     eyebrow: 'Aeroporti',
     title: 'Aeroporti vicino a {destination}',
-    intro: 'Consulta gli aeroporti restituiti dal fornitore di luoghi configurato vicino a questa destinazione.',
+    intro:
+      'Consulta gli aeroporti restituiti dal fornitore di luoghi configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     results: 'Aeroporti nelle vicinanze',
     noResults: 'Nessun aeroporto è stato trovato in questa area di ricerca.',
@@ -82,7 +87,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   pt: {
     eyebrow: 'Aeroportos',
     title: 'Aeroportos perto de {destination}',
-    intro: 'Consulte aeroportos devolvidos pelo fornecedor de locais configurado perto deste destino.',
+    intro:
+      'Consulte aeroportos devolvidos pelo fornecedor de locais configurado perto deste destino.',
     back: 'Voltar ao destino',
     results: 'Aeroportos próximos',
     noResults: 'Não foram encontrados aeroportos nesta área de pesquisa.',
@@ -95,7 +101,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   pl: {
     eyebrow: 'Lotniska',
     title: 'Lotniska w pobliżu {destination}',
-    intro: 'Przeglądaj lotniska zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj lotniska zwrócone przez skonfigurowanego dostawcę miejsc w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     results: 'Lotniska w pobliżu',
     noResults: 'W tym obszarze wyszukiwania nie znaleziono lotnisk.',
@@ -108,7 +115,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   nl: {
     eyebrow: 'Luchthavens',
     title: 'Luchthavens bij {destination}',
-    intro: 'Bekijk luchthavens die door de ingestelde plaatsenprovider in de buurt van deze bestemming worden teruggegeven.',
+    intro:
+      'Bekijk luchthavens die door de ingestelde plaatsenprovider in de buurt van deze bestemming worden teruggegeven.',
     back: 'Terug naar bestemming',
     results: 'Luchthavens in de buurt',
     noResults: 'Er zijn geen luchthavens gevonden in dit zoekgebied.',
@@ -121,7 +129,7 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   no: {
     eyebrow: 'Flyplasser',
     title: 'Flyplasser nær {destination}',
-    intro: 'Se flyplasser som den konfigurerte stedsleverandøren returnerer nær dette reisemålet.',
+    intro: 'Se flyplasser som den konfigurerte stedsleverantøren returnerer nær dette reisemålet.',
     back: 'Tilbake til reisemålet',
     results: 'Flyplasser i nærheten',
     noResults: 'Ingen flyplasser ble funnet i dette søkeområdet.',
@@ -160,7 +168,8 @@ const AIRPORTS_PAGE_COPY = Object.freeze({
   tr: {
     eyebrow: 'Havalimanları',
     title: '{destination} yakınındaki havalimanları',
-    intro: 'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında döndürdüğü havalimanlarını görüntüleyin.',
+    intro:
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında döndürdüğü havalimanlarını görüntüleyin.',
     back: 'Hedefe dön',
     results: 'Yakındaki havalimanları',
     noResults: 'Bu arama alanında havalimanı bulunamadı.',

@@ -265,7 +265,11 @@ export function AirportsDestinationPage({ destination, locale = 'en', messages }
             <Plane size={28} aria-hidden="true" />
             <strong>{messages.common.unavailable}</strong>
             <span>{copy.unavailable}</span>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>
@@ -276,7 +280,11 @@ export function AirportsDestinationPage({ destination, locale = 'en', messages }
           <div className={styles.feedback} role="status">
             <MapPin size={28} aria-hidden="true" />
             <span>{copy.noResults}</span>
-            <button className="button button--secondary button--compact" type="button" onClick={retry}>
+            <button
+              className="button button--secondary button--compact"
+              type="button"
+              onClick={retry}
+            >
               <RefreshCw size={15} aria-hidden="true" />
               {messages.common.retry}
             </button>
