@@ -4,7 +4,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   en: {
     eyebrow: 'Hospitals',
     title: 'Hospitals near {destination}',
-    intro: 'Browse places categorized as hospitals by the configured places provider near this destination.',
+    intro:
+      'Browse places categorized as hospitals by the configured places provider near this destination.',
     back: 'Back to destination',
     results: 'Nearby hospitals',
     noResults: 'No hospitals were found in this search area.',
@@ -18,7 +19,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   sv: {
     eyebrow: 'Sjukhus',
     title: 'Sjukhus nära {destination}',
-    intro: 'Se platser som den konfigurerade platsleverantören kategoriserar som sjukhus nära destinationen.',
+    intro:
+      'Se platser som den konfigurerade platsleverantören kategoriserar som sjukhus nära destinationen.',
     back: 'Tillbaka till destinationen',
     results: 'Sjukhus i närheten',
     noResults: 'Inga sjukhus hittades i sökområdet.',
@@ -32,7 +34,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   es: {
     eyebrow: 'Hospitales',
     title: 'Hospitales cerca de {destination}',
-    intro: 'Consulta lugares que el proveedor configurado clasifica como hospitales cerca de este destino.',
+    intro:
+      'Consulta lugares que el proveedor configurado clasifica como hospitales cerca de este destino.',
     back: 'Volver al destino',
     results: 'Hospitales cercanos',
     noResults: 'No se encontraron hospitales en esta zona de búsqueda.',
@@ -46,7 +49,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   fr: {
     eyebrow: 'Hôpitaux',
     title: 'Hôpitaux près de {destination}',
-    intro: 'Consultez les lieux classés comme hôpitaux par le fournisseur configuré près de cette destination.',
+    intro:
+      'Consultez les lieux classés comme hôpitaux par le fournisseur configuré près de cette destination.',
     back: 'Retour à la destination',
     results: 'Hôpitaux à proximité',
     noResults: 'Aucun hôpital n’a été trouvé dans cette zone de recherche.',
@@ -60,7 +64,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   de: {
     eyebrow: 'Krankenhäuser',
     title: 'Krankenhäuser nahe {destination}',
-    intro: 'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Krankenhäuser einordnet.',
+    intro:
+      'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Krankenhäuser einordnet.',
     back: 'Zurück zum Reiseziel',
     results: 'Krankenhäuser in der Nähe',
     noResults: 'In diesem Suchgebiet wurden keine Krankenhäuser gefunden.',
@@ -74,7 +79,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   it: {
     eyebrow: 'Ospedali',
     title: 'Ospedali vicino a {destination}',
-    intro: 'Consulta i luoghi classificati come ospedali dal fornitore configurato vicino a questa destinazione.',
+    intro:
+      'Consulta i luoghi classificati come ospedali dal fornitore configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     results: 'Ospedali nelle vicinanze',
     noResults: 'Nessun ospedale è stato trovato in questa area di ricerca.',
@@ -88,7 +94,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   pt: {
     eyebrow: 'Hospitais',
     title: 'Hospitais perto de {destination}',
-    intro: 'Consulte locais classificados como hospitais pelo fornecedor configurado perto deste destino.',
+    intro:
+      'Consulte locais classificados como hospitais pelo fornecedor configurado perto deste destino.',
     back: 'Voltar ao destino',
     results: 'Hospitais próximos',
     noResults: 'Não foram encontrados hospitais nesta área de pesquisa.',
@@ -102,7 +109,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   pl: {
     eyebrow: 'Szpitale',
     title: 'Szpitale w pobliżu {destination}',
-    intro: 'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako szpitale w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako szpitale w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     results: 'Szpitale w pobliżu',
     noResults: 'W tym obszarze wyszukiwania nie znaleziono szpitali.',
@@ -116,7 +124,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   nl: {
     eyebrow: 'Ziekenhuizen',
     title: 'Ziekenhuizen bij {destination}',
-    intro: 'Bekijk plaatsen die de ingestelde locatiesprovider als ziekenhuis classificeert nabij deze bestemming.',
+    intro:
+      'Bekijk plaatsen die de ingestelde locatiesprovider als ziekenhuis classificeert nabij deze bestemming.',
     back: 'Terug naar bestemming',
     results: 'Ziekenhuizen in de buurt',
     noResults: 'Er zijn geen ziekenhuizen gevonden in dit zoekgebied.',
@@ -130,7 +139,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   no: {
     eyebrow: 'Sykehus',
     title: 'Sykehus nær {destination}',
-    intro: 'Se steder som den konfigurerte stedsleverandøren kategoriserer som sykehus nær dette reisemålet.',
+    intro:
+      'Se steder som den konfigurerte stedsleverandøren kategoriserer som sykehus nær dette reisemålet.',
     back: 'Tilbake til reisemålet',
     results: 'Sykehus i nærheten',
     noResults: 'Ingen sykehus ble funnet i dette søkeområdet.',
@@ -144,7 +154,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   da: {
     eyebrow: 'Hospitaler',
     title: 'Hospitaler nær {destination}',
-    intro: 'Se steder, som den konfigurerede stedudbyder kategoriserer som hospitaler nær denne destination.',
+    intro:
+      'Se steder, som den konfigurerede stedudbyder kategoriserer som hospitaler nær denne destination.',
     back: 'Tilbage til destinationen',
     results: 'Hospitaler i nærheden',
     noResults: 'Der blev ikke fundet hospitaler i dette søgeområde.',
@@ -158,7 +169,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   fi: {
     eyebrow: 'Sairaalat',
     title: 'Sairaalat lähellä kohdetta {destination}',
-    intro: 'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee sairaaloiksi tämän kohteen lähellä.',
+    intro:
+      'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee sairaaloiksi tämän kohteen lähellä.',
     back: 'Takaisin kohteeseen',
     results: 'Lähellä olevat sairaalat',
     noResults: 'Tältä hakualueelta ei löytynyt sairaaloita.',
@@ -172,7 +184,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   tr: {
     eyebrow: 'Hastaneler',
     title: '{destination} yakınındaki hastaneler',
-    intro: 'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında hastane olarak sınıflandırdığı yerleri görüntüleyin.',
+    intro:
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında hastane olarak sınıflandırdığı yerleri görüntüleyin.',
     back: 'Hedefe dön',
     results: 'Yakındaki hastaneler',
     noResults: 'Bu arama alanında hastane bulunamadı.',
@@ -242,7 +255,8 @@ const HOSPITALS_PAGE_COPY = Object.freeze({
   hi: {
     eyebrow: 'अस्पताल',
     title: '{destination} के पास अस्पताल',
-    intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा अस्पताल के रूप में वर्गीकृत स्थान देखें।',
+    intro:
+      'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा अस्पताल के रूप में वर्गीकृत स्थान देखें।',
     back: 'गंतव्य पर वापस जाएँ',
     results: 'पास के अस्पताल',
     noResults: 'इस खोज क्षेत्र में कोई अस्पताल नहीं मिला।',
