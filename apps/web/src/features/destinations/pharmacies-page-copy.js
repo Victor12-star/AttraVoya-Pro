@@ -4,7 +4,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   en: {
     eyebrow: 'Pharmacies',
     title: 'Pharmacies near {destination}',
-    intro: 'Browse places categorized as pharmacies by the configured places provider near this destination.',
+    intro:
+      'Browse places categorized as pharmacies by the configured places provider near this destination.',
     back: 'Back to destination',
     results: 'Nearby pharmacies',
     noResults: 'No pharmacies were found in this search area.',
@@ -18,7 +19,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   sv: {
     eyebrow: 'Apotek',
     title: 'Apotek nära {destination}',
-    intro: 'Se platser som den konfigurerade platsleverantören kategoriserar som apotek nära destinationen.',
+    intro:
+      'Se platser som den konfigurerade platsleverantören kategoriserar som apotek nära destinationen.',
     back: 'Tillbaka till destinationen',
     results: 'Apotek i närheten',
     noResults: 'Inga apotek hittades i sökområdet.',
@@ -32,7 +34,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   es: {
     eyebrow: 'Farmacias',
     title: 'Farmacias cerca de {destination}',
-    intro: 'Consulta lugares que el proveedor configurado clasifica como farmacias cerca de este destino.',
+    intro:
+      'Consulta lugares que el proveedor configurado clasifica como farmacias cerca de este destino.',
     back: 'Volver al destino',
     results: 'Farmacias cercanas',
     noResults: 'No se encontraron farmacias en esta zona de búsqueda.',
@@ -46,7 +49,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   fr: {
     eyebrow: 'Pharmacies',
     title: 'Pharmacies près de {destination}',
-    intro: 'Consultez les lieux classés comme pharmacies par le fournisseur configuré près de cette destination.',
+    intro:
+      'Consultez les lieux classés comme pharmacies par le fournisseur configuré près de cette destination.',
     back: 'Retour à la destination',
     results: 'Pharmacies à proximité',
     noResults: 'Aucune pharmacie n’a été trouvée dans cette zone de recherche.',
@@ -60,7 +64,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   de: {
     eyebrow: 'Apotheken',
     title: 'Apotheken nahe {destination}',
-    intro: 'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Apotheken einordnet.',
+    intro:
+      'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Apotheken einordnet.',
     back: 'Zurück zum Reiseziel',
     results: 'Apotheken in der Nähe',
     noResults: 'In diesem Suchgebiet wurden keine Apotheken gefunden.',
@@ -74,7 +79,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   it: {
     eyebrow: 'Farmacie',
     title: 'Farmacie vicino a {destination}',
-    intro: 'Consulta i luoghi classificati come farmacie dal fornitore configurato vicino a questa destinazione.',
+    intro:
+      'Consulta i luoghi classificati come farmacie dal fornitore configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     results: 'Farmacie nelle vicinanze',
     noResults: 'Nessuna farmacia è stata trovata in questa area di ricerca.',
@@ -88,7 +94,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   pt: {
     eyebrow: 'Farmácias',
     title: 'Farmácias perto de {destination}',
-    intro: 'Consulte locais classificados como farmácias pelo fornecedor configurado perto deste destino.',
+    intro:
+      'Consulte locais classificados como farmácias pelo fornecedor configurado perto deste destino.',
     back: 'Voltar ao destino',
     results: 'Farmácias próximas',
     noResults: 'Não foram encontradas farmácias nesta área de pesquisa.',
@@ -102,7 +109,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   pl: {
     eyebrow: 'Apteki',
     title: 'Apteki w pobliżu {destination}',
-    intro: 'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako apteki w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako apteki w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     results: 'Apteki w pobliżu',
     noResults: 'W tym obszarze wyszukiwania nie znaleziono aptek.',
@@ -116,7 +124,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   nl: {
     eyebrow: 'Apotheken',
     title: 'Apotheken bij {destination}',
-    intro: 'Bekijk plaatsen die de ingestelde locatiesprovider als apotheek classificeert nabij deze bestemming.',
+    intro:
+      'Bekijk plaatsen die de ingestelde locatiesprovider als apotheek classificeert nabij deze bestemming.',
     back: 'Terug naar bestemming',
     results: 'Apotheken in de buurt',
     noResults: 'Er zijn geen apotheken gevonden in dit zoekgebied.',
@@ -130,7 +139,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   no: {
     eyebrow: 'Apotek',
     title: 'Apotek nær {destination}',
-    intro: 'Se steder som den konfigurerte stedsleverandøren kategoriserer som apotek nær dette reisemålet.',
+    intro:
+      'Se steder som den konfigurerte stedsleverandøren kategoriserer som apotek nær dette reisemålet.',
     back: 'Tilbake til reisemålet',
     results: 'Apotek i nærheten',
     noResults: 'Ingen apotek ble funnet i dette søkeområdet.',
@@ -144,7 +154,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   da: {
     eyebrow: 'Apoteker',
     title: 'Apoteker nær {destination}',
-    intro: 'Se steder, som den konfigurerede stedudbyder kategoriserer som apoteker nær denne destination.',
+    intro:
+      'Se steder, som den konfigurerede stedudbyder kategoriserer som apoteker nær denne destination.',
     back: 'Tilbage til destinationen',
     results: 'Apoteker i nærheden',
     noResults: 'Der blev ikke fundet apoteker i dette søgeområde.',
@@ -158,7 +169,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   fi: {
     eyebrow: 'Apteekit',
     title: 'Apteekit lähellä kohdetta {destination}',
-    intro: 'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee apteekeiksi tämän kohteen lähellä.',
+    intro:
+      'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee apteekeiksi tämän kohteen lähellä.',
     back: 'Takaisin kohteeseen',
     results: 'Lähellä olevat apteekit',
     noResults: 'Tältä hakualueelta ei löytynyt apteekkeja.',
@@ -172,7 +184,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   tr: {
     eyebrow: 'Eczaneler',
     title: '{destination} yakınındaki eczaneler',
-    intro: 'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında eczane olarak sınıflandırdığı yerleri görüntüleyin.',
+    intro:
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında eczane olarak sınıflandırdığı yerleri görüntüleyin.',
     back: 'Hedefe dön',
     results: 'Yakındaki eczaneler',
     noResults: 'Bu arama alanında eczane bulunamadı.',
@@ -242,7 +255,8 @@ const PHARMACIES_PAGE_COPY = Object.freeze({
   hi: {
     eyebrow: 'फार्मेसी',
     title: '{destination} के पास फार्मेसी',
-    intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा फार्मेसी के रूप में वर्गीकृत स्थान देखें।',
+    intro:
+      'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा फार्मेसी के रूप में वर्गीकृत स्थान देखें।',
     back: 'गंतव्य पर वापस जाएँ',
     results: 'पास की फार्मेसी',
     noResults: 'इस खोज क्षेत्र में कोई फार्मेसी नहीं मिली।',
