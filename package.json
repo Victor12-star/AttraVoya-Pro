@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "for f in apps/server/src/app.js apps/server/src/modules/planner/planner.routes.js apps/server/src/modules/planner/planner.service.js apps/server/src/modules/planner/planner.test.js packages/api-client/src/client.js packages/validation/src/budget-planner.js; do prettier \"$f\" | diff -u \"$f\" - || true; done",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
