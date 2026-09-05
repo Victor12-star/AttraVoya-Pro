@@ -14,13 +14,13 @@ This file is the permanent handoff point for continuing development safely in a 
 ## Product rules that must stay true
 
 - Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
-- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, prescription availability, pharmacist availability, museum exhibitions, ticket prices, accessibility, or provider results.
+- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, medical capabilities, waiting times, opening status, medication stock, prescription availability, pharmacist availability, police staffing/response availability, museum exhibitions, ticket prices, accessibility, or provider results.
 - Clearly distinguish provider-returned facts from estimates or static reference data.
 - Keep provider credentials server-side.
 - Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
 - Keep public travel data honest when provider keys are absent: show unavailable/empty states rather than fabricated content.
 - Keep all supported UI locales working, including Arabic RTL behavior.
-- Verified emergency contacts remain authoritative Safety data and must not be replaced by inferred place-provider medical information.
+- Verified emergency contacts remain authoritative Safety data and must not be replaced by inferred place-provider medical or police-service information.
 
 ## Completed integration checkpoints
 
@@ -64,51 +64,61 @@ This file is the permanent handoff point for continuing development safely in a 
 - It renders only supported normalized location facts and does not invent exhibitions, opening hours, ticket prices, accessibility, ratings, or availability.
 - `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
-## Current phase
-
 ### Phase 7T — Destination Pharmacies Discovery
 
-Branch: `feature/phase-7t-destination-pharmacies`
+- PR #20 merged into `develop`.
+- Final PR head: `dcce535733af7c13b0d135c86a220f55390f5b86`.
+- Final PR CI #241 passed all five jobs.
+- Squash merge commit: `173b79c783639e1ae1257a44e985ab10a3ec44db`.
+- Post-merge `develop` CI #242 passed all five jobs.
+- Pharmacy discovery uses the provider-neutral nearby places API and links to verified Safety & emergency contacts.
+- It does not invent or infer medication stock, prescription or pharmacist availability, opening status, medication prices, services, medical advice, or suitability for urgent care.
+- `GEOAPIFY_API_KEY` was absent in CI, so this is not live keyed Geoapify verification.
 
-PR: #20 — `Phase 7T: destination pharmacies discovery`
+## Current phase
 
-Base checkpoint: `787a598df2b99f7d2ded9be91cde32b54e339d74` — verified Phase 7S `develop` merge.
+### Phase 7U — Destination Police Stations Discovery
+
+Branch: `feature/phase-7u-destination-police`
+
+PR: #21 — `Phase 7U: destination police stations discovery`
+
+Base checkpoint: `173b79c783639e1ae1257a44e985ab10a3ec44db` — verified Phase 7T `develop` merge.
 
 Implemented:
 
-- `/destinations/[slug]/pharmacies` route.
-- Pharmacies entry point in the destination feature grid using the Lucide `Pill` icon.
-- `pharmacies` added to the strict destination child-route allowlist.
+- `/destinations/[slug]/police` route.
+- Police stations entry point in the destination feature grid using a Lucide shield icon.
+- `police` added to the strict destination child-route allowlist.
 - Reuses `apiClient.getNearbyPlaces(...)` and the existing provider-neutral places backend; browser code never calls Geoapify directly.
-- Uses `PLACE_CATEGORY_GROUPS.PHARMACIES` with a 10 km search radius, result limit of 20, destination coordinates, and the active UI locale.
-- Renders only normalized provider facts used by this slice: pharmacy/place name, formatted address, distance, provider/check time, and HTTPS website when present.
+- Uses `PLACE_CATEGORY_GROUPS.POLICE`, already mapped by the Geoapify adapter to `service.police`.
+- Uses a 15 km search radius, result limit of 20, destination coordinates, and the active UI locale.
+- Renders only normalized provider facts used by this slice: police-place name, formatted address, distance, provider/check time, and HTTPS website when present.
 - Rejects invalid coordinates, duplicate rows, mismatched countries, mismatched providers, and unsafe website URLs.
 - Links to the existing verified Safety & emergency route for authoritative emergency contacts.
-- Does not invent, infer, or display medication stock, prescription availability, pharmacist availability, opening status, medication prices, pharmacy services, medical advice, or suitability for urgent care, even if unexpected provider payload fields contain them.
+- Does not invent, infer, or display station type, opening status, staffing, response availability, phone availability, emergency handling, or walk-in availability, even if unexpected provider payload fields contain those values.
 - Honest loading, success, empty, provider-error, retry, and invalid-destination states.
 - Copy is provided for all 18 supported UI locales.
-- Focused tests cover the Pharmacy page, exact provider-neutral API request, medical-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
+- Focused tests cover the Police page, exact provider-neutral API request, unsupported police-service-field omission, country/provider filtering, HTTPS safety, empty state, error privacy, retry, invalid destination, strict child route, and destination dashboard entry point.
 
 Verification history:
 
-- Initial implementation/test head `1a3dd6677beb160c5a4ed814de8e846a54f9d872` ran CI #234. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only repository formatting flagged `apps/web/src/features/destinations/pharmacies-page-copy.js`.
-- Branch-only diagnostic head `074eb07c7213e9fe3bcd75a4706c80e15acc413f` ran CI #235 solely to capture Prettier 3.9.6 output. It showed mechanical line wrapping of long localized `intro` strings only. This diagnostic configuration is not merge-ready and must never be merged.
-- The exact wrapping was applied and root `package.json` restored to `"format:check": "prettier --check ."`; clean candidate `a9b59f58f36d150c4f51cee428ba569177acb72b` ran CI #237. All functional, build, database, security, provider, JavaScript, translation, lint, and unit tests passed, but Prettier still flagged only the same copy file.
-- Inspection showed the reconstructed copy file lacked Prettier's required final newline. A second branch-only diagnostic head `15d9c77a5d2fb21a1896d2fff86faafdeef4d2a7` was used only to inspect the remaining file-level difference and was superseded before becoming a merge candidate.
-- The final newline was added without changing localized text or behavior; root `package.json` was again restored to standard repository-wide `prettier --check .`.
-- Clean Phase 7T code checkpoint before this handoff update: `db0d6254cc01ab7cc215049b5ff020532536955c`.
-- CI #240 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and the complete unit-test suite.
-- `GEOAPIFY_API_KEY` is not configured in GitHub Actions. Provider smoke tests make no external API calls. Therefore Phase 7T must not be described as a live keyed Geoapify pharmacy request.
+- Initial implementation head `461a16c13b7c34d17dcb9f77ed6a02220eef789b` ran CI #243. Production build, database, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all unit tests passed; only Prettier flagged `apps/web/src/features/destinations/police-page.jsx`.
+- Branch-only diagnostic head `1c66f1c1f10defb12515171a74b34de62a915bf2` ran CI #244 solely to capture Prettier 3.9.6 output. The exact diff was one mechanical change: collapse the `normalizePolicePlaces(...)` call to one line. The diagnostic configuration must never be merged.
+- The exact formatting output was applied and root `package.json` restored to `"format:check": "prettier --check ."`.
+- Clean Phase 7U code checkpoint before this handoff update: `fba4b93afe388e95fea9230ea6085c23c8888c43`.
+- CI #246 on that clean checkpoint passed all five top-level jobs, including repository-wide Prettier, production builds, database verification, dependency/secret checks, live no-cost-provider checks, JavaScript, translations, ESLint, and 108 web unit tests.
+- `GEOAPIFY_API_KEY` is not configured in GitHub Actions. Provider smoke tests make no external API calls. Therefore Phase 7U must not be described as a live keyed Geoapify police request.
 
 ### Required next steps
 
 1. This handoff update changes the PR head, so run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` still contains `"format:check": "prettier --check ."`.
-3. Verify PR #20 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #20 using expected-head protection.
+3. Verify PR #21 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #21 using expected-head protection.
 5. Verify the resulting merge commit is the `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
-7. Only after that post-merge gate is green, mark Phase 7T complete and choose/start the next uncovered destination slice from the verified `develop` checkpoint.
+7. Only after that post-merge gate is green, mark Phase 7U complete and choose/start the next uncovered destination slice from the verified `develop` checkpoint.
 
 ## CI interpretation rule
 
