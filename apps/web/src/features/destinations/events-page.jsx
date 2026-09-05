@@ -174,7 +174,10 @@ function eventDateLabel(event, locale, copy) {
       : dateLabel;
   }
   if (event.start.dateTime) {
-    const options = { dateStyle: 'medium', timeStyle: 'short' };
+    const options = /** @type {Intl.DateTimeFormatOptions} */ ({
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
     if (event.start.timezone) options.timeZone = event.start.timezone;
     return new Intl.DateTimeFormat(locale, options).format(new Date(event.start.dateTime));
   }
