@@ -4,7 +4,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   en: {
     eyebrow: 'Supermarkets',
     title: 'Supermarkets near {destination}',
-    intro: 'Browse places categorized as supermarkets by the configured places provider near this destination.',
+    intro:
+      'Browse places categorized as supermarkets by the configured places provider near this destination.',
     back: 'Back to destination',
     results: 'Nearby supermarkets',
     noResults: 'No supermarkets were found in this search area.',
@@ -17,7 +18,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   sv: {
     eyebrow: 'Stormarknader',
     title: 'Stormarknader nära {destination}',
-    intro: 'Se platser som den konfigurerade platsleverantören kategoriserar som stormarknader nära destinationen.',
+    intro:
+      'Se platser som den konfigurerade platsleverantören kategoriserar som stormarknader nära destinationen.',
     back: 'Tillbaka till destinationen',
     results: 'Stormarknader i närheten',
     noResults: 'Inga stormarknader hittades i sökområdet.',
@@ -30,7 +32,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   es: {
     eyebrow: 'Supermercados',
     title: 'Supermercados cerca de {destination}',
-    intro: 'Consulta lugares que el proveedor configurado clasifica como supermercados cerca de este destino.',
+    intro:
+      'Consulta lugares que el proveedor configurado clasifica como supermercados cerca de este destino.',
     back: 'Volver al destino',
     results: 'Supermercados cercanos',
     noResults: 'No se encontraron supermercados en esta zona de búsqueda.',
@@ -43,7 +46,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   fr: {
     eyebrow: 'Supermarchés',
     title: 'Supermarchés près de {destination}',
-    intro: 'Consultez les lieux classés comme supermarchés par le fournisseur configuré près de cette destination.',
+    intro:
+      'Consultez les lieux classés comme supermarchés par le fournisseur configuré près de cette destination.',
     back: 'Retour à la destination',
     results: 'Supermarchés à proximité',
     noResults: 'Aucun supermarché n’a été trouvé dans cette zone de recherche.',
@@ -56,7 +60,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   de: {
     eyebrow: 'Supermärkte',
     title: 'Supermärkte nahe {destination}',
-    intro: 'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Supermärkte einordnet.',
+    intro:
+      'Sieh dir Orte an, die der konfigurierte Anbieter nahe diesem Reiseziel als Supermärkte einordnet.',
     back: 'Zurück zum Reiseziel',
     results: 'Supermärkte in der Nähe',
     noResults: 'In diesem Suchgebiet wurden keine Supermärkte gefunden.',
@@ -69,7 +74,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   it: {
     eyebrow: 'Supermercati',
     title: 'Supermercati vicino a {destination}',
-    intro: 'Consulta i luoghi classificati come supermercati dal fornitore configurato vicino a questa destinazione.',
+    intro:
+      'Consulta i luoghi classificati come supermercati dal fornitore configurato vicino a questa destinazione.',
     back: 'Torna alla destinazione',
     results: 'Supermercati nelle vicinanze',
     noResults: 'Nessun supermercato è stato trovato in questa area di ricerca.',
@@ -82,7 +88,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   pt: {
     eyebrow: 'Supermercados',
     title: 'Supermercados perto de {destination}',
-    intro: 'Consulte locais classificados como supermercados pelo fornecedor configurado perto deste destino.',
+    intro:
+      'Consulte locais classificados como supermercados pelo fornecedor configurado perto deste destino.',
     back: 'Voltar ao destino',
     results: 'Supermercados próximos',
     noResults: 'Não foram encontrados supermercados nesta área de pesquisa.',
@@ -95,7 +102,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   pl: {
     eyebrow: 'Supermarkety',
     title: 'Supermarkety w pobliżu {destination}',
-    intro: 'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako supermarkety w pobliżu celu podróży.',
+    intro:
+      'Przeglądaj miejsca oznaczone przez skonfigurowanego dostawcę jako supermarkety w pobliżu celu podróży.',
     back: 'Wróć do celu podróży',
     results: 'Supermarkety w pobliżu',
     noResults: 'W tym obszarze wyszukiwania nie znaleziono supermarketów.',
@@ -108,7 +116,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   nl: {
     eyebrow: 'Supermarkten',
     title: 'Supermarkten bij {destination}',
-    intro: 'Bekijk plaatsen die de ingestelde locatiesprovider als supermarkt classificeert nabij deze bestemming.',
+    intro:
+      'Bekijk plaatsen die de ingestelde locatiesprovider als supermarkt classificeert nabij deze bestemming.',
     back: 'Terug naar bestemming',
     results: 'Supermarkten in de buurt',
     noResults: 'Er zijn geen supermarkten gevonden in dit zoekgebied.',
@@ -121,7 +130,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   no: {
     eyebrow: 'Supermarkeder',
     title: 'Supermarkeder nær {destination}',
-    intro: 'Se steder som den konfigurerte stedsleverandøren kategoriserer som supermarkeder nær dette reisemålet.',
+    intro:
+      'Se steder som den konfigurerte stedsleverandøren kategoriserer som supermarkeder nær dette reisemålet.',
     back: 'Tilbake til reisemålet',
     results: 'Supermarkeder i nærheten',
     noResults: 'Ingen supermarkeder ble funnet i dette søkeområdet.',
@@ -134,7 +144,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   da: {
     eyebrow: 'Supermarkeder',
     title: 'Supermarkeder nær {destination}',
-    intro: 'Se steder, som den konfigurerede stedudbyder kategoriserer som supermarkeder nær denne destination.',
+    intro:
+      'Se steder, som den konfigurerede stedudbyder kategoriserer som supermarkeder nær denne destination.',
     back: 'Tilbage til destinationen',
     results: 'Supermarkeder i nærheden',
     noResults: 'Der blev ikke fundet supermarkeder i dette søgeområde.',
@@ -147,7 +158,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   fi: {
     eyebrow: 'Supermarketit',
     title: 'Supermarketit lähellä kohdetta {destination}',
-    intro: 'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee supermarketeiksi tämän kohteen lähellä.',
+    intro:
+      'Selaa paikkoja, jotka määritetty paikkapalvelu luokittelee supermarketeiksi tämän kohteen lähellä.',
     back: 'Takaisin kohteeseen',
     results: 'Lähellä olevat supermarketit',
     noResults: 'Tältä hakualueelta ei löytynyt supermarketteja.',
@@ -160,7 +172,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   tr: {
     eyebrow: 'Süpermarketler',
     title: '{destination} yakınındaki süpermarketler',
-    intro: 'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında süpermarket olarak sınıflandırdığı yerleri görüntüleyin.',
+    intro:
+      'Yapılandırılmış yer sağlayıcısının bu hedefin yakınında süpermarket olarak sınıflandırdığı yerleri görüntüleyin.',
     back: 'Hedefe dön',
     results: 'Yakındaki süpermarketler',
     noResults: 'Bu arama alanında süpermarket bulunamadı.',
@@ -199,7 +212,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   ja: {
     eyebrow: 'スーパーマーケット',
     title: '{destination}周辺のスーパーマーケット',
-    intro: '設定済みの場所プロバイダーがこの目的地の近くでスーパーマーケットとして分類した場所を確認できます。',
+    intro:
+      '設定済みの場所プロバイダーがこの目的地の近くでスーパーマーケットとして分類した場所を確認できます。',
     back: '目的地に戻る',
     results: '近くのスーパーマーケット',
     noResults: 'この検索範囲ではスーパーマーケットが見つかりませんでした。',
@@ -225,7 +239,8 @@ const SUPERMARKETS_PAGE_COPY = Object.freeze({
   hi: {
     eyebrow: 'सुपरमार्केट',
     title: '{destination} के पास सुपरमार्केट',
-    intro: 'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा सुपरमार्केट के रूप में वर्गीकृत स्थान देखें।',
+    intro:
+      'इस गंतव्य के पास कॉन्फ़िगर किए गए स्थान प्रदाता द्वारा सुपरमार्केट के रूप में वर्गीकृत स्थान देखें।',
     back: 'गंतव्य पर वापस जाएँ',
     results: 'पास के सुपरमार्केट',
     noResults: 'इस खोज क्षेत्र में कोई सुपरमार्केट नहीं मिला।',
