@@ -157,9 +157,7 @@ describe('CafesDestinationPage', () => {
 
     render(<CafesDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(
-      await screen.findByRole('heading', { name: 'Safe Café', level: 3 }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Safe Café', level: 3 })).toBeInTheDocument();
     expect(screen.queryByText('Wrong Country Café')).not.toBeInTheDocument();
     expect(screen.queryByText('Wrong Provider Café')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Website' })).not.toBeInTheDocument();
