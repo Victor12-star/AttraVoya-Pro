@@ -13,6 +13,7 @@ import {
   CircleParking,
   CloudRain,
   CloudSun,
+  Coffee,
   Coins,
   Compass,
   HeartHandshake,
@@ -41,6 +42,7 @@ import { apiClient } from '../../lib/api-client.js';
 import { getAirportsPageCopy } from './airports-page-copy.js';
 import { getAtmsPageCopy } from './atms-page-copy.js';
 import { getBeachesPageCopy } from './beaches-page-copy.js';
+import { getCafesPageCopy } from './cafes-page-copy.js';
 import { getDestinationPageCopy } from './destination-page-copy.js';
 import { buildDestinationChildHref, buildDestinationContextHref } from './destination-route.js';
 import { getEventsPageCopy } from './events-page-copy.js';
@@ -193,6 +195,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const airportsCopy = getAirportsPageCopy(locale);
   const atmsCopy = getAtmsPageCopy(locale);
   const beachesCopy = getBeachesPageCopy(locale);
+  const cafesCopy = getCafesPageCopy(locale);
   const eventsCopy = getEventsPageCopy(locale);
   const hospitalsCopy = getHospitalsPageCopy(locale);
   const museumsCopy = getMuseumsPageCopy(locale);
@@ -323,6 +326,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'restaurants'),
       icon: Utensils,
       label: restaurantsCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'cafes'),
+      icon: Coffee,
+      label: cafesCopy.eyebrow,
     },
     {
       href: buildDestinationChildHref(destination, 'beaches'),
