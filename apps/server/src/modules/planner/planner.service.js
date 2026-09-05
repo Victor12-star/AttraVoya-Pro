@@ -96,7 +96,9 @@ export function createPlannerService(repository) {
         input.targetDestinationId
           ? repository.findDestinationById(input.targetDestinationId)
           : Promise.resolve(null),
-        input.originCityId ? repository.findOriginCityById(input.originCityId) : Promise.resolve(null),
+        input.originCityId
+          ? repository.findOriginCityById(input.originCityId)
+          : Promise.resolve(null),
         input.originAirportId
           ? repository.findOriginAirportById(input.originAirportId)
           : Promise.resolve(null),
