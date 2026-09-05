@@ -114,6 +114,10 @@ describe('DestinationPage', () => {
       'href',
       expect.stringContaining('/destinations/stockholm-se/airports?'),
     );
+    expect(screen.getByRole('link', { name: 'Hospitals' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/destinations/stockholm-se/hospitals?'),
+    );
     expect(screen.getByRole('link', { name: 'Events' })).toHaveAttribute(
       'href',
       expect.stringContaining('/destinations/stockholm-se/events?'),
