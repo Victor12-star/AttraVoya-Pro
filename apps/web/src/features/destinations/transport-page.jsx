@@ -4,9 +4,6 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   ArrowLeft,
-  Bike,
-  Car,
-  Footprints,
   LoaderCircle,
   MapPin,
   RefreshCw,
@@ -105,6 +102,7 @@ function normalizePlace(row, countryCode) {
  * @param {TransportDestination} destination
  * @param {string} query
  * @param {string} locale
+ * @returns {Promise<{status: AsyncStatus, places: RoutePlace[]}>}
  */
 async function requestPlaces(destination, query, locale) {
   try {
@@ -122,7 +120,7 @@ async function requestPlaces(destination, query, locale) {
     const seen = new Set();
     const places = rows
       .map((row) => normalizePlace(row, destination.countryCode))
-      .filter(Boolean)
+      .filter((place) => place !== null)
       .filter((place) => {
         const key =
           place.externalId ??
@@ -143,6 +141,7 @@ async function requestPlaces(destination, query, locale) {
  * @param {RoutePlace} place
  * @param {RouteMode} mode
  * @param {string} locale
+ * @returns {Promise<{status: AsyncStatus, data: any}>}
  */
 async function requestRoute(destination, place, mode, locale) {
   try {
@@ -243,6 +242,8 @@ export function TransportDestinationPage({ destination, locale = 'en', messages 
     );
   }
 
+  const routeOrigin = destination;
+
   async function runPlaceSearch() {
     const normalizedQuery = query.trim();
     setSelectedPlace(null);
@@ -254,7 +255,7 @@ export function TransportDestinationPage({ destination, locale = 'en', messages 
     }
 
     setSearchState({ status: 'loading', places: [] });
-    const nextState = await requestPlaces(destination, normalizedQuery, locale);
+    const nextState = await requestPlaces(routeOrigin, normalizedQuery, locale);
     setSearchState(nextState);
   }
 
@@ -265,7 +266,7 @@ export function TransportDestinationPage({ destination, locale = 'en', messages 
 
   function calculateRoute(place, nextMode) {
     setRouteState({ status: 'loading', data: null });
-    void requestRoute(destination, place, nextMode, locale).then(setRouteState);
+    void requestRoute(routeOrigin, place, nextMode, locale).then(setRouteState);
   }
 
   function selectPlace(place) {
@@ -288,9 +289,9 @@ export function TransportDestinationPage({ destination, locale = 'en', messages 
   const fetchedAt = route?.fetchedAt ? new Date(route.fetchedAt) : null;
   const hasValidFetchedAt = fetchedAt && Number.isFinite(fetchedAt.getTime());
   const modeOptions = [
-    { value: 'walk', label: copy.walk, icon: Footprints },
-    { value: 'bicycle', label: copy.bicycle, icon: Bike },
-    { value: 'drive', label: copy.drive, icon: Car },
+    { value: 'walk', label: copy.walk },
+    { value: 'bicycle', label: copy.bicycle },
+    { value: 'drive', label: copy.drive },
   ];
 
   return (
