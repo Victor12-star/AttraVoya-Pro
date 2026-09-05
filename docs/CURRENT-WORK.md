@@ -110,67 +110,81 @@ This file is the permanent handoff point for continuing development safely in a 
 - This completed the thin standalone destination-category series. Do not create another near-duplicate category page unless a genuinely distinct product need appears.
 - `GEOAPIFY_API_KEY` was absent in CI; provider smoke tests did not make a live keyed Geoapify request.
 
-## Current phase
-
 ### Phase 7Z — Budget Planner Request Foundation
 
-Branch: `feature/phase-7z-budget-planner-request-foundation`
+- PR #26 merged into `develop`.
+- Final PR head: `9cca9a9abbfd8f64ab0b82016ae4e4ee5293e0d9`.
+- Final PR CI #288 passed all five top-level jobs.
+- Squash merge commit: `5fcd174a252913e1f0aa6ba47e5b3057518531fd`.
+- Post-merge `develop` CI #289 passed all five top-level jobs.
+- Added authenticated owner-scoped create/list/get planner-request APIs with `private, no-store` responses.
+- Reused the existing `TravelPlanRequest` / `TravelStayPreference` Prisma domain; no duplicate planner schema or migration was added.
+- Added currency/reference/date/traveller validation and shared API-client methods.
+- Cross-user request access resolves as 404 rather than leaking existence.
+- Phase 7Z intentionally did not invent destination recommendations, prices, availability, or budget allocations.
 
-PR: #26 — `Phase 7Z: budget planner request foundation`
+## Current phase
 
-Base checkpoint: `f5ab4082af2e33289650ec6e9c1d5bb799b4932d` — verified Phase 7Y `develop` merge.
+### Phase 8A — Budget Planner Web Request Flow
+
+Branch: `feature/phase-8a-budget-planner-web-flow`
+
+PR: #27 — `Phase 8A: budget planner web request flow`
+
+Base checkpoint: `5fcd174a252913e1f0aa6ba47e5b3057518531fd` — verified Phase 7Z `develop` merge.
 
 Reason for this phase:
 
-- The existing Prisma schema already contains the correct planner domain: `TravelPlanRequest`, `TravelStayPreference`, recommendations, versioned `BudgetPlan`, pricing provenance, trips, and actual expenses.
-- Therefore the correct architecture is to activate that domain rather than create a second budget model or parallel planner.
-- Phase 7Z intentionally establishes the secure traveller-owned planning brief before recommendation generation or provider pricing.
+- The secure planner-request API now exists, but `/trips` was still a placeholder.
+- Phase 8A turns that route into the first real budget-first traveller workflow while keeping recommendation generation and price claims out until provenance-aware planning exists.
+- Provider-search IDs are not treated as persisted internal destination IDs. Open-destination requests therefore remain genuinely open instead of fabricating database references.
 
 Implemented:
 
-- Protected `POST /api/v1/planner/requests` endpoint to persist a planning brief.
-- Protected `GET /api/v1/planner/requests` endpoint to list only the authenticated traveller's requests.
-- Protected `GET /api/v1/planner/requests/:requestId` endpoint with owner-scoped lookup; another user's request resolves as 404 rather than leaking existence.
-- Existing PostgreSQL-backed authentication hook is required before planner persistence/read access.
-- Planner responses use `Cache-Control: private, no-store` because the payload contains private travel intent and budget information.
-- Reuses existing `TravelPlanRequest` and `TravelStayPreference` Prisma models. No duplicate planner schema and no migration were added.
-- Reuses shared `createBudgetPlanRequestSchema` plus accommodation preference validation.
-- Strengthens date-mode validation so fixed-date and flexible-window fields cannot be silently mixed.
-- Enforces traveller-count limits before persistence.
-- Normalizes the budget currency code and validates it against stored currency reference data.
-- Validates optional target destination as an existing `PUBLISHED` destination.
-- Validates optional origin city and airport references and rejects mismatched city/airport combinations.
-- Persists new requests as `DRAFT` only.
-- Maps Prisma Decimal/date values into stable API-safe strings and date values without exposing ownership metadata or database internals.
-- Shared API client now exposes create/list/get planner-request methods for web and mobile consumers.
-- Focused tests cover unauthenticated rejection, valid persistence/defaults, owner isolation, contradictory dates, traveller limits, unsupported currency, inconsistent origin references, and shared API-client behavior.
+- Replaced the `/trips` placeholder with a real budget planner form.
+- Collects origin label, fixed or flexible dates, minimum/maximum nights, total budget, preferred currency, safety reserve, adults, children ages, interests, comfort level, lodging types, and family-friendly preference.
+- Uses shared `createBudgetPlanRequestSchema` in the browser before submission while keeping the server authoritative.
+- Persists planning briefs through the authenticated shared API client and the Phase 7Z backend endpoints.
+- Loads the signed-in traveller's recent private planning briefs.
+- Includes loading, empty, authentication, unavailable/error, retry, saving, success, and validation states.
+- A 401 presents a sign-in action rather than exposing API internals.
+- Uses same-site cookie authentication; no second browser token store was introduced.
+- Responsive UI uses existing design tokens, Lucide icons, and reduced-motion support.
+- Planner copy exists for all 18 supported UI locales with invariant option vocabulary safely falling back to English where appropriate.
+- Focused tests cover honest rendering, exact fixed-date submission, client validation before persistence, authentication handling, private draft loading, outage retry, and absence of invented recommendation/price claims.
 
 Deliberate boundary:
 
-- Phase 7Z does not generate destination recommendations.
-- It does not allocate the budget across flights, accommodation, food, local transport, activities, children's activities, transfers, and reserve yet.
-- It does not fetch or claim fares, accommodation availability/prices, attraction prices, or any other live provider pricing.
-- Recommendation generation and budget allocation must build on this verified request foundation and preserve explicit estimate/provider provenance.
+- Phase 8A stores and reviews a traveller's private planning brief only.
+- It does not generate destination recommendations.
+- It does not claim flight fares, accommodation prices/inventory, attraction prices, availability, or live budget feasibility.
+- It does not yet allocate the total budget across flights, accommodation, food, local transport, activities, children's activities, airport transfers, or contingency reserve.
+- The next planner slice should add a deterministic budget envelope/allocation foundation with explicit estimate/provenance semantics before any recommendation-ranking logic.
 
 Verification history:
 
-- Initial implementation head `ae2c3752fabb6fcd9a2ebae35eaa46513e9d1f24` ran PR CI #278. Production build, PostgreSQL/Prisma, dependency/secret, live no-cost-provider, JavaScript, translations, provider smoke, ESLint, and all functional tests passed; only repository-wide Prettier failed on six files.
-- Branch-only formatter diagnostic head `2a658e08672fc883d463b588e3d5e9003f0d18b0` ran CI #279 to print exact Prettier 3.9.6 rewrites. It was diagnostic only and is not a valid merge candidate.
-- Exact formatter output was applied mechanically to `apps/server/src/app.js`, planner routes/service/tests, `packages/api-client/src/client.js`, and `packages/validation/src/budget-planner.js` without changing planner behavior.
-- Root `package.json` was restored byte-for-byte to the normal `"format:check": "prettier --check ."` blob `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c`.
-- Clean-code checkpoint: `00a36d18af661cce66aacea9a21e1cb3387238bb`.
-- Clean-code PR CI #287 on exact head `00a36d18af661cce66aacea9a21e1cb3387238bb` passed all five top-level CI jobs, including repository-wide Prettier.
+- Initial implementation CI exposed strict-JavaScript state-inference problems (`never[]` draft inference and an overly narrow lodging array). These were fixed with explicit JavaScript/JSDoc domain types; no `any` escape or type-check weakening was used.
+- CI #291 then reached ESLint and identified `react-hooks/set-state-in-effect` violations. The planner was restructured rather than disabling the rule: currency starts from the server-provided default, and initial draft state changes occur from the asynchronous API completion path while retry behavior remains intact.
+- Functional head `5cf3380fe49c5b012a8cac5abd8b8c6c61d5a51f` ran CI #292. Production build, PostgreSQL/Prisma, dependency/secret, live no-cost-provider checks, strict JavaScript, translations, provider smoke, ESLint, and all tests passed. Only repository-wide Prettier failed on three Phase 8A files.
+- Temporary formatter diagnostics #293, #294, #295, and formatter-recovery #296 were branch-only diagnostic runs and are not valid merge candidates. They were used only to capture/apply exact Prettier 3.9.6 output.
+- Exact Prettier output was applied to `budget-planner-copy.js`, `budget-planner-page.jsx`, and `budget-planner-page.test.jsx` without changing planner behavior.
+- All temporary formatter/CI diagnostic configuration was removed.
+- Root `package.json` is restored byte-for-byte to canonical blob `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c` with `"format:check": "prettier --check ."`.
+- `.github/workflows/ci.yml` is restored byte-for-byte to canonical blob `31c6b4a781f69852eaeeb2fe5fe115b265feedc8`.
+- Clean Phase 8A diff against the base contains exactly five intended files: `/trips` route, planner copy, planner component, planner CSS, and planner tests.
+- Clean-code checkpoint: `a73dd8c2676f22e819a6c618b0f8d9dc1f4bd291`.
+- Clean-code PR CI #298 on exact head `a73dd8c2676f22e819a6c618b0f8d9dc1f4bd291` passed all five top-level CI jobs, including 133 web tests and canonical repository-wide Prettier.
 
 ### Required next steps
 
-1. This handoff update changes PR #26's head. Run the complete five-job PR CI on the exact new documentation head.
-2. Confirm root `package.json` blob remains `af4b2abbc4b5b1887f9a6293cd1a411649a69f7c` with `"format:check": "prettier --check ."`.
-3. Verify PR #26 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #26 using expected-head protection.
+1. This handoff update changes PR #27's head. Run the complete five-job PR CI on the exact new documentation head.
+2. Confirm root `package.json` remains canonical with `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical workflow.
+3. Verify PR #27 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #27 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
 7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
-8. Best next product direction: expose the verified planner request foundation through a real authenticated budget-planner web flow, then add deterministic budget allocation/provenance before any recommendation-ranking logic. Do not jump directly to fake/live pricing.
+8. Best next product direction: deterministic budget-envelope/allocation logic with explicit estimate/provenance semantics before recommendation ranking or any live-price claim.
 
 ## CI interpretation rule
 
