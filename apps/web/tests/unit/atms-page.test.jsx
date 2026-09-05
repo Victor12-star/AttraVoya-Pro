@@ -71,8 +71,12 @@ describe('AtmsDestinationPage', () => {
   it('loads nearby ATMs through the provider-neutral places API and renders only supported location facts', async () => {
     render(<AtmsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(screen.getByRole('heading', { name: 'ATMs near Stockholm', level: 1 })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Example ATM', level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'ATMs near Stockholm', level: 1 }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Example ATM', level: 3 }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Cash Street, Stockholm County, Sweden')).toBeInTheDocument();
     expect(screen.getByText('800 m')).toBeInTheDocument();
     expect(screen.getByText('Geoapify')).toBeInTheDocument();
@@ -162,12 +166,16 @@ describe('AtmsDestinationPage', () => {
 
     render(<AtmsDestinationPage destination={destination} locale="en" messages={messages} />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('ATMs could not be loaded right now.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'ATMs could not be loaded right now.',
+    );
     expect(screen.queryByText(/secret ATM provider detail/i)).not.toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Retry' }).click();
     await waitFor(() => expect(mocks.getNearbyPlaces).toHaveBeenCalledTimes(2));
-    expect(await screen.findByRole('heading', { name: 'Example ATM', level: 3 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Example ATM', level: 3 }),
+    ).toBeInTheDocument();
   });
 
   it('renders an invalid destination state without calling the places provider', async () => {
