@@ -7,9 +7,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: { getNearbyPlaces: mocks.getNearbyPlaces },
 }));
 
-const { ParkingDestinationPage } = await import(
-  '../../src/features/destinations/parking-page.jsx',
-);
+const { ParkingDestinationPage } = await import('../../src/features/destinations/parking-page.jsx');
 
 const messages = {
   common: { loading: 'Loading…', unavailable: 'Temporarily unavailable', retry: 'Retry' },
@@ -72,9 +70,7 @@ describe('ParkingDestinationPage', () => {
   });
 
   it('loads nearby parking through the provider-neutral places API and renders only supported location facts', async () => {
-    render(
-      <ParkingDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<ParkingDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
       screen.getByRole('heading', { name: 'Parking near Stockholm', level: 1 }),
@@ -149,9 +145,7 @@ describe('ParkingDestinationPage', () => {
       }),
     );
 
-    render(
-      <ParkingDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<ParkingDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
       await screen.findByRole('heading', { name: 'Safe Parking', level: 3 }),
@@ -164,9 +158,7 @@ describe('ParkingDestinationPage', () => {
   it('shows an honest empty state when no matching parking places are returned', async () => {
     mocks.getNearbyPlaces.mockResolvedValue(parkingResponse({ results: [] }));
 
-    render(
-      <ParkingDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<ParkingDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
       await screen.findByText('No parking places were found in this search area.'),
@@ -178,9 +170,7 @@ describe('ParkingDestinationPage', () => {
       .mockRejectedValueOnce(new Error('secret parking provider detail'))
       .mockResolvedValueOnce(parkingResponse());
 
-    render(
-      <ParkingDestinationPage destination={destination} locale="en" messages={messages} />,
-    );
+    render(<ParkingDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Parking places could not be loaded right now.',
