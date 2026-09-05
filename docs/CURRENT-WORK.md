@@ -62,20 +62,21 @@ Implemented:
 Verification history:
 
 - Initial PR head `ede363eb9a184fd03bc7f57e3f3ff6c083584d3a` reached CI #212. JavaScript checks, translations, provider smoke tests, ESLint, unit tests, database checks, live no-cost provider checks and dependency/security checks passed; the only identified issue was Prettier formatting in three Phase 7Q files.
-- A branch-only diagnostic formatter commit `86baa457f984698616fd6c54d8a2c1e168fe9959` was used only to capture exact Prettier output. It must never be merged as the final head.
-- Exact Prettier output was applied to the three affected files and the normal root `format:check` command was restored to `prettier --check .` in clean code head `c7a15bac0e3c871f0189917893c8f41d85d58fdb`.
+- A branch-only diagnostic formatter commit `86baa457f984698616fd6c54d8a2c1e168fe9959` was used only to capture exact Prettier output. It must never be the final merge head.
+- CI #213 generated the exact Prettier output for those three files; the diagnostic formatter configuration was then removed.
+- The three exact Prettier results were applied and the root `format:check` command was restored to `prettier --check .`.
+- A branch-order reconciliation was required because the first handoff commit and the formatted object commit were siblings. The corrected linear branch combines the handoff and exact Prettier output without changing Phase 7Q behavior.
 
 ### Required next steps
 
-1. Move `feature/phase-7q-destination-airports` to clean code commit `c7a15bac0e3c871f0189917893c8f41d85d58fdb` if it is not already there.
-2. Confirm root `package.json` again contains `"format:check": "prettier --check ."`.
-3. Run the full PR CI on the exact clean Phase 7Q head. All five top-level jobs must pass.
-4. Because this handoff update changes the PR head, run the full PR CI again on the exact final documentation head and require all five jobs to pass.
-5. Verify PR #17 still targets `develop`, is mergeable, and its head SHA is exactly the CI-verified final SHA.
-6. Squash-merge PR #17 using expected-head protection.
-7. Verify the merge commit becomes the `develop` head.
-8. Wait for the post-merge `develop` push CI and require all five top-level jobs to pass.
-9. Only after that post-merge gate is green, choose and start Phase 7R from the verified `develop` checkpoint.
+1. Confirm the current PR head contains the exact formatted airport files and root `package.json` contains `"format:check": "prettier --check ."`.
+2. Run the full PR CI on the exact current Phase 7Q head. All five top-level jobs must pass.
+3. If this handoff file is changed again, the new documentation commit becomes the final PR head and must pass the complete CI gate again.
+4. Verify PR #17 still targets `develop`, is mergeable, and its head SHA is exactly the CI-verified final SHA.
+5. Squash-merge PR #17 using expected-head protection.
+6. Verify the merge commit becomes the `develop` head.
+7. Wait for the post-merge `develop` push CI and require all five top-level jobs to pass.
+8. Only after that post-merge gate is green, choose and start Phase 7R from the verified `develop` checkpoint.
 
 ## CI interpretation rule
 
