@@ -1,204 +1,100 @@
-# AttraVoya Pro — Current Work Handoff
+# AttraVoya Pro — Current Work
 
-Last updated: 2026-09-05
+This file is the permanent handoff point for continuing development safely in a new ChatGPT session.
 
-This file is the engineering handoff for continuing AttraVoya Pro without relying on chat history.
+## Repository
 
-## Repository and workflow
+- Repository: `Victor12-star/AttraVoya-Pro`
+- Integration branch: `develop`
+- Production branch: `main`
+- Rule: every feature slice must pass the full GitHub Actions CI gate before merge.
+- Rule: after merge, verify the `develop` push CI before starting the next slice.
+- Never merge a diagnostic or temporary CI configuration.
 
-- GitHub: `Victor12-star/AttraVoya-Pro`
-- Working integration branch: `develop`
-- `main` is not the day-to-day development branch.
-- Latest verified merged checkpoint before the current PR: Phase 7O merge `7706560de4ff989ec6d26226b04ee8287d977c7f`.
-- Phase 7O post-merge `develop` CI `#198` passed all five top-level jobs.
-- Current feature branch: `feature/phase-7p-destination-news`.
-- Current pull request: `#16` from `feature/phase-7p-destination-news` into `develop`.
+## Product rules that must stay true
 
-Every vertical slice must follow this sequence:
+- Use provider-neutral backend APIs. Browser/mobile clients must not call paid/keyed third-party APIs directly.
+- Never invent live fares, availability, schedules, prices, safety data, ratings, airport codes, terminal information, or provider results.
+- Clearly distinguish provider-returned facts from estimates or static reference data.
+- Keep provider credentials server-side.
+- Keep destination routing strict so altered or incomplete share URLs do not silently render different data.
+- Keep public travel data honest when provider keys are absent: show unavailable/empty states rather than fabricated content.
+- Keep all supported UI locales working, including Arabic RTL behavior.
 
-1. Create a feature branch from the latest verified `develop` commit.
-2. Implement one coherent slice only.
-3. Open a pull request into `develop`.
-4. Require all GitHub CI jobs to pass on the exact final PR head.
-5. Merge only after the complete gate is green.
-6. Verify the resulting `develop` push CI is also fully green.
-7. Only then start the next slice.
+## Completed integration checkpoint
 
-The standard CI gate includes JavaScript checks, translation parity, provider smoke tests, ESLint, unit/integration tests, normal repository-wide Prettier formatting, PostgreSQL/Prisma verification, dependency/secret checks, production builds, and live-provider checks when credentials are available.
+### Phase 7P — Destination News Discovery
 
-Never weaken CI to make a slice pass, and never claim a provider was live-verified when its required API key was not configured.
+Merged through PR #16 into `develop`.
 
-## Product and architecture foundation
+- Merge commit: `7ba5f58dc0c5585274ac2cb1a0cfed3818ef3697`
+- Final PR-head CI: #208 — all five top-level jobs passed.
+- Post-merge `develop` CI: #209 — all five top-level jobs passed.
+- The News route uses the provider-neutral News API and does not call NewsData from the browser.
+- News results are normalized, deduplicated, country-scoped, HTTPS-link checked, localized, and include honest provider-delay disclosure.
+- `NEWSDATA_API_KEY` was not present in CI, so this must not be described as live keyed NewsData verification.
 
-The project is a JavaScript monorepo with a Next.js customer website, Next.js Admin app, Expo/React Native mobile app, Node.js/Fastify API, PostgreSQL/Prisma, Zod validation, shared API client, localization/global country system, authentication/session foundation, Guest/Free/Premium/Admin/Super Admin separation, budget-first trip-planning domain foundation, and verified-safety architecture.
+After Phase 7P, an accidental empty placeholder file was immediately removed. Cleanup checkpoint `16f28cee864f0ea473d9d297c8744c363a91e8e3` has the same application tree as the Phase 7P merge and passed all five jobs in CI #211. Phase 7Q was branched from this verified cleanup checkpoint.
 
-Provider adapters already implemented include:
+## Current phase
 
-- Open-Meteo weather
-- Frankfurter currency
-- LibreTranslate translation
-- Geoapify places/accommodation/geocoding/routing
-- Ticketmaster events
-- NewsData travel news
-- Pexels destination imagery
-- Resend transactional email
+### Phase 7Q — Destination Airports Discovery
 
-Provider secrets stay server-side. Never invent live travel prices, availability, emergency facts, ratings, opening times, exchange rates, safety claims, language facts, transport facts, event availability, news accuracy, or other provider data.
+Branch: `feature/phase-7q-destination-airports`
 
-## Phase 7 destination progress
-
-Completed and merged destination slices:
-
-- Phase 7A — Global destination search API
-- Phase 7B — Customer destination search UI
-- Phase 7C — Destination page foundation
-- Phase 7D — Attractions discovery
-- Phase 7E — Restaurants discovery
-- Phase 7F — Beaches discovery
-- Phase 7G — Shopping discovery
-- Phase 7H — Accommodation discovery
-- Phase 7I — Family destination discovery
-- Phase 7J — Nearby destination discovery
-- Phase 7K — Verified Safety destination foundation
-- Phase 7L — Destination currency and exchange
-- Phase 7M — Destination Language foundation
-- Phase 7N — Destination transport foundation
-- Phase 7O — Destination events discovery
-
-Important verified checkpoints:
-
-- Phase 7G merged at `ff40f33f257ba2e2cb8688d65912e01aebd76403`; PR CI `#133` and post-merge CI `#134` green.
-- Phase 7H merged at `05162952c277388fc143b4d45a2d8e1d94758294`; PR CI `#140` and post-merge CI `#141` green.
-- Phase 7I merged at `cf05786c12279bf884e99312539d9f116f0de92d`; PR CI `#148` and post-merge CI `#149` green.
-- Phase 7J merged at `3f4dc70cf173d954d92a7a002813a1124eaae552`; PR CI `#153` and post-merge CI `#154` green.
-- Phase 7K merged at `2a6706dc9df52bcf35ddd844ac0a3a6fd2d9674f`; final PR CI `#165` and post-merge CI `#166` green.
-- Phase 7L merged through PR `#12` by squash at `52da70966f08c03cd9b241d4e026ed334b6a1713`; final PR CI `#174` and post-merge `develop` CI `#175` green.
-- Phase 7M merged through PR `#13` by squash at `5550c835b18ec2596c0b5f17264bf82325924cf3`; final PR CI `#182` and post-merge `develop` CI `#183` green.
-- Phase 7N merged through PR `#14` at `2eafc1f745ea347b52af695d2980fc9ef7dcba01`; post-merge `develop` CI `#190` green.
-- Phase 7O merged through PR `#15` at `7706560de4ff989ec6d26226b04ee8287d977c7f`; final PR CI `#197` and post-merge `develop` CI `#198` green.
-
-## Phase 7P — Destination news discovery
-
-Current implementation is in PR `#16` from `feature/phase-7p-destination-news` into `develop`.
-
-The branch starts from the verified Phase 7O merge commit:
-
-`7706560de4ff989ec6d26226b04ee8287d977c7f`
+PR: #17 — `Phase 7Q: destination airports discovery`
 
 Implemented:
 
-- added destination route `/destinations/[slug]/news`
-- added a localized News entry point to the destination feature grid
-- added `news` to the strict destination child-route allowlist and covered it in the route-contract test
-- reused the existing provider-neutral News backend and shared `apiClient.getNews(...)`
-- browser code never calls NewsData directly and NewsData credentials stay server-side
-- requests use the selected destination name and country code, the active UI language, and a free-tier-safe result size of 10
-- UI renders only normalized factual provider fields such as title, provider description, publication time when supplied, source, category, provider identity, safe article URL, and provider checked/fetched time
-- duplicate provider rows are rejected
-- rows with a definite two-letter country-code mismatch are rejected
-- article/provider mismatches are rejected
-- unsafe article URLs such as `javascript:` are rejected; rendered external article links must use HTTPS
-- injected unsupported fields such as ratings or destination safety scores are deliberately not rendered
-- the UI explicitly discloses that provider results may be delayed and are not guaranteed real-time or breaking news
-- the UI does not treat news coverage as a destination safety rating and does not claim article accuracy has been independently verified by AttraVoya
-- honest loading, success, empty, provider-error, retry and invalid-destination states are implemented
-- all 18 supported UI locales are present and Arabic RTL behavior remains supported by the existing app localization system
-- responsive News page styling follows the established destination-slice patterns
-- focused News tests cover the shared API request contract, normalized factual rendering, delayed-result disclosure, HTTPS safety, country mismatch filtering, duplicate rejection, unsupported rating/safety-field omission, empty state, provider-error privacy, retry, and invalid destination handling
+- `/destinations/[slug]/airports` route.
+- Airports entry point in the destination feature grid.
+- `airports` added to the strict destination child-route allowlist.
+- Reuses `apiClient.getNearbyPlaces(...)` and the existing provider-neutral places backend.
+- Uses the existing `PLACE_CATEGORY_GROUPS.AIRPORTS` alias, currently mapped by the Geoapify adapter to the provider airport category.
+- 50 km nearby search radius with a result limit of 20 and active UI locale.
+- Renders only normalized factual provider fields used by this slice: airport/place name, formatted address, distance, provider and HTTPS website when present.
+- Rejects invalid coordinates, duplicate records, mismatched country rows, mismatched provider rows and unsafe website URLs.
+- Does not invent or infer airport codes, terminal information, airline schedules, live flights, fares, transfer prices, availability, or a claim that an airport is the destination's main/best/cheapest airport.
+- Honest loading, empty, provider-error, retry and invalid-destination states.
+- Copy is provided for all 18 supported UI locales.
+- Focused tests cover the airports page, strict child route and destination dashboard entry point.
 
-### Phase 7P CI findings and fixes
+Verification history:
 
-- CI `#199` failed strict JavaScript because normalized provider text arrays were inferred as `(string | null)[]`; `textArray(...)` was changed to use an explicitly typed `string[]` accumulator without changing runtime/provider behavior.
-- CI `#200` then exposed an integration guard: the new `news` route had not yet been added to `DESTINATION_CHILD_SEGMENTS`. The allowlist was corrected and the route-contract test now explicitly covers the News child route.
-- CI `#202` passed JavaScript, translations, provider smoke tests, ESLint, unit tests, PostgreSQL/Prisma, dependency/secret checks, live no-cost-provider checks, and the production build; its remaining code-quality failure was only repository Prettier on three Phase 7P files.
-- A controlled temporary formatter diagnostic used repository Prettier `3.9.6` to obtain the exact mechanical formatting diff for `news-page-copy.js`, `news-page.jsx`, and `news-page.test.jsx`.
-- CI `#203` confirmed all functional checks and tests were green on the diagnostic head; its formatting failure was intentional so the exact formatter diff could be captured.
-- The exact mechanical Prettier output was then applied to those three Phase 7P files.
-- Root `package.json` is restored to the normal script: `"format:check": "prettier --check ."`.
-- No temporary formatter diagnostic command remains in the intended final branch state.
+- Initial PR head `ede363eb9a184fd03bc7f57e3f3ff6c083584d3a` reached CI #212. JavaScript checks, translations, provider smoke tests, ESLint, unit tests, database checks, live no-cost provider checks and dependency/security checks passed; the only identified issue was Prettier formatting in three Phase 7Q files.
+- A branch-only diagnostic formatter commit `86baa457f984698616fd6c54d8a2c1e168fe9959` was used only to capture exact Prettier output. It must never be the final merge head.
+- CI #213 generated the exact Prettier output for those three files; the diagnostic formatter configuration was then removed.
+- The three exact Prettier results were applied and the root `format:check` command was restored to `prettier --check .`.
+- A branch-order reconciliation was required because the first handoff commit and the formatted object commit were siblings. The corrected linear branch combines the handoff and exact Prettier output without changing Phase 7Q behavior.
 
-Clean Phase 7P code checkpoint before this handoff update:
+### Required next steps
 
-`b4b01bcaf0fbc744567a063fc9eccaab5f3f2bcd`
+1. Confirm the current PR head contains the exact formatted airport files and root `package.json` contains `"format:check": "prettier --check ."`.
+2. Run the full PR CI on the exact current Phase 7Q head. All five top-level jobs must pass.
+3. If this handoff file is changed again, the new documentation commit becomes the final PR head and must pass the complete CI gate again.
+4. Verify PR #17 still targets `develop`, is mergeable, and its head SHA is exactly the CI-verified final SHA.
+5. Squash-merge PR #17 using expected-head protection.
+6. Verify the merge commit becomes the `develop` head.
+7. Wait for the post-merge `develop` push CI and require all five top-level jobs to pass.
+8. Only after that post-merge gate is green, choose and start Phase 7R from the verified `develop` checkpoint.
 
-PR CI `#207` on that exact clean code checkpoint passed all five top-level jobs:
+## CI interpretation rule
+
+The five top-level CI jobs are the merge gate:
 
 - Code quality and unit tests
-- PostgreSQL and Prisma verification
-- Production builds
 - Live no-cost provider checks
+- Production builds
 - Dependency and secret checks
+- PostgreSQL and Prisma verification
 
-The code-quality job passed environment validation, Prisma generation, strict JavaScript, translations, provider smoke tests, ESLint, all unit tests, and the normal repository-wide Prettier check.
+A provider check that is skipped because a key is absent is not live verification of that keyed provider. Do not overstate CI coverage.
 
-This documentation update creates a newer PR head. Do not merge PR `#16` based only on CI `#207`; require a new complete green CI run on the exact final head containing this handoff update.
+## Branch discipline
 
-## Live-provider verification status
-
-The live-provider CI currently verifies real network paths that do not depend on missing keyed-provider secrets, including:
-
-- Open-Meteo
-- Frankfurter
-- CI-hosted LibreTranslate
-
-Keyed provider checks may be skipped when their GitHub Actions secrets are not configured, including:
-
-- Geoapify (`GEOAPIFY_API_KEY`)
-- Ticketmaster (`TICKETMASTER_API_KEY`)
-- NewsData (`NEWSDATA_API_KEY`)
-- Pexels (`PEXELS_API_KEY`)
-- Resend where applicable
-
-Therefore Phase 7P has adapter/API/UI/test and production-build coverage, but **do not claim a real NewsData network request was verified by GitHub CI** unless `NEWSDATA_API_KEY` is configured and the live-provider job actually confirms it.
-
-A passing live-provider job does not by itself prove keyed-provider networking when the relevant secret is absent.
-
-Safety remains database-backed verified reference data, not an AI-generated fact source.
-
-## Immediate next engineering step
-
-Finish Phase 7P safely:
-
-1. Require complete green GitHub CI on the exact final head of PR `#16` after this handoff update.
-2. Fix any real failure without weakening CI.
-3. Recheck PR `#16`:
-   - base is `develop`
-   - head is `feature/phase-7p-destination-news`
-   - PR is mergeable
-   - all checks are green on the exact current head
-4. Merge PR `#16` into `develop` using the normal merge method and expected-head SHA protection.
-5. Verify `develop` points to the resulting merge commit.
-6. Verify the resulting `develop` push CI is fully green across all five top-level jobs.
-7. Only then mark Phase 7P complete and choose/start the next coherent phase from that exact verified `develop` commit.
-
-Do not create another Phase 7P branch and do not redo completed Phase 7P work.
-
-## Product constraints that must not be forgotten
-
-- Budget-first trip planning is a core differentiator.
-- The user should eventually be able to enter a total budget and receive realistic destination/trip options that fit it.
-- Budget allocation should cover flights, accommodation, food, local transportation, activities, children's activities, airport transfers, and a contingency/safety margin.
-- Real provider data must always be distinguished from estimates.
-- Cheapest room is not necessarily cheapest total trip.
-- Accommodation support should include legitimate lodging types beyond hotels, including guest houses, B&Bs, hostels, apartments, serviced apartments, aparthotels, vacation rentals, family rooms, budget hotels, resorts and campsites.
-- Family travel must use children's ages: `0–3`, `4–8`, `9–12`, `13–17`.
-- Basic emergency/safety functionality is never paywalled.
-- Official emergency numbers must come from authoritative verified data, never AI.
-- Premium never grants Admin permissions.
-- Frontend visibility is never an authorization boundary.
-- Use JavaScript only unless the product owner explicitly approves TypeScript.
-- Use Lucide icons consistently.
-- Maintain mobile responsiveness, localization, RTL support, accessibility, strong security and scalable architecture.
-- Avoid generic AI-template visuals, fake testimonials, fake statistics and fake live data.
-- Whole-app language support and country/language/currency separation must remain intact.
-- All new async UI features need loading, success, empty, error and retry behavior where useful.
-- Every visible interactive control must genuinely work.
-- Do not call a phase complete unless the relevant runtime/CI tests actually passed.
-
-## How to resume in a new chat
-
-Tell ChatGPT:
-
-> Continue AttraVoya Pro from `docs/CURRENT-WORK.md` in GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, inspect the current `develop` branch and any active feature PR, then continue only from the exact unfinished checkpoint. Keep the rule that every final feature head and post-merge `develop` CI must be completely green before proceeding.
-
-The repository and this handoff are the source of truth if chat memory and Git history ever disagree.
+- Start each slice from the latest verified `develop` commit.
+- Work on a dedicated `feature/...` branch.
+- Open a PR into `develop`.
+- Fix failures on the feature branch only.
+- Do not weaken tests, formatter rules, validation, security boundaries, or provider honesty to make CI pass.
+- When documentation is updated before merge, that documentation commit becomes the new final PR head and must pass the complete CI gate before merge.
