@@ -1,28 +1,255 @@
-name: Phase 8A formatter recovery
+name: CI
 
 on:
+  push:
+    branches:
+      - develop
+      - main
   pull_request:
     branches:
       - develop
+      - main
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: phase-8a-formatter-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_ENV: test
+  API_HOST: 127.0.0.1
+  API_PORT: 5000
+  LOG_LEVEL: silent
+  WEB_URL: http://localhost:3000
+  ADMIN_URL: http://localhost:3001
+  API_URL: http://localhost:5000
+  DATABASE_URL: postgresql://attravoya:attravoya_ci_password@127.0.0.1:5432/attravoya_ci?schema=public
+  JWT_ACCESS_SECRET: ci-jwt-access-secret-attravoya-pro-0123456789abcdef
+  COOKIE_SECRET: ci-cookie-secret-attravoya-pro-0123456789abcdef
+  DATA_ENCRYPTION_KEY: ci-data-encryption-key-attravoya-pro-0123456789abcdef
+  JWT_ACCESS_TTL: 15m
+  AUTH_REFRESH_SESSION_DAYS: 30
+  JWT_ISSUER: attravoya-pro-api
+  JWT_AUDIENCE: attravoya-pro
+  LIBRETRANSLATE_URL: http://127.0.0.1:5001
+  WEATHER_PROVIDER: openmeteo
+  CURRENCY_PROVIDER: frankfurter
+  TRANSLATION_PROVIDER: libretranslate
+  MAPS_PROVIDER: geoapify
+  PLACES_PROVIDER: geoapify
+  GEOCODING_PROVIDER: geoapify
+  ROUTING_PROVIDER: geoapify
+  ACCOMMODATION_PROVIDER: geoapify
+  EVENTS_PROVIDER: ticketmaster
+  NEWS_PROVIDER: newsdata
+  IMAGE_PROVIDER: pexels
+  EMAIL_PROVIDER: resend
+  FLIGHT_PROVIDER: none
+
 jobs:
-  format:
-    name: Apply exact Phase 8A formatting
+  quality:
+    name: Code quality and unit tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout feature branch
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate environment contract
+        run: pnpm env:check
+
+      - name: Generate Prisma client for JavaScript checks
+        run: pnpm db:generate
+
+      - name: Check JavaScript
+        run: pnpm check:js
+
+      - name: Check translations
+        run: pnpm translations:check
+
+      - name: Run provider smoke tests
+        run: pnpm providers:smoke
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Check formatting
+        run: pnpm format:check
+
+  database:
+    name: PostgreSQL and Prisma verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: attravoya_ci
+          POSTGRES_USER: attravoya
+          POSTGRES_PASSWORD: attravoya_ci_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U attravoya -d attravoya_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Validate Prisma schema
+        run: pnpm --filter @attravoya/database validate:schema
+
+      - name: Apply schema to disposable CI database
+        run: pnpm --filter @attravoya/database db:push
+
+      - name: Seed reference data
+        run: pnpm db:seed
+
+      - name: Run database tests
+        run: pnpm --filter @attravoya/database test
+
+  build:
+    name: Production builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Build workspace
+        run: pnpm build
+
+  live-providers:
+    name: Live no-cost provider checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local LibreTranslate
+        run: |
+          docker run -d --name attravoya-libretranslate \
+            -p 5001:5000 \
+            -e LT_DISABLE_WEB_UI=true \
+            -e LT_DISABLE_FILES_TRANSLATION=true \
+            -e LT_LOAD_ONLY=en,es \
+            -e LT_UPDATE_MODELS=false \
+            libretranslate/libretranslate:v1.9.6
+
+      - name: Wait for LibreTranslate
+        run: |
+          for attempt in {1..36}; do
+            if curl --fail --silent http://127.0.0.1:5001/languages >/dev/null; then
+              echo "LibreTranslate is ready."
+              exit 0
+            fi
+            echo "Waiting for LibreTranslate ($attempt/36)..."
+            sleep 10
+          done
+          docker logs attravoya-libretranslate
+          exit 1
+
+      - name: Run live provider checks
+        env:
+          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: node scripts/live-provider-check.js
+
+      - name: Show LibreTranslate logs on failure
+        if: failure()
+        run: docker logs attravoya-libretranslate || true
+
+  security:
+    name: Dependency and secret checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Install pnpm
@@ -40,31 +267,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Apply exact Prettier 3.9.6 output
-        run: >-
-          pnpm exec prettier --write
-          apps/web/src/features/planner/budget-planner-copy.js
-          apps/web/src/features/planner/budget-planner-page.jsx
-          apps/web/tests/unit/budget-planner-page.test.jsx
+      - name: Scan tracked files for common secret patterns
+        run: node scripts/secret-scan.js
 
-      - name: Restore canonical formatter and commit formatted files
-        env:
-          HEAD_BRANCH: ${{ github.head_ref }}
+      - name: Audit production dependencies
         run: |
-          git fetch origin develop
-          git show origin/develop:package.json > package.json
-          git add \
-            package.json \
-            apps/web/src/features/planner/budget-planner-copy.js \
-            apps/web/src/features/planner/budget-planner-page.jsx \
-            apps/web/tests/unit/budget-planner-page.test.jsx
-
-          if git diff --cached --quiet; then
-            echo "No formatter changes to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "style: apply exact Phase 8A formatting"
-          git push origin "HEAD:${HEAD_BRANCH}"
+          for attempt in 1 2 3; do
+            if pnpm audit --prod --audit-level=high; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Dependency audit failed after 3 attempts."
+              exit 1
+            fi
+            echo "Dependency audit attempt $attempt failed; retrying after a short delay."
+            sleep $((attempt * 10))
+          done
