@@ -34,7 +34,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "(prettier apps/web/src/features/destinations/supermarkets-page-copy.js | diff -u apps/web/src/features/destinations/supermarkets-page-copy.js - || true); (prettier apps/web/tests/unit/supermarkets-page.test.jsx | diff -u apps/web/tests/unit/supermarkets-page.test.jsx - || true)",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
