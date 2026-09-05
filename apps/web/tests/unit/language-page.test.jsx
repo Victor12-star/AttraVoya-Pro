@@ -128,7 +128,11 @@ describe('LanguageDestinationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Translate' }));
 
     expect(await screen.findByText('Hej')).toBeInTheDocument();
-    expect(mocks.translateText).toHaveBeenCalledWith({ text: 'Hello', source: 'auto', target: 'sv' });
+    expect(mocks.translateText).toHaveBeenCalledWith({
+      text: 'Hello',
+      source: 'auto',
+      target: 'sv',
+    });
     expect(screen.getAllByText('LibreTranslate').length).toBeGreaterThan(0);
     expect(screen.getByText('English')).toBeInTheDocument();
   });
