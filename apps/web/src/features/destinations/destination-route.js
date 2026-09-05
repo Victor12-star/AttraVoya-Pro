@@ -10,6 +10,7 @@ const DESTINATION_CHILD_SEGMENTS = new Set([
   'language',
   'museums',
   'news',
+  'parking',
   'pharmacies',
   'police',
   'restaurants',
