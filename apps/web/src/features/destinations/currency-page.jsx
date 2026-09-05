@@ -152,7 +152,10 @@ async function requestCurrencyContext(countryCode) {
     const response = await apiClient.getCountries();
     const countries = Array.isArray(response?.countries) ? response.countries : [];
     const country = countries.find(
-      (candidate) => String(candidate?.iso2 ?? '').trim().toUpperCase() === countryCode,
+      (candidate) =>
+        String(candidate?.iso2 ?? '')
+          .trim()
+          .toUpperCase() === countryCode,
     );
     const countryCurrencies = (Array.isArray(country?.currencies) ? country.currencies : [])
       .map(normalizeCountryCurrency)
@@ -266,7 +269,9 @@ function destinationText(template, destinationName) {
 }
 
 function providerDisplayName(provider) {
-  const normalized = String(provider ?? '').trim().toLowerCase();
+  const normalized = String(provider ?? '')
+    .trim()
+    .toLowerCase();
   if (normalized === 'frankfurter') return 'Frankfurter';
   return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : '—';
 }
@@ -462,7 +467,10 @@ export function CurrencyDestinationPage({ destination, locale = 'en', messages }
         ) : null}
 
         {context && context.countryCurrencies.length > 0 ? (
-          <section className={styles.currencyReference} aria-labelledby="destination-currencies-title">
+          <section
+            className={styles.currencyReference}
+            aria-labelledby="destination-currencies-title"
+          >
             <div className={styles.sectionHeading}>
               <div>
                 <span className="eyebrow">{destination.countryDisplayName}</span>
@@ -486,7 +494,9 @@ export function CurrencyDestinationPage({ destination, locale = 'en', messages }
                     <h3>{currencyName(currency.code)}</h3>
                     <p>{currency.code}</p>
                   </div>
-                  {currency.isPrimary ? <span className={styles.primary}>{copy.primary}</span> : null}
+                  {currency.isPrimary ? (
+                    <span className={styles.primary}>{copy.primary}</span>
+                  ) : null}
                 </article>
               ))}
             </div>
