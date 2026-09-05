@@ -7,8 +7,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: { getNearbyPlaces: mocks.getNearbyPlaces },
 }));
 
-const { MuseumsDestinationPage } =
-  await import('../../src/features/destinations/museums-page.jsx');
+const { MuseumsDestinationPage } = await import('../../src/features/destinations/museums-page.jsx');
 
 const messages = {
   common: { loading: 'Loading…', unavailable: 'Temporarily unavailable', retry: 'Retry' },
