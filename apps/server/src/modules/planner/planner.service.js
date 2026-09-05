@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '../../errors/app-error.js';
+import { buildBudgetEnvelope } from './budget-allocation.js';
 
 function toDate(value) {
   return value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -146,6 +147,12 @@ export function createPlannerService(repository) {
       const record = await repository.findOwnedRequestById({ userId, requestId });
       if (!record) throw new NotFoundError('The planning request was not found.');
       return mapPlannerRequest(record);
+    },
+
+    async getAllocation({ userId, requestId }) {
+      const record = await repository.findOwnedRequestById({ userId, requestId });
+      if (!record) throw new NotFoundError('The planning request was not found.');
+      return buildBudgetEnvelope(record);
     },
   };
 }
