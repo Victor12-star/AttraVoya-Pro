@@ -276,4 +276,142 @@ describe('budget planner requests', () => {
       },
     });
   });
+
+  it('builds an owner-scoped budget envelope from user-entered money without claiming provider prices', async () => {
+    const repository = createPlannerRepository();
+    const app = await createApp(repository);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/planner/requests/plan-request-1/allocation',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['cache-control']).toBe('private, no-store');
+    expect(repository.findOwnedRequestById).toHaveBeenCalledWith({
+      userId: 'user-1',
+      requestId: 'plan-request-1',
+    });
+    expect(response.json()).toEqual({
+      allocation: {
+        requestId: 'plan-request-1',
+        currencyCode: 'SEK',
+        totalBudget: '25000.00',
+        safetyReserve: {
+          category: 'SAFETY_RESERVE',
+          amount: '1875.00',
+          percentOfTotal: '7.50',
+          basis: 'USER_INPUT_DERIVED',
+        },
+        spendableBudget: '23125.00',
+        targets: [
+          {
+            category: 'FLIGHTS',
+            amount: '6937.50',
+            percentOfSpendable: '30.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'ACCOMMODATION',
+            amount: '7400.00',
+            percentOfSpendable: '32.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'FOOD',
+            amount: '3468.75',
+            percentOfSpendable: '15.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'LOCAL_TRANSPORT',
+            amount: '1850.00',
+            percentOfSpendable: '8.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'ACTIVITIES',
+            amount: '1618.75',
+            percentOfSpendable: '7.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'CHILDREN_ACTIVITIES',
+            amount: '693.75',
+            percentOfSpendable: '3.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'AIRPORT_TRANSFER',
+            amount: '693.75',
+            percentOfSpendable: '3.00',
+            basis: 'PLANNING_TARGET',
+          },
+          {
+            category: 'TRAVEL_INSURANCE',
+            amount: '462.50',
+            percentOfSpendable: '2.00',
+            basis: 'PLANNING_TARGET',
+          },
+        ],
+        provenance: {
+          kind: 'PLANNING_TARGET',
+          policyKey: 'attravoya-budget-envelope-v1',
+          policyVersion: 1,
+          liveDataUsed: false,
+          providerDataUsed: false,
+          statement:
+            "Targets divide the traveller's saved budget after their safety reserve. They are not fares, prices, quotes, availability, or destination-specific cost estimates.",
+        },
+      },
+    });
+  });
+
+  it('reallocates the child-activity target when the request has no children', async () => {
+    const repository = createPlannerRepository({
+      findOwnedRequestById: vi.fn(async ({ userId, requestId }) =>
+        userId === 'user-1' && requestId === 'plan-request-1'
+          ? storedRequest({ childrenAges: [] })
+          : null,
+      ),
+    });
+    const app = await createApp(repository);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/planner/requests/plan-request-1/allocation',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    const targets = response.json().allocation.targets;
+    expect(targets.find((target) => target.category === 'CHILDREN_ACTIVITIES')).toMatchObject({
+      amount: '0.00',
+      percentOfSpendable: '0.00',
+    });
+    expect(targets.find((target) => target.category === 'ACTIVITIES')).toMatchObject({
+      amount: '2312.50',
+      percentOfSpendable: '10.00',
+    });
+  });
+
+  it('protects the budget envelope with authentication and owner isolation', async () => {
+    const repository = createPlannerRepository();
+    const app = await createApp(repository);
+
+    const unauthenticated = await app.inject({
+      method: 'GET',
+      url: '/api/v1/planner/requests/plan-request-1/allocation',
+    });
+    expect(unauthenticated.statusCode).toBe(401);
+
+    const otherOwner = await app.inject({
+      method: 'GET',
+      url: '/api/v1/planner/requests/plan-request-1/allocation',
+      headers: bearer(app, 'user-2'),
+    });
+    expect(otherOwner.statusCode).toBe(404);
+    expect(otherOwner.json()).toMatchObject({ error: { code: 'NOT_FOUND' } });
+  });
 });
