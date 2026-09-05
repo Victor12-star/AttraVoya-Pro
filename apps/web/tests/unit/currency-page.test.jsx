@@ -22,9 +22,8 @@ vi.mock('../../src/lib/preferences.js', () => ({
   savePreferences: mocks.savePreferences,
 }));
 
-const { CurrencyDestinationPage } = await import(
-  '../../src/features/destinations/currency-page.jsx'
-);
+const { CurrencyDestinationPage } =
+  await import('../../src/features/destinations/currency-page.jsx');
 
 const messages = {
   common: {
@@ -54,17 +53,15 @@ function countriesResponse(currencies = null) {
       {
         iso2: 'SE',
         name: 'Sweden',
-        currencies:
-          currencies ??
-          [
-            {
-              code: 'SEK',
-              name: 'Swedish krona',
-              symbol: 'kr',
-              decimalDigits: 2,
-              isPrimary: true,
-            },
-          ],
+        currencies: currencies ?? [
+          {
+            code: 'SEK',
+            name: 'Swedish krona',
+            symbol: 'kr',
+            decimalDigits: 2,
+            isPrimary: true,
+          },
+        ],
       },
     ],
   };
@@ -122,7 +119,9 @@ describe('CurrencyDestinationPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Stockholm currency & exchange', level: 1 }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Destination currencies', level: 2 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Destination currencies', level: 2 }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText('SEK').length).toBeGreaterThan(0);
     expect(screen.getByText(/Rate provider: Frankfurter/)).toBeInTheDocument();
     expect(mocks.getCountries).toHaveBeenCalledTimes(1);
