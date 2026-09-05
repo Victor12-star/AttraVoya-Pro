@@ -1,8 +1,27 @@
 const POLICY_KEY = 'attravoya-budget-envelope-v1';
 
+function isNonNegativeDecimal(value) {
+  if (!value) return false;
+
+  let decimalPointSeen = false;
+  for (let index = 0; index < value.length; index += 1) {
+    const character = value[index];
+    if (character === '.') {
+      if (decimalPointSeen || index === 0 || index === value.length - 1) return false;
+      decimalPointSeen = true;
+      continue;
+    }
+
+    const codePoint = value.charCodeAt(index);
+    if (codePoint < 48 || codePoint > 57) return false;
+  }
+
+  return true;
+}
+
 function decimalToScaledInteger(value, scaleDigits, label) {
   const normalized = String(value ?? '').trim();
-  if (!/^\d+(?:\.\d+)?$/.test(normalized)) {
+  if (!isNonNegativeDecimal(normalized)) {
     throw new TypeError(`${label} must be a non-negative decimal value.`);
   }
 
