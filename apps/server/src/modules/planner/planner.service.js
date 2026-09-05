@@ -79,7 +79,15 @@ export function createPlannerService(repository) {
 
   return {
     async createRequest({ userId, input }) {
-      const currency = await repository.findCurrencyByCode(input.budgetCurrencyCode);
+      const {
+        budgetCurrencyCode,
+        fixedDeparture,
+        fixedReturn,
+        earliestDeparture,
+        latestReturn,
+        ...rest
+      } = input;
+      const currency = await repository.findCurrencyByCode(budgetCurrencyCode);
       if (!currency) {
         throw new ValidationError('The selected budget currency is not supported.');
       }
@@ -110,15 +118,6 @@ export function createPlannerService(repository) {
       ) {
         throw new ValidationError('The selected origin city and airport do not match.');
       }
-
-      const {
-        budgetCurrencyCode: _budgetCurrencyCode,
-        fixedDeparture,
-        fixedReturn,
-        earliestDeparture,
-        latestReturn,
-        ...rest
-      } = input;
 
       const record = await repository.createOwnedRequest({
         userId,
