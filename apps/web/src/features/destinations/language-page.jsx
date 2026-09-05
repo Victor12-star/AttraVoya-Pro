@@ -439,7 +439,9 @@ export function LanguageDestinationPage({ destination, locale = 'en', messages }
                           {copy.official}
                         </span>
                       ) : null}
-                      {language.isCommon ? <span className={styles.badge}>{copy.common}</span> : null}
+                      {language.isCommon ? (
+                        <span className={styles.badge}>{copy.common}</span>
+                      ) : null}
                     </div>
                   </article>
                 ))}
