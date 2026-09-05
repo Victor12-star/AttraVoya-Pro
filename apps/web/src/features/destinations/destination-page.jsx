@@ -24,6 +24,7 @@ import {
   Pill,
   Plane,
   RefreshCw,
+  Shield,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -43,6 +44,7 @@ import { getHospitalsPageCopy } from './hospitals-page-copy.js';
 import { getMuseumsPageCopy } from './museums-page-copy.js';
 import { getNewsPageCopy } from './news-page-copy.js';
 import { getPharmaciesPageCopy } from './pharmacies-page-copy.js';
+import { getPolicePageCopy } from './police-page-copy.js';
 import { getRestaurantsPageCopy } from './restaurants-page-copy.js';
 import { getShoppingPageCopy } from './shopping-page-copy.js';
 import styles from './destination-page.module.css';
@@ -189,6 +191,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
   const museumsCopy = getMuseumsPageCopy(locale);
   const newsCopy = getNewsPageCopy(locale);
   const pharmaciesCopy = getPharmaciesPageCopy(locale);
+  const policeCopy = getPolicePageCopy(locale);
   const restaurantsCopy = getRestaurantsPageCopy(locale);
   const shoppingCopy = getShoppingPageCopy(locale);
   const [weatherState, setWeatherState] = useState(
@@ -296,6 +299,11 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       href: buildDestinationChildHref(destination, 'pharmacies'),
       icon: Pill,
       label: pharmaciesCopy.eyebrow,
+    },
+    {
+      href: buildDestinationChildHref(destination, 'police'),
+      icon: Shield,
+      label: policeCopy.eyebrow,
     },
     {
       href: buildDestinationChildHref(destination, 'museums'),
