@@ -1,10 +1,13 @@
 import { NotFoundError, ValidationError } from '../../errors/app-error.js';
 import {
-  applyAccommodationPricingCollection,
+  applyMarketPricingCollection,
   buildAffordabilityEvidenceGate,
 } from './affordability-evidence.js';
 import { buildBudgetEnvelope } from './budget-allocation.js';
-import { normalizeAccommodationPricingEvidence } from './pricing-evidence.js';
+import {
+  normalizeAccommodationPricingEvidence,
+  normalizeFlightPricingEvidence,
+} from './pricing-evidence.js';
 
 function toDate(value) {
   return value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -117,7 +120,7 @@ function destinationCandidateEnvelope({ requestId, mode, records }) {
   };
 }
 
-async function collectAccommodationPricingEvidence(collector, gate) {
+async function collectMarketPricingEvidence({ collector, gate, normalize }) {
   if (!collector) return { status: 'NOT_CONFIGURED' };
 
   try {
@@ -130,10 +133,7 @@ async function collectAccommodationPricingEvidence(collector, gate) {
 
     return {
       status: 'COLLECTED',
-      evidence: normalizeAccommodationPricingEvidence(
-        rawEvidence,
-        gate.searchContext.budget.currencyCode,
-      ),
+      evidence: normalize(rawEvidence, gate.searchContext.budget.currencyCode),
     };
   } catch {
     return { status: 'FAILED' };
@@ -143,6 +143,7 @@ async function collectAccommodationPricingEvidence(collector, gate) {
 export function createPlannerService(repository, options = {}) {
   if (!repository) throw new TypeError('Planner repository is required.');
   const accommodationPricingCollector = options.accommodationPricingCollector;
+  const flightPricingCollector = options.flightPricingCollector;
 
   return {
     async createRequest({ userId, input }) {
@@ -266,16 +267,25 @@ export function createPlannerService(repository, options = {}) {
 
       if (!candidate) throw new NotFoundError('The destination candidate was not found.');
 
-      const gate = buildAffordabilityEvidenceGate({
+      let gate = buildAffordabilityEvidenceGate({
         planRequest: mapPlannerRequest(record),
         destination: mapDestinationCandidate(candidate),
         budgetEnvelope: buildBudgetEnvelope(record),
       });
-      const accommodationCollection = await collectAccommodationPricingEvidence(
-        accommodationPricingCollector,
+
+      const flightCollection = await collectMarketPricingEvidence({
+        collector: flightPricingCollector,
         gate,
-      );
-      return applyAccommodationPricingCollection(gate, accommodationCollection);
+        normalize: normalizeFlightPricingEvidence,
+      });
+      gate = applyMarketPricingCollection(gate, 'FLIGHTS', flightCollection);
+
+      const accommodationCollection = await collectMarketPricingEvidence({
+        collector: accommodationPricingCollector,
+        gate,
+        normalize: normalizeAccommodationPricingEvidence,
+      });
+      return applyMarketPricingCollection(gate, 'ACCOMMODATION', accommodationCollection);
     },
   };
 }
