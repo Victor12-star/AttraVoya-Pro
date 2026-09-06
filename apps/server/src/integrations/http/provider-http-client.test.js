@@ -9,9 +9,23 @@ function jsonResponse(status, payload, headers = {}) {
   });
 }
 
-function deferred() {
-  let resolve;
-  let reject;
+/**
+ * Creates a controllable Response promise for concurrency/backpressure tests.
+ * Initial no-op callbacks keep strict JavaScript checking from treating the
+ * resolver functions as possibly undefined before the Promise executor runs.
+ *
+ * @returns {{
+ *   promise: Promise<Response>,
+ *   resolve: (value: Response | PromiseLike<Response>) => void,
+ *   reject: (reason?: unknown) => void,
+ * }}
+ */
+function deferredResponse() {
+  /** @type {(value: Response | PromiseLike<Response>) => void} */
+  let resolve = () => {};
+  /** @type {(reason?: unknown) => void} */
+  let reject = () => {};
+  /** @type {Promise<Response>} */
   const promise = new Promise((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
     reject = rejectPromise;
@@ -52,7 +66,7 @@ describe('provider HTTP client', () => {
       .fn()
       .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary' }))
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
-    const sleepImpl = vi.fn().mockResolvedValue();
+    const sleepImpl = vi.fn().mockResolvedValue(undefined);
     const client = createProviderHttpClient({
       provider: 'test',
       fetchImpl,
@@ -74,7 +88,7 @@ describe('provider HTTP client', () => {
       .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary-1' }))
       .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary-2' }))
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
-    const sleepImpl = vi.fn().mockResolvedValue();
+    const sleepImpl = vi.fn().mockResolvedValue(undefined);
     const randomImpl = vi.fn().mockReturnValueOnce(0).mockReturnValueOnce(0.999999);
     const client = createProviderHttpClient({
       provider: 'test',
@@ -92,13 +106,14 @@ describe('provider HTTP client', () => {
   });
 
   it('never exceeds the configured in-flight concurrency cap', async () => {
+    /** @type {ReturnType<typeof deferredResponse>[]} */
     const pendingFetches = [];
     let activeFetches = 0;
     let maxActiveFetches = 0;
     const fetchImpl = vi.fn(() => {
       activeFetches += 1;
       maxActiveFetches = Math.max(maxActiveFetches, activeFetches);
-      const pending = deferred();
+      const pending = deferredResponse();
       pendingFetches.push(pending);
 
       return pending.promise.finally(() => {
@@ -145,8 +160,8 @@ describe('provider HTTP client', () => {
   });
 
   it('releases queued work after both successful and failed requests', async () => {
-    const firstFetch = deferred();
-    const secondFetch = deferred();
+    const firstFetch = deferredResponse();
+    const secondFetch = deferredResponse();
     const fetchImpl = vi
       .fn()
       .mockImplementationOnce(() => firstFetch.promise)
@@ -182,7 +197,7 @@ describe('provider HTTP client', () => {
   });
 
   it('fails closed when the bounded provider queue is full', async () => {
-    const firstFetch = deferred();
+    const firstFetch = deferredResponse();
     const fetchImpl = vi
       .fn()
       .mockImplementationOnce(() => firstFetch.promise)
