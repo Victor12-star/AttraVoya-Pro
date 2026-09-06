@@ -79,23 +79,33 @@ function repository() {
   };
 }
 
+function verifiedEvidence(category, amount = CATEGORY_TARGETS[category]) {
+  return /** @type {VerifiedCollectorResult} */ ({
+    amountMin: amount,
+    amountMax: amount,
+    currencyCode: 'EUR',
+    pricingBasis: 'VERIFIED_PRICE',
+    confidence: 'HIGH',
+    sourceProvider: `verified-${category.toLowerCase()}-test`,
+    sourceExternalId: `${category.toLowerCase()}-evidence-1`,
+    sourceFetchedAt: '2026-09-06T12:00:00.000Z',
+    rawProviderPayload: { mustNotLeak: true },
+  });
+}
+
 function verifiedCollector(category, amount = CATEGORY_TARGETS[category]) {
   return {
-    collect: vi.fn(
-      async () =>
-        /** @type {VerifiedCollectorResult} */ ({
-          amountMin: amount,
-          amountMax: amount,
-          currencyCode: 'EUR',
-          pricingBasis: 'VERIFIED_PRICE',
-          confidence: 'HIGH',
-          sourceProvider: `verified-${category.toLowerCase()}-test`,
-          sourceExternalId: `${category.toLowerCase()}-evidence-1`,
-          sourceFetchedAt: '2026-09-06T12:00:00.000Z',
-          rawProviderPayload: { mustNotLeak: true },
-        }),
-    ),
+    collect: vi.fn(async () => verifiedEvidence(category, amount)),
   };
+}
+
+function deferredEvidence() {
+  /** @type {(value: VerifiedCollectorResult) => void} */
+  let resolve = () => {};
+  const promise = new Promise((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
 }
 
 async function evidence(service) {
@@ -119,6 +129,89 @@ describe('remaining planner cost evidence collectors', () => {
     expect(result.evidence.required.every((item) => item.status === 'NOT_CONFIGURED')).toBe(true);
     expect(result.evidence.collected).toEqual([]);
     expect(result.evidence.status).toBe('INSUFFICIENT_EVIDENCE');
+    expect(result.evaluation).toEqual({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+    });
+  });
+
+  it('starts configured collectors concurrently while preserving deterministic category order', async () => {
+    const flightDeferred = deferredEvidence();
+    const accommodationDeferred = deferredEvidence();
+    const flightPricingCollector = { collect: vi.fn(() => flightDeferred.promise) };
+    const accommodationPricingCollector = {
+      collect: vi.fn(() => accommodationDeferred.promise),
+    };
+
+    const pendingResult = evidence(
+      createPlannerService(repository(), {
+        flightPricingCollector,
+        accommodationPricingCollector,
+      }),
+    );
+
+    await vi.waitFor(() => {
+      expect(flightPricingCollector.collect).toHaveBeenCalledTimes(1);
+      expect(accommodationPricingCollector.collect).toHaveBeenCalledTimes(1);
+    });
+
+    accommodationDeferred.resolve(verifiedEvidence('ACCOMMODATION'));
+    flightDeferred.resolve(verifiedEvidence('FLIGHTS'));
+    const result = await pendingResult;
+
+    expect(result.evidence.collectionAttempts.slice(0, 3)).toEqual([
+      { category: 'FLIGHTS', status: 'COLLECTED' },
+      { category: 'ACCOMMODATION', status: 'COLLECTED' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+    ]);
+    expect(result.evidence.collected.map((item) => item.category)).toEqual([
+      'FLIGHTS',
+      'ACCOMMODATION',
+    ]);
+    expect(result.evaluation).toEqual({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+    });
+  });
+
+  it('isolates a failed collector without cancelling verified evidence from another category', async () => {
+    const flightPricingCollector = {
+      collect: vi.fn(async () => {
+        throw new Error('simulated flight provider failure');
+      }),
+    };
+    const accommodationPricingCollector = verifiedCollector('ACCOMMODATION');
+
+    const result = await evidence(
+      createPlannerService(repository(), {
+        flightPricingCollector,
+        accommodationPricingCollector,
+      }),
+    );
+
+    expect(result.evidence.collectionAttempts.slice(0, 2)).toEqual([
+      { category: 'FLIGHTS', status: 'FAILED' },
+      { category: 'ACCOMMODATION', status: 'COLLECTED' },
+    ]);
+    expect(result.evidence.collected).toEqual([
+      expect.objectContaining({
+        category: 'ACCOMMODATION',
+        sourceProvider: 'verified-accommodation-test',
+        verifiedMarketEvidence: true,
+      }),
+    ]);
+    expect(result.evidence.required.find((item) => item.category === 'FLIGHTS')).toMatchObject({
+      status: 'FAILED',
+    });
+    expect(
+      result.evidence.required.find((item) => item.category === 'ACCOMMODATION'),
+    ).toMatchObject({
+      status: 'COLLECTED',
+    });
     expect(result.evaluation).toEqual({
       budgetFit: 'NOT_EVALUATED',
       rankingEligible: false,

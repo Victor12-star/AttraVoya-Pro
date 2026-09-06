@@ -142,6 +142,19 @@ async function collectMarketPricingEvidence({ collector, gate, category }) {
   }
 }
 
+async function collectVerifiedCostEvidence({ collectors, gate }) {
+  // Start all fixed planner-category collectors together so one slow provider
+  // does not add its latency to every category that follows. Each collector is
+  // still normalized and failed closed independently, and Promise.all preserves
+  // the deterministic category order used by the evidence contract.
+  return Promise.all(
+    collectors.map(async ({ category, collector }) => ({
+      category,
+      collection: await collectMarketPricingEvidence({ collector, gate, category }),
+    })),
+  );
+}
+
 export function createPlannerService(repository, options = {}) {
   if (!repository) throw new TypeError('Planner repository is required.');
 
@@ -284,8 +297,11 @@ export function createPlannerService(repository, options = {}) {
         budgetEnvelope: buildBudgetEnvelope(record),
       });
 
-      for (const { category, collector } of verifiedCostCollectors) {
-        const collection = await collectMarketPricingEvidence({ collector, gate, category });
+      const collectedEvidence = await collectVerifiedCostEvidence({
+        collectors: verifiedCostCollectors,
+        gate,
+      });
+      for (const { category, collection } of collectedEvidence) {
         gate = applyMarketPricingCollection(gate, category, collection);
       }
 

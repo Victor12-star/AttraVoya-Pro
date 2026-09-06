@@ -314,6 +314,33 @@ Verification history:
 - Exact clean implementation head `21fe7bae57d86664f39edd6a8284350f27f650be` ran PR CI #386.
 - PR CI #386 passed all five top-level jobs, including strict JavaScript, the complete unit suite, repository-wide Prettier, production build, database verification, security checks, and live no-cost provider checks.
 - Live-provider CI must not be overstated as proof of keyed pricing providers that are not configured.
+- Final documentation-inclusive PR head `a7ec159f714d0e79cc24ccf0ef2b9bfdab73b98b` passed final PR CI #390 with all five top-level jobs green.
+- PR #38 was squash-merged with expected-head protection as `6a4ab3f7c607b9b236cf655a4dc0d7b9d5a06cff`.
+- Post-merge `develop` CI #391 passed all five top-level jobs on that exact merge SHA.
+
+### Phase 8L — Concurrent Fail-Closed Pricing Evidence Collection
+
+Branch: `feature/phase-8l-concurrent-evidence-collection`
+
+PR: #39 — `Phase 8L: collect planner pricing evidence concurrently`
+
+Base checkpoint: `6a4ab3f7c607b9b236cf655a4dc0d7b9d5a06cff`, the verified Phase 8K `develop` merge with post-merge CI #391 green.
+
+Implemented:
+
+- Starts the fixed set of eight server-only planner pricing collectors concurrently rather than serially, preventing category latencies from accumulating when trusted providers are connected later.
+- Keeps the collector fan-out bounded to the existing eight planner categories; no dynamic or unbounded provider fan-out was added.
+- Each collector still normalizes independently through the strict verified pricing-evidence contract and fails closed as `NOT_CONFIGURED`, `UNAVAILABLE`, `FAILED`, or `COLLECTED`.
+- `Promise.all` is used only after each collector has its own error boundary, so one rejected/invalid provider result does not cancel valid evidence from another category.
+- Evidence is applied after collection in the canonical planner-category order, so response ordering is deterministic even when provider completion order differs.
+- Added regression coverage proving configured collectors start before earlier deferred collectors resolve, reverse completion order does not change output order, and one failed category preserves verified evidence from another category.
+- Existing complete-evidence affordability evaluation still works, while `rankingEligible` remains false.
+- No provider integration, provider credential, ranking/recommendation policy, availability/bookability claim, Prisma schema change, migration, persistence change, or client evidence-write path was introduced.
+
+Verification history:
+
+- Initial PR head `d9de3bb7aac729516ec157d25f08051992009526` passed strict JavaScript, translations, provider smoke, lint, and the complete unit suite; only canonical Prettier formatting failed.
+- The repository-pinned Prettier 3.9.6 formatted the single Phase 8L test file without logic changes; the temporary formatter workflow removed itself before the clean candidate tree.
 
 ## Mandatory privacy-conscious analytics and admin monitoring phase
 
@@ -329,13 +356,13 @@ Before production readiness is declared, implement the dedicated requirement in 
 
 ### Required next steps
 
-1. This handoff update changes PR #38's head. Run the complete five-job PR CI on the exact final documentation-inclusive head.
+1. Run the complete five-job PR CI on the exact final documentation-inclusive Phase 8L head.
 2. Confirm root `package.json` still uses canonical `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #38 targets `develop`, is mergeable, contains only the six intended Phase 8K product/test files plus this handoff update, and contains no temporary helper files.
-4. Squash-merge PR #38 using expected-head protection.
+3. Verify PR #39 still targets `develop`, is mergeable, contains only the two intended Phase 8L code/test files plus this handoff update, and contains no temporary helper files.
+4. Squash-merge PR #39 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head and its push CI passes all five top-level jobs.
-6. Only after that gate is green, inspect the planner roadmap and start the next distinct slice from the new verified `develop` SHA.
-7. Do not enable recommendation ranking merely because verified budget fit can now be displayed. Ranking requires a separate explicit policy and trustworthy production evidence; availability and bookability remain separate.
+6. Only after that gate is green, inspect current planner/provider architecture and start the next genuinely distinct slice from the new verified `develop` SHA.
+7. Do not enable ranking or persist recommendations merely because concurrent evidence collection is ready. Production still needs trustworthy pricing collectors and an explicit recommendation/ranking policy; availability and bookability remain separate.
 
 ## Standing final release-readiness requirement
 
@@ -361,3 +388,12 @@ A provider smoke test that makes no external request, or a live check that omits
 - Fix failures on the feature branch only.
 - Do not weaken tests, formatter rules, validation, security boundaries, privacy boundaries, or provider honesty to make CI pass.
 - When documentation is updated before merge, that documentation commit becomes the new final PR head and must pass the complete CI gate before merge.
+
+## Mandatory scalability, reliability, performance and user-experience requirement
+
+- `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md` and GitHub Issue #40 are standing production requirements.
+- AttraVoya Pro must support measured growth to many concurrent users without silent data loss, duplicate side effects, provider exhaustion, database connection exhaustion, privacy leakage, or confusing failure states.
+- Required production capabilities include stateless horizontal scaling where justified, PostgreSQL connection pooling/capacity planning, bounded pagination/query optimization, distributed caching when multi-instance scale requires it, durable idempotent queues for asynchronous work, provider bulkheads/circuit-breaker-style protection where measured need exists, route-aware backpressure/rate limits, idempotency/concurrency controls, observability/SLOs, backup/restore and disaster recovery, CDN/WAF/DDoS protection, and load/stress/soak/burst testing.
+- User satisfaction is part of scalability: preserve fast web/mobile performance, Core Web Vitals budgets, form state on recoverable errors, clear loading/partial/offline/retry states, duplicate-submit protection, accessibility, all 18 locales including Arabic RTL, and honest provider/provenance messaging.
+- Do not claim production scalability from unit CI or one hosted instance. It must be demonstrated with measured load/capacity tests, bounded resources, recovery exercises, multi-instance-safe infrastructure where needed, privacy/security controls, and graceful degradation.
+- Implement these requirements incrementally in dedicated slices; do not prematurely add distributed infrastructure without measured need, and never weaken the five-job CI/security/privacy/provider-honesty gates.
