@@ -1,4 +1,5 @@
 const POLICY_KEY = 'attravoya-affordability-evidence-v1';
+const MARKET_PRICING_CATEGORIES = new Set(['ACCOMMODATION', 'FLIGHTS']);
 
 function positivePlanningTargets(targets) {
   return targets.filter((target) => Number(target.amount) > 0);
@@ -10,10 +11,14 @@ function evidenceStatus(required) {
     : 'INSUFFICIENT_EVIDENCE';
 }
 
-export function applyAccommodationPricingCollection(gate, collection) {
+export function applyMarketPricingCollection(gate, category, collection) {
+  if (!MARKET_PRICING_CATEGORIES.has(category)) {
+    throw new TypeError('Market pricing collection category is not supported.');
+  }
+
   const collectedEvidence = collection.status === 'COLLECTED' ? collection.evidence : null;
   const required = gate.evidence.required.map((item) =>
-    item.category === 'ACCOMMODATION' ? { ...item, status: collection.status } : item,
+    item.category === category ? { ...item, status: collection.status } : item,
   );
   const collected = collectedEvidence
     ? [...gate.evidence.collected, collectedEvidence]
@@ -33,7 +38,7 @@ export function applyAccommodationPricingCollection(gate, collection) {
       collectionAttempts: [
         ...(gate.evidence.collectionAttempts ?? []),
         {
-          category: 'ACCOMMODATION',
+          category,
           status: collection.status,
         },
       ],
@@ -48,7 +53,7 @@ export function applyAccommodationPricingCollection(gate, collection) {
       providerDataUsed: gate.provenance.providerDataUsed || Boolean(collectedEvidence),
       pricingDataUsed: gate.provenance.pricingDataUsed || Boolean(collectedEvidence),
       statement: collectedEvidence
-        ? 'Verified accommodation pricing evidence was collected server-side, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
+        ? 'Verified market pricing evidence was collected server-side for one or more planner categories, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
         : gate.provenance.statement,
     },
   };
