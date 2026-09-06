@@ -1,0 +1,50 @@
+name: Phase 8L one-shot scalability handoff update
+
+on:
+  push:
+    branches:
+      - feature/phase-8l-concurrent-evidence-collection
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/phase-8l-concurrent-evidence-collection
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Append mandatory scalability requirement to handoff
+        run: |
+          printf '%s\n' \
+            '' \
+            '## Mandatory scalability, reliability, performance and user-experience requirement' \
+            '' \
+            '- `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md` and GitHub Issue #40 are standing production requirements.' \
+            '- AttraVoya Pro must support measured growth to many concurrent users without silent data loss, duplicate side effects, provider exhaustion, database connection exhaustion, privacy leakage, or confusing failure states.' \
+            '- Required production capabilities include stateless horizontal scaling where justified, PostgreSQL connection pooling/capacity planning, bounded pagination/query optimization, distributed caching when multi-instance scale requires it, durable idempotent queues for asynchronous work, provider bulkheads/circuit-breaker-style protection where measured need exists, route-aware backpressure/rate limits, idempotency/concurrency controls, observability/SLOs, backup/restore and disaster recovery, CDN/WAF/DDoS protection, and load/stress/soak/burst testing.' \
+            '- User satisfaction is part of scalability: preserve fast web/mobile performance, Core Web Vitals budgets, form state on recoverable errors, clear loading/partial/offline/retry states, duplicate-submit protection, accessibility, all 18 locales including Arabic RTL, and honest provider/provenance messaging.' \
+            '- Do not claim production scalability from unit CI or one hosted instance. It must be demonstrated with measured load/capacity tests, bounded resources, recovery exercises, multi-instance-safe infrastructure where needed, privacy/security controls, and graceful degradation.' \
+            '- Implement these requirements incrementally in dedicated slices; do not prematurely add distributed infrastructure without measured need, and never weaken the five-job CI/security/privacy/provider-honesty gates.' \
+            >> docs/CURRENT-WORK.md
+      - name: Format permanent handoff
+        run: pnpm exec prettier --write docs/CURRENT-WORK.md
+      - name: Remove helper and commit clean tree
+        run: |
+          rm .github/workflows/phase8l-scalability-handoff-one-shot.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/CURRENT-WORK.md .github/workflows/phase8l-scalability-handoff-one-shot.yml
+          git commit -m "docs: make scalability and UX readiness mandatory"
+          git push
