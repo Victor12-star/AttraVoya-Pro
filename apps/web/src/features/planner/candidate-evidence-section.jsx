@@ -38,6 +38,64 @@ const EVIDENCE_STATUSES = new Set([
 const PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
 
+/**
+ * @typedef {object} PlannerBrief
+ * @property {string} id
+ * @property {{label?: string|null}|null|undefined} origin
+ * @property {{amount?: string|null, currencyCode?: string|null}|null|undefined} budget
+ */
+
+/**
+ * @typedef {object} DestinationCandidate
+ * @property {string} id
+ * @property {string} slug
+ * @property {string} name
+ * @property {string|null|undefined} regionName
+ * @property {{code: string, name: string}} country
+ * @property {string|null|undefined} summary
+ */
+
+/**
+ * @typedef {object} CandidateSet
+ * @property {string} requestId
+ * @property {'FIXED_TARGET'|'PUBLISHED_CATALOG'} mode
+ * @property {DestinationCandidate[]} destinations
+ * @property {{budgetFit: string, rankingApplied: boolean, priceDataAvailable: boolean, availabilityDataUsed: boolean}} evaluation
+ * @property {{kind: string, source: string, liveDataUsed: boolean, providerDataUsed: boolean, pricingDataUsed: boolean}} provenance
+ */
+
+/**
+ * @typedef {object} RequiredEvidence
+ * @property {string} category
+ * @property {string} targetAmount
+ * @property {string} targetBasis
+ * @property {string} status
+ */
+
+/**
+ * @typedef {object} CollectedEvidence
+ * @property {string} category
+ * @property {string} amountScope
+ * @property {string} amountMin
+ * @property {string} amountMax
+ * @property {string} currencyCode
+ * @property {string} pricingBasis
+ * @property {string} confidence
+ * @property {string} sourceProvider
+ * @property {string} sourceExternalId
+ * @property {string} sourceFetchedAt
+ * @property {boolean} verifiedMarketEvidence
+ */
+
+/**
+ * @typedef {object} AffordabilityEvidence
+ * @property {string} requestId
+ * @property {DestinationCandidate} destination
+ * @property {{policyKey: string, policyVersion: number, status: string, required: RequiredEvidence[], collected: CollectedEvidence[], missingCategories: string[]}} evidence
+ * @property {{budgetFit: string, rankingEligible: boolean, affordabilityConfirmed: boolean, evidenceReady: boolean}} evaluation
+ * @property {{kind: string, liveDataUsed: boolean, providerDataUsed: boolean, pricingDataUsed: boolean}} provenance
+ */
+
 function isMoney(value) {
   return typeof value === 'string' && /^\d+\.\d{2}$/.test(value);
 }
@@ -172,18 +230,23 @@ function formatMoneyRange(item, locale) {
 function formatTimestamp(value, locale) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
 }
 
 export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState(/** @type {PlannerBrief[]} */ ([]));
   const [briefState, setBriefState] = useState('loading');
   const [selectedRequestId, setSelectedRequestId] = useState('');
   const [candidateState, setCandidateState] = useState('idle');
-  const [candidateSet, setCandidateSet] = useState(null);
+  const [candidateSet, setCandidateSet] = useState(/** @type {CandidateSet|null} */ (null));
   const [selectedDestinationId, setSelectedDestinationId] = useState('');
   const [evidenceState, setEvidenceState] = useState('idle');
-  const [affordabilityEvidence, setAffordabilityEvidence] = useState(null);
+  const [affordabilityEvidence, setAffordabilityEvidence] = useState(
+    /** @type {AffordabilityEvidence|null} */ (null),
+  );
   const briefSequence = useRef(0);
   const candidateSequence = useRef(0);
   const evidenceSequence = useRef(0);
@@ -289,7 +352,7 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
   }
 
   const selectedBrief = requests.find((request) => request.id === selectedRequestId);
-  const selectedDestination = candidateSet?.destinations?.find(
+  const selectedDestination = candidateSet?.destinations.find(
     (destination) => destination.id === selectedDestinationId,
   );
 
