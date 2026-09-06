@@ -5,7 +5,9 @@ import { createPlannerService } from './planner.service.js';
 
 export async function plannerRoutes(app, options = {}) {
   const repository = options.repository ?? createPlannerRepository();
-  const service = createPlannerService(repository);
+  const service = createPlannerService(repository, {
+    accommodationPricingCollector: options.accommodationPricingCollector,
+  });
   const controller = createPlannerController(service);
   const protectedApp = /** @type {any} */ (app);
   const authenticated = { onRequest: [protectedApp.authenticate] };
