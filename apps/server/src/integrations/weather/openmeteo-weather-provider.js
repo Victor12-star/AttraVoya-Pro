@@ -1,3 +1,4 @@
+import { loadProviderCacheValue } from '../http/provider-cache.js';
 import { normalizeOpenMeteoForecast } from './weather-normalizer.js';
 
 const FORECAST_ENDPOINT = 'https://api.open-meteo.com/v1/forecast';
@@ -36,20 +37,24 @@ export function createOpenMeteoWeatherProvider({ http, cache, cacheTtlSeconds = 
 
     async getForecast({ latitude, longitude, forecastDays = 7, timezone = 'auto' }) {
       const cacheKey = weatherCacheKey({ latitude, longitude, forecastDays, timezone });
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
 
-      const url = new URL(FORECAST_ENDPOINT);
-      url.searchParams.set('latitude', String(latitude));
-      url.searchParams.set('longitude', String(longitude));
-      url.searchParams.set('current', CURRENT_FIELDS.join(','));
-      url.searchParams.set('daily', DAILY_FIELDS.join(','));
-      url.searchParams.set('timezone', timezone);
-      url.searchParams.set('forecast_days', String(forecastDays));
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(FORECAST_ENDPOINT);
+          url.searchParams.set('latitude', String(latitude));
+          url.searchParams.set('longitude', String(longitude));
+          url.searchParams.set('current', CURRENT_FIELDS.join(','));
+          url.searchParams.set('daily', DAILY_FIELDS.join(','));
+          url.searchParams.set('timezone', timezone);
+          url.searchParams.set('forecast_days', String(forecastDays));
 
-      const payload = await http.requestJson(url);
-      const normalized = normalizeOpenMeteoForecast(payload);
-      return cache ? cache.set(cacheKey, normalized, cacheTtlSeconds) : normalized;
+          const payload = await http.requestJson(url);
+          return normalizeOpenMeteoForecast(payload);
+        },
+      });
     },
   };
 }
