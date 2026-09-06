@@ -31,6 +31,8 @@ const payload = {
   },
 };
 
+const query = { latitude: 59.33, longitude: 18.07, forecastDays: 1, timezone: 'auto' };
+
 describe('Open-Meteo adapter', () => {
   it('normalizes and caches weather responses', async () => {
     const http = { requestJson: vi.fn().mockResolvedValue(payload) };
@@ -39,7 +41,6 @@ describe('Open-Meteo adapter', () => {
       cache: createProviderCache(),
       cacheTtlSeconds: 600,
     });
-    const query = { latitude: 59.33, longitude: 18.07, forecastDays: 1, timezone: 'auto' };
 
     const first = await provider.getForecast(query);
     const second = await provider.getForecast(query);
@@ -47,6 +48,37 @@ describe('Open-Meteo adapter', () => {
     expect(first.current.temperatureC).toBe(19);
     expect(first.daily[0].temperatureMaxC).toBe(21);
     expect(second).toEqual(first);
+    expect(http.requestJson).toHaveBeenCalledTimes(1);
+  });
+
+  it('coalesces concurrent identical cache misses into one provider request', async () => {
+    const gate = Promise.withResolvers();
+    const http = {
+      requestJson: vi.fn().mockImplementation(async () => {
+        await gate.promise;
+        return payload;
+      }),
+    };
+    const provider = createOpenMeteoWeatherProvider({
+      http,
+      cache: createProviderCache(),
+      cacheTtlSeconds: 600,
+    });
+
+    const requests = [
+      provider.getForecast(query),
+      provider.getForecast(query),
+      provider.getForecast(query),
+    ];
+
+    await Promise.resolve();
+    expect(http.requestJson).toHaveBeenCalledTimes(1);
+
+    gate.resolve(undefined);
+    const results = await Promise.all(requests);
+
+    expect(results[1]).toEqual(results[0]);
+    expect(results[2]).toEqual(results[0]);
     expect(http.requestJson).toHaveBeenCalledTimes(1);
   });
 });
