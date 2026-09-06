@@ -27,6 +27,7 @@ This file is the permanent handoff point for continuing development safely in a 
 - Frontend visibility is not an authorization boundary. Protected persistence and private traveller data must be enforced on the server.
 - Private travel intent and budget data must not be stored in public/shared caches.
 - A published destination-catalog entry is not proof that a trip is affordable, available, safe for a specific traveller, or bookable. Planner candidate discovery must remain separate from provider-backed affordability evaluation.
+- A planning target is not a market price. Future affordability decisions must be based on explicit, provenance-aware evidence and must stay unevaluated when required evidence is missing.
 
 ## Completed integration checkpoints
 
@@ -165,66 +166,83 @@ This file is the permanent handoff point for continuing development safely in a 
 - Allocation copy works across all 18 supported UI locales and preserves responsive, RTL, and reduced-motion behavior.
 - Phase 8C did not add destination ranking, provider pricing, fares, availability, or destination-specific cost estimates.
 
-## Current phase
-
 ### Phase 8D — Planner Destination Candidate Foundation
 
-Branch: `feature/phase-8d-planner-destination-candidates`
+- PR #30 merged into `develop`.
+- Final PR head: `ce076bbe805c71c7475db0335fffa77d6a441b0e`.
+- Final PR CI #321 passed all five top-level jobs.
+- Squash merge commit: `03a01ea0b8a75b01decc1ab2cd8b22a2780ec567`.
+- Post-merge `develop` CI #322 passed all five top-level jobs on that exact merge SHA.
+- Added protected `GET /api/v1/planner/requests/:requestId/destination-candidates` with owner-scoped 404 isolation and `private, no-store` caching.
+- Open-destination requests receive up to 20 currently published AttraVoya destination-catalog entries, excluding a known origin city.
+- Fixed-target requests preserve only the saved target and never silently substitute another destination.
+- Candidate provenance is `PUBLISHED_CATALOG_CANDIDATE`; `budgetFit` is `NOT_EVALUATED`, no ranking is applied, and no pricing/provider/availability data is used.
+- Added shared API-client support and focused tests for authentication, owner isolation, fixed-target behavior, candidate honesty, and encoded IDs.
+- No recommendation, `BudgetPlan`, `BudgetLine`, Prisma schema, or migration change was introduced.
 
-PR: #30 — `Phase 8D: add planner destination candidate foundation`
+## Current phase
 
-Base checkpoint: `3c9d1240e6c723b65e95196b8027a470aeebc106` — verified Phase 8C `develop` merge with post-merge CI #317 green.
+### Phase 8E — Affordability Evidence Gate
+
+Branch: `feature/phase-8e-affordability-evidence-gate`
+
+PR: #31 — `Phase 8E: add affordability evidence gate`
+
+Base checkpoint: `03a01ea0b8a75b01decc1ab2cd8b22a2780ec567` — verified Phase 8D `develop` merge with post-merge CI #322 green.
 
 Reason for this phase:
 
-- The roadmap moves next toward budget-first destination discovery and replanning.
-- The repository does not yet contain verified flight/accommodation pricing evidence sufficient to claim that a destination fits a traveller's budget.
-- The database already contains a published destination catalog and later recommendation/budget-plan structures, but catalog publication is not affordability evidence.
-- Phase 8D therefore establishes a private request-owned candidate-discovery contract without pretending to rank by price or persist premature recommendations.
+- Phase 8D can identify valid published destination candidates, but the repository still has no verified flight/accommodation market-pricing evidence sufficient to call a destination affordable.
+- `FLIGHT_PROVIDER` remains `none`, and existing accommodation discovery returns real lodging locations but not verified live inventory/pricing suitable for budget-fit evaluation.
+- Before any recommendation ranking is allowed, AttraVoya needs a strict boundary that defines the traveller/candidate/budget inputs and records which market-evidence categories are still missing.
+- Phase 8E therefore builds a provider-ready evidence-search context without pretending that provider evidence has already been collected.
 
 Implemented:
 
-- Added protected `GET /api/v1/planner/requests/:requestId/destination-candidates`.
+- Added protected `GET /api/v1/planner/requests/:requestId/destination-candidates/:destinationId/affordability-evidence`.
 - Reuses owner-scoped `findOwnedRequestById`; another traveller receives 404 rather than request-existence disclosure.
-- Responses use `Cache-Control: private, no-store` because the candidate set is derived from private travel intent.
-- Open-destination requests receive up to 20 currently `PUBLISHED` AttraVoya destination-catalog entries.
-- When the request has a known origin city, that city is excluded from open-destination candidates.
-- When a traveller explicitly selected `targetDestinationId`, the endpoint preserves that fixed target rather than replacing it with unrelated destinations. If that target is no longer published, the fixed-target result is empty rather than silently substituting another destination.
-- Candidate records expose only catalog-supported destination/city/country fields and summary text.
-- Shared API client exposes `getPlannerDestinationCandidates(requestId)` and URL-encodes the request ID.
-- Added focused server tests for authentication, owner isolation, private caching, origin-city exclusion, fixed-target behavior, unpublished fixed targets, and honest provenance.
-- Added API-client coverage for the encoded destination-candidate route.
+- Responses use `Cache-Control: private, no-store` because the payload contains private travel intent, traveller composition, dates, budget, and accommodation preferences.
+- Reuses the saved planner request, the valid published candidate, and the verified deterministic Phase 8B budget envelope rather than creating a second planning model.
+- The returned `searchContext` carries the saved origin, dates, travellers, interests, comfort level, accommodation preferences, budget currency, total budget, safety reserve, spendable budget, planning targets, and planning-target provenance.
+- Candidate membership is strict:
+  - a fixed-target request can build evidence only for its saved published target;
+  - an open request can build evidence only for a destination in its current published candidate set;
+  - a mismatched or unavailable candidate resolves as 404 rather than becoming an implicit recommendation.
+- Versioned evidence policy: `attravoya-affordability-evidence-v1`, version `1`.
+- Every positive planning-target category is represented as required evidence with status `NOT_COLLECTED`.
+- `evidence.collected` is deliberately empty and `evidence.status` is `INSUFFICIENT_EVIDENCE`.
+- Shared API client exposes `getPlannerAffordabilityEvidence(requestId, destinationId)` and URL-encodes both IDs.
+- Focused server tests cover authentication, owner isolation, private caching, exact budget-envelope reuse, open-candidate membership, fixed-target non-substitution, and honest provenance.
+- API-client tests cover encoded request/destination IDs.
 - No Prisma schema or migration change was made.
 
 Data-honesty boundary:
 
-- Candidate mode is either `PUBLISHED_CATALOG` or `FIXED_TARGET`.
-- `evaluation.budgetFit` is explicitly `NOT_EVALUATED`.
-- `rankingApplied` is `false`.
-- `priceDataAvailable` is `false`.
-- `availabilityDataUsed` is `false`.
-- Provenance is `PUBLISHED_CATALOG_CANDIDATE` from `ATTRAVOYA_PUBLISHED_DESTINATION_CATALOG` with `liveDataUsed: false`, `providerDataUsed: false`, and `pricingDataUsed: false`.
-- These candidates are not affordability recommendations and are not proof that a trip is feasible or bookable.
-- No flight fares, accommodation prices, quotes, availability, keyed-provider results, or other pricing evidence are invented.
+- `evaluation.budgetFit` remains `NOT_EVALUATED`.
+- `rankingEligible` is `false`.
+- `affordabilityConfirmed` is `false`.
+- `evidence.status` is `INSUFFICIENT_EVIDENCE` and `collected` is empty.
+- Required positive budget categories are marked `NOT_COLLECTED`; their amounts are planning targets from the traveller's own budget, not provider prices.
+- Provenance is `AFFORDABILITY_EVIDENCE_GATE` and explicitly states `liveDataUsed: false`, `providerDataUsed: false`, and `pricingDataUsed: false`.
+- No flight fares, accommodation prices, quotes, availability, provider results, ranking scores, affordability conclusions, or bookability claims are invented.
 - No `TravelPlanRecommendation`, `BudgetPlan`, or `BudgetLine` persistence is created in this phase.
 
 Verification history:
 
-- Initial implementation head `16a98114a3b04e07a29d20af1c915b41e8b86155` opened PR #30 and ran CI #318. PostgreSQL/Prisma and dependency/secret checks passed, while strict JavaScript and production build failed on the same inference issue: `excludeCityId` was not included in the inferred optional repository options type.
-- Fix head `bfe27d4cd6dc75201e1258c2b4a6f4f2511aa704` added an explicit JavaScript JSDoc options type without runtime behavior changes. CI #319 then passed strict JavaScript, translations, provider smoke, ESLint, all unit tests, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks. Repository-wide Prettier flagged only `packages/api-client/src/client.js`.
-- Formatting head `fac3fefcaed4bd13b67c88751ae8c2bd1c08e6e5` changed only the API-client call layout to canonical Prettier form.
-- PR CI #320 on exact head `fac3fefcaed4bd13b67c88751ae8c2bd1c08e6e5` passed all five top-level jobs, including strict JavaScript, translations, provider smoke, ESLint, all unit tests, repository-wide Prettier, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks.
+- Initial implementation head `4cfe1ce1431ab2ae9425afb960e3205d68ca4182` opened PR #31 and ran CI #323. Strict JavaScript, translations, provider smoke, ESLint, all unit tests, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks passed. Repository-wide Prettier flagged only `packages/api-client/tests/planner-client.test.js`.
+- Formatting head `d0dee0747cf8f9a9d315faeba38e55bc90d9f0fc` changed only the planner API-client test call layout to canonical Prettier form.
+- PR CI #324 on exact head `d0dee0747cf8f9a9d315faeba38e55bc90d9f0fc` passed all five top-level CI jobs, including strict JavaScript, translations, provider smoke, ESLint, all unit tests, repository-wide Prettier, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks.
 
 ### Required next steps
 
-1. This handoff update changes PR #30's head. Run the complete five-job PR CI on the exact new documentation head.
+1. This handoff update changes PR #31's head. Run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` remains canonical with `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #30 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #30 using expected-head protection.
+3. Verify PR #31 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #31 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
 7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
-8. Best next product direction: introduce provider-ready affordability evidence/search in a narrow server-side slice before any destination ranking. Do not label catalog candidates affordable or feasible until verified price evidence exists, and preserve explicit provenance for every future price/estimate used in budget-fit evaluation.
+8. Best next product direction: Phase 8F should introduce the first provider-evidence normalization/ingestion contract for one pricing category only, while keeping missing evidence explicit. Because flights currently have no provider and Geoapify accommodation discovery does not provide verified live lodging prices/inventory, do not fabricate a pricing adapter. Prefer a provenance-safe evidence contract that can accept future verified provider results and cannot make ranking eligible until the required evidence threshold is genuinely satisfied.
 
 ## CI interpretation rule
 
