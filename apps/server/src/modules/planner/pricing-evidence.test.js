@@ -37,7 +37,7 @@ describe('accommodation pricing evidence normalization', () => {
     });
   });
 
-  it.each(['ESTIMATE', 'USER_ENTERED', 'UNAVAILABLE']) (
+  it.each(['ESTIMATE', 'USER_ENTERED', 'UNAVAILABLE'])(
     'rejects %s as verified accommodation market evidence',
     (pricingBasis) => {
       expect(() =>
@@ -51,7 +51,10 @@ describe('accommodation pricing evidence normalization', () => {
       normalizeAccommodationPricingEvidence(validEvidence({ currencyCode: 'SEK' }), 'EUR'),
     ).toThrow('planner budget currency');
     expect(() =>
-      normalizeAccommodationPricingEvidence(validEvidence({ amountMin: 400, amountMax: 300 }), 'EUR'),
+      normalizeAccommodationPricingEvidence(
+        validEvidence({ amountMin: 400, amountMax: 300 }),
+        'EUR',
+      ),
     ).toThrow('maximum cannot be below');
     expect(() =>
       normalizeAccommodationPricingEvidence(validEvidence({ sourceProvider: ' ' }), 'EUR'),
