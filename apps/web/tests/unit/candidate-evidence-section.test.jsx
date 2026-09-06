@@ -190,9 +190,7 @@ describe('CandidateEvidenceSection', () => {
 
     fireEvent.click(screen.getByRole('button', { name: copy.inspect }));
 
-    expect(
-      await screen.findByText('verified-accommodation-test'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('verified-accommodation-test')).toBeInTheDocument();
     expect(mocks.getPlannerAffordabilityEvidence).toHaveBeenCalledWith(
       'request-1',
       'destination-lisbon',
@@ -200,7 +198,9 @@ describe('CandidateEvidenceSection', () => {
     expect(screen.getByText('240.00–280.50 EUR')).toBeInTheDocument();
     expect(screen.getByText(copy.statuses.NOT_CONFIGURED)).toBeInTheDocument();
     expect(screen.getAllByText(copy.notAffordableYet).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/book now|best destination|recommended for you/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/book now|best destination|recommended for you/i),
+    ).not.toBeInTheDocument();
   });
 
   it('rejects a candidate payload that claims ranking or pricing evaluation', async () => {
