@@ -1,3 +1,4 @@
+import { loadProviderCacheValue } from '../http/provider-cache.js';
 import { requireProviderCredential } from '../http/provider-credentials.js';
 import { normalizeTicketmasterEvents } from './ticketmaster-events-normalizer.js';
 
@@ -67,37 +68,41 @@ export function createTicketmasterEventsProvider({ http, apiKey, cache, cacheTtl
 
     async searchEvents(query = {}) {
       const cacheKey = eventCacheKey(query);
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
 
-      const url = new URL(EVENTS_ENDPOINT);
-      url.searchParams.set('apikey', key());
-      url.searchParams.set('size', String(query.size ?? 20));
-      url.searchParams.set('page', String(query.page ?? 0));
-      url.searchParams.set('locale', query.locale ?? 'en');
-      url.searchParams.set('includeTest', 'no');
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(EVENTS_ENDPOINT);
+          url.searchParams.set('apikey', key());
+          url.searchParams.set('size', String(query.size ?? 20));
+          url.searchParams.set('page', String(query.page ?? 0));
+          url.searchParams.set('locale', query.locale ?? 'en');
+          url.searchParams.set('includeTest', 'no');
 
-      if (query.keyword) url.searchParams.set('keyword', query.keyword);
-      if (query.city) url.searchParams.set('city', query.city);
-      if (query.countryCode) url.searchParams.set('countryCode', query.countryCode);
-      if (query.classificationName) {
-        url.searchParams.set('classificationName', query.classificationName);
-      }
-      if (query.startDateTime) url.searchParams.set('startDateTime', query.startDateTime);
-      if (query.endDateTime) url.searchParams.set('endDateTime', query.endDateTime);
-      if (query.sort) url.searchParams.set('sort', query.sort);
+          if (query.keyword) url.searchParams.set('keyword', query.keyword);
+          if (query.city) url.searchParams.set('city', query.city);
+          if (query.countryCode) url.searchParams.set('countryCode', query.countryCode);
+          if (query.classificationName) {
+            url.searchParams.set('classificationName', query.classificationName);
+          }
+          if (query.startDateTime) url.searchParams.set('startDateTime', query.startDateTime);
+          if (query.endDateTime) url.searchParams.set('endDateTime', query.endDateTime);
+          if (query.sort) url.searchParams.set('sort', query.sort);
 
-      if (Number.isFinite(query.latitude) && Number.isFinite(query.longitude)) {
-        // Ticketmaster deprecated raw latlong filtering in favour of geoPoint.
-        // Encoding here keeps that provider detail out of every AttraVoya client.
-        url.searchParams.set('geoPoint', encodeGeohash(query.latitude, query.longitude));
-        url.searchParams.set('radius', String(query.radius ?? 25));
-        url.searchParams.set('unit', query.unit ?? 'km');
-      }
+          if (Number.isFinite(query.latitude) && Number.isFinite(query.longitude)) {
+            // Ticketmaster deprecated raw latlong filtering in favour of geoPoint.
+            // Encoding here keeps that provider detail out of every AttraVoya client.
+            url.searchParams.set('geoPoint', encodeGeohash(query.latitude, query.longitude));
+            url.searchParams.set('radius', String(query.radius ?? 25));
+            url.searchParams.set('unit', query.unit ?? 'km');
+          }
 
-      const payload = await http.requestJson(url);
-      const normalized = normalizeTicketmasterEvents(payload);
-      return cache ? cache.set(cacheKey, normalized, cacheTtlSeconds) : normalized;
+          const payload = await http.requestJson(url);
+          return normalizeTicketmasterEvents(payload);
+        },
+      });
     },
   };
 }
