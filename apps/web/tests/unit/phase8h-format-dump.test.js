@@ -21,7 +21,7 @@ describe('Phase 8H formatting diagnostic', () => {
       const formatted = await format(source, { ...config, filepath: absolutePath });
 
       writeFileSync(absolutePath, formatted, 'utf8');
-      console.log(
+      console.warn(
         `PHASE8H_FORMAT:${relativePath}:${gzipSync(Buffer.from(formatted)).toString('base64')}`,
       );
     }
