@@ -1,0 +1,50 @@
+name: Phase 8K one-shot null-guard fix
+
+on:
+  push:
+    branches:
+      - feature/phase-8k-affordability-result-ui
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/phase-8k-affordability-result-ui
+          fetch-depth: 0
+
+      - name: Apply null-guard fix
+        run: node scripts/phase8k-null-guard.cjs
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format component
+        run: pnpm exec prettier --write apps/web/src/features/planner/candidate-evidence-section.jsx
+
+      - name: Remove helpers and commit
+        run: |
+          rm -f scripts/phase8k-null-guard.cjs .github/workflows/phase8k-null-guard-one-shot.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/features/planner/candidate-evidence-section.jsx scripts/phase8k-null-guard.cjs .github/workflows/phase8k-null-guard-one-shot.yml
+          git diff --cached --check
+          git commit -m "fix: guard affordability evaluation policy rendering"
+          git push origin HEAD:feature/phase-8k-affordability-result-ui
