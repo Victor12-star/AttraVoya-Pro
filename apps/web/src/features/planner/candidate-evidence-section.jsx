@@ -466,14 +466,14 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                 </div>
               ) : null}
 
-              {candidateState === 'success' && candidateSet?.destinations.length === 0 ? (
+              {candidateState === 'success' && candidateSet && candidateSet.destinations.length === 0 ? (
                 <div className={styles.state}>
                   <MapPinned size={24} aria-hidden="true" />
                   <p>{copy.emptyCandidates}</p>
                 </div>
               ) : null}
 
-              {candidateState === 'success' && candidateSet?.destinations.length > 0 ? (
+              {candidateState === 'success' && candidateSet && candidateSet.destinations.length > 0 ? (
                 <div className={styles.results}>
                   <div className={styles.context}>
                     <strong>{briefLabel(selectedBrief, copy.savedBrief)}</strong>
