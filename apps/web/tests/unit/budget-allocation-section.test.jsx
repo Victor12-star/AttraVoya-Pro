@@ -149,7 +149,9 @@ describe('BudgetAllocationSection', () => {
   });
 
   it('shows exact saved-budget amounts and clear non-market provenance after selection', async () => {
-    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+    render(
+      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
+    );
 
     expect(
       await screen.findByText('Choose a saved planning brief to view its allocation targets.'),
@@ -183,7 +185,9 @@ describe('BudgetAllocationSection', () => {
       }),
     );
 
-    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+    render(
+      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
+    );
 
     expect(
       await screen.findByText('Sign in to save and view private planning briefs.'),
@@ -197,7 +201,9 @@ describe('BudgetAllocationSection', () => {
       .mockRejectedValueOnce(new Error('private allocation database detail'))
       .mockResolvedValueOnce({ allocation: allocation() });
 
-    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+    render(
+      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
+    );
 
     await screen.findByText('Choose a saved planning brief to view its allocation targets.');
     fireEvent.change(screen.getByLabelText('Saved planning brief'), {
@@ -227,7 +233,9 @@ describe('BudgetAllocationSection', () => {
       }),
     });
 
-    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+    render(
+      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
+    );
 
     await screen.findByText('Choose a saved planning brief to view its allocation targets.');
     fireEvent.change(screen.getByLabelText('Saved planning brief'), {
