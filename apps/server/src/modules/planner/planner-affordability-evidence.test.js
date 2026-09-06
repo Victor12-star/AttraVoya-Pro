@@ -105,13 +105,18 @@ function plannerRepository(overrides = {}) {
   };
 }
 
-async function createApp(repository, plannerAccommodationPricingCollector) {
+async function createApp(
+  repository,
+  plannerAccommodationPricingCollector,
+  plannerFlightPricingCollector,
+) {
   const app = await buildApp({
     logger: false,
     authRepository: authorizationRepository(),
     healthRepository: { checkDatabase: async () => true },
     plannerRepository: repository,
     plannerAccommodationPricingCollector,
+    plannerFlightPricingCollector,
   });
   apps.push(app);
   return app;
@@ -245,7 +250,13 @@ describe('planner affordability evidence gate', () => {
         'AIRPORT_TRANSFER',
         'TRAVEL_INSURANCE',
       ],
-      collectionAttempts: [{ category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' }],
+      collectionAttempts: [
+        { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
+        { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+      ],
+    });
+    expect(payload.evidence.required.find((item) => item.category === 'FLIGHTS')).toMatchObject({
+      status: 'NOT_CONFIGURED',
     });
     expect(
       payload.evidence.required.find((item) => item.category === 'ACCOMMODATION'),
@@ -302,6 +313,7 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collected).toEqual([
       {
         category: 'ACCOMMODATION',
+        amountScope: 'PLANNER_CATEGORY_TOTAL',
         amountMin: '240.00',
         amountMax: '280.50',
         currencyCode: 'EUR',
@@ -314,9 +326,11 @@ describe('planner affordability evidence gate', () => {
       },
     ]);
     expect(payload.evidence.collectionAttempts).toEqual([
+      { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'COLLECTED' },
     ]);
     expect(payload.evidence.missingCategories).not.toContain('ACCOMMODATION');
+    expect(payload.evidence.missingCategories).toContain('FLIGHTS');
     expect(payload.evidence.status).toBe('INSUFFICIENT_EVIDENCE');
     expect(payload.evaluation).toEqual({
       budgetFit: 'NOT_EVALUATED',
@@ -330,6 +344,77 @@ describe('planner affordability evidence gate', () => {
       pricingDataUsed: true,
     });
     expect(JSON.stringify(payload)).not.toContain('ignoredRawField');
+  });
+
+  it('accepts normalized verified flight evidence only from the server collector', async () => {
+    const flightCollector = {
+      collect: vi.fn(async () => ({
+        amountMin: 180,
+        amountMax: '225.5',
+        currencyCode: 'eur',
+        pricingBasis: 'LIVE',
+        confidence: 'MEDIUM',
+        sourceProvider: 'verified-flight-test',
+        sourceExternalId: 'flight-offer-789',
+        sourceFetchedAt: '2026-09-06T11:00:00+02:00',
+        rawOffer: { mustNotLeak: true },
+      })),
+    };
+    const app = await createApp(plannerRepository(), undefined, flightCollector);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: evidenceUrl,
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(flightCollector.collect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: 'plan-request-1',
+        destination: expect.objectContaining({ id: 'destination-lisbon' }),
+        searchContext: expect.objectContaining({
+          origin: expect.objectContaining({ label: 'Stockholm' }),
+          travellers: { adults: 2, childrenAges: [6] },
+          budget: expect.objectContaining({ currencyCode: 'EUR' }),
+        }),
+      }),
+    );
+
+    const payload = response.json().affordabilityEvidence;
+    expect(payload.evidence.collected).toEqual([
+      {
+        category: 'FLIGHTS',
+        amountScope: 'PLANNER_CATEGORY_TOTAL',
+        amountMin: '180.00',
+        amountMax: '225.50',
+        currencyCode: 'EUR',
+        pricingBasis: 'LIVE',
+        confidence: 'MEDIUM',
+        sourceProvider: 'verified-flight-test',
+        sourceExternalId: 'flight-offer-789',
+        sourceFetchedAt: '2026-09-06T09:00:00.000Z',
+        verifiedMarketEvidence: true,
+      },
+    ]);
+    expect(payload.evidence.collectionAttempts).toEqual([
+      { category: 'FLIGHTS', status: 'COLLECTED' },
+      { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+    ]);
+    expect(payload.evidence.missingCategories).not.toContain('FLIGHTS');
+    expect(payload.evidence.missingCategories).toContain('ACCOMMODATION');
+    expect(payload.evaluation).toEqual({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+    });
+    expect(payload.provenance).toMatchObject({
+      liveDataUsed: true,
+      providerDataUsed: true,
+      pricingDataUsed: true,
+    });
+    expect(JSON.stringify(payload)).not.toContain('rawOffer');
   });
 
   it('fails closed when collector evidence is invalid or uses another currency', async () => {
@@ -357,13 +442,53 @@ describe('planner affordability evidence gate', () => {
     const payload = response.json().affordabilityEvidence;
     expect(payload.evidence.collected).toEqual([]);
     expect(payload.evidence.collectionAttempts).toEqual([
+      { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'FAILED' },
     ]);
     expect(payload.evidence.missingCategories).toContain('ACCOMMODATION');
+    expect(payload.evidence.missingCategories).toContain('FLIGHTS');
     expect(payload.provenance).toMatchObject({
       providerDataUsed: false,
       pricingDataUsed: false,
     });
+    expect(payload.evaluation.rankingEligible).toBe(false);
+  });
+
+  it('fails closed when flight evidence is invalid and does not invent fare data', async () => {
+    const flightCollector = {
+      collect: vi.fn(async () => ({
+        amountMin: 200,
+        amountMax: 150,
+        currencyCode: 'EUR',
+        pricingBasis: 'LIVE',
+        confidence: 'HIGH',
+        sourceProvider: 'invalid-flight-test',
+        sourceExternalId: 'flight-invalid',
+        sourceFetchedAt: '2026-09-06T07:30:00.000Z',
+      })),
+    };
+    const app = await createApp(plannerRepository(), undefined, flightCollector);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: evidenceUrl,
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    const payload = response.json().affordabilityEvidence;
+    expect(payload.evidence.collected).toEqual([]);
+    expect(payload.evidence.collectionAttempts).toEqual([
+      { category: 'FLIGHTS', status: 'FAILED' },
+      { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+    ]);
+    expect(payload.evidence.missingCategories).toContain('FLIGHTS');
+    expect(payload.provenance).toMatchObject({
+      liveDataUsed: false,
+      providerDataUsed: false,
+      pricingDataUsed: false,
+    });
+    expect(payload.evaluation.budgetFit).toBe('NOT_EVALUATED');
     expect(payload.evaluation.rankingEligible).toBe(false);
   });
 
@@ -380,6 +505,7 @@ describe('planner affordability evidence gate', () => {
     const payload = response.json().affordabilityEvidence;
     expect(payload.evidence.collected).toEqual([]);
     expect(payload.evidence.collectionAttempts).toEqual([
+      { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'UNAVAILABLE' },
     ]);
     expect(payload.evaluation.budgetFit).toBe('NOT_EVALUATED');
