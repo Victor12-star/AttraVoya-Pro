@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '../../errors/app-error.js';
+import { evaluateAffordabilityEvidenceGate } from './affordability-evaluation.js';
 import {
   applyMarketPricingCollection,
   buildAffordabilityEvidenceGate,
@@ -285,7 +286,8 @@ export function createPlannerService(repository, options = {}) {
         gate,
         normalize: normalizeAccommodationPricingEvidence,
       });
-      return applyMarketPricingCollection(gate, 'ACCOMMODATION', accommodationCollection);
+      gate = applyMarketPricingCollection(gate, 'ACCOMMODATION', accommodationCollection);
+      return evaluateAffordabilityEvidenceGate(gate);
     },
   };
 }
