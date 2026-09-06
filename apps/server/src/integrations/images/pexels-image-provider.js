@@ -48,9 +48,7 @@ export function createPexelsImageProvider({ http, apiKey, cache, cacheTtlSeconds
             headers: { Authorization: key() },
           });
           if (!payload || typeof payload !== 'object' || !Array.isArray(payload.photos)) {
-            throw new ProviderResponseError(
-              'Pexels returned an unexpected photo search response.',
-            );
+            throw new ProviderResponseError('Pexels returned an unexpected photo search response.');
           }
 
           return normalizePexelsSearch(payload);
