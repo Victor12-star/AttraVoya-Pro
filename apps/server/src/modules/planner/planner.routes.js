@@ -8,6 +8,12 @@ export async function plannerRoutes(app, options = {}) {
   const service = createPlannerService(repository, {
     accommodationPricingCollector: options.accommodationPricingCollector,
     flightPricingCollector: options.flightPricingCollector,
+    foodPricingCollector: options.foodPricingCollector,
+    localTransportPricingCollector: options.localTransportPricingCollector,
+    activitiesPricingCollector: options.activitiesPricingCollector,
+    childrenActivitiesPricingCollector: options.childrenActivitiesPricingCollector,
+    airportTransferPricingCollector: options.airportTransferPricingCollector,
+    travelInsurancePricingCollector: options.travelInsurancePricingCollector,
   });
   const controller = createPlannerController(service);
   const protectedApp = /** @type {any} */ (app);
