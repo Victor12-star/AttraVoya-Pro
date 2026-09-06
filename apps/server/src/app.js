@@ -189,6 +189,7 @@ export async function buildApp(options = {}) {
     prefix: `${API_PREFIX}/planner/requests`,
     repository: options.plannerRepository,
     accommodationPricingCollector: options.plannerAccommodationPricingCollector,
+    flightPricingCollector: options.plannerFlightPricingCollector,
   });
 
   return app;
