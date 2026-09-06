@@ -13,7 +13,7 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function hasCompleteCategoryParity(evidence, expectedCurrency) {
+function getCompleteEvidenceTotals(evidence, expectedCurrency) {
   if (
     evidence.status !== 'COMPLETE_EVIDENCE' ||
     !Array.isArray(evidence.required) ||
@@ -23,7 +23,7 @@ function hasCompleteCategoryParity(evidence, expectedCurrency) {
     evidence.missingCategories.length !== 0 ||
     evidence.collected.length !== evidence.required.length
   ) {
-    return false;
+    return null;
   }
 
   const requiredCategories = new Set();
@@ -36,12 +36,14 @@ function hasCompleteCategoryParity(evidence, expectedCurrency) {
       moneyToCents(item.targetAmount) === null ||
       requiredCategories.has(item.category)
     ) {
-      return false;
+      return null;
     }
     requiredCategories.add(item.category);
   }
 
   const collectedCategories = new Set();
+  let totalMin = 0;
+  let totalMax = 0;
   for (const item of evidence.collected) {
     const amountMin = moneyToCents(item?.amountMin);
     const amountMax = moneyToCents(item?.amountMax);
@@ -62,12 +64,16 @@ function hasCompleteCategoryParity(evidence, expectedCurrency) {
       Number.isNaN(Date.parse(item.sourceFetchedAt)) ||
       item.verifiedMarketEvidence !== true
     ) {
-      return false;
+      return null;
     }
     collectedCategories.add(item.category);
+    totalMin += amountMin;
+    totalMax += amountMax;
+    if (!Number.isSafeInteger(totalMin) || !Number.isSafeInteger(totalMax)) return null;
   }
 
-  return collectedCategories.size === requiredCategories.size;
+  if (collectedCategories.size !== requiredCategories.size) return null;
+  return { totalMin, totalMax };
 }
 
 function isValidEvaluationPolicy(policy) {
@@ -107,12 +113,21 @@ export function isSafeAffordabilityEvaluation(evidence, evaluation) {
   }
 
   const policy = evaluation.evaluationPolicy;
-  if (!hasCompleteCategoryParity(evidence, policy.currencyCode)) return false;
+  const evidenceTotals = getCompleteEvidenceTotals(evidence, policy.currencyCode);
+  if (!evidenceTotals) return false;
 
   const spendable = moneyToCents(policy.spendableBudget);
   const amountMin = moneyToCents(policy.totalEvidenceRange.amountMin);
   const amountMax = moneyToCents(policy.totalEvidenceRange.amountMax);
-  if (spendable === null || amountMin === null || amountMax === null) return false;
+  if (
+    spendable === null ||
+    amountMin === null ||
+    amountMax === null ||
+    evidenceTotals.totalMin !== amountMin ||
+    evidenceTotals.totalMax !== amountMax
+  ) {
+    return false;
+  }
 
   if (evaluation.budgetFit === 'COMFORTABLE') {
     return evaluation.affordabilityConfirmed === true && amountMax <= spendable;

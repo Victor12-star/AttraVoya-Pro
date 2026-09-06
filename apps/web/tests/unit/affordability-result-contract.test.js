@@ -17,7 +17,7 @@ const CATEGORIES = [
   'TRAVEL_INSURANCE',
 ];
 
-function completeEvidence() {
+function completeEvidence(firstMin = '180.00', firstMax = '220.00') {
   return {
     status: 'COMPLETE_EVIDENCE',
     required: CATEGORIES.map((category) => ({
@@ -29,8 +29,8 @@ function completeEvidence() {
     collected: CATEGORIES.map((category, index) => ({
       category,
       amountScope: 'PLANNER_CATEGORY_TOTAL',
-      amountMin: index === 0 ? '180.00' : '80.00',
-      amountMax: index === 0 ? '220.00' : '90.00',
+      amountMin: index === 0 ? firstMin : '80.00',
+      amountMax: index === 0 ? firstMax : '90.00',
       currencyCode: 'EUR',
       pricingBasis: index % 2 === 0 ? 'VERIFIED_PRICE' : 'LIVE',
       confidence: 'HIGH',
@@ -81,15 +81,13 @@ describe('affordability result contract', () => {
   });
 
   it('accepts a mathematically consistent comfortable result', () => {
-    expect(isSafeAffordabilityEvaluation(completeEvidence(), evaluation('COMFORTABLE'))).toBe(
-      true,
-    );
+    expect(isSafeAffordabilityEvaluation(completeEvidence(), evaluation('COMFORTABLE'))).toBe(true);
   });
 
   it('accepts a mathematically consistent tight result', () => {
     expect(
       isSafeAffordabilityEvaluation(
-        completeEvidence(),
+        completeEvidence('280.00', '330.00'),
         evaluation('TIGHT', {
           affordabilityConfirmed: false,
           evaluationPolicy: {
@@ -104,7 +102,7 @@ describe('affordability result contract', () => {
   it('accepts a mathematically consistent over-budget result', () => {
     expect(
       isSafeAffordabilityEvaluation(
-        completeEvidence(),
+        completeEvidence('350.00', '380.00'),
         evaluation('OVER_BUDGET', {
           affordabilityConfirmed: false,
           evaluationPolicy: {
@@ -155,6 +153,20 @@ describe('affordability result contract', () => {
           evaluationPolicy: {
             ...evaluation('COMFORTABLE').evaluationPolicy,
             totalEvidenceRange: { amountMin: '840.00', amountMax: '960.00' },
+          },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('rejects a policy total that does not equal the collected category totals', () => {
+    expect(
+      isSafeAffordabilityEvaluation(
+        completeEvidence(),
+        evaluation('COMFORTABLE', {
+          evaluationPolicy: {
+            ...evaluation('COMFORTABLE').evaluationPolicy,
+            totalEvidenceRange: { amountMin: '700.00', amountMax: '800.00' },
           },
         }),
       ),
