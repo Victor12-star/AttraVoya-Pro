@@ -9,6 +9,22 @@ function jsonResponse(status, payload, headers = {}) {
   });
 }
 
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+
+  return { promise, resolve, reject };
+}
+
+async function flushMicrotasks() {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe('provider HTTP client', () => {
   it('returns parsed JSON for successful responses', async () => {
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
@@ -36,11 +52,167 @@ describe('provider HTTP client', () => {
       .fn()
       .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary' }))
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
-    const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 1 });
+    const sleepImpl = vi.fn().mockResolvedValue();
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 1,
+      sleepImpl,
+      randomImpl: () => 0.5,
+    });
 
     await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
       ok: true,
     });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(sleepImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps retry jitter inside the defined equal-jitter bounds', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary-1' }))
+      .mockResolvedValueOnce(jsonResponse(503, { error: 'temporary-2' }))
+      .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
+    const sleepImpl = vi.fn().mockResolvedValue();
+    const randomImpl = vi.fn().mockReturnValueOnce(0).mockReturnValueOnce(0.999999);
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 2,
+      sleepImpl,
+      randomImpl,
+    });
+
+    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
+      ok: true,
+    });
+    expect(sleepImpl).toHaveBeenNthCalledWith(1, 125);
+    expect(sleepImpl).toHaveBeenNthCalledWith(2, 500);
+  });
+
+  it('never exceeds the configured in-flight concurrency cap', async () => {
+    const pendingFetches = [];
+    let activeFetches = 0;
+    let maxActiveFetches = 0;
+    const fetchImpl = vi.fn(() => {
+      activeFetches += 1;
+      maxActiveFetches = Math.max(maxActiveFetches, activeFetches);
+      const pending = deferred();
+      pendingFetches.push(pending);
+
+      return pending.promise.finally(() => {
+        activeFetches -= 1;
+      });
+    });
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      maxConcurrent: 2,
+      maxQueued: 2,
+    });
+
+    const requests = [0, 1, 2, 3].map((id) =>
+      client.requestJson(`https://provider.example/data/${id}`),
+    );
+    await flushMicrotasks();
+
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(maxActiveFetches).toBe(2);
+
+    pendingFetches[0].resolve(jsonResponse(200, { id: 0 }));
+    await expect(requests[0]).resolves.toEqual({ id: 0 });
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    expect(maxActiveFetches).toBe(2);
+
+    pendingFetches[1].resolve(jsonResponse(200, { id: 1 }));
+    await expect(requests[1]).resolves.toEqual({ id: 1 });
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(4);
+    expect(maxActiveFetches).toBe(2);
+
+    pendingFetches[2].resolve(jsonResponse(200, { id: 2 }));
+    pendingFetches[3].resolve(jsonResponse(200, { id: 3 }));
+    await expect(Promise.all(requests)).resolves.toEqual([
+      { id: 0 },
+      { id: 1 },
+      { id: 2 },
+      { id: 3 },
+    ]);
+    expect(maxActiveFetches).toBe(2);
+  });
+
+  it('releases queued work after both successful and failed requests', async () => {
+    const firstFetch = deferred();
+    const secondFetch = deferred();
+    const fetchImpl = vi
+      .fn()
+      .mockImplementationOnce(() => firstFetch.promise)
+      .mockImplementationOnce(() => secondFetch.promise)
+      .mockResolvedValueOnce(jsonResponse(200, { id: 3 }));
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      maxConcurrent: 1,
+      maxQueued: 2,
+    });
+
+    const firstRequest = client.requestJson('https://provider.example/data/1');
+    const secondRequest = client.requestJson('https://provider.example/data/2');
+    const thirdRequest = client.requestJson('https://provider.example/data/3');
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    firstFetch.resolve(jsonResponse(200, { id: 1 }));
+    await expect(firstRequest).resolves.toEqual({ id: 1 });
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+
+    secondFetch.reject(new Error('provider connection failed'));
+    await expect(secondRequest).rejects.toMatchObject({
+      code: 'PROVIDER_UNAVAILABLE',
+      details: { provider: 'test', reason: 'network' },
+    });
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    await expect(thirdRequest).resolves.toEqual({ id: 3 });
+  });
+
+  it('fails closed when the bounded provider queue is full', async () => {
+    const firstFetch = deferred();
+    const fetchImpl = vi
+      .fn()
+      .mockImplementationOnce(() => firstFetch.promise)
+      .mockResolvedValueOnce(jsonResponse(200, { id: 2 }));
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      maxConcurrent: 1,
+      maxQueued: 1,
+    });
+
+    const firstRequest = client.requestJson('https://provider.example/data/1');
+    const secondRequest = client.requestJson('https://provider.example/data/2');
+    const rejectedRequest = client.requestJson('https://provider.example/data/3');
+
+    await expect(rejectedRequest).rejects.toMatchObject({
+      code: 'PROVIDER_UNAVAILABLE',
+      details: {
+        provider: 'test',
+        reason: 'busy',
+        maxConcurrent: 1,
+        maxQueued: 1,
+      },
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    firstFetch.resolve(jsonResponse(200, { id: 1 }));
+    await expect(firstRequest).resolves.toEqual({ id: 1 });
+    await expect(secondRequest).resolves.toEqual({ id: 2 });
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });
