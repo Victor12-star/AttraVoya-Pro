@@ -11,12 +11,9 @@ function evidenceStatus(required) {
 }
 
 export function applyAccommodationPricingCollection(gate, collection) {
-  const collectedEvidence =
-    collection.status === 'COLLECTED' ? collection.evidence : null;
+  const collectedEvidence = collection.status === 'COLLECTED' ? collection.evidence : null;
   const required = gate.evidence.required.map((item) =>
-    item.category === 'ACCOMMODATION'
-      ? { ...item, status: collection.status }
-      : item,
+    item.category === 'ACCOMMODATION' ? { ...item, status: collection.status } : item,
   );
   const collected = collectedEvidence
     ? [...gate.evidence.collected, collectedEvidence]
@@ -47,10 +44,8 @@ export function applyAccommodationPricingCollection(gate, collection) {
     },
     provenance: {
       ...gate.provenance,
-      liveDataUsed:
-        gate.provenance.liveDataUsed || collectedEvidence?.pricingBasis === 'LIVE',
-      providerDataUsed:
-        gate.provenance.providerDataUsed || Boolean(collectedEvidence),
+      liveDataUsed: gate.provenance.liveDataUsed || collectedEvidence?.pricingBasis === 'LIVE',
+      providerDataUsed: gate.provenance.providerDataUsed || Boolean(collectedEvidence),
       pricingDataUsed: gate.provenance.pricingDataUsed || Boolean(collectedEvidence),
       statement: collectedEvidence
         ? 'Verified accommodation pricing evidence was collected server-side, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
