@@ -4,22 +4,27 @@ Use this file to continue the project in a new ChatGPT conversation without repe
 
 ## Paste this in the new chat
 
-> Continue AttraVoya Pro from `docs/NEXT-CHAT-HANDOFF.md` in the GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, then read `docs/CURRENT-WORK.md` and `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md`. Start from the exact verified `develop` commit recorded in the handoff. Preserve the rule that every slice must pass all five top-level GitHub Actions CI jobs on the exact final PR head before squash merge, then the exact resulting `develop` commit must also pass all five jobs before the next slice starts. Do not repeat completed work.
+> Continue AttraVoya Pro from `docs/NEXT-CHAT-HANDOFF.md` in the GitHub repository `Victor12-star/AttraVoya-Pro`. Read that file first, then read `docs/CURRENT-WORK.md` and `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md`. Inspect the current `develop` HEAD before making changes. The current HEAD must be the minimum verified handoff anchor recorded below or a descendant of it, and the latest development checkpoint used for new work must have its own successful five-job post-merge CI. Start new work from that latest verified `develop` HEAD, not from the older Phase 8L application-baseline SHA. Preserve the rule that every slice must pass all five top-level GitHub Actions CI jobs on the exact final PR head before squash merge, then the exact resulting `develop` commit must also pass all five jobs before the next slice starts. Do not repeat completed work.
 
-## Exact current stopping point
+## Verified handoff anchors
 
 - Repository: `Victor12-star/AttraVoya-Pro`
 - Integration branch: `develop`
 - Production branch: `main`
-- Current verified `develop` SHA: `61296f456ff778ab4852000c2a4c6bd1a8c54742`
-- This is the Phase 8L squash merge commit.
-- Post-merge CI: run #405, workflow run `34053616390`.
-- All five top-level jobs passed on that exact `develop` SHA:
-  1. Code quality and unit tests
-  2. PostgreSQL and Prisma verification
-  3. Production builds
-  4. Live no-cost provider checks
-  5. Dependency and secret checks
+- Last verified application implementation baseline before the handoff docs: `61296f456ff778ab4852000c2a4c6bd1a8c54742`
+- That application baseline is the Phase 8L squash merge commit.
+- Phase 8L post-merge CI: run #405, workflow run `34053616390`, all five top-level jobs passed.
+- Minimum verified handoff anchor on `develop`: `d4777c0c0928ff332f1bb4132544f76943cf738b`
+- That handoff anchor is the squash merge of PR #41, which added this handoff file.
+- Handoff-anchor post-merge CI: run #407, workflow run `34054657876`, all five top-level jobs passed.
+
+Because this handoff file itself may receive later documentation corrections, **do not assume the minimum anchor is the newest `develop` commit forever**. In a new chat:
+
+1. Resolve the current `develop` HEAD.
+2. Confirm it is `d4777c0c0928ff332f1bb4132544f76943cf738b` or a descendant.
+3. Confirm the development checkpoint you will branch from has a successful five-job post-merge CI run.
+4. Start the next feature branch from that latest verified `develop` HEAD.
+5. If `develop` is not the anchor or a descendant, or its latest change is not verified, investigate before starting new feature work rather than silently resetting or guessing.
 
 ## Phase 8L is complete
 
@@ -29,7 +34,7 @@ Final PR head before merge:
 
 `70a43e30601613b5bdc0d8d672ca020f83b7714e`
 
-Squash merge / verified `develop` SHA:
+Squash merge / verified application implementation baseline:
 
 `61296f456ff778ab4852000c2a4c6bd1a8c54742`
 
@@ -116,9 +121,7 @@ This can become a problem when many users hit the same external provider at once
 
 ## Recommended next slice
 
-Start a new feature branch from the exact verified base:
-
-`61296f456ff778ab4852000c2a4c6bd1a8c54742`
+Start a new feature branch from the **latest verified current `develop` HEAD**, following the anchor checks above. Do not branch from `61296f456ff778ab4852000c2a4c6bd1a8c54742` merely because it is the Phase 8L application baseline.
 
 The next slice should strengthen the shared provider transport with a small, testable, provider-neutral load-protection boundary.
 
@@ -147,8 +150,8 @@ If inspection reveals a safer or more foundational missing scale boundary, docum
 
 Every new slice must follow this exact sequence:
 
-1. Start from the exact currently verified `develop` SHA.
-2. Create a dedicated feature branch.
+1. Resolve and verify the latest current `develop` HEAD.
+2. Create a dedicated feature branch from that exact verified SHA.
 3. Make the smallest coherent production-safe change.
 4. Add/adjust focused tests.
 5. Keep canonical formatter/CI/security rules unchanged.
