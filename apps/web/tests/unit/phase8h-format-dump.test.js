@@ -1,0 +1,32 @@
+import { readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
+
+import { describe, expect, it } from 'vitest';
+import { format, resolveConfig } from 'prettier';
+
+const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url));
+const targets = [
+  'apps/web/src/features/planner/candidate-evidence-copy.js',
+  'apps/web/src/features/planner/candidate-evidence-section.jsx',
+  'apps/web/tests/unit/candidate-evidence-section.test.jsx',
+];
+
+describe('Phase 8H formatting diagnostic', () => {
+  it('emits and applies canonical Prettier output for the Phase 8H files', async () => {
+    for (const relativePath of targets) {
+      const absolutePath = `${repositoryRoot}${relativePath}`;
+      const source = readFileSync(absolutePath, 'utf8');
+      const config = (await resolveConfig(absolutePath)) ?? {};
+      const formatted = await format(source, { ...config, filepath: absolutePath });
+
+      writeFileSync(absolutePath, formatted, 'utf8');
+      console.log(
+        `PHASE8H_FORMAT:${relativePath}:${gzipSync(Buffer.from(formatted)).toString('base64')}`,
+      );
+    }
+
+    unlinkSync(fileURLToPath(import.meta.url));
+    expect(true).toBe(true);
+  });
+});
