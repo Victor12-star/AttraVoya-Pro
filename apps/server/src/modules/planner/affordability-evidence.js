@@ -4,6 +4,57 @@ function positivePlanningTargets(targets) {
   return targets.filter((target) => Number(target.amount) > 0);
 }
 
+function evidenceStatus(required) {
+  return required.every((item) => item.status === 'COLLECTED')
+    ? 'COMPLETE_EVIDENCE'
+    : 'INSUFFICIENT_EVIDENCE';
+}
+
+export function applyAccommodationPricingCollection(gate, collection) {
+  const collectedEvidence = collection.status === 'COLLECTED' ? collection.evidence : null;
+  const required = gate.evidence.required.map((item) =>
+    item.category === 'ACCOMMODATION' ? { ...item, status: collection.status } : item,
+  );
+  const collected = collectedEvidence
+    ? [...gate.evidence.collected, collectedEvidence]
+    : gate.evidence.collected;
+  const missingCategories = required
+    .filter((item) => item.status !== 'COLLECTED')
+    .map((item) => item.category);
+
+  return {
+    ...gate,
+    evidence: {
+      ...gate.evidence,
+      status: evidenceStatus(required),
+      required,
+      collected,
+      missingCategories,
+      collectionAttempts: [
+        ...(gate.evidence.collectionAttempts ?? []),
+        {
+          category: 'ACCOMMODATION',
+          status: collection.status,
+        },
+      ],
+    },
+    evaluation: {
+      ...gate.evaluation,
+      evidenceReady: missingCategories.length === 0,
+    },
+    provenance: {
+      ...gate.provenance,
+      liveDataUsed:
+        gate.provenance.liveDataUsed || collectedEvidence?.pricingBasis === 'LIVE',
+      providerDataUsed: gate.provenance.providerDataUsed || Boolean(collectedEvidence),
+      pricingDataUsed: gate.provenance.pricingDataUsed || Boolean(collectedEvidence),
+      statement: collectedEvidence
+        ? 'Verified accommodation pricing evidence was collected server-side, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
+        : gate.provenance.statement,
+    },
+  };
+}
+
 export function buildAffordabilityEvidenceGate({ planRequest, destination, budgetEnvelope }) {
   const requiredEvidence = positivePlanningTargets(budgetEnvelope.targets).map((target) => ({
     category: target.category,
@@ -38,11 +89,13 @@ export function buildAffordabilityEvidenceGate({ planRequest, destination, budge
       required: requiredEvidence,
       collected: [],
       missingCategories: requiredEvidence.map((item) => item.category),
+      collectionAttempts: [],
     },
     evaluation: {
       budgetFit: 'NOT_EVALUATED',
       rankingEligible: false,
       affordabilityConfirmed: false,
+      evidenceReady: false,
     },
     provenance: {
       kind: 'AFFORDABILITY_EVIDENCE_GATE',
