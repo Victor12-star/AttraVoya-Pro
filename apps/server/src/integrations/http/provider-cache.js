@@ -115,3 +115,20 @@ export function createProviderCache({
     },
   };
 }
+
+/**
+ * Provider adapters call one helper so production caches receive single-flight
+ * protection while simple injected get/set test doubles remain compatible.
+ */
+export async function loadProviderCacheValue({ cache, key, ttlSeconds, loader }) {
+  if (!cache) return loader();
+  if (typeof cache.getOrLoad === 'function') {
+    return cache.getOrLoad(key, loader, ttlSeconds);
+  }
+
+  const cached = cache.get?.(key);
+  if (cached !== undefined) return cached;
+
+  const value = await loader();
+  return typeof cache.set === 'function' ? cache.set(key, value, ttlSeconds) : value;
+}
