@@ -67,14 +67,12 @@ function storedRequest({ requestId, userId, input, currencyCode = 'SEK' }) {
 
 function plannerRepository(options = {}) {
   const records = new Map();
-  const createOwnedRequestIdempotently = vi.fn(
-    async ({ requestId, userId, input }) => {
-      const record = storedRequest({ requestId, userId, input });
-      if (options.simulateRace) return { record, created: false };
-      records.set(requestId, record);
-      return { record, created: true };
-    },
-  );
+  const createOwnedRequestIdempotently = vi.fn(async ({ requestId, userId, input }) => {
+    const record = storedRequest({ requestId, userId, input });
+    if (options.simulateRace) return { record, created: false };
+    records.set(requestId, record);
+    return { record, created: true };
+  });
 
   return {
     records,
