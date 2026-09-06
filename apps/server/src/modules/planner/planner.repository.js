@@ -48,6 +48,20 @@ const plannerRequestSelect = {
   },
 };
 
+const destinationCandidateSelect = {
+  id: true,
+  cityId: true,
+  slug: true,
+  summary: true,
+  city: {
+    select: {
+      name: true,
+      regionName: true,
+      country: { select: { iso2: true, name: true } },
+    },
+  },
+};
+
 export function createPlannerRepository() {
   return {
     async findCurrencyByCode(code) {
@@ -106,6 +120,27 @@ export function createPlannerRepository() {
       return prisma.travelPlanRequest.findFirst({
         where: { id: requestId, userId },
         select: plannerRequestSelect,
+      });
+    },
+
+    async findPublishedDestinationCandidateById(destinationId) {
+      const { prisma } = await import('@attravoya/database');
+      return prisma.destination.findFirst({
+        where: { id: destinationId, status: 'PUBLISHED' },
+        select: destinationCandidateSelect,
+      });
+    },
+
+    async listPublishedDestinationCandidates({ excludeCityId, limit = 20 } = {}) {
+      const { prisma } = await import('@attravoya/database');
+      return prisma.destination.findMany({
+        where: {
+          status: 'PUBLISHED',
+          ...(excludeCityId ? { cityId: { not: excludeCityId } } : {}),
+        },
+        orderBy: [{ publishedAt: 'desc' }, { slug: 'asc' }],
+        take: limit,
+        select: destinationCandidateSelect,
       });
     },
   };
