@@ -75,6 +75,43 @@ function mapPlannerRequest(record) {
   };
 }
 
+function mapDestinationCandidate(record) {
+  return {
+    id: record.id,
+    slug: record.slug,
+    name: record.city.name,
+    regionName: record.city.regionName,
+    country: {
+      code: record.city.country.iso2,
+      name: record.city.country.name,
+    },
+    summary: record.summary,
+  };
+}
+
+function destinationCandidateEnvelope({ requestId, mode, records }) {
+  return {
+    requestId,
+    mode,
+    destinations: records.map(mapDestinationCandidate),
+    evaluation: {
+      budgetFit: 'NOT_EVALUATED',
+      rankingApplied: false,
+      priceDataAvailable: false,
+      availabilityDataUsed: false,
+    },
+    provenance: {
+      kind: 'PUBLISHED_CATALOG_CANDIDATE',
+      source: 'ATTRAVOYA_PUBLISHED_DESTINATION_CATALOG',
+      liveDataUsed: false,
+      providerDataUsed: false,
+      pricingDataUsed: false,
+      statement:
+        'Candidates are published AttraVoya catalog destinations only. They are not ranked by price or confirmed affordable, and no fare, accommodation-price, or availability data was used.',
+    },
+  };
+}
+
 export function createPlannerService(repository) {
   if (!repository) throw new TypeError('Planner repository is required.');
 
@@ -153,6 +190,32 @@ export function createPlannerService(repository) {
       const record = await repository.findOwnedRequestById({ userId, requestId });
       if (!record) throw new NotFoundError('The planning request was not found.');
       return buildBudgetEnvelope(record);
+    },
+
+    async getDestinationCandidates({ userId, requestId }) {
+      const record = await repository.findOwnedRequestById({ userId, requestId });
+      if (!record) throw new NotFoundError('The planning request was not found.');
+
+      if (record.targetDestinationId) {
+        const target = await repository.findPublishedDestinationCandidateById(
+          record.targetDestinationId,
+        );
+        return destinationCandidateEnvelope({
+          requestId,
+          mode: 'FIXED_TARGET',
+          records: target ? [target] : [],
+        });
+      }
+
+      const records = await repository.listPublishedDestinationCandidates({
+        excludeCityId: record.originCityId ?? undefined,
+        limit: 20,
+      });
+      return destinationCandidateEnvelope({
+        requestId,
+        mode: 'PUBLISHED_CATALOG',
+        records,
+      });
     },
   };
 }
