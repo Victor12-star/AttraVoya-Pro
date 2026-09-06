@@ -388,6 +388,7 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
     (destination) => destination.id === selectedDestinationId,
   );
   const resultCopy = getAffordabilityResultCopy(locale);
+  const evaluationPolicy = affordabilityEvidence?.evaluation?.evaluationPolicy;
 
   return (
     <section className={styles.section} aria-labelledby="candidate-evidence-title">
@@ -598,23 +599,19 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                             : copy.evidenceIncomplete}
                       </p>
 
-                      {affordabilityEvidence.evaluation.budgetFit !== 'NOT_EVALUATED' ? (
+                      {affordabilityEvidence.evaluation.budgetFit !== 'NOT_EVALUATED' &&
+                      evaluationPolicy ? (
                         <div className={styles.evaluationGrid}>
                           <div className={styles.evaluationMetric}>
                             <span>{resultCopy.totalRange}</span>
-                            <strong>
-                              {formatEvaluationRange(
-                                affordabilityEvidence.evaluation.evaluationPolicy,
-                                locale,
-                              )}
-                            </strong>
+                            <strong>{formatEvaluationRange(evaluationPolicy, locale)}</strong>
                           </div>
                           <div className={styles.evaluationMetric}>
                             <span>{resultCopy.spendableBudget}</span>
                             <strong>
                               {formatMoneyValue(
-                                affordabilityEvidence.evaluation.evaluationPolicy.spendableBudget,
-                                affordabilityEvidence.evaluation.evaluationPolicy.currencyCode,
+                                evaluationPolicy.spendableBudget,
+                                evaluationPolicy.currencyCode,
                                 locale,
                               )}
                             </strong>
