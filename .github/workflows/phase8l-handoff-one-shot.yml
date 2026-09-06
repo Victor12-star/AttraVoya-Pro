@@ -26,70 +26,29 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Update permanent handoff
+        env:
+          PHASE8L_SECTION_B64: LSBMaXZlLXByb3ZpZGVyIENJIG11c3Qgbm90IGJlIG92ZXJzdGF0ZWQgYXMgcHJvb2Ygb2Yga2V5ZWQgcHJpY2luZyBwcm92aWRlcnMgdGhhdCBhcmUgbm90IGNvbmZpZ3VyZWQuCi0gRmluYWwgZG9jdW1lbnRhdGlvbi1pbmNsdXNpdmUgUFIgaGVhZCBgYTdlYzE1OWY3MTRkMGU3OWNjMjRjY2YwZWYyYjliZmRhYjczYjk4YmAgcGFzc2VkIGZpbmFsIFBSIENJICMzOTAgd2l0aCBhbGwgZml2ZSB0b3AtbGV2ZWwgam9icyBncmVlbi4KLSBQUiAjMzggd2FzIHNxdWFzaC1tZXJnZWQgd2l0aCBleHBlY3RlZC1oZWFkIHByb3RlY3Rpb24gYXMgYDZhNGFiM2Y3YzYwN2I5YjIzNmNmNjU1YTRkYzBkN2I5ZDVhMDZjZmZgLgotIFBvc3QtbWVyZ2UgYGRldmVsb3BgIENJICMzOTEgcGFzc2VkIGFsbCBmaXZlIHRvcC1sZXZlbCBqb2JzIG9uIHRoYXQgZXhhY3QgbWVyZ2UgU0hBLgoKIyMjIFBoYXNlIDhMIOKAlCBDb25jdXJyZW50IEZhaWwtQ2xvc2VkIFByaWNpbmcgRXZpZGVuY2UgQ29sbGVjdGlvbgoKQnJhbmNoOiBgZmVhdHVyZS9waGFzZS04bC1jb25jdXJyZW50LWV2aWRlbmNlLWNvbGxlY3Rpb25gCgpQUjogIzM5IOKAlCBgUGhhc2UgOEw6IGNvbGxlY3QgcGxhbm5lciBwcmljaW5nIGV2aWRlbmNlIGNvbmN1cnJlbnRseWAKCkJhc2UgY2hlY2twb2ludDogYDZhNGFiM2Y3YzYwN2I5YjIzNmNmNjU1YTRkYzBkN2I5ZDVhMDZjZmZgLCB0aGUgdmVyaWZpZWQgUGhhc2UgOEsgYGRldmVsb3BgIG1lcmdlIHdpdGggcG9zdC1tZXJnZSBDSSAjMzkxIGdyZWVuLgoKSW1wbGVtZW50ZWQ6CgotIFN0YXJ0cyB0aGUgZml4ZWQgc2V0IG9mIGVpZ2h0IHNlcnZlci1vbmx5IHBsYW5uZXIgcHJpY2luZyBjb2xsZWN0b3JzIGNvbmN1cnJlbnRseSByYXRoZXIgdGhhbiBzZXJpYWxseSwgcHJldmVudGluZyBjYXRlZ29yeSBsYXRlbmNpZXMgZnJvbSBhY2N1bXVsYXRpbmcgd2hlbiB0cnVzdGVkIHByb3ZpZGVycyBhcmUgY29ubmVjdGVkIGxhdGVyLgotIEtlZXBzIHRoZSBjb2xsZWN0b3IgZmFuLW91dCBib3VuZGVkIHRvIHRoZSBleGlzdGluZyBlaWdodCBwbGFubmVyIGNhdGVnb3JpZXM7IG5vIGR5bmFtaWMgb3IgdW5ib3VuZGVkIHByb3ZpZGVyIGZhbi1vdXQgd2FzIGFkZGVkLgotIEVhY2ggY29sbGVjdG9yIHN0aWxsIG5vcm1hbGl6ZXMgaW5kZXBlbmRlbnRseSB0aHJvdWdoIHRoZSBzdHJpY3QgdmVyaWZpZWQgcHJpY2luZy1ldmlkZW5jZSBjb250cmFjdCBhbmQgZmFpbHMgY2xvc2VkIGFzIGBOT1RfQ09ORklHVVJFRGAsIGBVTkFWQUlMQUJMRWAsIGBGQUlMRURgLCBvciBgQ09MTEVDVEVEYC4KLSBgUHJvbWlzZS5hbGxgIGlzIHVzZWQgb25seSBhZnRlciBlYWNoIGNvbGxlY3RvciBoYXMgaXRzIG93biBlcnJvciBib3VuZGFyeSwgc28gb25lIHJlamVjdGVkL2ludmFsaWQgcHJvdmlkZXIgcmVzdWx0IGRvZXMgbm90IGNhbmNlbCB2YWxpZCBldmlkZW5jZSBmcm9tIGFub3RoZXIgY2F0ZWdvcnkuCi0gRXZpZGVuY2UgaXMgYXBwbGllZCBhZnRlciBjb2xsZWN0aW9uIGluIHRoZSBjYW5vbmljYWwgcGxhbm5lci1jYXRlZ29yeSBvcmRlciwgc28gcmVzcG9uc2Ugb3JkZXJpbmcgaXMgZGV0ZXJtaW5pc3RpYyBldmVuIHdoZW4gcHJvdmlkZXIgY29tcGxldGlvbiBvcmRlciBkaWZmZXJzLgotIEFkZGVkIHJlZ3Jlc3Npb24gY292ZXJhZ2UgcHJvdmluZyBjb25maWd1cmVkIGNvbGxlY3RvcnMgc3RhcnQgYmVmb3JlIGVhcmxpZXIgZGVmZXJyZWQgY29sbGVjdG9ycyByZXNvbHZlLCByZXZlcnNlIGNvbXBsZXRpb24gb3JkZXIgZG9lcyBub3QgY2hhbmdlIG91dHB1dCBvcmRlciwgYW5kIG9uZSBmYWlsZWQgY2F0ZWdvcnkgcHJlc2VydmVzIHZlcmlmaWVkIGV2aWRlbmNlIGZyb20gYW5vdGhlciBjYXRlZ29yeS4KLSBFeGlzdGluZyBjb21wbGV0ZS1ldmlkZW5jZSBhZmZvcmRhYmlsaXR5IGV2YWx1YXRpb24gc3RpbGwgd29ya3MsIHdoaWxlIGByYW5raW5nRWxpZ2libGVgIHJlbWFpbnMgZmFsc2UuCi0gTm8gcHJvdmlkZXIgaW50ZWdyYXRpb24sIHByb3ZpZGVyIGNyZWRlbnRpYWwsIHJhbmtpbmcvcmVjb21tZW5kYXRpb24gcG9saWN5LCBhdmFpbGFiaWxpdHkvYm9va2FiaWxpdHkgY2xhaW0sIFByaXNtYSBzY2hlbWEgY2hhbmdlLCBtaWdyYXRpb24sIHBlcnNpc3RlbmNlIGNoYW5nZSwgb3IgY2xpZW50IGV2aWRlbmNlLXdyaXRlIHBhdGggd2FzIGludHJvZHVjZWQuCgpWZXJpZmljYXRpb24gaGlzdG9yeToKCi0gSW5pdGlhbCBQUiBoZWFkIGBkOWRlM2JiN2FhYzcyOTUxNmVjMTU3ZDI1ZjA4MDUxOTkyMDA5NTI2YCBwYXNzZWQgc3RyaWN0IEphdmFTY3JpcHQsIHRyYW5zbGF0aW9ucywgcHJvdmlkZXIgc21va2UsIGxpbnQsIGFuZCB0aGUgY29tcGxldGUgdW5pdCBzdWl0ZTsgb25seSBjYW5vbmljYWwgUHJldHRpZXIgZm9ybWF0dGluZyBmYWlsZWQuCi0gVGhlIHJlcG9zaXRvcnktcGlubmVkIFByZXR0aWVyIDMuOS42IGZvcm1hdHRlZCB0aGUgc2luZ2xlIFBoYXNlIDhMIHRlc3QgZmlsZSB3aXRob3V0IGxvZ2ljIGNoYW5nZXM7IHRoZSB0ZW1wb3JhcnkgZm9ybWF0dGVyIHdvcmtmbG93IHJlbW92ZWQgaXRzZWxmIGJlZm9yZSB0aGUgY2xlYW4gY2FuZGlkYXRlIHRyZWUuCgojIyBNYW5kYXRvcnkgcHJpdmFjeS1jb25zY2lvdXMgYW5hbHl0aWNzIGFuZCBhZG1pbiBtb25pdG9yaW5nIHBoYXNl
+          OLD_STEPS_B64: IyMjIFJlcXVpcmVkIG5leHQgc3RlcHMKCjEuIFRoaXMgaGFuZG9mZiB1cGRhdGUgY2hhbmdlcyBQUiAjMzgncyBoZWFkLiBSdW4gdGhlIGNvbXBsZXRlIGZpdmUtam9iIFBSIENJIG9uIHRoZSBleGFjdCBmaW5hbCBkb2N1bWVudGF0aW9uLWluY2x1c2l2ZSBoZWFkLgoyLiBDb25maXJtIHJvb3QgYHBhY2thZ2UuanNvbmAgc3RpbGwgdXNlcyBjYW5vbmljYWwgYCJmb3JtYXQ6Y2hlY2siOiAicHJldHRpZXIgLS1jaGVjayAuImAgYW5kIGAuZ2l0aHViL3dvcmtmbG93cy9jaS55bWxgIHJlbWFpbnMgdGhlIGNhbm9uaWNhbCBmaXZlLWpvYiB3b3JrZmxvdy4KMy4gVmVyaWZ5IFBSICMzOCB0YXJnZXRzIGBkZXZlbG9wYCwgaXMgbWVyZ2VhYmxlLCBjb250YWlucyBvbmx5IHRoZSBzaXggaW50ZW5kZWQgUGhhc2UgOEsgcHJvZHVjdC90ZXN0IGZpbGVzIHBsdXMgdGhpcyBoYW5kb2ZmIHVwZGF0ZSwgYW5kIGNvbnRhaW5zIG5vIHRlbXBvcmFyeSBoZWxwZXIgZmlsZXMuCjQuIFNxdWFzaC1tZXJnZSBQUiAjMzggdXNpbmcgZXhwZWN0ZWQtaGVhZCBwcm90ZWN0aW9uLgo1LiBWZXJpZnkgdGhlIHJldHVybmVkIG1lcmdlIFNIQSBpcyB0aGUgYWN0dWFsIGBkZXZlbG9wYCBoZWFkIGFuZCBpdHMgcHVzaCBDSSBwYXNzZXMgYWxsIGZpdmUgdG9wLWxldmVsIGpvYnMuCjYuIE9ubHkgYWZ0ZXIgdGhhdCBnYXRlIGlzIGdyZWVuLCBpbnNwZWN0IHRoZSBwbGFubmVyIHJvYWRtYXAgYW5kIHN0YXJ0IHRoZSBuZXh0IGRpc3RpbmN0IHNsaWNlIGZyb20gdGhlIG5ldyB2ZXJpZmllZCBgZGV2ZWxvcGAgU0hBLgo3LiBEbyBub3QgZW5hYmxlIHJlY29tbWVuZGF0aW9uIHJhbmtpbmcgbWVyZWx5IGJlY2F1c2UgdmVyaWZpZWQgYnVkZ2V0IGZpdCBjYW4gbm93IGJlIGRpc3BsYXllZC4gUmFua2luZyByZXF1aXJlcyBhIHNlcGFyYXRlIGV4cGxpY2l0IHBvbGljeSBhbmQgdHJ1c3R3b3J0aHkgcHJvZHVjdGlvbiBldmlkZW5jZTsgYXZhaWxhYmlsaXR5IGFuZCBib29rYWJpbGl0eSByZW1haW4gc2VwYXJhdGUuCg==
+          NEW_STEPS_B64: IyMjIFJlcXVpcmVkIG5leHQgc3RlcHMKCjEuIFJ1biB0aGUgY29tcGxldGUgZml2ZS1qb2IgUFIgQ0kgb24gdGhlIGV4YWN0IGZpbmFsIGRvY3VtZW50YXRpb24taW5jbHVzaXZlIFBoYXNlIDhMIGhlYWQuCjIuIENvbmZpcm0gcm9vdCBgcGFja2FnZS5qc29uYCBzdGlsbCB1c2VzIGNhbm9uaWNhbCBgImZvcm1hdDpjaGVjayI6ICJwcmV0dGllciAtLWNoZWNrIC4iYCBhbmQgYC5naXRodWIvd29ya2Zsb3dzL2NpLnltbGAgcmVtYWlucyB0aGUgY2Fub25pY2FsIGZpdmUtam9iIHdvcmtmbG93LgozLiBWZXJpZnkgUFIgIzM5IHN0aWxsIHRhcmdldHMgYGRldmVsb3BgLCBpcyBtZXJnZWFibGUsIGNvbnRhaW5zIG9ubHkgdGhlIHR3byBpbnRlbmRlZCBQaGFzZSA4TCBjb2RlL3Rlc3QgZmlsZXMgcGx1cyB0aGlzIGhhbmRvZmYgdXBkYXRlLCBhbmQgY29udGFpbnMgbm8gdGVtcG9yYXJ5IGhlbHBlciBmaWxlcy4KNC4gU3F1YXNoLW1lcmdlIFBSICMzOSB1c2luZyBleHBlY3RlZC1oZWFkIHByb3RlY3Rpb24uCjUuIFZlcmlmeSB0aGUgcmV0dXJuZWQgbWVyZ2UgU0hBIGlzIHRoZSBhY3R1YWwgYGRldmVsb3BgIGhlYWQgYW5kIGl0cyBwdXNoIENJIHBhc3NlcyBhbGwgZml2ZSB0b3AtbGV2ZWwgam9icy4KNi4gT25seSBhZnRlciB0aGF0IGdhdGUgaXMgZ3JlZW4sIGluc3BlY3QgY3VycmVudCBwbGFubmVyL3Byb3ZpZGVyIGFyY2hpdGVjdHVyZSBhbmQgc3RhcnQgdGhlIG5leHQgZ2VudWluZWx5IGRpc3RpbmN0IHNsaWNlIGZyb20gdGhlIG5ldyB2ZXJpZmllZCBgZGV2ZWxvcGAgU0hBLgo3LiBEbyBub3QgZW5hYmxlIHJhbmtpbmcgb3IgcGVyc2lzdCByZWNvbW1lbmRhdGlvbnMgbWVyZWx5IGJlY2F1c2UgY29uY3VycmVudCBldmlkZW5jZSBjb2xsZWN0aW9uIGlzIHJlYWR5LiBQcm9kdWN0aW9uIHN0aWxsIG5lZWRzIHRydXN0d29ydGh5IHByaWNpbmcgY29sbGVjdG9ycyBhbmQgYW4gZXhwbGljaXQgcmVjb21tZW5kYXRpb24vcmFua2luZyBwb2xpY3k7IGF2YWlsYWJpbGl0eSBhbmQgYm9va2FiaWxpdHkgcmVtYWluIHNlcGFyYXRlLgo=
         run: |
           python3 - <<'PY'
+          import base64
+          import os
           from pathlib import Path
 
           path = Path('docs/CURRENT-WORK.md')
           text = path.read_text()
+          anchor = '- Live-provider CI must not be overstated as proof of keyed pricing providers that are not configured.\n\n## Mandatory privacy-conscious analytics and admin monitoring phase'
+          replacement = base64.b64decode(os.environ['PHASE8L_SECTION_B64']).decode()
+          old_steps = base64.b64decode(os.environ['OLD_STEPS_B64']).decode()
+          new_steps = base64.b64decode(os.environ['NEW_STEPS_B64']).decode()
 
-          phase8k_anchor = "- Live-provider CI must not be overstated as proof of keyed pricing providers that are not configured.\n\n## Mandatory privacy-conscious analytics and admin monitoring phase"
-          phase8k_replacement = """- Live-provider CI must not be overstated as proof of keyed pricing providers that are not configured.
-- Final documentation-inclusive PR head `a7ec159f714d0e79cc24ccf0ef2b9bfdab73b98b` passed final PR CI #390 with all five top-level jobs green.
-- PR #38 was squash-merged with expected-head protection as `6a4ab3f7c607b9b236cf655a4dc0d7b9d5a06cff`.
-- Post-merge `develop` CI #391 passed all five top-level jobs on that exact merge SHA.
-
-### Phase 8L — Concurrent Fail-Closed Pricing Evidence Collection
-
-Branch: `feature/phase-8l-concurrent-evidence-collection`
-
-PR: #39 — `Phase 8L: collect planner pricing evidence concurrently`
-
-Base checkpoint: `6a4ab3f7c607b9b236cf655a4dc0d7b9d5a06cff`, the verified Phase 8K `develop` merge with post-merge CI #391 green.
-
-Implemented:
-
-- Starts the fixed set of eight server-only planner pricing collectors concurrently rather than serially, preventing category latencies from accumulating when trusted providers are connected later.
-- Keeps the collector fan-out bounded to the existing eight planner categories; no dynamic or unbounded provider fan-out was added.
-- Each collector still normalizes independently through the strict verified pricing-evidence contract and fails closed as `NOT_CONFIGURED`, `UNAVAILABLE`, `FAILED`, or `COLLECTED`.
-- `Promise.all` is used only after each collector has its own error boundary, so one rejected/invalid provider result does not cancel valid evidence from another category.
-- Evidence is applied after collection in the canonical planner-category order, so response ordering is deterministic even when provider completion order differs.
-- Added regression coverage proving configured collectors start before earlier deferred collectors resolve, reverse completion order does not change output order, and one failed category preserves verified evidence from another category.
-- Existing complete-evidence affordability evaluation still works, while `rankingEligible` remains false.
-- No provider integration, provider credential, ranking/recommendation policy, availability/bookability claim, Prisma schema change, migration, persistence change, or client evidence-write path was introduced.
-
-Verification history:
-
-- Initial PR head `d9de3bb7aac729516ec157d25f08051992009526` passed strict JavaScript, translations, provider smoke, lint, and the complete unit suite; only canonical Prettier formatting failed.
-- The repository-pinned Prettier 3.9.6 formatted the single Phase 8L test file without logic changes; the temporary formatter workflow removed itself before the clean candidate tree.
-
-## Mandatory privacy-conscious analytics and admin monitoring phase"""
-          if phase8k_anchor not in text:
+          if anchor not in text:
               raise SystemExit('Phase 8K handoff anchor not found')
-          text = text.replace(phase8k_anchor, phase8k_replacement, 1)
-
-          old_steps = """### Required next steps
-
-1. This handoff update changes PR #38's head. Run the complete five-job PR CI on the exact final documentation-inclusive head.
-2. Confirm root `package.json` still uses canonical `\"format:check\": \"prettier --check .\"` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #38 targets `develop`, is mergeable, contains only the six intended Phase 8K product/test files plus this handoff update, and contains no temporary helper files.
-4. Squash-merge PR #38 using expected-head protection.
-5. Verify the returned merge SHA is the actual `develop` head and its push CI passes all five top-level jobs.
-6. Only after that gate is green, inspect the planner roadmap and start the next distinct slice from the new verified `develop` SHA.
-7. Do not enable recommendation ranking merely because verified budget fit can now be displayed. Ranking requires a separate explicit policy and trustworthy production evidence; availability and bookability remain separate.
-"""
-          new_steps = """### Required next steps
-
-1. Run the complete five-job PR CI on the exact final documentation-inclusive Phase 8L head.
-2. Confirm root `package.json` still uses canonical `\"format:check\": \"prettier --check .\"` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #39 still targets `develop`, is mergeable, contains only the two intended Phase 8L code/test files plus this handoff update, and contains no temporary helper files.
-4. Squash-merge PR #39 using expected-head protection.
-5. Verify the returned merge SHA is the actual `develop` head and its push CI passes all five top-level jobs.
-6. Only after that gate is green, inspect current planner/provider architecture and start the next genuinely distinct slice from the new verified `develop` SHA.
-7. Do not enable ranking or persist recommendations merely because concurrent evidence collection is ready. Production still needs trustworthy pricing collectors and an explicit recommendation/ranking policy; availability and bookability remain separate.
-"""
           if old_steps not in text:
               raise SystemExit('Required-next-steps anchor not found')
+
+          text = text.replace(anchor, replacement, 1)
           text = text.replace(old_steps, new_steps, 1)
           path.write_text(text)
           PY
