@@ -13,6 +13,19 @@ const CATEGORY_TARGETS = Object.freeze({
   TRAVEL_INSURANCE: '18.00',
 });
 
+/**
+ * @typedef {Object} VerifiedCollectorResult
+ * @property {string} amountMin
+ * @property {string} amountMax
+ * @property {string} currencyCode
+ * @property {string} pricingBasis
+ * @property {string} confidence
+ * @property {string} sourceProvider
+ * @property {string} sourceExternalId
+ * @property {string} sourceFetchedAt
+ * @property {{ mustNotLeak: boolean }} [rawProviderPayload]
+ */
+
 function storedRequest() {
   return {
     id: 'plan-request-1',
@@ -68,17 +81,20 @@ function repository() {
 
 function verifiedCollector(category, amount = CATEGORY_TARGETS[category]) {
   return {
-    collect: vi.fn(async () => ({
-      amountMin: amount,
-      amountMax: amount,
-      currencyCode: 'EUR',
-      pricingBasis: 'VERIFIED_PRICE',
-      confidence: 'HIGH',
-      sourceProvider: `verified-${category.toLowerCase()}-test`,
-      sourceExternalId: `${category.toLowerCase()}-evidence-1`,
-      sourceFetchedAt: '2026-09-06T12:00:00.000Z',
-      rawProviderPayload: { mustNotLeak: true },
-    })),
+    collect: vi.fn(
+      async () =>
+        /** @type {VerifiedCollectorResult} */ ({
+          amountMin: amount,
+          amountMax: amount,
+          currencyCode: 'EUR',
+          pricingBasis: 'VERIFIED_PRICE',
+          confidence: 'HIGH',
+          sourceProvider: `verified-${category.toLowerCase()}-test`,
+          sourceExternalId: `${category.toLowerCase()}-evidence-1`,
+          sourceFetchedAt: '2026-09-06T12:00:00.000Z',
+          rawProviderPayload: { mustNotLeak: true },
+        }),
+    ),
   };
 }
 
