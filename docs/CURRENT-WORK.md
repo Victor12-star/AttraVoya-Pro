@@ -194,72 +194,90 @@ This file is the permanent handoff point for continuing development safely in a 
 - Market evidence remains empty until collected server-side; `budgetFit` remains `NOT_EVALUATED`, `rankingEligible` remains false, and `affordabilityConfirmed` remains false.
 - No fares, lodging prices, quotes, availability, recommendation ranking, Prisma schema changes, migrations, `BudgetPlan`, or `BudgetLine` persistence were introduced.
 
-## Current phase
-
 ### Phase 8F — Accommodation Pricing Evidence Contract
 
-Branch: `feature/phase-8f-accommodation-pricing-evidence-contract`
+- PR #32 merged into `develop`.
+- Final PR head: `8df0bddb17b8ee0a595f37749b537761e678edfc`.
+- Final PR CI #333 passed all five top-level jobs.
+- Squash merge commit: `e4de8b1a2f8174e8bf16bb3b7508d8cce32b497f`.
+- Post-merge `develop` CI #334 passed all five top-level jobs on that exact merge SHA.
+- Added a server-internal accommodation pricing-evidence normalization and collection boundary.
+- Only `LIVE` or `VERIFIED_PRICE` evidence can enter the verified market-evidence path.
+- Evidence requires bounded non-negative price ranges, planner-budget currency, confidence, provider identity, external ID, and source-fetch timestamp.
+- Raw provider-specific fields are stripped before planner responses are built.
+- `ESTIMATE`, `USER_ENTERED`, and `UNAVAILABLE` cannot masquerade as verified accommodation market evidence.
+- Added optional server-only `plannerAccommodationPricingCollector` injection; no client evidence-write API exists.
+- Missing, empty, invalid, and valid collector states remain explicit as `NOT_CONFIGURED`, `UNAVAILABLE`, `FAILED`, and `COLLECTED`.
+- Geoapify remains accommodation-location discovery only and is not treated as live room pricing or inventory.
+- Even valid accommodation pricing evidence does not set budget fit, confirm affordability, enable ranking, or claim availability/bookability.
+- No Prisma schema change, migration, `TravelPlanRecommendation`, `BudgetPlan`, `BudgetLine`, or `AccommodationOption` persistence was added.
 
-PR: #32 — `Phase 8F: add accommodation pricing evidence contract`
+## Current phase
 
-Base checkpoint: `a5eac63826d499f1e4e8da8b2af22834fd8a7d92` — verified Phase 8E `develop` merge with post-merge CI #326 green.
+### Phase 8G — Shared Market Pricing Evidence Core + Flight Contract
+
+Branch: `feature/phase-8g-shared-market-pricing-evidence`
+
+PR: #33 — `Phase 8G: add shared market pricing evidence core`
+
+Base checkpoint: `e4de8b1a2f8174e8bf16bb3b7508d8cce32b497f` — verified Phase 8F `develop` merge with post-merge CI #334 green.
 
 Reason for this phase:
 
-- Phase 8E defines which evidence is required but intentionally has no trusted mechanism for turning provider pricing results into planner evidence.
-- Existing Geoapify accommodation discovery proves that lodging locations exist; it does not provide verified live room inventory or pricing suitable for affordability decisions.
-- A future pricing adapter must not be allowed to leak raw provider payloads, silently change currency, or label estimates/user-entered values as verified market evidence.
-- Phase 8F therefore creates a server-internal normalization and collection boundary for accommodation pricing without pretending a real pricing provider is configured today.
+- Phase 8F proved the server-only accommodation pricing evidence boundary, but duplicating near-identical validation/application logic for every market-pricing category would create drift and inconsistent honesty rules.
+- Flights are a required planner budget category, yet `FLIGHT_PROVIDER` remains `none`; the correct next step is a provider-ready evidence contract, not a fabricated or sandbox fare adapter.
+- Phase 8G therefore generalizes the verified market-pricing core and adds a flight collector hook that fails closed when no trusted provider exists.
 
 Implemented:
 
-- Added a server-internal accommodation pricing-evidence normalizer.
-- Only `LIVE` or `VERIFIED_PRICE` evidence can enter the verified market-evidence path.
-- Accepted evidence requires a non-negative bounded `amountMin`/`amountMax` range, matching planner currency, allowed confidence, source provider, source external ID, and valid source-fetch timestamp.
-- Currency codes are normalized and must match the planner budget currency; mismatches fail closed.
-- Raw provider-specific fields are stripped. Planner responses contain only normalized evidence fields and provenance.
-- `ESTIMATE`, `USER_ENTERED`, and `UNAVAILABLE` cannot masquerade as verified accommodation market evidence.
-- Added optional `plannerAccommodationPricingCollector` injection through server construction only: `buildApp` → planner routes → planner service.
-- No browser/mobile evidence-write endpoint was added, so clients cannot manufacture provider pricing evidence.
-- With no collector configured, accommodation evidence is explicit `NOT_CONFIGURED`.
-- A collector returning no result produces `UNAVAILABLE`; invalid collector evidence produces `FAILED`; valid normalized evidence produces `COLLECTED`.
-- When accommodation evidence is collected, it is added to the evidence gate and removed from `missingCategories`, while all other missing categories remain explicit.
-- `evaluation.evidenceReady` becomes true only if all required evidence categories are collected.
-- Even valid accommodation pricing evidence does not itself set budget fit, confirm affordability, or enable ranking.
-- Focused normalizer tests cover allowed bases, currency mismatch, invalid ranges, missing source identity, and raw-payload stripping.
-- Planner integration tests cover authentication, private caching, unconfigured/unavailable/failed/collected states, owner isolation, candidate membership, fixed-target behavior, normalized provider evidence, and continued ranking lockout.
-- No Prisma schema change, migration, `TravelPlanRecommendation`, `BudgetPlan`, `BudgetLine`, or `AccommodationOption` persistence was added.
+- Generalized verified market-pricing normalization so accommodation and flight evidence share the same strict validation boundary.
+- Supported verified pricing bases remain only `LIVE` and `VERIFIED_PRICE`.
+- Both categories require bounded non-negative `amountMin`/`amountMax`, planner-budget currency, confidence, source provider, source external ID, and valid source-fetch timestamp.
+- Normalized evidence now carries `amountScope: PLANNER_CATEGORY_TOTAL`, making the collected range explicitly comparable to that planner category's budget target rather than implying a per-person, per-night, or per-segment amount.
+- Raw provider-specific fields are stripped by the shared normalizer.
+- Added `normalizeFlightPricingEvidence` using the same core contract as accommodation.
+- Generalized evidence-gate application into `applyMarketPricingCollection` for the market categories `FLIGHTS` and `ACCOMMODATION`.
+- Added optional server-only flight collector injection: `buildApp` → planner routes → planner service.
+- No browser/mobile evidence-write endpoint was added; clients still cannot manufacture market evidence.
+- The affordability-evidence endpoint now attempts flight and accommodation pricing collection independently and records each category state explicitly.
+- With no flight collector configured, the result is `FLIGHTS: NOT_CONFIGURED`; this is not interpreted as zero cost, free travel, or an affordable fare.
+- A flight collector returning no evidence produces `UNAVAILABLE`; invalid evidence produces `FAILED`; only normalized trusted evidence produces `COLLECTED`.
+- Valid `LIVE` flight evidence can set evidence provenance flags (`liveDataUsed`, `providerDataUsed`, `pricingDataUsed`) while affordability and ranking remain locked.
+- Added focused normalizer tests for both accommodation and flight evidence, including rejection of `ESTIMATE`, `USER_ENTERED`, and `UNAVAILABLE` pricing bases.
+- Added private planner-route tests proving server-only flight collection, raw-field stripping, explicit `NOT_CONFIGURED`, invalid-evidence fail-closed behavior, owner isolation, candidate membership, private caching, and continued affordability/ranking lockout.
+- No Prisma schema change, migration, flight provider adapter, `TravelPlanRecommendation`, `BudgetPlan`, `BudgetLine`, or recommendation persistence was added.
 
 Data-honesty and security boundary:
 
-- Geoapify remains accommodation-location discovery only; it is not treated as a pricing or live-inventory provider.
-- No real accommodation pricing provider is configured by this phase.
-- Browser/mobile clients cannot submit or overwrite provider evidence.
-- Only server-injected collector output can reach the accommodation normalization boundary.
-- Invalid or currency-mismatched evidence fails closed and does not set `providerDataUsed` or `pricingDataUsed` true.
-- Valid provider evidence retains `pricingBasis`, `confidence`, `sourceProvider`, `sourceExternalId`, and `sourceFetchedAt` provenance.
+- `FLIGHT_PROVIDER` remains `none`; Phase 8G does not connect or claim live public fares.
+- No test/sandbox fare is presented as live public pricing.
+- Geoapify still provides accommodation location discovery only, not verified room pricing/inventory.
+- Browser/mobile clients cannot submit, overwrite, or promote pricing evidence.
+- Only server-injected collector output reaches the shared verified market-pricing normalizer.
+- Invalid, mismatched-currency, malformed-range, or untrusted-basis evidence fails closed and does not become collected market data.
+- Collected evidence retains explicit provider identity, external ID, fetch timestamp, pricing basis, confidence, currency, price range, category, and amount scope.
 - `budgetFit` remains `NOT_EVALUATED`.
 - `rankingEligible` remains false.
 - `affordabilityConfirmed` remains false.
-- A single collected category never makes a destination affordable, feasible, ranked, bookable, or available.
+- One or two collected market-pricing categories do not make a destination affordable, feasible, ranked, available, or bookable while other required evidence remains missing.
 
 Verification history:
 
-- Initial implementation head `a01fd1f87c41c7dfab6f60a8a5f67ec289c301c6` ran PR CI #327. Strict JavaScript, translations, provider smoke, ESLint, all unit tests, production builds, PostgreSQL/Prisma, dependency/secret checks, and live no-cost-provider checks passed. Repository-wide Prettier reported formatting only.
-- Formatter work was restricted to the files named by Prettier and made no behavioral or test-weakening changes.
-- Exact implementation head `5ef9aa66f4bc819b5d5454a72c789793d583377d` passed PR CI #332 with all five top-level jobs green, including repository-wide Prettier.
-- On CI #332, server tests passed 71/71 and web tests passed 138/138.
+- Exact implementation head `eaafbeb6bd95c43141486993dd28d21c311ff4b2` ran PR CI #335.
+- PR CI #335 passed all five top-level jobs: Code quality and unit tests, Live no-cost provider checks, Production builds, Dependency and secret checks, and PostgreSQL and Prisma verification.
+- Strict JavaScript, translation checks, provider smoke tests, ESLint, all unit tests, repository-wide Prettier, production build, database validation/tests, dependency/secret checks, and live no-cost provider checks all passed on that exact implementation head.
+- CI #335 does not constitute live flight-provider verification because no flight provider is configured; `FLIGHT_PROVIDER` remains `none`.
 
 ### Required next steps
 
-1. This handoff update changes PR #32's head. Run the complete five-job PR CI on the exact new documentation head.
+1. This handoff update changes PR #33's head. Run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` still uses canonical `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #32 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #32 using expected-head protection.
+3. Verify PR #33 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #33 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
 7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
-8. For the next slice, read this handoff and the current planner/provider architecture first. Do not invent live flight or accommodation providers. `FLIGHT_PROVIDER` is still `none`, and Phase 8F intentionally does not configure a lodging pricing provider.
+8. For the next slice, read this handoff and current provider architecture first. Do not enable affordability/ranking merely because flight and accommodation contracts exist; required evidence completeness and a separate explicit evaluation rule must remain the gate.
 
 ## CI interpretation rule
 
