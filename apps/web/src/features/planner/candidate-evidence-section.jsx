@@ -304,7 +304,9 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
       } catch (error) {
         if (candidateSequence.current !== sequence) return;
         setCandidateSet(null);
-        setCandidateState(error instanceof ApiClientError && error.status === 401 ? 'auth' : 'error');
+        setCandidateState(
+          error instanceof ApiClientError && error.status === 401 ? 'auth' : 'error',
+        );
       }
     },
     [resetEvidence],
@@ -396,7 +398,9 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
               <RefreshCw
                 size={16}
                 className={
-                  briefState === 'loading' || candidateState === 'loading' ? styles.spin : undefined
+                  briefState === 'loading' || candidateState === 'loading'
+                    ? styles.spin
+                    : undefined
                 }
                 aria-hidden="true"
               />
@@ -482,14 +486,18 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                 </div>
               ) : null}
 
-              {candidateState === 'success' && candidateSet && candidateSet.destinations.length === 0 ? (
+              {candidateState === 'success' &&
+              candidateSet &&
+              candidateSet.destinations.length === 0 ? (
                 <div className={styles.state}>
                   <MapPinned size={24} aria-hidden="true" />
                   <p>{copy.emptyCandidates}</p>
                 </div>
               ) : null}
 
-              {candidateState === 'success' && candidateSet && candidateSet.destinations.length > 0 ? (
+              {candidateState === 'success' &&
+              candidateSet &&
+              candidateSet.destinations.length > 0 ? (
                 <div className={styles.results}>
                   <div className={styles.context}>
                     <strong>{briefLabel(selectedBrief, copy.savedBrief)}</strong>
