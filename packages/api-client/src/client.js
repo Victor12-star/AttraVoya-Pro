@@ -23,9 +23,7 @@ function normalizeIdempotencyKey(value) {
 
   const normalized = value.trim();
   if (!IDEMPOTENCY_KEY_PATTERN.test(normalized)) {
-    throw new TypeError(
-      'The planner idempotency key must contain 8 to 128 safe ASCII characters.',
-    );
+    throw new TypeError('The planner idempotency key must contain 8 to 128 safe ASCII characters.');
   }
   return normalized;
 }
