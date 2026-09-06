@@ -1,5 +1,9 @@
 const ACCEPTED_PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
+const MARKET_CATEGORY_LABELS = Object.freeze({
+  ACCOMMODATION: 'Accommodation',
+  FLIGHTS: 'Flight',
+});
 const MAX_MONEY_AMOUNT = 1_000_000_000;
 
 function boundedText(value, fieldName, maxLength) {
@@ -36,32 +40,35 @@ function sourceTimestamp(value) {
   return parsed.toISOString();
 }
 
-export function normalizeAccommodationPricingEvidence(rawEvidence, expectedCurrencyCode) {
+function normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, category) {
+  const label = MARKET_CATEGORY_LABELS[category];
+  if (!label) throw new TypeError('Market pricing evidence category is not supported.');
   if (!rawEvidence || typeof rawEvidence !== 'object' || Array.isArray(rawEvidence)) {
-    throw new TypeError('Accommodation pricing evidence must be an object.');
+    throw new TypeError(`${label} pricing evidence must be an object.`);
   }
 
   const normalizedCurrency = currencyCode(rawEvidence.currencyCode);
   const expectedCurrency = currencyCode(expectedCurrencyCode);
   if (normalizedCurrency !== expectedCurrency) {
-    throw new TypeError('Accommodation pricing evidence must use the planner budget currency.');
+    throw new TypeError(`${label} pricing evidence must use the planner budget currency.`);
   }
 
   if (!ACCEPTED_PRICING_BASES.has(rawEvidence.pricingBasis)) {
-    throw new TypeError('Accommodation pricing evidence must be live or verified-price evidence.');
+    throw new TypeError(`${label} pricing evidence must be live or verified-price evidence.`);
   }
   if (!ACCEPTED_CONFIDENCE.has(rawEvidence.confidence)) {
-    throw new TypeError('Accommodation pricing evidence confidence is invalid.');
+    throw new TypeError(`${label} pricing evidence confidence is invalid.`);
   }
 
   const amountMin = money(rawEvidence.amountMin, 'amountMin');
   const amountMax = money(rawEvidence.amountMax, 'amountMax');
   if (Number(amountMax) < Number(amountMin)) {
-    throw new TypeError('Accommodation pricing evidence maximum cannot be below its minimum.');
+    throw new TypeError(`${label} pricing evidence maximum cannot be below its minimum.`);
   }
 
   return {
-    category: 'ACCOMMODATION',
+    category,
+    amountScope: 'PLANNER_CATEGORY_TOTAL',
     amountMin,
     amountMax,
     currencyCode: normalizedCurrency,
@@ -72,4 +79,12 @@ export function normalizeAccommodationPricingEvidence(rawEvidence, expectedCurre
     sourceFetchedAt: sourceTimestamp(rawEvidence.sourceFetchedAt),
     verifiedMarketEvidence: true,
   };
+}
+
+export function normalizeAccommodationPricingEvidence(rawEvidence, expectedCurrencyCode) {
+  return normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, 'ACCOMMODATION');
+}
+
+export function normalizeFlightPricingEvidence(rawEvidence, expectedCurrencyCode) {
+  return normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, 'FLIGHTS');
 }
