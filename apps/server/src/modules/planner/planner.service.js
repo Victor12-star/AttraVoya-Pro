@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '../../errors/app-error.js';
+import { buildAffordabilityEvidenceGate } from './affordability-evidence.js';
 import { buildBudgetEnvelope } from './budget-allocation.js';
 
 function toDate(value) {
@@ -215,6 +216,32 @@ export function createPlannerService(repository) {
         requestId,
         mode: 'PUBLISHED_CATALOG',
         records,
+      });
+    },
+
+    async getAffordabilityEvidence({ userId, requestId, destinationId }) {
+      const record = await repository.findOwnedRequestById({ userId, requestId });
+      if (!record) throw new NotFoundError('The planning request was not found.');
+
+      let candidate = null;
+      if (record.targetDestinationId) {
+        if (record.targetDestinationId === destinationId) {
+          candidate = await repository.findPublishedDestinationCandidateById(destinationId);
+        }
+      } else {
+        const candidates = await repository.listPublishedDestinationCandidates({
+          excludeCityId: record.originCityId ?? undefined,
+          limit: 20,
+        });
+        candidate = candidates.find((item) => item.id === destinationId) ?? null;
+      }
+
+      if (!candidate) throw new NotFoundError('The destination candidate was not found.');
+
+      return buildAffordabilityEvidenceGate({
+        planRequest: mapPlannerRequest(record),
+        destination: mapDestinationCandidate(candidate),
+        budgetEnvelope: buildBudgetEnvelope(record),
       });
     },
   };

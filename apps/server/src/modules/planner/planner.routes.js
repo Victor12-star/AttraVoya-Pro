@@ -30,6 +30,11 @@ export async function plannerRoutes(app, options = {}) {
     controller.getDestinationCandidates,
   );
   app.get(
+    '/:requestId/destination-candidates/:destinationId/affordability-evidence',
+    { ...authenticated, schema: plannerSchemas.getCandidateEvidence },
+    controller.getAffordabilityEvidence,
+  );
+  app.get(
     '/:requestId',
     { ...authenticated, schema: plannerSchemas.getRequest },
     controller.getRequest,
