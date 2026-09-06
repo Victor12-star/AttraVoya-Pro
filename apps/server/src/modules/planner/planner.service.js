@@ -1,10 +1,14 @@
-import { NotFoundError, ValidationError } from '../../errors/app-error.js';
+import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 import { evaluateAffordabilityEvidenceGate } from './affordability-evaluation.js';
 import {
   applyMarketPricingCollection,
   buildAffordabilityEvidenceGate,
 } from './affordability-evidence.js';
 import { buildBudgetEnvelope } from './budget-allocation.js';
+import {
+  plannerRequestIdFromIdempotencyKey,
+  plannerRequestMatchesInput,
+} from './planner-idempotency.js';
 import { normalizePlannerCategoryPricingEvidence } from './pricing-evidence.js';
 
 function toDate(value) {
@@ -17,6 +21,12 @@ function toDateString(value) {
 
 function toDecimalString(value) {
   return value === null || value === undefined ? null : String(value);
+}
+
+function idempotencyConflict() {
+  return new ConflictError(
+    'This idempotency key has already been used for a different planning request.',
+  );
 }
 
 function mapStayPreference(stayPreference) {
@@ -170,7 +180,18 @@ export function createPlannerService(repository, options = {}) {
   ];
 
   return {
-    async createRequest({ userId, input }) {
+    async createRequest({ userId, idempotencyKey, input }) {
+      const requestId = plannerRequestIdFromIdempotencyKey({ userId, idempotencyKey });
+      const existing = await repository.findOwnedRequestById({ userId, requestId });
+
+      // Replays should not depend on reference data still having the same current
+      // publication state. The authoritative stored request is returned when the
+      // validated payload matches what that key originally created.
+      if (existing) {
+        if (!plannerRequestMatchesInput(existing, input)) throw idempotencyConflict();
+        return { planRequest: mapPlannerRequest(existing), created: false };
+      }
+
       const {
         budgetCurrencyCode,
         fixedDeparture,
@@ -213,7 +234,8 @@ export function createPlannerService(repository, options = {}) {
         throw new ValidationError('The selected origin city and airport do not match.');
       }
 
-      const record = await repository.createOwnedRequest({
+      const creation = await repository.createOwnedRequestIdempotently({
+        requestId,
         userId,
         currencyId: currency.id,
         input: {
@@ -226,7 +248,16 @@ export function createPlannerService(repository, options = {}) {
         },
       });
 
-      return mapPlannerRequest(record);
+      // Another replica may have created the deterministic request ID after the
+      // pre-check. Accept that race only when it represents the same payload.
+      if (!creation.created && !plannerRequestMatchesInput(creation.record, input)) {
+        throw idempotencyConflict();
+      }
+
+      return {
+        planRequest: mapPlannerRequest(creation.record),
+        created: creation.created,
+      };
     },
 
     async listRequests(userId) {
