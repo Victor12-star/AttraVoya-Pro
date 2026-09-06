@@ -23,7 +23,8 @@ const COPY = {
   en: {
     eyebrow: 'Saved budget',
     title: 'Budget allocation targets',
-    intro: 'Choose a saved planning brief to see how your own budget is divided after the safety reserve. These targets are planning guidance, not market prices or live estimates.',
+    intro:
+      'Choose a saved planning brief to see how your own budget is divided after the safety reserve. These targets are planning guidance, not market prices or live estimates.',
     selectLabel: 'Saved planning brief',
     selectPlaceholder: 'Choose a planning brief',
     savedBrief: 'Saved planning brief',
@@ -37,7 +38,8 @@ const COPY = {
     categoryTargets: 'Category targets',
     percentOfSpendable: 'Share of spendable budget',
     planningTarget: 'Planning targets',
-    provenance: 'These amounts divide your saved budget. They are not fares, market prices, quotes, live estimates, availability, or destination-specific cost estimates.',
+    provenance:
+      'These amounts divide your saved budget. They are not fares, market prices, quotes, live estimates, availability, or destination-specific cost estimates.',
     categories: {
       FLIGHTS: 'Flights',
       ACCOMMODATION: 'Accommodation',
@@ -52,7 +54,8 @@ const COPY = {
   sv: {
     eyebrow: 'Sparad budget',
     title: 'Mål för budgetfördelning',
-    intro: 'Välj ett sparat planeringsunderlag för att se hur din egen budget fördelas efter säkerhetsmarginalen. Målen är planeringsstöd, inte marknadspriser eller liveuppskattningar.',
+    intro:
+      'Välj ett sparat planeringsunderlag för att se hur din egen budget fördelas efter säkerhetsmarginalen. Målen är planeringsstöd, inte marknadspriser eller liveuppskattningar.',
     selectLabel: 'Sparat planeringsunderlag',
     selectPlaceholder: 'Välj ett planeringsunderlag',
     savedBrief: 'Sparat planeringsunderlag',
@@ -66,7 +69,8 @@ const COPY = {
     categoryTargets: 'Kategorimål',
     percentOfSpendable: 'Andel av budgeten att fördela',
     planningTarget: 'Planeringsmål',
-    provenance: 'Beloppen fördelar din sparade budget. De är inte flygpriser, marknadspriser, offerter, liveuppskattningar, tillgänglighet eller destinationsspecifika kostnadsuppskattningar.',
+    provenance:
+      'Beloppen fördelar din sparade budget. De är inte flygpriser, marknadspriser, offerter, liveuppskattningar, tillgänglighet eller destinationsspecifika kostnadsuppskattningar.',
     categories: {
       FLIGHTS: 'Flyg',
       ACCOMMODATION: 'Boende',
@@ -81,7 +85,8 @@ const COPY = {
   es: {
     eyebrow: 'Presupuesto guardado',
     title: 'Objetivos de distribución del presupuesto',
-    intro: 'Elige una planificación guardada para ver cómo se reparte tu propio presupuesto después de la reserva de seguridad. Son objetivos de planificación, no precios de mercado ni estimaciones en tiempo real.',
+    intro:
+      'Elige una planificación guardada para ver cómo se reparte tu propio presupuesto después de la reserva de seguridad. Son objetivos de planificación, no precios de mercado ni estimaciones en tiempo real.',
     selectLabel: 'Planificación guardada',
     selectPlaceholder: 'Elige una planificación',
     savedBrief: 'Planificación guardada',
@@ -95,7 +100,8 @@ const COPY = {
     categoryTargets: 'Objetivos por categoría',
     percentOfSpendable: 'Parte del presupuesto disponible',
     planningTarget: 'Objetivos de planificación',
-    provenance: 'Estas cantidades reparten tu presupuesto guardado. No son tarifas, precios de mercado, cotizaciones, estimaciones en tiempo real, disponibilidad ni estimaciones de costes específicas del destino.',
+    provenance:
+      'Estas cantidades reparten tu presupuesto guardado. No son tarifas, precios de mercado, cotizaciones, estimaciones en tiempo real, disponibilidad ni estimaciones de costes específicas del destino.',
     categories: {
       FLIGHTS: 'Vuelos',
       ACCOMMODATION: 'Alojamiento',
@@ -110,7 +116,8 @@ const COPY = {
   de: {
     eyebrow: 'Gespeichertes Budget',
     title: 'Ziele der Budgetaufteilung',
-    intro: 'Wähle eine gespeicherte Reiseplanung, um zu sehen, wie dein eigenes Budget nach der Sicherheitsreserve aufgeteilt wird. Dies sind Planungsziele, keine Marktpreise oder Live-Schätzungen.',
+    intro:
+      'Wähle eine gespeicherte Reiseplanung, um zu sehen, wie dein eigenes Budget nach der Sicherheitsreserve aufgeteilt wird. Dies sind Planungsziele, keine Marktpreise oder Live-Schätzungen.',
     selectLabel: 'Gespeicherte Reiseplanung',
     selectPlaceholder: 'Reiseplanung auswählen',
     savedBrief: 'Gespeicherte Reiseplanung',
@@ -124,7 +131,8 @@ const COPY = {
     categoryTargets: 'Kategorieziele',
     percentOfSpendable: 'Anteil des verfügbaren Budgets',
     planningTarget: 'Planungsziele',
-    provenance: 'Diese Beträge teilen dein gespeichertes Budget auf. Sie sind keine Tarife, Marktpreise, Angebote, Live-Schätzungen, Verfügbarkeiten oder reisezielspezifischen Kostenschätzungen.',
+    provenance:
+      'Diese Beträge teilen dein gespeichertes Budget auf. Sie sind keine Tarife, Marktpreise, Angebote, Live-Schätzungen, Verfügbarkeiten oder reisezielspezifischen Kostenschätzungen.',
     categories: {
       FLIGHTS: 'Flüge',
       ACCOMMODATION: 'Unterkunft',
@@ -139,7 +147,8 @@ const COPY = {
   fr: {
     eyebrow: 'Budget enregistré',
     title: 'Objectifs de répartition du budget',
-    intro: 'Choisissez un projet de voyage enregistré pour voir comment votre propre budget est réparti après la réserve de sécurité. Il s’agit d’objectifs de planification, pas de prix du marché ni d’estimations en direct.',
+    intro:
+      'Choisissez un projet de voyage enregistré pour voir comment votre propre budget est réparti après la réserve de sécurité. Il s’agit d’objectifs de planification, pas de prix du marché ni d’estimations en direct.',
     selectLabel: 'Projet de voyage enregistré',
     selectPlaceholder: 'Choisir un projet de voyage',
     savedBrief: 'Projet de voyage enregistré',
@@ -153,7 +162,8 @@ const COPY = {
     categoryTargets: 'Objectifs par catégorie',
     percentOfSpendable: 'Part du budget disponible',
     planningTarget: 'Objectifs de planification',
-    provenance: 'Ces montants répartissent votre budget enregistré. Ils ne sont ni des tarifs, ni des prix du marché, ni des devis, ni des estimations en direct, ni des disponibilités, ni des estimations de coûts propres à une destination.',
+    provenance:
+      'Ces montants répartissent votre budget enregistré. Ils ne sont ni des tarifs, ni des prix du marché, ni des devis, ni des estimations en direct, ni des disponibilités, ni des estimations de coûts propres à une destination.',
     categories: {
       FLIGHTS: 'Vols',
       ACCOMMODATION: 'Hébergement',
@@ -168,7 +178,8 @@ const COPY = {
   it: {
     eyebrow: 'Budget salvato',
     title: 'Obiettivi di ripartizione del budget',
-    intro: 'Scegli un piano di viaggio salvato per vedere come viene suddiviso il tuo budget dopo la riserva di sicurezza. Sono obiettivi di pianificazione, non prezzi di mercato o stime in tempo reale.',
+    intro:
+      'Scegli un piano di viaggio salvato per vedere come viene suddiviso il tuo budget dopo la riserva di sicurezza. Sono obiettivi di pianificazione, non prezzi di mercato o stime in tempo reale.',
     selectLabel: 'Piano di viaggio salvato',
     selectPlaceholder: 'Scegli un piano di viaggio',
     savedBrief: 'Piano di viaggio salvato',
@@ -182,7 +193,8 @@ const COPY = {
     categoryTargets: 'Obiettivi per categoria',
     percentOfSpendable: 'Quota del budget disponibile',
     planningTarget: 'Obiettivi di pianificazione',
-    provenance: 'Questi importi suddividono il tuo budget salvato. Non sono tariffe, prezzi di mercato, preventivi, stime in tempo reale, disponibilità o stime dei costi specifiche per una destinazione.',
+    provenance:
+      'Questi importi suddividono il tuo budget salvato. Non sono tariffe, prezzi di mercato, preventivi, stime in tempo reale, disponibilità o stime dei costi specifiche per una destinazione.',
     categories: {
       FLIGHTS: 'Voli',
       ACCOMMODATION: 'Alloggio',
@@ -197,7 +209,8 @@ const COPY = {
   pt: {
     eyebrow: 'Orçamento guardado',
     title: 'Metas de distribuição do orçamento',
-    intro: 'Escolha um plano de viagem guardado para ver como o seu próprio orçamento é distribuído após a reserva de segurança. São metas de planeamento, não preços de mercado nem estimativas em tempo real.',
+    intro:
+      'Escolha um plano de viagem guardado para ver como o seu próprio orçamento é distribuído após a reserva de segurança. São metas de planeamento, não preços de mercado nem estimativas em tempo real.',
     selectLabel: 'Plano de viagem guardado',
     selectPlaceholder: 'Escolha um plano de viagem',
     savedBrief: 'Plano de viagem guardado',
@@ -211,7 +224,8 @@ const COPY = {
     categoryTargets: 'Metas por categoria',
     percentOfSpendable: 'Parcela do orçamento disponível',
     planningTarget: 'Metas de planeamento',
-    provenance: 'Estes valores distribuem o seu orçamento guardado. Não são tarifas, preços de mercado, cotações, estimativas em tempo real, disponibilidade nem estimativas de custos específicas do destino.',
+    provenance:
+      'Estes valores distribuem o seu orçamento guardado. Não são tarifas, preços de mercado, cotações, estimativas em tempo real, disponibilidade nem estimativas de custos específicas do destino.',
     categories: {
       FLIGHTS: 'Voos',
       ACCOMMODATION: 'Alojamento',
@@ -226,7 +240,8 @@ const COPY = {
   nl: {
     eyebrow: 'Opgeslagen budget',
     title: 'Doelen voor budgetverdeling',
-    intro: 'Kies een opgeslagen reisplan om te zien hoe je eigen budget na de veiligheidsreserve wordt verdeeld. Dit zijn planningsdoelen, geen marktprijzen of live schattingen.',
+    intro:
+      'Kies een opgeslagen reisplan om te zien hoe je eigen budget na de veiligheidsreserve wordt verdeeld. Dit zijn planningsdoelen, geen marktprijzen of live schattingen.',
     selectLabel: 'Opgeslagen reisplan',
     selectPlaceholder: 'Kies een reisplan',
     savedBrief: 'Opgeslagen reisplan',
@@ -240,7 +255,8 @@ const COPY = {
     categoryTargets: 'Categoriedoelen',
     percentOfSpendable: 'Aandeel van beschikbaar budget',
     planningTarget: 'Planningsdoelen',
-    provenance: 'Deze bedragen verdelen je opgeslagen budget. Het zijn geen tarieven, marktprijzen, offertes, live schattingen, beschikbaarheid of bestemmingsspecifieke kostenramingen.',
+    provenance:
+      'Deze bedragen verdelen je opgeslagen budget. Het zijn geen tarieven, marktprijzen, offertes, live schattingen, beschikbaarheid of bestemmingsspecifieke kostenramingen.',
     categories: {
       FLIGHTS: 'Vluchten',
       ACCOMMODATION: 'Accommodatie',
@@ -255,7 +271,8 @@ const COPY = {
   no: {
     eyebrow: 'Lagret budsjett',
     title: 'Mål for budsjettfordeling',
-    intro: 'Velg et lagret reisegrunnlag for å se hvordan ditt eget budsjett fordeles etter sikkerhetsreserven. Dette er planleggingsmål, ikke markedspriser eller live-estimater.',
+    intro:
+      'Velg et lagret reisegrunnlag for å se hvordan ditt eget budsjett fordeles etter sikkerhetsreserven. Dette er planleggingsmål, ikke markedspriser eller live-estimater.',
     selectLabel: 'Lagret reisegrunnlag',
     selectPlaceholder: 'Velg et reisegrunnlag',
     savedBrief: 'Lagret reisegrunnlag',
@@ -269,7 +286,8 @@ const COPY = {
     categoryTargets: 'Kategorimål',
     percentOfSpendable: 'Andel av disponibelt budsjett',
     planningTarget: 'Planleggingsmål',
-    provenance: 'Beløpene fordeler det lagrede budsjettet ditt. De er ikke priser, markedspriser, tilbud, live-estimater, tilgjengelighet eller destinasjonsspesifikke kostnadsestimater.',
+    provenance:
+      'Beløpene fordeler det lagrede budsjettet ditt. De er ikke priser, markedspriser, tilbud, live-estimater, tilgjengelighet eller destinasjonsspesifikke kostnadsestimater.',
     categories: {
       FLIGHTS: 'Fly',
       ACCOMMODATION: 'Overnatting',
@@ -284,7 +302,8 @@ const COPY = {
   da: {
     eyebrow: 'Gemt budget',
     title: 'Mål for budgetfordeling',
-    intro: 'Vælg et gemt rejsegrundlag for at se, hvordan dit eget budget fordeles efter sikkerhedsreserven. Det er planlægningsmål, ikke markedspriser eller liveestimater.',
+    intro:
+      'Vælg et gemt rejsegrundlag for at se, hvordan dit eget budget fordeles efter sikkerhedsreserven. Det er planlægningsmål, ikke markedspriser eller liveestimater.',
     selectLabel: 'Gemt rejsegrundlag',
     selectPlaceholder: 'Vælg et rejsegrundlag',
     savedBrief: 'Gemt rejsegrundlag',
@@ -298,7 +317,8 @@ const COPY = {
     categoryTargets: 'Kategorimål',
     percentOfSpendable: 'Andel af disponibelt budget',
     planningTarget: 'Planlægningsmål',
-    provenance: 'Beløbene fordeler dit gemte budget. De er ikke priser, markedspriser, tilbud, liveestimater, tilgængelighed eller destinationsspecifikke prisoverslag.',
+    provenance:
+      'Beløbene fordeler dit gemte budget. De er ikke priser, markedspriser, tilbud, liveestimater, tilgængelighed eller destinationsspecifikke prisoverslag.',
     categories: {
       FLIGHTS: 'Fly',
       ACCOMMODATION: 'Overnatning',
@@ -313,7 +333,8 @@ const COPY = {
   fi: {
     eyebrow: 'Tallennettu budjetti',
     title: 'Budjetin jakotavoitteet',
-    intro: 'Valitse tallennettu matkasuunnitelma nähdäksesi, miten oma budjettisi jaetaan turvavaran jälkeen. Nämä ovat suunnittelutavoitteita, eivät markkinahintoja tai reaaliaikaisia arvioita.',
+    intro:
+      'Valitse tallennettu matkasuunnitelma nähdäksesi, miten oma budjettisi jaetaan turvavaran jälkeen. Nämä ovat suunnittelutavoitteita, eivät markkinahintoja tai reaaliaikaisia arvioita.',
     selectLabel: 'Tallennettu matkasuunnitelma',
     selectPlaceholder: 'Valitse matkasuunnitelma',
     savedBrief: 'Tallennettu matkasuunnitelma',
@@ -327,7 +348,8 @@ const COPY = {
     categoryTargets: 'Luokkakohtaiset tavoitteet',
     percentOfSpendable: 'Osuus käytettävissä olevasta budjetista',
     planningTarget: 'Suunnittelutavoitteet',
-    provenance: 'Nämä summat jakavat tallennetun budjettisi. Ne eivät ole hintoja, markkinahintoja, tarjouksia, reaaliaikaisia arvioita, saatavuustietoja tai kohdekohtaisia kustannusarvioita.',
+    provenance:
+      'Nämä summat jakavat tallennetun budjettisi. Ne eivät ole hintoja, markkinahintoja, tarjouksia, reaaliaikaisia arvioita, saatavuustietoja tai kohdekohtaisia kustannusarvioita.',
     categories: {
       FLIGHTS: 'Lennot',
       ACCOMMODATION: 'Majoitus',
@@ -342,7 +364,8 @@ const COPY = {
   pl: {
     eyebrow: 'Zapisany budżet',
     title: 'Cele podziału budżetu',
-    intro: 'Wybierz zapisany plan podróży, aby zobaczyć, jak Twój własny budżet jest dzielony po odjęciu rezerwy bezpieczeństwa. To cele planistyczne, a nie ceny rynkowe ani szacunki na żywo.',
+    intro:
+      'Wybierz zapisany plan podróży, aby zobaczyć, jak Twój własny budżet jest dzielony po odjęciu rezerwy bezpieczeństwa. To cele planistyczne, a nie ceny rynkowe ani szacunki na żywo.',
     selectLabel: 'Zapisany plan podróży',
     selectPlaceholder: 'Wybierz plan podróży',
     savedBrief: 'Zapisany plan podróży',
@@ -356,7 +379,8 @@ const COPY = {
     categoryTargets: 'Cele kategorii',
     percentOfSpendable: 'Udział w budżecie do wykorzystania',
     planningTarget: 'Cele planistyczne',
-    provenance: 'Te kwoty dzielą zapisany budżet. Nie są to taryfy, ceny rynkowe, oferty, szacunki na żywo, dostępność ani szacunki kosztów dla konkretnego miejsca docelowego.',
+    provenance:
+      'Te kwoty dzielą zapisany budżet. Nie są to taryfy, ceny rynkowe, oferty, szacunki na żywo, dostępność ani szacunki kosztów dla konkretnego miejsca docelowego.',
     categories: {
       FLIGHTS: 'Loty',
       ACCOMMODATION: 'Zakwaterowanie',
@@ -371,7 +395,8 @@ const COPY = {
   tr: {
     eyebrow: 'Kaydedilmiş bütçe',
     title: 'Bütçe dağılım hedefleri',
-    intro: 'Kendi bütçenizin güvenlik payından sonra nasıl dağıtıldığını görmek için kaydedilmiş bir seyahat planı seçin. Bunlar planlama hedefleridir; piyasa fiyatları veya canlı tahminler değildir.',
+    intro:
+      'Kendi bütçenizin güvenlik payından sonra nasıl dağıtıldığını görmek için kaydedilmiş bir seyahat planı seçin. Bunlar planlama hedefleridir; piyasa fiyatları veya canlı tahminler değildir.',
     selectLabel: 'Kaydedilmiş seyahat planı',
     selectPlaceholder: 'Bir seyahat planı seçin',
     savedBrief: 'Kaydedilmiş seyahat planı',
@@ -385,7 +410,8 @@ const COPY = {
     categoryTargets: 'Kategori hedefleri',
     percentOfSpendable: 'Kullanılabilir bütçedeki pay',
     planningTarget: 'Planlama hedefleri',
-    provenance: 'Bu tutarlar kaydedilmiş bütçenizi böler. Ücret, piyasa fiyatı, teklif, canlı tahmin, müsaitlik veya destinasyona özel maliyet tahmini değildir.',
+    provenance:
+      'Bu tutarlar kaydedilmiş bütçenizi böler. Ücret, piyasa fiyatı, teklif, canlı tahmin, müsaitlik veya destinasyona özel maliyet tahmini değildir.',
     categories: {
       FLIGHTS: 'Uçuşlar',
       ACCOMMODATION: 'Konaklama',
@@ -400,7 +426,8 @@ const COPY = {
   ar: {
     eyebrow: 'الميزانية المحفوظة',
     title: 'أهداف توزيع الميزانية',
-    intro: 'اختر خطة سفر محفوظة لترى كيف تُقسَّم ميزانيتك الخاصة بعد احتياطي الأمان. هذه أهداف للتخطيط وليست أسعار سوق أو تقديرات مباشرة.',
+    intro:
+      'اختر خطة سفر محفوظة لترى كيف تُقسَّم ميزانيتك الخاصة بعد احتياطي الأمان. هذه أهداف للتخطيط وليست أسعار سوق أو تقديرات مباشرة.',
     selectLabel: 'خطة سفر محفوظة',
     selectPlaceholder: 'اختر خطة سفر',
     savedBrief: 'خطة سفر محفوظة',
@@ -414,7 +441,8 @@ const COPY = {
     categoryTargets: 'أهداف الفئات',
     percentOfSpendable: 'الحصة من الميزانية المتاحة',
     planningTarget: 'أهداف التخطيط',
-    provenance: 'هذه المبالغ تقسم ميزانيتك المحفوظة. وهي ليست أسعار تذاكر أو أسعار سوق أو عروض أسعار أو تقديرات مباشرة أو توافراً أو تقديرات تكلفة خاصة بوجهة معينة.',
+    provenance:
+      'هذه المبالغ تقسم ميزانيتك المحفوظة. وهي ليست أسعار تذاكر أو أسعار سوق أو عروض أسعار أو تقديرات مباشرة أو توافراً أو تقديرات تكلفة خاصة بوجهة معينة.',
     categories: {
       FLIGHTS: 'الرحلات الجوية',
       ACCOMMODATION: 'الإقامة',
@@ -429,7 +457,8 @@ const COPY = {
   zh: {
     eyebrow: '已保存预算',
     title: '预算分配目标',
-    intro: '选择一个已保存的旅行计划，查看扣除安全预留后如何分配您自己的预算。这些是规划目标，不是市场价格或实时估算。',
+    intro:
+      '选择一个已保存的旅行计划，查看扣除安全预留后如何分配您自己的预算。这些是规划目标，不是市场价格或实时估算。',
     selectLabel: '已保存的旅行计划',
     selectPlaceholder: '选择旅行计划',
     savedBrief: '已保存的旅行计划',
@@ -443,7 +472,8 @@ const COPY = {
     categoryTargets: '类别目标',
     percentOfSpendable: '占可支配预算的比例',
     planningTarget: '规划目标',
-    provenance: '这些金额只是分配您已保存的预算。它们不是票价、市场价格、报价、实时估算、可用性信息或特定目的地的成本估算。',
+    provenance:
+      '这些金额只是分配您已保存的预算。它们不是票价、市场价格、报价、实时估算、可用性信息或特定目的地的成本估算。',
     categories: {
       FLIGHTS: '机票',
       ACCOMMODATION: '住宿',
@@ -458,7 +488,8 @@ const COPY = {
   ja: {
     eyebrow: '保存済み予算',
     title: '予算配分の目標',
-    intro: '保存済みの旅行計画を選ぶと、安全予備費を除いたご自身の予算がどのように配分されるか確認できます。これは計画上の目標であり、市場価格やリアルタイム見積もりではありません。',
+    intro:
+      '保存済みの旅行計画を選ぶと、安全予備費を除いたご自身の予算がどのように配分されるか確認できます。これは計画上の目標であり、市場価格やリアルタイム見積もりではありません。',
     selectLabel: '保存済み旅行計画',
     selectPlaceholder: '旅行計画を選択',
     savedBrief: '保存済み旅行計画',
@@ -472,7 +503,8 @@ const COPY = {
     categoryTargets: 'カテゴリ別目標',
     percentOfSpendable: '配分可能予算に占める割合',
     planningTarget: '計画上の目標',
-    provenance: 'これらの金額は保存した予算を配分したものです。運賃、市場価格、見積価格、リアルタイム推定、空き状況、目的地別の費用見積もりではありません。',
+    provenance:
+      'これらの金額は保存した予算を配分したものです。運賃、市場価格、見積価格、リアルタイム推定、空き状況、目的地別の費用見積もりではありません。',
     categories: {
       FLIGHTS: '航空券',
       ACCOMMODATION: '宿泊',
@@ -487,7 +519,8 @@ const COPY = {
   ko: {
     eyebrow: '저장된 예산',
     title: '예산 배분 목표',
-    intro: '저장된 여행 계획을 선택하면 안전 예비비를 제외한 본인의 예산이 어떻게 배분되는지 확인할 수 있습니다. 이는 계획 목표이며 시장 가격이나 실시간 추정치가 아닙니다.',
+    intro:
+      '저장된 여행 계획을 선택하면 안전 예비비를 제외한 본인의 예산이 어떻게 배분되는지 확인할 수 있습니다. 이는 계획 목표이며 시장 가격이나 실시간 추정치가 아닙니다.',
     selectLabel: '저장된 여행 계획',
     selectPlaceholder: '여행 계획 선택',
     savedBrief: '저장된 여행 계획',
@@ -501,7 +534,8 @@ const COPY = {
     categoryTargets: '항목별 목표',
     percentOfSpendable: '사용 가능 예산 비율',
     planningTarget: '계획 목표',
-    provenance: '이 금액은 저장한 예산을 나눈 것입니다. 운임, 시장 가격, 견적, 실시간 추정치, 이용 가능 여부 또는 목적지별 비용 추정치가 아닙니다.',
+    provenance:
+      '이 금액은 저장한 예산을 나눈 것입니다. 운임, 시장 가격, 견적, 실시간 추정치, 이용 가능 여부 또는 목적지별 비용 추정치가 아닙니다.',
     categories: {
       FLIGHTS: '항공편',
       ACCOMMODATION: '숙박',
@@ -516,7 +550,8 @@ const COPY = {
   hi: {
     eyebrow: 'सहेजा गया बजट',
     title: 'बजट आवंटन लक्ष्य',
-    intro: 'सुरक्षा आरक्षित राशि के बाद आपका अपना बजट कैसे बाँटा जाता है, यह देखने के लिए सहेजी गई यात्रा योजना चुनें। ये योजना लक्ष्य हैं, बाजार मूल्य या लाइव अनुमान नहीं।',
+    intro:
+      'सुरक्षा आरक्षित राशि के बाद आपका अपना बजट कैसे बाँटा जाता है, यह देखने के लिए सहेजी गई यात्रा योजना चुनें। ये योजना लक्ष्य हैं, बाजार मूल्य या लाइव अनुमान नहीं।',
     selectLabel: 'सहेजी गई यात्रा योजना',
     selectPlaceholder: 'यात्रा योजना चुनें',
     savedBrief: 'सहेजी गई यात्रा योजना',
@@ -530,7 +565,8 @@ const COPY = {
     categoryTargets: 'श्रेणी लक्ष्य',
     percentOfSpendable: 'उपयोग योग्य बजट का हिस्सा',
     planningTarget: 'योजना लक्ष्य',
-    provenance: 'ये राशियाँ आपके सहेजे गए बजट को बाँटती हैं। ये किराए, बाजार मूल्य, कोटेशन, लाइव अनुमान, उपलब्धता या किसी गंतव्य के विशेष लागत अनुमान नहीं हैं।',
+    provenance:
+      'ये राशियाँ आपके सहेजे गए बजट को बाँटती हैं। ये किराए, बाजार मूल्य, कोटेशन, लाइव अनुमान, उपलब्धता या किसी गंतव्य के विशेष लागत अनुमान नहीं हैं।',
     categories: {
       FLIGHTS: 'उड़ानें',
       ACCOMMODATION: 'आवास',
