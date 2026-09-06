@@ -25,10 +25,7 @@ describe('planner API client', () => {
     await client.getBudgetPlanRequest('request/with space');
     await client.getBudgetAllocation('request/with space');
     await client.getPlannerDestinationCandidates('request/with space');
-    await client.getPlannerAffordabilityEvidence(
-      'request/with space',
-      'destination/with space',
-    );
+    await client.getPlannerAffordabilityEvidence('request/with space', 'destination/with space');
 
     expect(calls).toEqual([
       {
