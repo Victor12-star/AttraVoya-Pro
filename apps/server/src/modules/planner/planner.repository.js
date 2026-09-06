@@ -131,7 +131,9 @@ export function createPlannerRepository() {
       });
     },
 
-    async listPublishedDestinationCandidates({ excludeCityId, limit = 20 } = {}) {
+    /** @param {{excludeCityId?: string, limit?: number}} [options] */
+    async listPublishedDestinationCandidates(options = {}) {
+      const { excludeCityId, limit = 20 } = options;
       const { prisma } = await import('@attravoya/database');
       return prisma.destination.findMany({
         where: {
