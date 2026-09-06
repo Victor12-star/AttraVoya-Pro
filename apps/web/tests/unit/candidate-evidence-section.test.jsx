@@ -123,6 +123,71 @@ function evidence(overrides = {}) {
   };
 }
 
+function evaluatedEvidence() {
+  const categories = [
+    'FLIGHTS',
+    'ACCOMMODATION',
+    'FOOD',
+    'LOCAL_TRANSPORT',
+    'ACTIVITIES',
+    'CHILDREN_ACTIVITIES',
+    'AIRPORT_TRANSFER',
+    'TRAVEL_INSURANCE',
+  ];
+
+  return {
+    ...evidence(),
+    evidence: {
+      policyKey: 'attravoya-affordability-evidence-v1',
+      policyVersion: 1,
+      status: 'COMPLETE_EVIDENCE',
+      required: categories.map((category) => ({
+        category,
+        targetAmount: '100.00',
+        targetBasis: 'PLANNING_TARGET',
+        status: 'COLLECTED',
+      })),
+      collected: categories.map((category, index) => ({
+        category,
+        amountScope: 'PLANNER_CATEGORY_TOTAL',
+        amountMin: index === 0 ? '180.00' : '80.00',
+        amountMax: index === 0 ? '220.00' : '90.00',
+        currencyCode: 'EUR',
+        pricingBasis: 'VERIFIED_PRICE',
+        confidence: 'HIGH',
+        sourceProvider: `verified-${category.toLowerCase()}-test`,
+        sourceExternalId: `evidence-${index}`,
+        sourceFetchedAt: '2026-09-06T16:00:00.000Z',
+        verifiedMarketEvidence: true,
+      })),
+      missingCategories: [],
+      collectionAttempts: categories.map((category) => ({ category, status: 'COLLECTED' })),
+    },
+    evaluation: {
+      budgetFit: 'COMFORTABLE',
+      rankingEligible: false,
+      affordabilityConfirmed: true,
+      evidenceReady: true,
+      evaluationPolicy: {
+        policyKey: 'attravoya-affordability-evaluation-v1',
+        policyVersion: 1,
+        status: 'EVALUATED',
+        comparisonBasis: 'SPENDABLE_BUDGET',
+        safetyReserveProtected: true,
+        currencyCode: 'EUR',
+        spendableBudget: '900.00',
+        totalEvidenceRange: { amountMin: '740.00', amountMax: '850.00' },
+      },
+    },
+    provenance: {
+      kind: 'AFFORDABILITY_EVIDENCE_GATE',
+      liveDataUsed: true,
+      providerDataUsed: true,
+      pricingDataUsed: true,
+    },
+  };
+}
+
 async function selectSavedBrief() {
   await screen.findByText(copy.notSelected);
   fireEvent.change(screen.getByLabelText(copy.selectLabel), {
@@ -185,7 +250,7 @@ describe('CandidateEvidenceSection', () => {
     expect(mocks.getPlannerDestinationCandidates).toHaveBeenCalledWith('request-1');
     expect(mocks.getPlannerAffordabilityEvidence).not.toHaveBeenCalled();
     expect(screen.getAllByText(copy.notRanked).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(copy.notAffordableYet).length).toBeGreaterThan(0);
+    expect(screen.queryByText(copy.notAffordableYet)).not.toBeInTheDocument();
     expect(screen.getByText('Published destination summary.')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: copy.inspect }));
@@ -198,6 +263,25 @@ describe('CandidateEvidenceSection', () => {
     expect(screen.getByText('240.00–280.50 EUR')).toBeInTheDocument();
     expect(screen.getByText(copy.statuses.NOT_CONFIGURED)).toBeInTheDocument();
     expect(screen.getAllByText(copy.notAffordableYet).length).toBeGreaterThan(0);
+    expect(
+      screen.queryByText(/book now|best destination|recommended for you/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows a verified comfortable budget-fit result without ranking or booking claims', async () => {
+    mocks.getPlannerAffordabilityEvidence.mockResolvedValue({
+      affordabilityEvidence: evaluatedEvidence(),
+    });
+
+    render(<CandidateEvidenceSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+
+    await selectSavedBrief();
+    fireEvent.click(screen.getByRole('button', { name: copy.inspect }));
+
+    expect(await screen.findByText('Within spendable budget')).toBeInTheDocument();
+    expect(screen.getByText('740.00–850.00 EUR')).toBeInTheDocument();
+    expect(screen.getByText('900.00 EUR')).toBeInTheDocument();
+    expect(screen.getAllByText(copy.notRanked).length).toBeGreaterThan(0);
     expect(
       screen.queryByText(/book now|best destination|recommended for you/i),
     ).not.toBeInTheDocument();

@@ -386,6 +386,33 @@
   line-height: 1.6;
 }
 
+.evaluationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.evaluationMetric {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  padding: 14px;
+}
+
+.evaluationMetric span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.evaluationMetric strong {
+  overflow-wrap: anywhere;
+  font-size: 16px;
+}
+
 .spin {
   animation: spin 1s linear infinite;
 }
@@ -418,7 +445,8 @@
 
   .candidateGrid,
   .requiredList,
-  .collectedList dl {
+  .collectedList dl,
+  .evaluationGrid {
     grid-template-columns: 1fr;
   }
 

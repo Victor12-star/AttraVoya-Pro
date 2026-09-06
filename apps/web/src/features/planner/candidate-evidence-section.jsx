@@ -16,6 +16,8 @@ import {
 import { ApiClientError } from '@attravoya/api-client';
 
 import { apiClient } from '../../lib/api-client.js';
+import { isSafeAffordabilityEvaluation } from './affordability-result-contract.js';
+import { getAffordabilityResultCopy } from './affordability-result-copy.js';
 import styles from './candidate-evidence-section.module.css';
 
 const EVIDENCE_CATEGORIES = new Set([
@@ -92,7 +94,7 @@ const CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
  * @property {string} requestId
  * @property {DestinationCandidate} destination
  * @property {{policyKey: string, policyVersion: number, status: string, required: RequiredEvidence[], collected: CollectedEvidence[], missingCategories: string[]}} evidence
- * @property {{budgetFit: string, rankingEligible: boolean, affordabilityConfirmed: boolean, evidenceReady: boolean}} evaluation
+ * @property {{budgetFit: string, rankingEligible: boolean, affordabilityConfirmed: boolean, evidenceReady: boolean, evaluationPolicy?: {policyKey: string, policyVersion: number, status: string, comparisonBasis: string, safetyReserveProtected: boolean, currencyCode: string, spendableBudget: string, totalEvidenceRange: {amountMin: string, amountMax: string}}}} evaluation
  * @property {{kind: string, liveDataUsed: boolean, providerDataUsed: boolean, pricingDataUsed: boolean}} provenance
  */
 
@@ -199,11 +201,7 @@ export function isSafeAffordabilityEvidence(value, requestId, destinationId) {
   const evaluation = value.evaluation;
   const provenance = value.provenance;
   return Boolean(
-    evaluation &&
-    evaluation.budgetFit === 'NOT_EVALUATED' &&
-    evaluation.rankingEligible === false &&
-    evaluation.affordabilityConfirmed === false &&
-    typeof evaluation.evidenceReady === 'boolean' &&
+    isSafeAffordabilityEvaluation(evidence, evaluation) &&
     provenance &&
     provenance.kind === 'AFFORDABILITY_EVIDENCE_GATE' &&
     typeof provenance.liveDataUsed === 'boolean' &&
@@ -225,6 +223,22 @@ function formatMoneyRange(item, locale) {
     maximumFractionDigits: 2,
   });
   return `${formatter.format(Number(item.amountMin))}–${formatter.format(Number(item.amountMax))} ${item.currencyCode}`;
+}
+
+function formatMoneyValue(value, currencyCode, locale) {
+  const formatter = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${formatter.format(Number(value))} ${currencyCode}`;
+}
+
+function formatEvaluationRange(policy, locale) {
+  const formatter = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${formatter.format(Number(policy.totalEvidenceRange.amountMin))}–${formatter.format(Number(policy.totalEvidenceRange.amountMax))} ${policy.currencyCode}`;
 }
 
 function formatTimestamp(value, locale) {
@@ -373,6 +387,8 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
   const selectedDestination = candidateSet?.destinations.find(
     (destination) => destination.id === selectedDestinationId,
   );
+  const resultCopy = getAffordabilityResultCopy(locale);
+  const evaluationPolicy = affordabilityEvidence?.evaluation?.evaluationPolicy;
 
   return (
     <section className={styles.section} aria-labelledby="candidate-evidence-title">
@@ -501,7 +517,6 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                     <strong>{briefLabel(selectedBrief, copy.savedBrief)}</strong>
                     <div className={styles.contextBadges}>
                       <span>{copy.notRanked}</span>
-                      <span>{copy.notAffordableYet}</span>
                     </div>
                   </div>
 
@@ -521,7 +536,6 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                         {destination.summary ? <p>{destination.summary}</p> : null}
                         <div className={styles.candidateBoundary}>
                           <span>{copy.notRanked}</span>
-                          <span>{copy.notAffordableYet}</span>
                         </div>
                         <button
                           type="button"
@@ -573,15 +587,37 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                         </div>
                         <div className={styles.lockedStatus}>
                           <ShieldAlert size={18} aria-hidden="true" />
-                          {copy.notAffordableYet}
+                          {resultCopy.statuses[affordabilityEvidence.evaluation.budgetFit]}
                         </div>
                       </div>
 
                       <p className={styles.evidenceSummary}>
-                        {affordabilityEvidence.evidence.status === 'COMPLETE_EVIDENCE'
-                          ? copy.evidenceComplete
-                          : copy.evidenceIncomplete}
+                        {affordabilityEvidence.evaluation.budgetFit !== 'NOT_EVALUATED'
+                          ? resultCopy.summaries[affordabilityEvidence.evaluation.budgetFit]
+                          : affordabilityEvidence.evidence.status === 'COMPLETE_EVIDENCE'
+                            ? copy.evidenceComplete
+                            : copy.evidenceIncomplete}
                       </p>
+
+                      {affordabilityEvidence.evaluation.budgetFit !== 'NOT_EVALUATED' &&
+                      evaluationPolicy ? (
+                        <div className={styles.evaluationGrid}>
+                          <div className={styles.evaluationMetric}>
+                            <span>{resultCopy.totalRange}</span>
+                            <strong>{formatEvaluationRange(evaluationPolicy, locale)}</strong>
+                          </div>
+                          <div className={styles.evaluationMetric}>
+                            <span>{resultCopy.spendableBudget}</span>
+                            <strong>
+                              {formatMoneyValue(
+                                evaluationPolicy.spendableBudget,
+                                evaluationPolicy.currencyCode,
+                                locale,
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+                      ) : null}
 
                       <div>
                         <h4>{copy.collectedEvidence}</h4>
@@ -636,7 +672,11 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                         <ShieldAlert size={20} aria-hidden="true" />
                         <div>
                           <strong>{copy.provenanceTitle}</strong>
-                          <p>{copy.provenance}</p>
+                          <p>
+                            {affordabilityEvidence.evaluation.budgetFit !== 'NOT_EVALUATED'
+                              ? resultCopy.boundary
+                              : copy.provenance}
+                          </p>
                         </div>
                       </div>
                     </div>
