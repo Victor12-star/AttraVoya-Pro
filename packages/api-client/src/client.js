@@ -1,6 +1,7 @@
 import { ApiClientError } from './errors.js';
 
 const DEFAULT_TIMEOUT_MS = 12_000;
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
 
 function joinUrl(baseUrl, path) {
   return `${String(baseUrl).replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
@@ -13,6 +14,20 @@ function toSearchParams(input = {}) {
     params.set(key, Array.isArray(value) ? value.join(',') : String(value));
   }
   return params;
+}
+
+function normalizeIdempotencyKey(value) {
+  if (typeof value !== 'string') {
+    throw new TypeError('createBudgetPlanRequest requires an idempotency key.');
+  }
+
+  const normalized = value.trim();
+  if (!IDEMPOTENCY_KEY_PATTERN.test(normalized)) {
+    throw new TypeError(
+      'The planner idempotency key must contain 8 to 128 safe ASCII characters.',
+    );
+  }
+  return normalized;
 }
 
 async function readResponseBody(response) {
@@ -146,8 +161,12 @@ export function createApiClient(options) {
       const params = toSearchParams(query);
       return request(`/api/v1/accommodation/nearby?${params}`);
     },
-    createBudgetPlanRequest: (body) =>
-      request('/api/v1/planner/requests', { method: 'POST', body }),
+    createBudgetPlanRequest: (body, idempotencyKey) =>
+      request('/api/v1/planner/requests', {
+        method: 'POST',
+        headers: { 'Idempotency-Key': normalizeIdempotencyKey(idempotencyKey) },
+        body,
+      }),
     listBudgetPlanRequests: () => request('/api/v1/planner/requests'),
     getBudgetPlanRequest: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}`),
