@@ -8,7 +8,7 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
-import { API_PREFIX, DEFAULT_RATE_LIMIT } from './config/constants.js';
+import { API_PREFIX, DEFAULT_BODY_LIMIT_BYTES, DEFAULT_RATE_LIMIT } from './config/constants.js';
 import { env } from './config/env.js';
 import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
@@ -39,6 +39,7 @@ export async function buildApp(options = {}) {
     genReqId: () => randomUUID(),
     trustProxy: env.NODE_ENV === 'production',
     disableRequestLogging: false,
+    bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
   });
 
   // Standardize all request validation on shared Zod schemas. Keeping one
