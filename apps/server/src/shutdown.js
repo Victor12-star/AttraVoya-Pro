@@ -1,4 +1,13 @@
-export function createShutdownHandler({ app, exitImpl = process.exit }) {
+/**
+ * @typedef {object} ShutdownApp
+ * @property {() => Promise<void>} close
+ * @property {{ info: (...args: any[]) => void, error: (...args: any[]) => void }} log
+ */
+
+/**
+ * @param {{ app: ShutdownApp, exitImpl?: (code: number) => void }} options
+ */
+export function createShutdownHandler({ app, exitImpl = (code) => process.exit(code) }) {
   /** @type {Promise<void> | null} */
   let shutdownPromise = null;
 
