@@ -24,6 +24,7 @@ describe('planner API client', () => {
     await client.listBudgetPlanRequests();
     await client.getBudgetPlanRequest('request/with space');
     await client.getBudgetAllocation('request/with space');
+    await client.getPlannerDestinationCandidates('request/with space');
 
     expect(calls).toEqual([
       {
@@ -43,6 +44,11 @@ describe('planner API client', () => {
       },
       {
         url: 'http://localhost:5000/api/v1/planner/requests/request%2Fwith%20space/allocation',
+        method: 'GET',
+        body: null,
+      },
+      {
+        url: 'http://localhost:5000/api/v1/planner/requests/request%2Fwith%20space/destination-candidates',
         method: 'GET',
         body: null,
       },

@@ -37,5 +37,13 @@ export function createPlannerController(service) {
       });
       return sendPrivate(reply, { allocation });
     },
+
+    async getDestinationCandidates(request, reply) {
+      const destinationCandidates = await service.getDestinationCandidates({
+        userId: authenticatedUserId(request),
+        requestId: request.params.requestId,
+      });
+      return sendPrivate(reply, { destinationCandidates });
+    },
   };
 }
