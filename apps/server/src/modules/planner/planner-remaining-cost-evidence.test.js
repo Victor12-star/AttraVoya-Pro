@@ -181,7 +181,10 @@ describe('remaining planner cost evidence collectors', () => {
 
     const result = await evidence(createPlannerService(repository(), { foodPricingCollector }));
 
-    expect(result.evidence.collectionAttempts).toContainEqual({ category: 'FOOD', status: 'FAILED' });
+    expect(result.evidence.collectionAttempts).toContainEqual({
+      category: 'FOOD',
+      status: 'FAILED',
+    });
     expect(result.evidence.collected).toEqual([]);
     expect(result.evidence.required.find((item) => item.category === 'FOOD')).toMatchObject({
       status: 'FAILED',

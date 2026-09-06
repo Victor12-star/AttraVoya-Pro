@@ -92,7 +92,11 @@ export function normalizePlannerCategoryPricingEvidence(
 }
 
 export function normalizeAccommodationPricingEvidence(rawEvidence, expectedCurrencyCode) {
-  return normalizePlannerCategoryPricingEvidence(rawEvidence, expectedCurrencyCode, 'ACCOMMODATION');
+  return normalizePlannerCategoryPricingEvidence(
+    rawEvidence,
+    expectedCurrencyCode,
+    'ACCOMMODATION',
+  );
 }
 
 export function normalizeFlightPricingEvidence(rawEvidence, expectedCurrencyCode) {
