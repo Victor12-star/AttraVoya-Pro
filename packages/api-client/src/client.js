@@ -155,5 +155,9 @@ export function createApiClient(options) {
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/allocation`),
     getPlannerDestinationCandidates: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/destination-candidates`),
+    getPlannerAffordabilityEvidence: (requestId, destinationId) =>
+      request(
+        `/api/v1/planner/requests/${encodeURIComponent(requestId)}/destination-candidates/${encodeURIComponent(destinationId)}/affordability-evidence`,
+      ),
   };
 }
