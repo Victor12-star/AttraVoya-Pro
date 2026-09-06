@@ -1,0 +1,34 @@
+name: Phase 8K one-shot handoff update
+
+on:
+  push:
+    branches:
+      - feature/phase-8k-affordability-result-ui
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/phase-8k-affordability-result-ui
+          fetch-depth: 0
+
+      - name: Update permanent handoff
+        run: node scripts/phase8k-handoff-update.cjs
+
+      - name: Remove one-shot helpers
+        run: rm -f scripts/phase8k-handoff-update.cjs .github/workflows/phase8k-handoff-one-shot.yml
+
+      - name: Commit handoff update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/CURRENT-WORK.md scripts/phase8k-handoff-update.cjs .github/workflows/phase8k-handoff-one-shot.yml
+          git diff --cached --check
+          git commit -m "docs: update handoff through Phase 8K"
+          git push origin HEAD:feature/phase-8k-affordability-result-ui
