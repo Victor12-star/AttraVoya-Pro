@@ -9,6 +9,8 @@ const environmentSchema = z.object({
   ADMIN_URL: z.string().url(),
   API_URL: z.string().url(),
   DATABASE_URL: z.string().trim().min(1),
+  DB_POOL_MAX: z.coerce.number().int().min(1).max(50).default(5),
+  DB_POOL_CONNECTION_TIMEOUT_MS: z.coerce.number().int().min(500).max(30000).default(5000),
   JWT_ACCESS_SECRET: z.string().min(32),
   COOKIE_SECRET: z.string().min(32),
   DATA_ENCRYPTION_KEY: z.string().min(32),
