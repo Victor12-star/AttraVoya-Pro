@@ -41,11 +41,7 @@ describe('provider cache', () => {
     gate.resolve(undefined);
     const results = await Promise.all([first, second, third]);
 
-    expect(results).toEqual([
-      { value: 'shared' },
-      { value: 'shared' },
-      { value: 'shared' },
-    ]);
+    expect(results).toEqual([{ value: 'shared' }, { value: 'shared' }, { value: 'shared' }]);
     expect(cache.get('same-key')).toEqual({ value: 'shared' });
   });
 
