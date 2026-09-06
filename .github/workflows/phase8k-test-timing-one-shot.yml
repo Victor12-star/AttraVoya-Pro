@@ -1,0 +1,53 @@
+name: Phase 8K one-shot timing-test fix
+
+on:
+  push:
+    branches:
+      - feature/phase-8k-affordability-result-ui
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/phase-8k-affordability-result-ui
+          fetch-depth: 0
+
+      - name: Update timing assertion
+        run: node scripts/phase8k-test-timing.cjs
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format test
+        run: pnpm exec prettier --write apps/web/tests/unit/candidate-evidence-section.test.jsx
+
+      - name: Run focused web tests
+        run: pnpm --filter @attravoya/web exec vitest run tests/unit/candidate-evidence-section.test.jsx tests/unit/affordability-result-contract.test.js
+
+      - name: Remove helpers and commit
+        run: |
+          rm -f scripts/phase8k-test-timing.cjs .github/workflows/phase8k-test-timing-one-shot.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/tests/unit/candidate-evidence-section.test.jsx scripts/phase8k-test-timing.cjs .github/workflows/phase8k-test-timing-one-shot.yml
+          git diff --cached --check
+          git commit -m "test: align affordability status timing"
+          git push origin HEAD:feature/phase-8k-affordability-result-ui
