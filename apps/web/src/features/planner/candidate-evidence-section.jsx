@@ -333,13 +333,29 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
   }, []);
 
   useEffect(() => {
-    void loadRequests();
+    let active = true;
+
+    apiClient
+      .listBudgetPlanRequests()
+      .then((result) => {
+        if (!active) return;
+        if (!Array.isArray(result?.requests)) throw new Error('Invalid planner response.');
+        setRequests(result.requests);
+        setBriefState('success');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setRequests([]);
+        setBriefState(error instanceof ApiClientError && error.status === 401 ? 'auth' : 'error');
+      });
+
     return () => {
+      active = false;
       briefSequence.current += 1;
       candidateSequence.current += 1;
       evidenceSequence.current += 1;
     };
-  }, [loadRequests]);
+  }, []);
 
   function handleRequestSelection(event) {
     const requestId = event.target.value;
