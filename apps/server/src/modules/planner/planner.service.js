@@ -5,10 +5,7 @@ import {
   buildAffordabilityEvidenceGate,
 } from './affordability-evidence.js';
 import { buildBudgetEnvelope } from './budget-allocation.js';
-import {
-  normalizeAccommodationPricingEvidence,
-  normalizeFlightPricingEvidence,
-} from './pricing-evidence.js';
+import { normalizePlannerCategoryPricingEvidence } from './pricing-evidence.js';
 
 function toDate(value) {
   return value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -121,7 +118,7 @@ function destinationCandidateEnvelope({ requestId, mode, records }) {
   };
 }
 
-async function collectMarketPricingEvidence({ collector, gate, normalize }) {
+async function collectMarketPricingEvidence({ collector, gate, category }) {
   if (!collector) return { status: 'NOT_CONFIGURED' };
 
   try {
@@ -134,7 +131,11 @@ async function collectMarketPricingEvidence({ collector, gate, normalize }) {
 
     return {
       status: 'COLLECTED',
-      evidence: normalize(rawEvidence, gate.searchContext.budget.currencyCode),
+      evidence: normalizePlannerCategoryPricingEvidence(
+        rawEvidence,
+        gate.searchContext.budget.currencyCode,
+        category,
+      ),
     };
   } catch {
     return { status: 'FAILED' };
@@ -143,8 +144,17 @@ async function collectMarketPricingEvidence({ collector, gate, normalize }) {
 
 export function createPlannerService(repository, options = {}) {
   if (!repository) throw new TypeError('Planner repository is required.');
-  const accommodationPricingCollector = options.accommodationPricingCollector;
-  const flightPricingCollector = options.flightPricingCollector;
+
+  const verifiedCostCollectors = [
+    { category: 'FLIGHTS', collector: options.flightPricingCollector },
+    { category: 'ACCOMMODATION', collector: options.accommodationPricingCollector },
+    { category: 'FOOD', collector: options.foodPricingCollector },
+    { category: 'LOCAL_TRANSPORT', collector: options.localTransportPricingCollector },
+    { category: 'ACTIVITIES', collector: options.activitiesPricingCollector },
+    { category: 'CHILDREN_ACTIVITIES', collector: options.childrenActivitiesPricingCollector },
+    { category: 'AIRPORT_TRANSFER', collector: options.airportTransferPricingCollector },
+    { category: 'TRAVEL_INSURANCE', collector: options.travelInsurancePricingCollector },
+  ];
 
   return {
     async createRequest({ userId, input }) {
@@ -274,19 +284,11 @@ export function createPlannerService(repository, options = {}) {
         budgetEnvelope: buildBudgetEnvelope(record),
       });
 
-      const flightCollection = await collectMarketPricingEvidence({
-        collector: flightPricingCollector,
-        gate,
-        normalize: normalizeFlightPricingEvidence,
-      });
-      gate = applyMarketPricingCollection(gate, 'FLIGHTS', flightCollection);
+      for (const { category, collector } of verifiedCostCollectors) {
+        const collection = await collectMarketPricingEvidence({ collector, gate, category });
+        gate = applyMarketPricingCollection(gate, category, collection);
+      }
 
-      const accommodationCollection = await collectMarketPricingEvidence({
-        collector: accommodationPricingCollector,
-        gate,
-        normalize: normalizeAccommodationPricingEvidence,
-      });
-      gate = applyMarketPricingCollection(gate, 'ACCOMMODATION', accommodationCollection);
       return evaluateAffordabilityEvidenceGate(gate);
     },
   };

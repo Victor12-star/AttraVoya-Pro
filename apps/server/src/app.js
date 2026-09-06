@@ -190,6 +190,12 @@ export async function buildApp(options = {}) {
     repository: options.plannerRepository,
     accommodationPricingCollector: options.plannerAccommodationPricingCollector,
     flightPricingCollector: options.plannerFlightPricingCollector,
+    foodPricingCollector: options.plannerFoodPricingCollector,
+    localTransportPricingCollector: options.plannerLocalTransportPricingCollector,
+    activitiesPricingCollector: options.plannerActivitiesPricingCollector,
+    childrenActivitiesPricingCollector: options.plannerChildrenActivitiesPricingCollector,
+    airportTransferPricingCollector: options.plannerAirportTransferPricingCollector,
+    travelInsurancePricingCollector: options.plannerTravelInsurancePricingCollector,
   });
 
   return app;

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   normalizeAccommodationPricingEvidence,
   normalizeFlightPricingEvidence,
+  normalizePlannerCategoryPricingEvidence,
 } from './pricing-evidence.js';
 
 function validEvidence(overrides = {}) {
@@ -68,6 +69,42 @@ describe('market pricing evidence normalization', () => {
     });
   });
 
+  it.each([
+    'FOOD',
+    'LOCAL_TRANSPORT',
+    'ACTIVITIES',
+    'CHILDREN_ACTIVITIES',
+    'AIRPORT_TRANSFER',
+    'TRAVEL_INSURANCE',
+  ])('normalizes %s only through the verified category-total contract', (category) => {
+    const normalized = normalizePlannerCategoryPricingEvidence(
+      validEvidence({
+        amountMin: 40,
+        amountMax: 75.5,
+        pricingBasis: 'VERIFIED_PRICE',
+        sourceExternalId: `${category.toLowerCase()}-evidence`,
+        rawSourceResponse: { mustNotLeak: true },
+      }),
+      'EUR',
+      category,
+    );
+
+    expect(normalized).toEqual({
+      category,
+      amountScope: 'PLANNER_CATEGORY_TOTAL',
+      amountMin: '40.00',
+      amountMax: '75.50',
+      currencyCode: 'EUR',
+      pricingBasis: 'VERIFIED_PRICE',
+      confidence: 'HIGH',
+      sourceProvider: 'verified-provider',
+      sourceExternalId: `${category.toLowerCase()}-evidence`,
+      sourceFetchedAt: '2026-09-06T10:00:00.000Z',
+      verifiedMarketEvidence: true,
+    });
+    expect(normalized).not.toHaveProperty('rawSourceResponse');
+  });
+
   it.each(['ESTIMATE', 'USER_ENTERED', 'UNAVAILABLE'])(
     'rejects %s as verified accommodation market evidence',
     (pricingBasis) => {
@@ -78,15 +115,15 @@ describe('market pricing evidence normalization', () => {
   );
 
   it.each(['ESTIMATE', 'USER_ENTERED', 'UNAVAILABLE'])(
-    'rejects %s as verified flight market evidence',
+    'rejects %s as verified remaining-category evidence',
     (pricingBasis) => {
-      expect(() => normalizeFlightPricingEvidence(validEvidence({ pricingBasis }), 'EUR')).toThrow(
-        'live or verified-price evidence',
-      );
+      expect(() =>
+        normalizePlannerCategoryPricingEvidence(validEvidence({ pricingBasis }), 'EUR', 'FOOD'),
+      ).toThrow('live or verified-price evidence');
     },
   );
 
-  it('rejects currency mismatch, invalid ranges, and missing source identity', () => {
+  it('rejects currency mismatch, invalid ranges, missing identity, and unsupported categories', () => {
     expect(() =>
       normalizeAccommodationPricingEvidence(validEvidence({ currencyCode: 'SEK' }), 'EUR'),
     ).toThrow('planner budget currency');
@@ -94,7 +131,14 @@ describe('market pricing evidence normalization', () => {
       normalizeFlightPricingEvidence(validEvidence({ amountMin: 400, amountMax: 300 }), 'EUR'),
     ).toThrow('maximum cannot be below');
     expect(() =>
-      normalizeFlightPricingEvidence(validEvidence({ sourceProvider: ' ' }), 'EUR'),
+      normalizePlannerCategoryPricingEvidence(
+        validEvidence({ sourceProvider: ' ' }),
+        'EUR',
+        'LOCAL_TRANSPORT',
+      ),
     ).toThrow('sourceProvider is invalid');
+    expect(() => normalizePlannerCategoryPricingEvidence(validEvidence(), 'EUR', 'OTHER')).toThrow(
+      'category is not supported',
+    );
   });
 });

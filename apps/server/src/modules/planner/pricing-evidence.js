@@ -1,8 +1,14 @@
 const ACCEPTED_PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
-const MARKET_CATEGORY_LABELS = Object.freeze({
-  ACCOMMODATION: 'Accommodation',
+const VERIFIED_COST_CATEGORY_LABELS = Object.freeze({
   FLIGHTS: 'Flight',
+  ACCOMMODATION: 'Accommodation',
+  FOOD: 'Food',
+  LOCAL_TRANSPORT: 'Local transport',
+  ACTIVITIES: 'Activities',
+  CHILDREN_ACTIVITIES: 'Children activities',
+  AIRPORT_TRANSFER: 'Airport transfer',
+  TRAVEL_INSURANCE: 'Travel insurance',
 });
 const MAX_MONEY_AMOUNT = 1_000_000_000;
 
@@ -40,9 +46,13 @@ function sourceTimestamp(value) {
   return parsed.toISOString();
 }
 
-function normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, category) {
-  const label = MARKET_CATEGORY_LABELS[category];
-  if (!label) throw new TypeError('Market pricing evidence category is not supported.');
+export function normalizePlannerCategoryPricingEvidence(
+  rawEvidence,
+  expectedCurrencyCode,
+  category,
+) {
+  const label = VERIFIED_COST_CATEGORY_LABELS[category];
+  if (!label) throw new TypeError('Verified cost evidence category is not supported.');
   if (!rawEvidence || typeof rawEvidence !== 'object' || Array.isArray(rawEvidence)) {
     throw new TypeError(`${label} pricing evidence must be an object.`);
   }
@@ -82,9 +92,13 @@ function normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCod
 }
 
 export function normalizeAccommodationPricingEvidence(rawEvidence, expectedCurrencyCode) {
-  return normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, 'ACCOMMODATION');
+  return normalizePlannerCategoryPricingEvidence(
+    rawEvidence,
+    expectedCurrencyCode,
+    'ACCOMMODATION',
+  );
 }
 
 export function normalizeFlightPricingEvidence(rawEvidence, expectedCurrencyCode) {
-  return normalizeVerifiedMarketPricingEvidence(rawEvidence, expectedCurrencyCode, 'FLIGHTS');
+  return normalizePlannerCategoryPricingEvidence(rawEvidence, expectedCurrencyCode, 'FLIGHTS');
 }

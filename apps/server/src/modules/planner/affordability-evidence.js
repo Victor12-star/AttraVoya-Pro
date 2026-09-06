@@ -1,5 +1,14 @@
 const POLICY_KEY = 'attravoya-affordability-evidence-v1';
-const MARKET_PRICING_CATEGORIES = new Set(['ACCOMMODATION', 'FLIGHTS']);
+const VERIFIED_COST_CATEGORIES = new Set([
+  'FLIGHTS',
+  'ACCOMMODATION',
+  'FOOD',
+  'LOCAL_TRANSPORT',
+  'ACTIVITIES',
+  'CHILDREN_ACTIVITIES',
+  'AIRPORT_TRANSFER',
+  'TRAVEL_INSURANCE',
+]);
 
 function positivePlanningTargets(targets) {
   return targets.filter((target) => Number(target.amount) > 0);
@@ -12,8 +21,8 @@ function evidenceStatus(required) {
 }
 
 export function applyMarketPricingCollection(gate, category, collection) {
-  if (!MARKET_PRICING_CATEGORIES.has(category)) {
-    throw new TypeError('Market pricing collection category is not supported.');
+  if (!VERIFIED_COST_CATEGORIES.has(category)) {
+    throw new TypeError('Verified cost collection category is not supported.');
   }
 
   const collectedEvidence = collection.status === 'COLLECTED' ? collection.evidence : null;
@@ -53,7 +62,7 @@ export function applyMarketPricingCollection(gate, category, collection) {
       providerDataUsed: gate.provenance.providerDataUsed || Boolean(collectedEvidence),
       pricingDataUsed: gate.provenance.pricingDataUsed || Boolean(collectedEvidence),
       statement: collectedEvidence
-        ? 'Verified market pricing evidence was collected server-side for one or more planner categories, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
+        ? 'Verified cost evidence was collected server-side for one or more planner categories, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
         : gate.provenance.statement,
     },
   };

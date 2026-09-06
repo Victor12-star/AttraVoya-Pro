@@ -253,6 +253,12 @@ describe('planner affordability evidence gate', () => {
       collectionAttempts: [
         { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
         { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+        { category: 'FOOD', status: 'NOT_CONFIGURED' },
+        { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+        { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+        { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+        { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+        { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
       ],
     });
     expect(payload.evidence.required.find((item) => item.category === 'FLIGHTS')).toMatchObject({
@@ -328,6 +334,12 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collectionAttempts).toEqual([
       { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'COLLECTED' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+      { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+      { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+      { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
     ]);
     expect(payload.evidence.missingCategories).not.toContain('ACCOMMODATION');
     expect(payload.evidence.missingCategories).toContain('FLIGHTS');
@@ -400,6 +412,12 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collectionAttempts).toEqual([
       { category: 'FLIGHTS', status: 'COLLECTED' },
       { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+      { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+      { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+      { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
     ]);
     expect(payload.evidence.missingCategories).not.toContain('FLIGHTS');
     expect(payload.evidence.missingCategories).toContain('ACCOMMODATION');
@@ -444,6 +462,12 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collectionAttempts).toEqual([
       { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'FAILED' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+      { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+      { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+      { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
     ]);
     expect(payload.evidence.missingCategories).toContain('ACCOMMODATION');
     expect(payload.evidence.missingCategories).toContain('FLIGHTS');
@@ -481,6 +505,12 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collectionAttempts).toEqual([
       { category: 'FLIGHTS', status: 'FAILED' },
       { category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+      { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+      { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+      { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
     ]);
     expect(payload.evidence.missingCategories).toContain('FLIGHTS');
     expect(payload.provenance).toMatchObject({
@@ -507,6 +537,12 @@ describe('planner affordability evidence gate', () => {
     expect(payload.evidence.collectionAttempts).toEqual([
       { category: 'FLIGHTS', status: 'NOT_CONFIGURED' },
       { category: 'ACCOMMODATION', status: 'UNAVAILABLE' },
+      { category: 'FOOD', status: 'NOT_CONFIGURED' },
+      { category: 'LOCAL_TRANSPORT', status: 'NOT_CONFIGURED' },
+      { category: 'ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'CHILDREN_ACTIVITIES', status: 'NOT_CONFIGURED' },
+      { category: 'AIRPORT_TRANSFER', status: 'NOT_CONFIGURED' },
+      { category: 'TRAVEL_INSURANCE', status: 'NOT_CONFIGURED' },
     ]);
     expect(payload.evaluation.budgetFit).toBe('NOT_EVALUATED');
   });
