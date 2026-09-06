@@ -247,9 +247,9 @@ describe('planner affordability evidence gate', () => {
       ],
       collectionAttempts: [{ category: 'ACCOMMODATION', status: 'NOT_CONFIGURED' }],
     });
-    expect(payload.evidence.required.find((item) => item.category === 'ACCOMMODATION')).toMatchObject(
-      { status: 'NOT_CONFIGURED' },
-    );
+    expect(
+      payload.evidence.required.find((item) => item.category === 'ACCOMMODATION'),
+    ).toMatchObject({ status: 'NOT_CONFIGURED' });
     expect(payload.evaluation).toEqual({
       budgetFit: 'NOT_EVALUATED',
       rankingEligible: false,
@@ -264,73 +264,76 @@ describe('planner affordability evidence gate', () => {
     });
   });
 
-  it('accepts normalized verified accommodation evidence only from the server collector', async () => {
-    const collector = {
-      collect: vi.fn(async () => ({
-        amountMin: 240,
-        amountMax: '280.5',
-        currencyCode: 'eur',
-        pricingBasis: 'VERIFIED_PRICE',
-        confidence: 'HIGH',
-        sourceProvider: 'verified-accommodation-test',
-        sourceExternalId: 'property-123',
-        sourceFetchedAt: '2026-09-06T09:30:00+02:00',
-        ignoredRawField: 'must not leak',
-      })),
-    };
-    const repository = plannerRepository();
-    const app = await createApp(repository, collector);
+  it(
+    'accepts normalized verified accommodation evidence only from the server collector',
+    async () => {
+      const collector = {
+        collect: vi.fn(async () => ({
+          amountMin: 240,
+          amountMax: '280.5',
+          currencyCode: 'eur',
+          pricingBasis: 'VERIFIED_PRICE',
+          confidence: 'HIGH',
+          sourceProvider: 'verified-accommodation-test',
+          sourceExternalId: 'property-123',
+          sourceFetchedAt: '2026-09-06T09:30:00+02:00',
+          ignoredRawField: 'must not leak',
+        })),
+      };
+      const repository = plannerRepository();
+      const app = await createApp(repository, collector);
 
-    const response = await app.inject({
-      method: 'GET',
-      url: evidenceUrl,
-      headers: bearer(app),
-    });
+      const response = await app.inject({
+        method: 'GET',
+        url: evidenceUrl,
+        headers: bearer(app),
+      });
 
-    expect(response.statusCode).toBe(200);
-    expect(collector.collect).toHaveBeenCalledWith(
-      expect.objectContaining({
-        requestId: 'plan-request-1',
-        destination: expect.objectContaining({ id: 'destination-lisbon' }),
-        searchContext: expect.objectContaining({
-          budget: expect.objectContaining({ currencyCode: 'EUR' }),
+      expect(response.statusCode).toBe(200);
+      expect(collector.collect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          requestId: 'plan-request-1',
+          destination: expect.objectContaining({ id: 'destination-lisbon' }),
+          searchContext: expect.objectContaining({
+            budget: expect.objectContaining({ currencyCode: 'EUR' }),
+          }),
         }),
-      }),
-    );
+      );
 
-    const payload = response.json().affordabilityEvidence;
-    expect(payload.evidence.collected).toEqual([
-      {
-        category: 'ACCOMMODATION',
-        amountMin: '240.00',
-        amountMax: '280.50',
-        currencyCode: 'EUR',
-        pricingBasis: 'VERIFIED_PRICE',
-        confidence: 'HIGH',
-        sourceProvider: 'verified-accommodation-test',
-        sourceExternalId: 'property-123',
-        sourceFetchedAt: '2026-09-06T07:30:00.000Z',
-        verifiedMarketEvidence: true,
-      },
-    ]);
-    expect(payload.evidence.collectionAttempts).toEqual([
-      { category: 'ACCOMMODATION', status: 'COLLECTED' },
-    ]);
-    expect(payload.evidence.missingCategories).not.toContain('ACCOMMODATION');
-    expect(payload.evidence.status).toBe('INSUFFICIENT_EVIDENCE');
-    expect(payload.evaluation).toEqual({
-      budgetFit: 'NOT_EVALUATED',
-      rankingEligible: false,
-      affordabilityConfirmed: false,
-      evidenceReady: false,
-    });
-    expect(payload.provenance).toMatchObject({
-      liveDataUsed: false,
-      providerDataUsed: true,
-      pricingDataUsed: true,
-    });
-    expect(JSON.stringify(payload)).not.toContain('ignoredRawField');
-  });
+      const payload = response.json().affordabilityEvidence;
+      expect(payload.evidence.collected).toEqual([
+        {
+          category: 'ACCOMMODATION',
+          amountMin: '240.00',
+          amountMax: '280.50',
+          currencyCode: 'EUR',
+          pricingBasis: 'VERIFIED_PRICE',
+          confidence: 'HIGH',
+          sourceProvider: 'verified-accommodation-test',
+          sourceExternalId: 'property-123',
+          sourceFetchedAt: '2026-09-06T07:30:00.000Z',
+          verifiedMarketEvidence: true,
+        },
+      ]);
+      expect(payload.evidence.collectionAttempts).toEqual([
+        { category: 'ACCOMMODATION', status: 'COLLECTED' },
+      ]);
+      expect(payload.evidence.missingCategories).not.toContain('ACCOMMODATION');
+      expect(payload.evidence.status).toBe('INSUFFICIENT_EVIDENCE');
+      expect(payload.evaluation).toEqual({
+        budgetFit: 'NOT_EVALUATED',
+        rankingEligible: false,
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+      });
+      expect(payload.provenance).toMatchObject({
+        liveDataUsed: false,
+        providerDataUsed: true,
+        pricingDataUsed: true,
+      });
+      expect(JSON.stringify(payload)).not.toContain('ignoredRawField');
+    },
+  );
 
   it('fails closed when collector evidence is invalid or uses another currency', async () => {
     const collector = {
