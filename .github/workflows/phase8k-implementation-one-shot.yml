@@ -18,6 +18,25 @@ jobs:
           ref: feature/phase-8k-affordability-result-ui
           fetch-depth: 0
 
+      - name: Escape source-template literals in helper
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/phase8k-patch.cjs')
+          text = path.read_text()
+          for token in [
+              '${formatter.format(Number(value))}',
+              '${currencyCode}',
+              '${formatter.format(Number(policy.totalEvidenceRange.amountMin))}',
+              '${formatter.format(Number(policy.totalEvidenceRange.amountMax))}',
+              '${policy.currencyCode}',
+              '${category.toLowerCase()}',
+              '${index}',
+          ]:
+              text = text.replace(token, '\\' + token)
+          path.write_text(text)
+          PY
+
       - name: Apply Phase 8K UI alignment
         run: node scripts/phase8k-patch.cjs
 
