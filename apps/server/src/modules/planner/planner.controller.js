@@ -2,6 +2,10 @@ function authenticatedUserId(request) {
   return /** @type {any} */ (request).auth.id;
 }
 
+function idempotencyKey(request) {
+  return String(request.headers['idempotency-key']).trim();
+}
+
 function sendPrivate(reply, payload, statusCode = 200) {
   reply.header('Cache-Control', 'private, no-store');
   return reply.code(statusCode).send(payload);
@@ -10,11 +14,14 @@ function sendPrivate(reply, payload, statusCode = 200) {
 export function createPlannerController(service) {
   return {
     async createRequest(request, reply) {
-      const planRequest = await service.createRequest({
+      const result = await service.createRequest({
         userId: authenticatedUserId(request),
+        idempotencyKey: idempotencyKey(request),
         input: request.body,
       });
-      return sendPrivate(reply, { planRequest }, 201);
+
+      if (!result.created) reply.header('Idempotency-Replayed', 'true');
+      return sendPrivate(reply, { planRequest: result.planRequest }, result.created ? 201 : 200);
     },
 
     async listRequests(request, reply) {

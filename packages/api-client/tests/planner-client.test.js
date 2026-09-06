@@ -20,7 +20,7 @@ describe('planner API client', () => {
       budgetCurrencyCode: 'SEK',
     };
 
-    await client.createBudgetPlanRequest(body);
+    await client.createBudgetPlanRequest(body, 'planner-create-0001');
     await client.listBudgetPlanRequests();
     await client.getBudgetPlanRequest('request/with space');
     await client.getBudgetAllocation('request/with space');
@@ -59,5 +59,22 @@ describe('planner API client', () => {
         body: null,
       },
     ]);
+
+    const plannerHeaders = new Headers(fetchImpl.mock.calls[0][1].headers);
+    expect(plannerHeaders.get('idempotency-key')).toBe('planner-create-0001');
+  });
+
+  it('requires callers to provide a reusable planner idempotency key', () => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: vi.fn(),
+    });
+
+    expect(() => client.createBudgetPlanRequest({}, undefined)).toThrow(
+      'createBudgetPlanRequest requires an idempotency key.',
+    );
+    expect(() => client.createBudgetPlanRequest({}, 'short')).toThrow(
+      'The planner idempotency key must contain 8 to 128 safe ASCII characters.',
+    );
   });
 });

@@ -62,6 +62,12 @@ const destinationCandidateSelect = {
   },
 };
 
+/** @param {unknown} error */
+function isUniqueConstraintError(error) {
+  if (!error || typeof error !== 'object') return false;
+  return /** @type {{ code?: string }} */ (error).code === 'P2002';
+}
+
 export function createPlannerRepository() {
   return {
     async findCurrencyByCode(code) {
@@ -103,6 +109,37 @@ export function createPlannerRepository() {
         },
         select: plannerRequestSelect,
       });
+    },
+
+    async createOwnedRequestIdempotently({ requestId, userId, currencyId, input }) {
+      const { prisma } = await import('@attravoya/database');
+      const { accommodation, ...requestInput } = input;
+
+      try {
+        const record = await prisma.travelPlanRequest.create({
+          data: {
+            id: requestId,
+            ...requestInput,
+            userId,
+            budgetCurrencyId: currencyId,
+            ...(accommodation ? { stayPreference: { create: accommodation } } : {}),
+          },
+          select: plannerRequestSelect,
+        });
+        return { record, created: true };
+      } catch (error) {
+        if (!isUniqueConstraintError(error)) throw error;
+
+        // A concurrent retry on another replica can win the deterministic ID
+        // race. Recover only when that exact request is now owned by this user;
+        // any unrelated uniqueness failure remains an error.
+        const record = await prisma.travelPlanRequest.findFirst({
+          where: { id: requestId, userId },
+          select: plannerRequestSelect,
+        });
+        if (!record) throw error;
+        return { record, created: false };
+      }
     },
 
     async listOwnedRequests(userId, limit = 20) {

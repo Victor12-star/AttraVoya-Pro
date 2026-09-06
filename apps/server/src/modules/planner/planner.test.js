@@ -87,7 +87,10 @@ function createPlannerRepository(overrides = {}) {
     findDestinationById: vi.fn(async () => ({ id: 'destination-1', status: 'PUBLISHED' })),
     findOriginCityById: vi.fn(async () => ({ id: 'city-1' })),
     findOriginAirportById: vi.fn(async () => ({ id: 'airport-1', cityId: 'city-1' })),
-    createOwnedRequest: vi.fn(async () => storedRequest()),
+    createOwnedRequestIdempotently: vi.fn(async ({ requestId }) => ({
+      record: storedRequest({ id: requestId }),
+      created: true,
+    })),
     listOwnedRequests: vi.fn(async (userId) => (userId === 'user-1' ? [storedRequest()] : [])),
     findOwnedRequestById: vi.fn(async ({ userId, requestId }) =>
       userId === 'user-1' && requestId === 'plan-request-1' ? storedRequest() : null,
@@ -134,6 +137,10 @@ function bearer(app, userId = 'user-1') {
   return { authorization: `Bearer ${app.jwt.sign({ sub: userId })}` };
 }
 
+function plannerHeaders(app, idempotencyKey = 'planner-test-key-0001') {
+  return { ...bearer(app), 'idempotency-key': idempotencyKey };
+}
+
 describe('budget planner requests', () => {
   it('rejects persisted planner data without current authentication', async () => {
     const repository = createPlannerRepository();
@@ -147,7 +154,7 @@ describe('budget planner requests', () => {
 
     expect(response.statusCode).toBe(401);
     expect(response.json()).toMatchObject({ error: { code: 'AUTHENTICATION_REQUIRED' } });
-    expect(repository.createOwnedRequest).not.toHaveBeenCalled();
+    expect(repository.createOwnedRequestIdempotently).not.toHaveBeenCalled();
   });
 
   it('creates an owner-bound draft using shared defaults and normalized references', async () => {
@@ -157,14 +164,15 @@ describe('budget planner requests', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/api/v1/planner/requests',
-      headers: bearer(app),
+      headers: plannerHeaders(app),
       payload: validBody(),
     });
 
     expect(response.statusCode).toBe(201);
     expect(repository.findCurrencyByCode).toHaveBeenCalledWith('SEK');
-    expect(repository.createOwnedRequest).toHaveBeenCalledWith(
+    expect(repository.createOwnedRequestIdempotently).toHaveBeenCalledWith(
       expect.objectContaining({
+        requestId: expect.stringMatching(/^pridem_[a-f0-9]{64}$/),
         userId: 'user-1',
         currencyId: 'currency-sek',
         input: expect.objectContaining({
@@ -184,7 +192,7 @@ describe('budget planner requests', () => {
     );
     expect(response.json()).toMatchObject({
       planRequest: {
-        id: 'plan-request-1',
+        id: expect.stringMatching(/^pridem_[a-f0-9]{64}$/),
         budget: { amount: '25000', currencyCode: 'SEK', safetyReservePercent: '7.5' },
         travellers: { adults: 2, childrenAges: [6] },
         status: 'DRAFT',
@@ -225,7 +233,7 @@ describe('budget planner requests', () => {
     const contradictory = await app.inject({
       method: 'POST',
       url: '/api/v1/planner/requests',
-      headers: bearer(app),
+      headers: plannerHeaders(app, 'planner-invalid-date-0001'),
       payload: validBody({ flexibleDates: true }),
     });
     expect(contradictory.statusCode).toBe(400);
@@ -233,11 +241,11 @@ describe('budget planner requests', () => {
     const tooManyTravellers = await app.inject({
       method: 'POST',
       url: '/api/v1/planner/requests',
-      headers: bearer(app),
+      headers: plannerHeaders(app, 'planner-too-many-0001'),
       payload: validBody({ adults: 12, childrenAges: Array(9).fill(7) }),
     });
     expect(tooManyTravellers.statusCode).toBe(400);
-    expect(repository.createOwnedRequest).not.toHaveBeenCalled();
+    expect(repository.createOwnedRequestIdempotently).not.toHaveBeenCalled();
   });
 
   it('rejects unsupported currencies and inconsistent origin references without exposing database details', async () => {
@@ -247,7 +255,7 @@ describe('budget planner requests', () => {
     const currencyResponse = await app.inject({
       method: 'POST',
       url: '/api/v1/planner/requests',
-      headers: bearer(app),
+      headers: plannerHeaders(app, 'planner-unsupported-currency-0001'),
       payload: validBody({ budgetCurrencyCode: 'ZZZ' }),
     });
     expect(currencyResponse.statusCode).toBe(400);
@@ -265,7 +273,7 @@ describe('budget planner requests', () => {
     const mismatchResponse = await mismatchApp.inject({
       method: 'POST',
       url: '/api/v1/planner/requests',
-      headers: bearer(mismatchApp),
+      headers: plannerHeaders(mismatchApp, 'planner-origin-mismatch-0001'),
       payload: validBody({ originCityId: 'city-1', originAirportId: 'airport-2' }),
     });
     expect(mismatchResponse.statusCode).toBe(400);
