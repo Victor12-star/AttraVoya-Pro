@@ -96,9 +96,9 @@ function isBudgetAllocation(value, requestId) {
   const provenance = value.provenance;
   return Boolean(
     provenance &&
-      provenance.kind === 'PLANNING_TARGET' &&
-      provenance.liveDataUsed === false &&
-      provenance.providerDataUsed === false,
+    provenance.kind === 'PLANNING_TARGET' &&
+    provenance.liveDataUsed === false &&
+    provenance.providerDataUsed === false,
   );
 }
 
@@ -358,11 +358,7 @@ export function BudgetAllocationSection({ copy, locale, plannerCopy }) {
                     <div className={styles.metric}>
                       <span>{copy.spendableBudget}</span>
                       <strong>
-                        {formatMoney(
-                          allocation.spendableBudget,
-                          allocation.currencyCode,
-                          locale,
-                        )}
+                        {formatMoney(allocation.spendableBudget, allocation.currencyCode, locale)}
                       </strong>
                     </div>
                   </div>
