@@ -212,72 +212,79 @@ This file is the permanent handoff point for continuing development safely in a 
 - Even valid accommodation pricing evidence does not set budget fit, confirm affordability, enable ranking, or claim availability/bookability.
 - No Prisma schema change, migration, `TravelPlanRecommendation`, `BudgetPlan`, `BudgetLine`, or `AccommodationOption` persistence was added.
 
-## Current phase
+## Completed integration checkpoints — continued
 
 ### Phase 8G — Shared Market Pricing Evidence Core + Flight Contract
 
-Branch: `feature/phase-8g-shared-market-pricing-evidence`
+- PR #33 merged into `develop`.
+- Final PR head: `cc638410998c491af7787ad87c93d33f2b02b1d1`.
+- Final PR CI #336 passed all five top-level jobs.
+- Squash merge commit: `dcc42476e91f40496a2174a9be6c0ca9e7ea49d7`.
+- Post-merge `develop` CI #337 passed all five top-level jobs on that exact merge SHA.
+- Generalized verified market-pricing normalization so accommodation and flight evidence share one strict server-only contract.
+- Verified pricing bases remain only `LIVE` and `VERIFIED_PRICE`, with bounded category-total ranges, planner-budget currency, confidence, provider identity, external ID, and source-fetch timestamp.
+- Added a fail-closed server-only flight collector path while `FLIGHT_PROVIDER` remains `none`; missing flight collection is explicit and never interpreted as zero cost.
+- Browser/mobile clients still cannot manufacture market evidence, and Geoapify remains accommodation-location discovery rather than room pricing or inventory.
+- Even collected flight/accommodation evidence leaves `budgetFit` as `NOT_EVALUATED`, `rankingEligible` false, and `affordabilityConfirmed` false until required evidence is complete and a separate evaluation rule exists.
+- No Prisma schema change, migration, live flight adapter, recommendation persistence, `BudgetPlan`, or `BudgetLine` persistence was introduced.
 
-PR: #33 — `Phase 8G: add shared market pricing evidence core`
+## Current phase
 
-Base checkpoint: `e4de8b1a2f8174e8bf16bb3b7508d8cce32b497f` — verified Phase 8F `develop` merge with post-merge CI #334 green.
+### Phase 8H — Planner Candidate Evidence Web UI
+
+Branch: `feature/phase-8h-planner-candidate-evidence-ui`
+
+PR: #34 — `Phase 8H: expose planner candidate evidence UI`
+
+Base checkpoint: `dcc42476e91f40496a2174a9be6c0ca9e7ea49d7` — verified Phase 8G `develop` merge with post-merge CI #337 green.
 
 Reason for this phase:
 
-- Phase 8F proved the server-only accommodation pricing evidence boundary, but duplicating near-identical validation/application logic for every market-pricing category would create drift and inconsistent honesty rules.
-- Flights are a required planner budget category, yet `FLIGHT_PROVIDER` remains `none`; the correct next step is a provider-ready evidence contract, not a fabricated or sandbox fare adapter.
-- Phase 8G therefore generalizes the verified market-pricing core and adds a flight collector hook that fails closed when no trusted provider exists.
+- Phases 8D through 8G created private candidate and affordability-evidence contracts, but travellers still could not inspect those honest states from the budget-planner web flow.
+- The UI must expose what is actually known without turning published catalog entries into recommendations or turning partial pricing evidence into an affordability conclusion.
+- Evidence collection should happen only after an explicit traveller action rather than automatically fetching private/provider-backed evidence for every candidate.
 
 Implemented:
 
-- Generalized verified market-pricing normalization so accommodation and flight evidence share the same strict validation boundary.
-- Supported verified pricing bases remain only `LIVE` and `VERIFIED_PRICE`.
-- Both categories require bounded non-negative `amountMin`/`amountMax`, planner-budget currency, confidence, source provider, source external ID, and valid source-fetch timestamp.
-- Normalized evidence now carries `amountScope: PLANNER_CATEGORY_TOTAL`, making the collected range explicitly comparable to that planner category's budget target rather than implying a per-person, per-night, or per-segment amount.
-- Raw provider-specific fields are stripped by the shared normalizer.
-- Added `normalizeFlightPricingEvidence` using the same core contract as accommodation.
-- Generalized evidence-gate application into `applyMarketPricingCollection` for the market categories `FLIGHTS` and `ACCOMMODATION`.
-- Added optional server-only flight collector injection: `buildApp` → planner routes → planner service.
-- No browser/mobile evidence-write endpoint was added; clients still cannot manufacture market evidence.
-- The affordability-evidence endpoint now attempts flight and accommodation pricing collection independently and records each category state explicitly.
-- With no flight collector configured, the result is `FLIGHTS: NOT_CONFIGURED`; this is not interpreted as zero cost, free travel, or an affordable fare.
-- A flight collector returning no evidence produces `UNAVAILABLE`; invalid evidence produces `FAILED`; only normalized trusted evidence produces `COLLECTED`.
-- Valid `LIVE` flight evidence can set evidence provenance flags (`liveDataUsed`, `providerDataUsed`, `pricingDataUsed`) while affordability and ranking remain locked.
-- Added focused normalizer tests for both accommodation and flight evidence, including rejection of `ESTIMATE`, `USER_ENTERED`, and `UNAVAILABLE` pricing bases.
-- Added private planner-route tests proving server-only flight collection, raw-field stripping, explicit `NOT_CONFIGURED`, invalid-evidence fail-closed behavior, owner isolation, candidate membership, private caching, and continued affordability/ranking lockout.
-- No Prisma schema change, migration, flight provider adapter, `TravelPlanRecommendation`, `BudgetPlan`, `BudgetLine`, or recommendation persistence was added.
+- Added a destination-candidate evidence section to the authenticated `/trips` planner surface.
+- A traveller selects a saved planning brief before private destination candidates are loaded.
+- Published candidates are labelled as catalog candidates, explicitly unranked, and explicitly not yet evaluated for affordability.
+- Candidate responses are validated client-side against the existing honest contract; unsafe payloads that claim ranking, pricing availability, availability use, or incompatible provenance are rejected instead of rendered.
+- Added an explicit `Inspect evidence` action for an individual candidate. Affordability evidence is not fetched automatically for every destination.
+- Evidence responses are validated before display: required categories/statuses must be recognized, and collected market evidence must use `LIVE` or `VERIFIED_PRICE`, category-total scope, bounded money ranges, planner currency format, confidence, provider identity, external ID, fetch timestamp, and verified-market-evidence marking.
+- The UI shows collected verified market-pricing ranges with provider, pricing basis, and fetch time while keeping missing categories and collection states explicit.
+- Authentication, loading, empty, unavailable/error, retry, refresh, selected-candidate, incomplete-evidence, and complete-evidence-without-evaluation states are handled without exposing raw API/provider errors.
+- Added responsive styling, reduced-motion-safe loading behavior, Lucide icons, and candidate/evidence copy across all 18 supported UI locales while preserving the application's RTL direction behavior.
+- Added focused web unit tests for honest candidate rendering, explicit evidence inspection, verified evidence display, unsafe-response rejection, error/retry behavior, and no premature ranking/affordability claims.
 
 Data-honesty and security boundary:
 
-- `FLIGHT_PROVIDER` remains `none`; Phase 8G does not connect or claim live public fares.
-- No test/sandbox fare is presented as live public pricing.
-- Geoapify still provides accommodation location discovery only, not verified room pricing/inventory.
-- Browser/mobile clients cannot submit, overwrite, or promote pricing evidence.
-- Only server-injected collector output reaches the shared verified market-pricing normalizer.
-- Invalid, mismatched-currency, malformed-range, or untrusted-basis evidence fails closed and does not become collected market data.
-- Collected evidence retains explicit provider identity, external ID, fetch timestamp, pricing basis, confidence, currency, price range, category, and amount scope.
+- No provider credentials, provider configuration, server endpoint, database schema, migration, or client evidence-write path was added.
+- Candidate discovery remains separate from affordability evaluation.
+- A published catalog candidate is still not a recommendation.
+- Collected evidence is still not proof that the trip is affordable, available, ranked, feasible, or bookable.
 - `budgetFit` remains `NOT_EVALUATED`.
 - `rankingEligible` remains false.
 - `affordabilityConfirmed` remains false.
-- One or two collected market-pricing categories do not make a destination affordable, feasible, ranked, available, or bookable while other required evidence remains missing.
+- `FLIGHT_PROVIDER` remains `none`; Phase 8H does not claim live public flight fares.
 
 Verification history:
 
-- Exact implementation head `eaafbeb6bd95c43141486993dd28d21c311ff4b2` ran PR CI #335.
-- PR CI #335 passed all five top-level jobs: Code quality and unit tests, Live no-cost provider checks, Production builds, Dependency and secret checks, and PostgreSQL and Prisma verification.
-- Strict JavaScript, translation checks, provider smoke tests, ESLint, all unit tests, repository-wide Prettier, production build, database validation/tests, dependency/secret checks, and live no-cost provider checks all passed on that exact implementation head.
-- CI #335 does not constitute live flight-provider verification because no flight provider is configured; `FLIGHT_PROVIDER` remains `none`.
+- Clean implementation checkpoint `8e1acd08843a2f2281a52359d7d60d222539b91c` ran PR CI #351 after all temporary formatting helpers were removed.
+- PR CI #351 passed all five top-level jobs: Code quality and unit tests, Live no-cost provider checks, Production builds, Dependency and secret checks, and PostgreSQL and Prisma verification.
+- Strict JavaScript checks, translation checks, provider smoke tests, ESLint, unit tests, repository-wide Prettier, production builds, database validation/tests, dependency/secret checks, and live no-cost provider checks all passed on that clean product tree.
+- CI #351 does not constitute live keyed verification for provider secrets that are absent, and it does not constitute live flight-provider verification because `FLIGHT_PROVIDER` remains `none`.
 
 ### Required next steps
 
-1. This handoff update changes PR #33's head. Run the complete five-job PR CI on the exact new documentation head.
+1. This handoff update changes PR #34's head. Run the complete five-job PR CI on the exact new documentation head.
 2. Confirm root `package.json` still uses canonical `"format:check": "prettier --check ."` and `.github/workflows/ci.yml` remains the canonical five-job workflow.
-3. Verify PR #33 still targets `develop`, is mergeable, and its head SHA exactly matches the final CI-verified SHA.
-4. Squash-merge PR #33 using expected-head protection.
+3. Verify PR #34 still targets `develop`, is mergeable, contains no temporary formatter/diagnostic files, and its head SHA exactly matches the final CI-verified SHA.
+4. Squash-merge PR #34 using expected-head protection.
 5. Verify the returned merge SHA is the actual `develop` head.
 6. Verify the post-merge `develop` push CI passes all five top-level jobs.
 7. Only after that gate is green, start the next planner slice from the new verified `develop` SHA.
-8. For the next slice, read this handoff and current provider architecture first. Do not enable affordability/ranking merely because flight and accommodation contracts exist; required evidence completeness and a separate explicit evaluation rule must remain the gate.
+8. For the next slice, inspect the current affordability-evidence policy and pricing-evidence architecture first. Do not enable ranking merely because evidence exists; any affordability evaluation must require explicit evidence completeness and a separate fail-closed evaluation rule.
 
 ## CI interpretation rule
 
