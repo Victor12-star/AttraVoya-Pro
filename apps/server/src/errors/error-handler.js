@@ -23,6 +23,14 @@ function classifyError(error) {
     };
   }
 
+  if (error.statusCode === 413) {
+    return {
+      statusCode: 413,
+      code: ERROR_CODES.REQUEST_TOO_LARGE,
+      message: 'The request body is too large.',
+    };
+  }
+
   if (error.statusCode === 429) {
     return {
       statusCode: 429,
