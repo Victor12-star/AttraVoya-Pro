@@ -59,7 +59,12 @@ function isMoney(value) {
 
 function isBudgetAllocation(value, requestId) {
   if (!value || typeof value !== 'object') return false;
-  if (value.requestId !== requestId || !/^[A-Z]{3}$/.test(value.currencyCode ?? '')) return false;
+  if (
+    value.requestId !== requestId ||
+    !/^[A-Z]{3}$/.test(value.currencyCode ?? '')
+  ) {
+    return false;
+  }
   if (!isMoney(value.totalBudget) || !isMoney(value.spendableBudget)) return false;
 
   const reserve = value.safetyReserve;
@@ -129,7 +134,9 @@ export function BudgetAllocationSection({ copy, locale, plannerCopy }) {
   const [briefState, setBriefState] = useState('loading');
   const [selectedRequestId, setSelectedRequestId] = useState('');
   const [allocationState, setAllocationState] = useState('idle');
-  const [allocation, setAllocation] = useState(/** @type {BudgetAllocation|null} */ (null));
+  const [allocation, setAllocation] = useState(
+    /** @type {BudgetAllocation|null} */ (null),
+  );
   const briefSequence = useRef(0);
   const allocationSequence = useRef(0);
 
@@ -319,7 +326,10 @@ export function BudgetAllocationSection({ copy, locale, plannerCopy }) {
               {allocationState === 'error' ? (
                 <div className={styles.state} role="alert">
                   <p>{copy.allocationUnavailable}</p>
-                  <button type="button" onClick={() => void loadAllocation(selectedRequestId)}>
+                  <button
+                    type="button"
+                    onClick={() => void loadAllocation(selectedRequestId)}
+                  >
                     <RefreshCw size={15} aria-hidden="true" />
                     {plannerCopy.retry}
                   </button>
