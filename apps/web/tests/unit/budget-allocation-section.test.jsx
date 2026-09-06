@@ -148,34 +148,35 @@ describe('BudgetAllocationSection', () => {
     }
   });
 
-  it('shows exact saved-budget amounts and clear non-market provenance after selection', async () => {
-    render(
-      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
-    );
+  it(
+    'shows exact saved-budget amounts and clear non-market provenance after selection',
+    async () => {
+      render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
 
-    expect(
-      await screen.findByText('Choose a saved planning brief to view its allocation targets.'),
-    ).toBeInTheDocument();
+      expect(
+        await screen.findByText('Choose a saved planning brief to view its allocation targets.'),
+      ).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText('Saved planning brief'), {
-      target: { value: 'request-1' },
-    });
+      fireEvent.change(screen.getByLabelText('Saved planning brief'), {
+        target: { value: 'request-1' },
+      });
 
-    expect(
-      await screen.findByText(
-        'These amounts divide your saved budget. They are not fares, market prices, quotes, live estimates, availability, or destination-specific cost estimates.',
-      ),
-    ).toBeInTheDocument();
-    expect(mocks.getBudgetAllocation).toHaveBeenCalledWith('request-1');
-    expect(screen.getByText('1,000.00 SEK')).toBeInTheDocument();
-    expect(screen.getByText('100.00 SEK')).toBeInTheDocument();
-    expect(screen.getByText('900.00 SEK')).toBeInTheDocument();
-    expect(screen.getByText('270.00 SEK')).toBeInTheDocument();
-    expect(screen.getByText('288.00 SEK')).toBeInTheDocument();
-    expect(
-      screen.queryByText(/best price|available now|book now|live fare/i),
-    ).not.toBeInTheDocument();
-  });
+      expect(
+        await screen.findByText(
+          'These amounts divide your saved budget. They are not fares, market prices, quotes, live estimates, availability, or destination-specific cost estimates.',
+        ),
+      ).toBeInTheDocument();
+      expect(mocks.getBudgetAllocation).toHaveBeenCalledWith('request-1');
+      expect(screen.getByText('1,000.00 SEK')).toBeInTheDocument();
+      expect(screen.getByText('100.00 SEK')).toBeInTheDocument();
+      expect(screen.getByText('900.00 SEK')).toBeInTheDocument();
+      expect(screen.getByText('270.00 SEK')).toBeInTheDocument();
+      expect(screen.getByText('288.00 SEK')).toBeInTheDocument();
+      expect(
+        screen.queryByText(/best price|available now|book now|live fare/i),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   it('shows an authentication action without leaking API details', async () => {
     mocks.listBudgetPlanRequests.mockRejectedValue(
@@ -185,9 +186,7 @@ describe('BudgetAllocationSection', () => {
       }),
     );
 
-    render(
-      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
-    );
+    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
 
     expect(
       await screen.findByText('Sign in to save and view private planning briefs.'),
@@ -201,9 +200,7 @@ describe('BudgetAllocationSection', () => {
       .mockRejectedValueOnce(new Error('private allocation database detail'))
       .mockResolvedValueOnce({ allocation: allocation() });
 
-    render(
-      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
-    );
+    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
 
     await screen.findByText('Choose a saved planning brief to view its allocation targets.');
     fireEvent.change(screen.getByLabelText('Saved planning brief'), {
@@ -233,9 +230,7 @@ describe('BudgetAllocationSection', () => {
       }),
     });
 
-    render(
-      <BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />,
-    );
+    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
 
     await screen.findByText('Choose a saved planning brief to view its allocation targets.');
     fireEvent.change(screen.getByLabelText('Saved planning brief'), {
