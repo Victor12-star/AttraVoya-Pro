@@ -2,10 +2,27 @@ import { describe, expect, it } from 'vitest';
 
 import { createProviderCache } from './provider-cache.js';
 
+/**
+ * Creates a controllable void promise without requiring newer Promise APIs
+ * than the server JavaScript target currently exposes.
+ *
+ * @returns {{ promise: Promise<void>, resolve: (value: void | PromiseLike<void>) => void }}
+ */
+function deferredVoid() {
+  /** @type {(value: void | PromiseLike<void>) => void} */
+  let resolve = () => {};
+  /** @type {Promise<void>} */
+  const promise = new Promise((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+
+  return { promise, resolve };
+}
+
 describe('provider cache', () => {
   it('coalesces concurrent misses for the same key into one loader call', async () => {
     const cache = createProviderCache();
-    const gate = Promise.withResolvers();
+    const gate = deferredVoid();
     let loaderCalls = 0;
 
     const loader = async () => {
@@ -66,7 +83,7 @@ describe('provider cache', () => {
 
   it('allows different cache keys to load independently', async () => {
     const cache = createProviderCache();
-    const gate = Promise.withResolvers();
+    const gate = deferredVoid();
     const started = [];
 
     const first = cache.getOrLoad(
