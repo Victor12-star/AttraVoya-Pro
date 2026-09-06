@@ -1,0 +1,31 @@
+name: Phase 8J one-shot handoff update
+
+on:
+  push:
+    branches:
+      - feature/phase-8j-remaining-cost-evidence-contracts
+    paths:
+      - .github/workflows/phase8j-handoff-one-shot.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: feature/phase-8j-remaining-cost-evidence-contracts
+      - name: Update permanent handoff
+        run: node scripts/phase8j-update-handoff.mjs
+      - name: Remove one-shot helpers
+        run: rm scripts/phase8j-update-handoff.mjs .github/workflows/phase8j-handoff-one-shot.yml
+      - name: Commit handoff update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/CURRENT-WORK.md scripts/phase8j-update-handoff.mjs .github/workflows/phase8j-handoff-one-shot.yml
+          git commit -m "docs: update handoff through Phase 8J"
+          git push
