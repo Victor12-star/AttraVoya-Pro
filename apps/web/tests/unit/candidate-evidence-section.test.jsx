@@ -250,7 +250,7 @@ describe('CandidateEvidenceSection', () => {
     expect(mocks.getPlannerDestinationCandidates).toHaveBeenCalledWith('request-1');
     expect(mocks.getPlannerAffordabilityEvidence).not.toHaveBeenCalled();
     expect(screen.getAllByText(copy.notRanked).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(copy.notAffordableYet).length).toBeGreaterThan(0);
+    expect(screen.queryByText(copy.notAffordableYet)).not.toBeInTheDocument();
     expect(screen.getByText('Published destination summary.')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: copy.inspect }));
