@@ -45,5 +45,14 @@ export function createPlannerController(service) {
       });
       return sendPrivate(reply, { destinationCandidates });
     },
+
+    async getAffordabilityEvidence(request, reply) {
+      const affordabilityEvidence = await service.getAffordabilityEvidence({
+        userId: authenticatedUserId(request),
+        requestId: request.params.requestId,
+        destinationId: request.params.destinationId,
+      });
+      return sendPrivate(reply, { affordabilityEvidence });
+    },
   };
 }
