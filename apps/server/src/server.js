@@ -1,19 +1,12 @@
 import { env } from './config/env.js';
 import { buildApp } from './app.js';
+import { registerDatabaseLifecycle } from './plugins/database.js';
+import { createShutdownHandler } from './shutdown.js';
 
 const app = await buildApp();
+registerDatabaseLifecycle(app);
 
-async function shutdown(signal) {
-  app.log.info({ signal }, 'Graceful shutdown started');
-
-  try {
-    await app.close();
-    process.exit(0);
-  } catch (error) {
-    app.log.error({ err: error }, 'Graceful shutdown failed');
-    process.exit(1);
-  }
-}
+const shutdown = createShutdownHandler({ app });
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.once(signal, () => {
