@@ -1,3 +1,4 @@
+import { loadProviderCacheValue } from '../http/provider-cache.js';
 import {
   normalizeFrankfurterRates,
   normalizeFrankfurterSingleRate,
@@ -15,23 +16,26 @@ export function createFrankfurterCurrencyProvider({ http, cache, cacheTtlSeconds
       const normalizedBase = upperCurrency(base);
       const normalizedQuotes = [...new Set(quotes.map(upperCurrency).filter(Boolean))].sort();
       const cacheKey = `rates:${normalizedBase}:${normalizedQuotes.join(',') || '*'}`;
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
 
-      const url = new URL(`${API_BASE}/rates`);
-      url.searchParams.set('base', normalizedBase);
-      if (normalizedQuotes.length) url.searchParams.set('quotes', normalizedQuotes.join(','));
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(`${API_BASE}/rates`);
+          url.searchParams.set('base', normalizedBase);
+          if (normalizedQuotes.length) url.searchParams.set('quotes', normalizedQuotes.join(','));
 
-      const payload = await http.requestJson(url);
-      const result = {
-        provider: 'frankfurter',
-        fetchedAt: new Date().toISOString(),
-        base: normalizedBase,
-        rates: normalizeFrankfurterRates(payload, normalizedBase),
-        approximate: true,
-      };
-
-      return cache ? cache.set(cacheKey, result, cacheTtlSeconds) : result;
+          const payload = await http.requestJson(url);
+          return {
+            provider: 'frankfurter',
+            fetchedAt: new Date().toISOString(),
+            base: normalizedBase,
+            rates: normalizeFrankfurterRates(payload, normalizedBase),
+            approximate: true,
+          };
+        },
+      });
     },
 
     async convert({ amount, from, to }) {
@@ -54,14 +58,17 @@ export function createFrankfurterCurrencyProvider({ http, cache, cacheTtlSeconds
       }
 
       const cacheKey = `pair:${base}:${quote}`;
-      let rate = cache?.get(cacheKey);
-      if (!rate) {
-        const payload = await http.requestJson(
-          `${API_BASE}/rate/${encodeURIComponent(base)}/${encodeURIComponent(quote)}`,
-        );
-        rate = normalizeFrankfurterSingleRate(payload, base, quote);
-        cache?.set(cacheKey, rate, cacheTtlSeconds);
-      }
+      const rate = await loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const payload = await http.requestJson(
+            `${API_BASE}/rate/${encodeURIComponent(base)}/${encodeURIComponent(quote)}`,
+          );
+          return normalizeFrankfurterSingleRate(payload, base, quote);
+        },
+      });
 
       return {
         provider: 'frankfurter',

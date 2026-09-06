@@ -1,3 +1,4 @@
+import { loadProviderCacheValue } from '../http/provider-cache.js';
 import { requireProviderCredential } from '../http/provider-credentials.js';
 import { PLACE_CATEGORY_GROUPS } from './place-categories.js';
 import {
@@ -48,28 +49,34 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
         biasLongitude ?? '',
         type ?? '',
       ].join(':');
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
 
-      const url = new URL(AUTOCOMPLETE_ENDPOINT);
-      url.searchParams.set('text', query);
-      url.searchParams.set('format', 'json');
-      url.searchParams.set('limit', String(limit));
-      url.searchParams.set('lang', language);
-      url.searchParams.set('apiKey', key());
-      if (type) url.searchParams.set('type', type);
-      if (countryCode) url.searchParams.set('filter', `countrycode:${countryCode.toLowerCase()}`);
-      if (Number.isFinite(biasLatitude) && Number.isFinite(biasLongitude)) {
-        url.searchParams.set('bias', `proximity:${biasLongitude},${biasLatitude}`);
-      }
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: Math.min(cacheTtlSeconds, 900),
+        async loader() {
+          const url = new URL(AUTOCOMPLETE_ENDPOINT);
+          url.searchParams.set('text', query);
+          url.searchParams.set('format', 'json');
+          url.searchParams.set('limit', String(limit));
+          url.searchParams.set('lang', language);
+          url.searchParams.set('apiKey', key());
+          if (type) url.searchParams.set('type', type);
+          if (countryCode) {
+            url.searchParams.set('filter', `countrycode:${countryCode.toLowerCase()}`);
+          }
+          if (Number.isFinite(biasLatitude) && Number.isFinite(biasLongitude)) {
+            url.searchParams.set('bias', `proximity:${biasLongitude},${biasLatitude}`);
+          }
 
-      const payload = await http.requestJson(url);
-      const result = {
-        provider: 'geoapify',
-        fetchedAt: new Date().toISOString(),
-        results: normalizeGeoapifyAutocomplete(payload),
-      };
-      return cache ? cache.set(cacheKey, result, Math.min(cacheTtlSeconds, 900)) : result;
+          const payload = await http.requestJson(url);
+          return {
+            provider: 'geoapify',
+            fetchedAt: new Date().toISOString(),
+            results: normalizeGeoapifyAutocomplete(payload),
+          };
+        },
+      });
     },
 
     async searchNearby({
@@ -92,25 +99,29 @@ export function createGeoapifyPlacesProvider({ http, apiKey, cache, cacheTtlSeco
         limit,
         language,
       ].join(':');
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
 
-      const url = new URL(PLACES_ENDPOINT);
-      url.searchParams.set('categories', categories.join(','));
-      url.searchParams.set('filter', `circle:${longitude},${latitude},${radiusMeters}`);
-      url.searchParams.set('bias', `proximity:${longitude},${latitude}`);
-      url.searchParams.set('limit', String(limit));
-      url.searchParams.set('lang', language);
-      url.searchParams.set('apiKey', key());
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(PLACES_ENDPOINT);
+          url.searchParams.set('categories', categories.join(','));
+          url.searchParams.set('filter', `circle:${longitude},${latitude},${radiusMeters}`);
+          url.searchParams.set('bias', `proximity:${longitude},${latitude}`);
+          url.searchParams.set('limit', String(limit));
+          url.searchParams.set('lang', language);
+          url.searchParams.set('apiKey', key());
 
-      const payload = await http.requestJson(url);
-      const result = {
-        provider: 'geoapify',
-        fetchedAt: new Date().toISOString(),
-        categoryGroup,
-        results: normalizeGeoapifyFeatureCollection(payload),
-      };
-      return cache ? cache.set(cacheKey, result, cacheTtlSeconds) : result;
+          const payload = await http.requestJson(url);
+          return {
+            provider: 'geoapify',
+            fetchedAt: new Date().toISOString(),
+            categoryGroup,
+            results: normalizeGeoapifyFeatureCollection(payload),
+          };
+        },
+      });
     },
   };
 }

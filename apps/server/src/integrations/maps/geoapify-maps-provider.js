@@ -1,3 +1,4 @@
+import { loadProviderCacheValue } from '../http/provider-cache.js';
 import { requireProviderCredential } from '../http/provider-credentials.js';
 import { normalizeGeoapifyGeocoding, normalizeGeoapifyRoute } from './maps-normalizer.js';
 
@@ -13,32 +14,40 @@ export function createGeoapifyMapsProvider({ http, apiKey, cache, cacheTtlSecond
 
     async geocode({ text, language = 'en', limit = 5 }) {
       const cacheKey = `geocode:${language}:${limit}:${text.toLowerCase()}`;
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
-      const url = new URL(GEOCODE_ENDPOINT);
-      url.searchParams.set('text', text);
-      url.searchParams.set('format', 'json');
-      url.searchParams.set('lang', language);
-      url.searchParams.set('limit', String(limit));
-      url.searchParams.set('apiKey', key());
-      const payload = await http.requestJson(url);
-      const result = normalizeGeoapifyGeocoding(payload);
-      return cache ? cache.set(cacheKey, result, cacheTtlSeconds) : result;
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(GEOCODE_ENDPOINT);
+          url.searchParams.set('text', text);
+          url.searchParams.set('format', 'json');
+          url.searchParams.set('lang', language);
+          url.searchParams.set('limit', String(limit));
+          url.searchParams.set('apiKey', key());
+          const payload = await http.requestJson(url);
+          return normalizeGeoapifyGeocoding(payload);
+        },
+      });
     },
 
     async reverseGeocode({ latitude, longitude, language = 'en' }) {
       const cacheKey = `reverse:${Number(latitude).toFixed(5)}:${Number(longitude).toFixed(5)}:${language}`;
-      const cached = cache?.get(cacheKey);
-      if (cached) return cached;
-      const url = new URL(REVERSE_ENDPOINT);
-      url.searchParams.set('lat', String(latitude));
-      url.searchParams.set('lon', String(longitude));
-      url.searchParams.set('format', 'json');
-      url.searchParams.set('lang', language);
-      url.searchParams.set('apiKey', key());
-      const payload = await http.requestJson(url);
-      const result = normalizeGeoapifyGeocoding(payload);
-      return cache ? cache.set(cacheKey, result, cacheTtlSeconds) : result;
+      return loadProviderCacheValue({
+        cache,
+        key: cacheKey,
+        ttlSeconds: cacheTtlSeconds,
+        async loader() {
+          const url = new URL(REVERSE_ENDPOINT);
+          url.searchParams.set('lat', String(latitude));
+          url.searchParams.set('lon', String(longitude));
+          url.searchParams.set('format', 'json');
+          url.searchParams.set('lang', language);
+          url.searchParams.set('apiKey', key());
+          const payload = await http.requestJson(url);
+          return normalizeGeoapifyGeocoding(payload);
+        },
+      });
     },
 
     async route({ waypoints, mode = 'drive', language = 'en' }) {
