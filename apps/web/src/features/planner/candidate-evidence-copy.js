@@ -42,7 +42,8 @@ const EN = {
   evidenceIntro:
     'Evidence shows what has actually been collected. Missing categories stay explicit and no affordability conclusion is made.',
   evidenceIncomplete: 'Required evidence is still incomplete.',
-  evidenceComplete: 'Required evidence is complete, but affordability still has not been evaluated.',
+  evidenceComplete:
+    'Required evidence is complete, but affordability still has not been evaluated.',
   collectedEvidence: 'Collected verified market evidence',
   noCollectedEvidence: 'No verified market-pricing evidence has been collected yet.',
   requiredEvidence: 'Required evidence categories',

@@ -103,13 +103,13 @@ function isMoney(value) {
 function isDestination(destination) {
   return Boolean(
     destination &&
-      typeof destination.id === 'string' &&
-      destination.id &&
-      typeof destination.slug === 'string' &&
-      typeof destination.name === 'string' &&
-      destination.country &&
-      typeof destination.country.code === 'string' &&
-      typeof destination.country.name === 'string',
+    typeof destination.id === 'string' &&
+    destination.id &&
+    typeof destination.slug === 'string' &&
+    typeof destination.name === 'string' &&
+    destination.country &&
+    typeof destination.country.code === 'string' &&
+    typeof destination.country.name === 'string',
   );
 }
 
@@ -122,37 +122,37 @@ export function isSafeDestinationCandidateSet(value, requestId) {
   const provenance = value.provenance;
   return Boolean(
     evaluation &&
-      evaluation.budgetFit === 'NOT_EVALUATED' &&
-      evaluation.rankingApplied === false &&
-      evaluation.priceDataAvailable === false &&
-      evaluation.availabilityDataUsed === false &&
-      provenance &&
-      provenance.kind === 'PUBLISHED_CATALOG_CANDIDATE' &&
-      provenance.source === 'ATTRAVOYA_PUBLISHED_DESTINATION_CATALOG' &&
-      provenance.liveDataUsed === false &&
-      provenance.providerDataUsed === false &&
-      provenance.pricingDataUsed === false,
+    evaluation.budgetFit === 'NOT_EVALUATED' &&
+    evaluation.rankingApplied === false &&
+    evaluation.priceDataAvailable === false &&
+    evaluation.availabilityDataUsed === false &&
+    provenance &&
+    provenance.kind === 'PUBLISHED_CATALOG_CANDIDATE' &&
+    provenance.source === 'ATTRAVOYA_PUBLISHED_DESTINATION_CATALOG' &&
+    provenance.liveDataUsed === false &&
+    provenance.providerDataUsed === false &&
+    provenance.pricingDataUsed === false,
   );
 }
 
 function isCollectedMarketEvidence(item) {
   return Boolean(
     item &&
-      EVIDENCE_CATEGORIES.has(item.category) &&
-      item.amountScope === 'PLANNER_CATEGORY_TOTAL' &&
-      isMoney(item.amountMin) &&
-      isMoney(item.amountMax) &&
-      Number(item.amountMax) >= Number(item.amountMin) &&
-      /^[A-Z]{3}$/.test(item.currencyCode ?? '') &&
-      PRICING_BASES.has(item.pricingBasis) &&
-      CONFIDENCE.has(item.confidence) &&
-      typeof item.sourceProvider === 'string' &&
-      item.sourceProvider.length > 0 &&
-      typeof item.sourceExternalId === 'string' &&
-      item.sourceExternalId.length > 0 &&
-      typeof item.sourceFetchedAt === 'string' &&
-      !Number.isNaN(Date.parse(item.sourceFetchedAt)) &&
-      item.verifiedMarketEvidence === true,
+    EVIDENCE_CATEGORIES.has(item.category) &&
+    item.amountScope === 'PLANNER_CATEGORY_TOTAL' &&
+    isMoney(item.amountMin) &&
+    isMoney(item.amountMax) &&
+    Number(item.amountMax) >= Number(item.amountMin) &&
+    /^[A-Z]{3}$/.test(item.currencyCode ?? '') &&
+    PRICING_BASES.has(item.pricingBasis) &&
+    CONFIDENCE.has(item.confidence) &&
+    typeof item.sourceProvider === 'string' &&
+    item.sourceProvider.length > 0 &&
+    typeof item.sourceExternalId === 'string' &&
+    item.sourceExternalId.length > 0 &&
+    typeof item.sourceFetchedAt === 'string' &&
+    !Number.isNaN(Date.parse(item.sourceFetchedAt)) &&
+    item.verifiedMarketEvidence === true,
   );
 }
 
@@ -200,15 +200,15 @@ export function isSafeAffordabilityEvidence(value, requestId, destinationId) {
   const provenance = value.provenance;
   return Boolean(
     evaluation &&
-      evaluation.budgetFit === 'NOT_EVALUATED' &&
-      evaluation.rankingEligible === false &&
-      evaluation.affordabilityConfirmed === false &&
-      typeof evaluation.evidenceReady === 'boolean' &&
-      provenance &&
-      provenance.kind === 'AFFORDABILITY_EVIDENCE_GATE' &&
-      typeof provenance.liveDataUsed === 'boolean' &&
-      typeof provenance.providerDataUsed === 'boolean' &&
-      typeof provenance.pricingDataUsed === 'boolean',
+    evaluation.budgetFit === 'NOT_EVALUATED' &&
+    evaluation.rankingEligible === false &&
+    evaluation.affordabilityConfirmed === false &&
+    typeof evaluation.evidenceReady === 'boolean' &&
+    provenance &&
+    provenance.kind === 'AFFORDABILITY_EVIDENCE_GATE' &&
+    typeof provenance.liveDataUsed === 'boolean' &&
+    typeof provenance.providerDataUsed === 'boolean' &&
+    typeof provenance.pricingDataUsed === 'boolean',
   );
 }
 
@@ -398,9 +398,7 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
               <RefreshCw
                 size={16}
                 className={
-                  briefState === 'loading' || candidateState === 'loading'
-                    ? styles.spin
-                    : undefined
+                  briefState === 'loading' || candidateState === 'loading' ? styles.spin : undefined
                 }
                 aria-hidden="true"
               />
@@ -557,9 +555,7 @@ export function CandidateEvidenceSection({ copy, locale, plannerCopy }) {
                       <p>{copy.evidenceUnavailable}</p>
                       <button
                         type="button"
-                        onClick={() =>
-                          void loadEvidence(selectedRequestId, selectedDestinationId)
-                        }
+                        onClick={() => void loadEvidence(selectedRequestId, selectedDestinationId)}
                       >
                         <RefreshCw size={15} aria-hidden="true" />
                         {plannerCopy.retry}
