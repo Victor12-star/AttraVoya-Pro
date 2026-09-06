@@ -33,6 +33,23 @@ const payload = {
 
 const query = { latitude: 59.33, longitude: 18.07, forecastDays: 1, timezone: 'auto' };
 
+/**
+ * Creates a controllable void promise without requiring newer Promise APIs
+ * than the server JavaScript target currently exposes.
+ *
+ * @returns {{ promise: Promise<void>, resolve: (value: void | PromiseLike<void>) => void }}
+ */
+function deferredVoid() {
+  /** @type {(value: void | PromiseLike<void>) => void} */
+  let resolve = () => {};
+  /** @type {Promise<void>} */
+  const promise = new Promise((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+
+  return { promise, resolve };
+}
+
 describe('Open-Meteo adapter', () => {
   it('normalizes and caches weather responses', async () => {
     const http = { requestJson: vi.fn().mockResolvedValue(payload) };
@@ -52,7 +69,7 @@ describe('Open-Meteo adapter', () => {
   });
 
   it('coalesces concurrent identical cache misses into one provider request', async () => {
-    const gate = Promise.withResolvers();
+    const gate = deferredVoid();
     const http = {
       requestJson: vi.fn().mockImplementation(async () => {
         await gate.promise;
