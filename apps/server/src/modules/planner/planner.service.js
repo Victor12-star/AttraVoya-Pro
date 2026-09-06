@@ -1,6 +1,10 @@
 import { NotFoundError, ValidationError } from '../../errors/app-error.js';
-import { buildAffordabilityEvidenceGate } from './affordability-evidence.js';
+import {
+  applyAccommodationPricingCollection,
+  buildAffordabilityEvidenceGate,
+} from './affordability-evidence.js';
 import { buildBudgetEnvelope } from './budget-allocation.js';
+import { normalizeAccommodationPricingEvidence } from './pricing-evidence.js';
 
 function toDate(value) {
   return value ? new Date(`${value}T00:00:00.000Z`) : null;
@@ -113,8 +117,32 @@ function destinationCandidateEnvelope({ requestId, mode, records }) {
   };
 }
 
-export function createPlannerService(repository) {
+async function collectAccommodationPricingEvidence(collector, gate) {
+  if (!collector) return { status: 'NOT_CONFIGURED' };
+
+  try {
+    const rawEvidence = await collector.collect({
+      requestId: gate.requestId,
+      destination: gate.destination,
+      searchContext: gate.searchContext,
+    });
+    if (!rawEvidence) return { status: 'UNAVAILABLE' };
+
+    return {
+      status: 'COLLECTED',
+      evidence: normalizeAccommodationPricingEvidence(
+        rawEvidence,
+        gate.searchContext.budget.currencyCode,
+      ),
+    };
+  } catch {
+    return { status: 'FAILED' };
+  }
+}
+
+export function createPlannerService(repository, options = {}) {
   if (!repository) throw new TypeError('Planner repository is required.');
+  const accommodationPricingCollector = options.accommodationPricingCollector;
 
   return {
     async createRequest({ userId, input }) {
@@ -238,11 +266,16 @@ export function createPlannerService(repository) {
 
       if (!candidate) throw new NotFoundError('The destination candidate was not found.');
 
-      return buildAffordabilityEvidenceGate({
+      const gate = buildAffordabilityEvidenceGate({
         planRequest: mapPlannerRequest(record),
         destination: mapDestinationCandidate(candidate),
         budgetEnvelope: buildBudgetEnvelope(record),
       });
+      const accommodationCollection = await collectAccommodationPricingEvidence(
+        accommodationPricingCollector,
+        gate,
+      );
+      return applyAccommodationPricingCollection(gate, accommodationCollection);
     },
   };
 }

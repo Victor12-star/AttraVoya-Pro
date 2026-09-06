@@ -188,6 +188,7 @@ export async function buildApp(options = {}) {
   await app.register(plannerRoutes, {
     prefix: `${API_PREFIX}/planner/requests`,
     repository: options.plannerRepository,
+    accommodationPricingCollector: options.plannerAccommodationPricingCollector,
   });
 
   return app;
