@@ -141,10 +141,7 @@ export function createProviderHttpClient(options) {
 
     while (true) {
       const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        requestOptions.timeoutMs ?? timeoutMs,
-      );
+      const timeout = setTimeout(() => controller.abort(), requestOptions.timeoutMs ?? timeoutMs);
 
       try {
         const headers = new Headers(requestOptions.headers);
