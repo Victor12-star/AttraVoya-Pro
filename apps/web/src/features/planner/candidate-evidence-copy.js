@@ -72,6 +72,7 @@ const EN = {
   },
 };
 
+// prettier-ignore
 const COPY = {
   en: EN,
   sv: {
@@ -179,20 +180,6 @@ const COPY = {
   },
 };
 
-COPY.zh = COPY.zh;
-COPY.ja = COPY.ja;
-COPY.ko = COPY.ko;
-COPY.hi = COPY.hi;
-
-// Keep concise localized variants for locales whose planner UI already uses the same language family.
-COPY.no = COPY.no;
-COPY.da = COPY.da;
-COPY.fi = COPY.fi;
-COPY.pl = COPY.pl;
-COPY.tr = COPY.tr;
-
-// Italian/Portuguese/Dutch are defined above. Add the remaining locale through safe English fallback only
-// when a locale is unknown, never for one of the maintained 18 dictionaries.
 export function getCandidateEvidenceCopy(locale = 'en') {
   return COPY[locale] ?? COPY.en;
 }
