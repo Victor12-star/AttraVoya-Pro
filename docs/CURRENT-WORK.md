@@ -388,3 +388,12 @@ A provider smoke test that makes no external request, or a live check that omits
 - Fix failures on the feature branch only.
 - Do not weaken tests, formatter rules, validation, security boundaries, privacy boundaries, or provider honesty to make CI pass.
 - When documentation is updated before merge, that documentation commit becomes the new final PR head and must pass the complete CI gate before merge.
+
+## Mandatory scalability, reliability, performance and user-experience requirement
+
+- `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md` and GitHub Issue #40 are standing production requirements.
+- AttraVoya Pro must support measured growth to many concurrent users without silent data loss, duplicate side effects, provider exhaustion, database connection exhaustion, privacy leakage, or confusing failure states.
+- Required production capabilities include stateless horizontal scaling where justified, PostgreSQL connection pooling/capacity planning, bounded pagination/query optimization, distributed caching when multi-instance scale requires it, durable idempotent queues for asynchronous work, provider bulkheads/circuit-breaker-style protection where measured need exists, route-aware backpressure/rate limits, idempotency/concurrency controls, observability/SLOs, backup/restore and disaster recovery, CDN/WAF/DDoS protection, and load/stress/soak/burst testing.
+- User satisfaction is part of scalability: preserve fast web/mobile performance, Core Web Vitals budgets, form state on recoverable errors, clear loading/partial/offline/retry states, duplicate-submit protection, accessibility, all 18 locales including Arabic RTL, and honest provider/provenance messaging.
+- Do not claim production scalability from unit CI or one hosted instance. It must be demonstrated with measured load/capacity tests, bounded resources, recovery exercises, multi-instance-safe infrastructure where needed, privacy/security controls, and graceful degradation.
+- Implement these requirements incrementally in dedicated slices; do not prematurely add distributed infrastructure without measured need, and never weaken the five-job CI/security/privacy/provider-honesty gates.
