@@ -207,7 +207,9 @@ describe('remaining planner cost evidence collectors', () => {
     expect(result.evidence.required.find((item) => item.category === 'FLIGHTS')).toMatchObject({
       status: 'FAILED',
     });
-    expect(result.evidence.required.find((item) => item.category === 'ACCOMMODATION')).toMatchObject({
+    expect(
+      result.evidence.required.find((item) => item.category === 'ACCOMMODATION'),
+    ).toMatchObject({
       status: 'COLLECTED',
     });
     expect(result.evaluation).toEqual({
