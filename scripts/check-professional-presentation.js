@@ -40,6 +40,7 @@ const userInterfaceRoots = [
 // ordinary text symbols such as copyright or mathematical operators.
 const emojiPresentationPattern = /\p{Emoji_Presentation}/gu;
 const emojiStylePattern = /[\u2600-\u27BF]\uFE0F/gu;
+const pseudoStatusIconPattern = /[\u2713\u2714\u2717\u2718]/gu;
 
 const disallowedUiIconNames = [
   'Bot',
@@ -98,6 +99,7 @@ for (const file of trackedFiles) {
 
   addMatches(findings, file, text, emojiPresentationPattern, 'decorative emoji/pictograph');
   addMatches(findings, file, text, emojiStylePattern, 'emoji-style symbol');
+  addMatches(findings, file, text, pseudoStatusIconPattern, 'decorative status glyph');
 
   if (!isUiFile(file)) continue;
 
@@ -114,7 +116,9 @@ for (const file of trackedFiles) {
 if (findings.length > 0) {
   console.error('Professional presentation check failed:');
   for (const finding of findings) console.error(`  - ${finding}`);
-  console.error('\nRemove decorative emoji/AI-style presentation cues or replace them with professional text/functional UI.');
+  console.error(
+    '\nRemove decorative emoji/AI-style presentation cues or replace them with professional text/functional UI.',
+  );
   process.exit(1);
 }
 
