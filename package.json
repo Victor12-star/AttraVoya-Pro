@@ -42,6 +42,7 @@
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
     "db:deploy": "pnpm --filter @attravoya/database migrate:deploy",
     "db:seed": "pnpm --filter @attravoya/database seed",
+    "db:recovery:test": "node scripts/postgres-recovery-check.js",
     "db:studio": "pnpm --filter @attravoya/database studio",
     "translations:check": "node scripts/check-translations.js",
     "presentation:check": "node scripts/check-professional-presentation.js",
