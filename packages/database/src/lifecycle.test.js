@@ -48,11 +48,17 @@ describe('database closer', () => {
     /** @type {any} */
     const invalidPool = null;
 
-    expect(() => createDatabaseCloser({ prismaClient: invalidPrismaClient, pool: { end() {} } })).toThrow(
-      'Database closer requires a Prisma disconnect function.',
-    );
     expect(() =>
-      createDatabaseCloser({ prismaClient: { $disconnect() {} }, pool: invalidPool }),
+      createDatabaseCloser({
+        prismaClient: invalidPrismaClient,
+        pool: { async end() {} },
+      }),
+    ).toThrow('Database closer requires a Prisma disconnect function.');
+    expect(() =>
+      createDatabaseCloser({
+        prismaClient: { async $disconnect() {} },
+        pool: invalidPool,
+      }),
     ).toThrow('Database closer requires a pool end function.');
   });
 });
