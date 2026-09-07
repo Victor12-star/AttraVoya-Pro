@@ -175,6 +175,7 @@ export async function buildApp(options = {}) {
   await app.register(phrasebookRoutes, {
     prefix: `${API_PREFIX}/phrasebook`,
     provider: options.translationProvider,
+    repository: options.phrasebookRepository,
   });
 
   await app.register(translationRoutes, {
