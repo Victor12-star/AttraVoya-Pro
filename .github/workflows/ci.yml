@@ -163,6 +163,11 @@ jobs:
       - name: Seed reference data
         run: pnpm db:seed
 
+      - name: Verify PostgreSQL backup and restore
+        env:
+          POSTGRES_RECOVERY_TEST: '1'
+        run: pnpm db:recovery:test
+
       - name: Run database tests
         run: pnpm --filter @attravoya/database test
 
