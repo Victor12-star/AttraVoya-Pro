@@ -123,7 +123,7 @@ describe('TravelCompanionPage', () => {
       source: 'en',
       target: 'sv',
     });
-    expect(screen.getByText('English')).toBeInTheDocument();
+    expect(screen.getAllByText('English').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Swedish').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'How are you?' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'How much is this?' })).toBeInTheDocument();
@@ -143,7 +143,7 @@ describe('TravelCompanionPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Translate' }));
 
     expect(await screen.findByText('Hur mycket kostar det här?')).toBeInTheDocument();
-    expect(screen.getByText('How much is this?')).toBeInTheDocument();
+    expect(screen.getAllByText('How much is this?').length).toBeGreaterThan(1);
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(screen.getByText('Your translated phrases will appear here.')).toBeInTheDocument();
