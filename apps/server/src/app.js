@@ -14,6 +14,7 @@ import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
 import { createAuthorizeHook } from './hooks/authorize.js';
+import { createReadinessState } from './lifecycle/readiness-state.js';
 import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
 import { authRepository } from './modules/auth/auth.repository.js';
 import { healthRoutes } from './modules/health/health.routes.js';
@@ -38,6 +39,7 @@ import {
 } from './observability/http-request-metrics.js';
 
 export async function buildApp(options = {}) {
+  const readinessState = options.readinessState ?? createReadinessState();
   const app = Fastify({
     logger: options.logger ?? createLoggerOptions(),
     genReqId: () => randomUUID(),
@@ -127,6 +129,7 @@ export async function buildApp(options = {}) {
   await app.register(healthRoutes, {
     prefix: `${API_PREFIX}/health`,
     repository: options.healthRepository,
+    readinessState,
   });
 
   await app.register(countriesRoutes, {
