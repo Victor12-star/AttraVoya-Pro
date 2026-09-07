@@ -1,6 +1,8 @@
 import { ServiceUnavailableError } from '../../errors/app-error.js';
 
-export function createHealthService(repository) {
+export function createHealthService(repository, options = {}) {
+  const readinessState = options.readinessState;
+
   return {
     getLiveness() {
       return {
@@ -12,6 +14,10 @@ export function createHealthService(repository) {
     },
 
     async getReadiness() {
+      if (readinessState?.isAcceptingTraffic() === false) {
+        throw new ServiceUnavailableError('AttraVoya Pro is not ready to accept traffic yet.');
+      }
+
       try {
         await repository.checkDatabase();
         return {
