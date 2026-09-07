@@ -1,5 +1,13 @@
 import { providerCacheMetrics as defaultProviderCacheMetrics } from '../../observability/provider-cache-metrics.js';
 
+/**
+ * @typedef {{ record: (event: { outcome: string }) => void }} ProviderCacheMetricsObserver
+ */
+
+/**
+ * @param {ProviderCacheMetricsObserver} metrics
+ * @param {string} outcome
+ */
 function recordCacheMetric(metrics, outcome) {
   try {
     metrics.record({ outcome });
@@ -15,6 +23,13 @@ function recordCacheMetric(metrics, outcome) {
  * external API calls during local development without pretending to be a
  * distributed cache. A production deployment can later replace this behind
  * the same provider/service boundary with Redis or another shared cache.
+ *
+ * @param {{
+ *   maxEntries?: number,
+ *   maxInFlight?: number,
+ *   now?: () => number,
+ *   metrics?: ProviderCacheMetricsObserver
+ * }} [options]
  */
 export function createProviderCache({
   maxEntries = 500,
