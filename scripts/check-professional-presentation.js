@@ -43,8 +43,18 @@ const requiredBrowserIconPackages = new Map([
   ['apps/admin/package.json', 'lucide-react'],
   ['apps/web/package.json', 'lucide-react'],
 ]);
-const competingIconPackagePattern =
-  /(?:from\s+|require\()['"](?:@expo\/vector-icons|@fortawesome\/[^'"]+|@heroicons\/[^'"]+|@mui\/icons-material(?:\/[^'"]*)?|@phosphor-icons\/react|iconoir-react|material-icons(?:\/[^'"]*)?|phosphor-react|react-feather|react-icons(?:\/[^'"]*)?)['"]/g;
+const competingIconPackageNames = [
+  '@expo/vector-icons',
+  '@fortawesome/',
+  '@heroicons/',
+  '@mui/icons-material',
+  '@phosphor-icons/react',
+  'iconoir-react',
+  'material-icons',
+  'phosphor-react',
+  'react-feather',
+  'react-icons',
+];
 
 // Emoji-presentation characters cover decorative pictographs such as rockets, bots,
 // sparkles, stars, celebration marks, and similar UI decoration without banning
@@ -96,6 +106,11 @@ function addMatches(findings, file, text, pattern, description) {
   }
 }
 
+function addLiteralMatch(findings, file, text, value, description) {
+  const index = text.indexOf(value);
+  if (index >= 0) findings.push(`${file}:${lineNumberAt(text, index)} ${description}`);
+}
+
 const findings = [];
 
 for (const [packageFile, requiredPackage] of requiredBrowserIconPackages) {
@@ -126,13 +141,15 @@ for (const file of trackedFiles) {
 
   if (!isUiFile(file)) continue;
 
-  addMatches(
-    findings,
-    file,
-    text,
-    competingIconPackagePattern,
-    'non-Lucide general-purpose icon library; use Lucide functional icons',
-  );
+  for (const packageName of competingIconPackageNames) {
+    addLiteralMatch(
+      findings,
+      file,
+      text,
+      packageName,
+      `non-Lucide general-purpose icon library "${packageName}"; use Lucide functional icons`,
+    );
+  }
 
   for (const iconName of disallowedUiIconNames) {
     const iconPattern = new RegExp(`\\b${iconName}\\b`, 'g');
