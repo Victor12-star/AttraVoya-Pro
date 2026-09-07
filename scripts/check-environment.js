@@ -35,7 +35,7 @@ function commandVersion(command, args = ['--version']) {
 }
 
 function status(label, ok, detail) {
-  console.log(`${ok ? '✓' : '✗'} ${label}: ${detail}`);
+  console.log(`[${ok ? 'PASS' : 'FAIL'}] ${label}: ${detail}`);
   return ok;
 }
 
@@ -70,7 +70,7 @@ healthy =
 
 if (!healthy) {
   console.error(
-    '\nEnvironment check failed. Fix the items marked ✗ before starting development services.',
+    '\nEnvironment check failed. Fix the items marked [FAIL] before starting development services.',
   );
   process.exit(1);
 }
