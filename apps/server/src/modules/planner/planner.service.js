@@ -264,7 +264,7 @@ export function createPlannerService(repository, options = {}) {
       };
     },
 
-    async listRequests({ userId, limit = 20, cursor }) {
+    async listRequests({ userId, limit = 20, cursor = undefined }) {
       const decodedCursor = cursor ? decodePlannerRequestCursor(cursor) : undefined;
       const records = decodedCursor
         ? await repository.listOwnedRequests(userId, limit, decodedCursor)
