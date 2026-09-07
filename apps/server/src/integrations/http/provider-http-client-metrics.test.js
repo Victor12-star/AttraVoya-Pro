@@ -62,12 +62,16 @@ describe('provider HTTP client metrics', () => {
       provider: 'test-provider',
       fetchImpl: vi
         .fn()
-        .mockResolvedValue(jsonResponse(429, { private: 'upstream-body' }, { 'retry-after': '60' })),
+        .mockResolvedValue(
+          jsonResponse(429, { private: 'upstream-body' }, { 'retry-after': '60' }),
+        ),
       retryMax: 2,
       metrics,
     });
 
-    await expect(client.requestJson('https://provider.example/secret-place')).rejects.toMatchObject({
+    await expect(
+      client.requestJson('https://provider.example/secret-place'),
+    ).rejects.toMatchObject({
       code: 'PROVIDER_RATE_LIMITED',
     });
 
@@ -130,6 +134,8 @@ describe('provider HTTP client metrics', () => {
       },
     });
 
-    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({ ok: true });
+    await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
+      ok: true,
+    });
   });
 });
