@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { createLoggerOptions, requestRouteForLog } from './logger.js';
+process.env.NODE_ENV = 'test';
+process.env.API_HOST = '127.0.0.1';
+process.env.API_PORT = '5000';
+process.env.LOG_LEVEL = 'silent';
+process.env.WEB_URL = 'http://localhost:3000';
+process.env.ADMIN_URL = 'http://localhost:3001';
+process.env.API_URL = 'http://localhost:5000';
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+process.env.JWT_ACCESS_SECRET = 'a'.repeat(64);
+process.env.COOKIE_SECRET = 'c'.repeat(64);
+process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
+
+const { createLoggerOptions, requestRouteForLog } = await import('./logger.js');
 
 describe('privacy-safe request logging', () => {
   it('uses the matched route template instead of private query and path values', () => {
