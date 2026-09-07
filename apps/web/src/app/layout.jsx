@@ -1,4 +1,5 @@
 import './globals.css';
+import './contrast.css';
 
 import { getTextDirection } from '@attravoya/localization';
 
