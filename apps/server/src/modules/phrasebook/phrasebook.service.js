@@ -1,7 +1,4 @@
-import {
-  PHRASEBOOK_CATEGORIES,
-  PHRASEBOOK_SOURCE_LANGUAGE,
-} from './phrasebook.contracts.js';
+import { PHRASEBOOK_CATEGORIES, PHRASEBOOK_SOURCE_LANGUAGE } from './phrasebook.contracts.js';
 
 function baseLanguageCode(value) {
   return String(value ?? '')
@@ -26,25 +23,18 @@ export function createPhrasebookService(provider, repository) {
         ? providerLanguages.languages
         : [];
       const english = languages.find(
-        (language) =>
-          baseLanguageCode(language.code) === PHRASEBOOK_SOURCE_LANGUAGE,
+        (language) => baseLanguageCode(language.code) === PHRASEBOOK_SOURCE_LANGUAGE,
       );
       const supportedTargets = new Set(
-        (Array.isArray(english?.targets) ? english.targets : []).map(
-          baseLanguageCode,
-        ),
+        (Array.isArray(english?.targets) ? english.targets : []).map(baseLanguageCode),
       );
       const providerLanguageByCode = new Map(
-        languages.map((language) => [
-          baseLanguageCode(language.code),
-          language,
-        ]),
+        languages.map((language) => [baseLanguageCode(language.code), language]),
       );
 
       const seenDestinationLanguages = new Set();
-      const destinationLanguages = (Array.isArray(destinationCountry?.languages)
-        ? destinationCountry.languages
-        : []
+      const destinationLanguages = (
+        Array.isArray(destinationCountry?.languages) ? destinationCountry.languages : []
       )
         .map((countryLanguage) => {
           const language = countryLanguage?.language;
@@ -53,8 +43,7 @@ export function createPhrasebookService(provider, repository) {
           seenDestinationLanguages.add(code);
           return {
             code,
-            name:
-              language?.name ?? providerLanguageByCode.get(code)?.name ?? code,
+            name: language?.name ?? providerLanguageByCode.get(code)?.name ?? code,
             nativeName: language?.nativeName ?? language?.name ?? code,
             direction: language?.direction ?? 'ltr',
             isOfficial: countryLanguage?.isOfficial === true,
@@ -70,9 +59,7 @@ export function createPhrasebookService(provider, repository) {
           code,
           name: providerLanguageByCode.get(code)?.name ?? code,
         }))
-        .sort((left, right) =>
-          left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }),
-        );
+        .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
 
       return {
         sourceLanguage: { code: PHRASEBOOK_SOURCE_LANGUAGE, name: 'English' },
@@ -82,14 +69,10 @@ export function createPhrasebookService(provider, repository) {
           knownCountry: Boolean(destinationCountry),
           languages: destinationLanguages,
           preferredTargetLanguage:
-            destinationLanguages.find((language) => language.available)?.code ??
-            null,
+            destinationLanguages.find((language) => language.available)?.code ?? null,
         },
         provider: {
-          name:
-            providerLanguages?.provider ??
-            provider.name ??
-            'translation-provider',
+          name: providerLanguages?.provider ?? provider.name ?? 'translation-provider',
           fetchedAt: providerLanguages?.fetchedAt ?? null,
         },
         availableTargetLanguages,
