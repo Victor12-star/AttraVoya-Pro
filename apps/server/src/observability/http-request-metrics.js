@@ -107,10 +107,7 @@ function snapshotState(state, elapsedSeconds) {
  * Keep HTTP metrics bounded and aggregate-only. Route labels must be supplied by
  * a code-defined route normalizer, never from a raw URL or private identifier.
  */
-export function createHttpRequestMetrics({
-  now = Date.now,
-  maxSeries = DEFAULT_MAX_SERIES,
-} = {}) {
+export function createHttpRequestMetrics({ now = Date.now, maxSeries = DEFAULT_MAX_SERIES } = {}) {
   if (typeof now !== 'function') throw new TypeError('now must be a function.');
   if (!Number.isInteger(maxSeries) || maxSeries < 1) {
     throw new RangeError('maxSeries must be a positive integer.');
