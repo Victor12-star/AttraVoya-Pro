@@ -5,9 +5,17 @@
  */
 
 /**
- * @param {{ app: ShutdownApp, exitImpl?: (code: number) => void }} options
+ * @param {{
+ *   app: ShutdownApp,
+ *   readinessState?: { markDraining: () => void },
+ *   exitImpl?: (code: number) => void,
+ * }} options
  */
-export function createShutdownHandler({ app, exitImpl = (code) => process.exit(code) }) {
+export function createShutdownHandler({
+  app,
+  readinessState,
+  exitImpl = (code) => process.exit(code),
+}) {
   /** @type {Promise<void> | null} */
   let shutdownPromise = null;
 
@@ -18,6 +26,9 @@ export function createShutdownHandler({ app, exitImpl = (code) => process.exit(c
       app.log.info({ signal }, 'Graceful shutdown started');
 
       try {
+        // Stop advertising readiness before close() begins draining in-flight
+        // work, so an orchestrator can remove this instance from new traffic.
+        readinessState?.markDraining();
         await app.close();
         exitImpl(0);
       } catch (error) {
