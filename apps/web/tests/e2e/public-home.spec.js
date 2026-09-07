@@ -53,9 +53,7 @@ test.describe('public home page', () => {
 
     expect(offlineNavigationFailed).toBe(true);
 
-    const response = await page.goto(
-      '/plan-by-budget?origin=Stockholm&budget=10000&currency=SEK',
-    );
+    const response = await page.goto('/plan-by-budget?origin=Stockholm&budget=10000&currency=SEK');
 
     expect(response?.ok()).toBe(true);
     await expect(page.locator('.query-summary')).toContainText('Stockholm');
