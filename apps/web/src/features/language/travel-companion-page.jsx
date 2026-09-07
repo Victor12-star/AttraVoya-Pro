@@ -29,6 +29,17 @@ function languageCode(value) {
     : null;
 }
 
+function browserWindow() {
+  if (typeof window === 'undefined') return null;
+  return /** @type {any} */ (window);
+}
+
+function speechRecognitionConstructor() {
+  const currentWindow = browserWindow();
+  return currentWindow?.SpeechRecognition ?? currentWindow?.webkitSpeechRecognition ?? null;
+}
+
+/** @param {any} response */
 function normalizeCountries(response) {
   const rows = Array.isArray(response?.countries) ? response.countries : [];
   return rows
@@ -41,6 +52,7 @@ function normalizeCountries(response) {
     .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
 }
 
+/** @param {any} response */
 function normalizePhrasebook(response) {
   const phrasebook = response?.phrasebook;
   if (languageCode(phrasebook?.sourceLanguage?.code) !== 'en') return null;
@@ -91,6 +103,10 @@ function normalizePhrasebook(response) {
   };
 }
 
+/**
+ * @param {any} response
+ * @param {string} expectedTarget
+ */
 function normalizeTranslation(response, expectedTarget) {
   const translation = response?.translation;
   const target = languageCode(translation?.target);
@@ -109,18 +125,27 @@ function providerDisplayName(provider) {
   return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : '—';
 }
 
+/**
+ * @param {object} props
+ * @param {string} [props.locale]
+ * @param {any} props.messages
+ */
 export function TravelCompanionPage({ locale = 'en', messages }) {
   const languageCopy = getLanguagePageCopy(locale);
   const companionCopy = getTravelCompanionCopy(locale);
-  const recognitionRef = useRef(null);
+  const recognitionRef = useRef(/** @type {any} */ (null));
   const historyIdRef = useRef(0);
-  const [countriesState, setCountriesState] = useState({ status: 'loading', data: [] });
+  const [countriesState, setCountriesState] = useState(
+    /** @type {any} */ ({ status: 'loading', data: [] }),
+  );
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [phrasebookState, setPhrasebookState] = useState({ status: 'idle', data: null });
+  const [phrasebookState, setPhrasebookState] = useState(
+    /** @type {any} */ ({ status: 'idle', data: null }),
+  );
   const [targetLanguage, setTargetLanguage] = useState('');
   const [phrase, setPhrase] = useState('');
   const [translationStatus, setTranslationStatus] = useState('idle');
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState(/** @type {any[]} */ ([]));
   const [voiceInputSupported, setVoiceInputSupported] = useState(false);
   const [voiceOutputSupported, setVoiceOutputSupported] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState('idle');
@@ -138,21 +163,19 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
         if (active) setCountriesState({ status: 'error', data: [] });
       });
 
-    if (typeof window !== 'undefined') {
-      setVoiceInputSupported(
-        typeof window.SpeechRecognition === 'function' ||
-          typeof window.webkitSpeechRecognition === 'function',
-      );
-      setVoiceOutputSupported(
-        typeof window.speechSynthesis !== 'undefined' &&
-          typeof window.SpeechSynthesisUtterance === 'function',
-      );
-    }
+    const currentWindow = browserWindow();
+    setVoiceInputSupported(typeof speechRecognitionConstructor() === 'function');
+    setVoiceOutputSupported(
+      Boolean(
+        currentWindow?.speechSynthesis &&
+          typeof currentWindow?.SpeechSynthesisUtterance === 'function',
+      ),
+    );
 
     return () => {
       active = false;
       recognitionRef.current?.abort?.();
-      if (typeof window !== 'undefined') window.speechSynthesis?.cancel?.();
+      currentWindow?.speechSynthesis?.cancel?.();
     };
   }, []);
 
@@ -279,8 +302,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   }
 
   function startVoiceInput() {
-    if (typeof window === 'undefined') return;
-    const Recognition = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    const Recognition = speechRecognitionConstructor();
     if (typeof Recognition !== 'function') return;
 
     recognitionRef.current?.abort?.();
@@ -311,22 +333,22 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   }
 
   function speakTranslation(text, target) {
+    const currentWindow = browserWindow();
     if (
-      typeof window === 'undefined' ||
-      typeof window.SpeechSynthesisUtterance !== 'function' ||
-      !window.speechSynthesis
+      !currentWindow?.speechSynthesis ||
+      typeof currentWindow?.SpeechSynthesisUtterance !== 'function'
     ) {
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const utterance = new window.SpeechSynthesisUtterance(text);
+    currentWindow.speechSynthesis.cancel();
+    const utterance = new currentWindow.SpeechSynthesisUtterance(text);
     utterance.lang = target;
-    const matchingVoice = window.speechSynthesis
+    const matchingVoice = currentWindow.speechSynthesis
       .getVoices()
       .find((voice) => String(voice.lang).toLowerCase().startsWith(target.toLowerCase()));
     if (matchingVoice) utterance.voice = matchingVoice;
-    window.speechSynthesis.speak(utterance);
+    currentWindow.speechSynthesis.speak(utterance);
   }
 
   return (
