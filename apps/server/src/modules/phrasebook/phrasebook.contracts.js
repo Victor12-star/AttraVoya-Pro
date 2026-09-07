@@ -6,9 +6,13 @@ export const PHRASEBOOK_CATEGORIES = Object.freeze([
     name: 'Greetings and courtesy',
     phrases: [
       { id: 'hello', text: 'Hello.' },
+      { id: 'how-are-you', text: 'How are you?' },
       { id: 'good-morning', text: 'Good morning.' },
+      { id: 'good-afternoon', text: 'Good afternoon.' },
+      { id: 'good-evening', text: 'Good evening.' },
       { id: 'please', text: 'Please.' },
       { id: 'thank-you', text: 'Thank you.' },
+      { id: 'goodbye', text: 'Goodbye.' },
       { id: 'excuse-me', text: 'Excuse me.' },
     ],
   },
@@ -17,6 +21,9 @@ export const PHRASEBOOK_CATEGORIES = Object.freeze([
     name: 'Directions',
     phrases: [
       { id: 'where-is', text: 'Where is this place?' },
+      { id: 'place-called', text: 'What is this place called?' },
+      { id: 'go-to-place', text: 'I want to go to this place.' },
+      { id: 'help-find-place', text: 'Can you help me find this place?' },
       { id: 'how-get-there', text: 'How do I get there?' },
       { id: 'left-or-right', text: 'Is it left or right?' },
       { id: 'how-far', text: 'How far is it?' },
@@ -60,7 +67,7 @@ export const PHRASEBOOK_CATEGORIES = Object.freeze([
     id: 'shopping',
     name: 'Shopping and payments',
     phrases: [
-      { id: 'how-much', text: 'How much does this cost?' },
+      { id: 'how-much', text: 'How much is this?' },
       { id: 'card-payment', text: 'Can I pay by card?' },
       { id: 'cash', text: 'Do you accept cash?' },
       { id: 'receipt', text: 'May I have a receipt, please?' },
@@ -72,6 +79,7 @@ export const PHRASEBOOK_CATEGORIES = Object.freeze([
     name: 'Emergency and safety',
     phrases: [
       { id: 'help', text: 'Help, please.' },
+      { id: 'can-you-help', text: 'Can you help me, please?' },
       { id: 'police', text: 'Please call the police.' },
       { id: 'lost', text: 'I am lost.' },
       { id: 'passport-lost', text: 'I lost my passport.' },
