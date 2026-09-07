@@ -36,12 +36,34 @@ function statusClassFor(statusCode) {
   return `${Math.floor(statusCode / 100)}xx`;
 }
 
+function incrementStatusClass(statusClasses, statusClass) {
+  switch (statusClass) {
+    case '1xx':
+      statusClasses['1xx'] += 1;
+      return;
+    case '2xx':
+      statusClasses['2xx'] += 1;
+      return;
+    case '3xx':
+      statusClasses['3xx'] += 1;
+      return;
+    case '4xx':
+      statusClasses['4xx'] += 1;
+      return;
+    case '5xx':
+      statusClasses['5xx'] += 1;
+      return;
+    default:
+      statusClasses.other += 1;
+  }
+}
+
 function observe(state, statusCode, durationMs) {
   const safeDurationMs = Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : 0;
   const statusClass = statusClassFor(statusCode);
 
   state.requests += 1;
-  state.statusClasses[statusClass] += 1;
+  incrementStatusClass(state.statusClasses, statusClass);
   if (statusCode >= 500 && statusCode <= 599) state.serverErrors += 1;
 
   const bucketIndex = LATENCY_BUCKETS_MS.findIndex((upperBound) => safeDurationMs <= upperBound);
@@ -85,7 +107,10 @@ function snapshotState(state, elapsedSeconds) {
  * Keep HTTP metrics bounded and aggregate-only. Route labels must be supplied by
  * a code-defined route normalizer, never from a raw URL or private identifier.
  */
-export function createHttpRequestMetrics({ now = Date.now, maxSeries = DEFAULT_MAX_SERIES } = {}) {
+export function createHttpRequestMetrics({
+  now = Date.now,
+  maxSeries = DEFAULT_MAX_SERIES,
+} = {}) {
   if (typeof now !== 'function') throw new TypeError('now must be a function.');
   if (!Number.isInteger(maxSeries) || maxSeries < 1) {
     throw new RangeError('maxSeries must be a positive integer.');
@@ -117,7 +142,8 @@ export function createHttpRequestMetrics({ now = Date.now, maxSeries = DEFAULT_M
 
   return {
     record({ method, route, statusCode, durationMs }) {
-      const safeMethod = typeof method === 'string' && method.length > 0 ? method.toUpperCase() : 'UNKNOWN';
+      const safeMethod =
+        typeof method === 'string' && method.length > 0 ? method.toUpperCase() : 'UNKNOWN';
       const safeRoute = typeof route === 'string' && route.length > 0 ? route : '<unmatched>';
       const safeStatusCode = Number.isInteger(statusCode) ? statusCode : 0;
 
