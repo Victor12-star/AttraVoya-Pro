@@ -27,8 +27,7 @@ export function snapshotDatabasePool(pool) {
   const idleConnections = Math.min(nonNegativeInteger(pool.idleCount), totalConnections);
   const activeConnections = Math.max(0, totalConnections - idleConnections);
   const waitingRequests = nonNegativeInteger(pool.waitingCount);
-  const utilization =
-    maxConnections > 0 ? Math.min(1, activeConnections / maxConnections) : 0;
+  const utilization = maxConnections > 0 ? Math.min(1, activeConnections / maxConnections) : 0;
 
   return Object.freeze({
     maxConnections,
