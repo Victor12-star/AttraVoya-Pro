@@ -61,6 +61,121 @@ describe('provider HTTP client', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
+  it('suppresses new requests until a Retry-After delay expires', async () => {
+    let nowMs = 1_000_000;
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(429, { error: 'slow down' }, { 'retry-after': '60' }))
+      .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      nowImpl: () => nowMs,
+    });
+
+    await expect(client.requestJson('https://provider.example/data/1')).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+      details: { retryAfter: '60' },
+    });
+    await expect(client.requestJson('https://provider.example/data/2')).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+      details: { retryAfter: '60' },
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    nowMs += 60_000;
+    await expect(client.requestJson('https://provider.example/data/3')).resolves.toEqual({
+      ok: true,
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('honors an HTTP-date Retry-After value across requests', async () => {
+    let nowMs = Date.UTC(2026, 0, 1, 0, 0, 0);
+    const retryAtMs = nowMs + 5_000;
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(
+          429,
+          { error: 'slow down' },
+          { 'retry-after': new Date(retryAtMs).toUTCString() },
+        ),
+      )
+      .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      nowImpl: () => nowMs,
+    });
+
+    await expect(client.requestJson('https://provider.example/data/1')).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+    });
+
+    nowMs = retryAtMs - 1;
+    await expect(client.requestJson('https://provider.example/data/2')).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+      details: { retryAfter: '1' },
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    nowMs = retryAtMs;
+    await expect(client.requestJson('https://provider.example/data/3')).resolves.toEqual({
+      ok: true,
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not invent a cooldown for an invalid Retry-After value', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse(429, { error: 'slow down' }, { 'retry-after': 'not-a-valid-value' }),
+      )
+      .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
+    const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 0 });
+
+    await expect(client.requestJson('https://provider.example/data/1')).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+    });
+    await expect(client.requestJson('https://provider.example/data/2')).resolves.toEqual({
+      ok: true,
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('suppresses queued work when an earlier request establishes a Retry-After cooldown', async () => {
+    let nowMs = 2_000_000;
+    const firstFetch = deferredResponse();
+    const fetchImpl = vi.fn().mockImplementationOnce(() => firstFetch.promise);
+    const client = createProviderHttpClient({
+      provider: 'test',
+      fetchImpl,
+      retryMax: 0,
+      maxConcurrent: 1,
+      maxQueued: 1,
+      nowImpl: () => nowMs,
+    });
+
+    const firstRequest = client.requestJson('https://provider.example/data/1');
+    const queuedRequest = client.requestJson('https://provider.example/data/2');
+    await flushMicrotasks();
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    firstFetch.resolve(jsonResponse(429, { error: 'slow down' }, { 'retry-after': '30' }));
+    await expect(firstRequest).rejects.toMatchObject({ code: 'PROVIDER_RATE_LIMITED' });
+    await expect(queuedRequest).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+      details: { retryAfter: '30' },
+    });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    nowMs += 30_000;
+  });
+
   it('retries transient GET failures before succeeding', async () => {
     const fetchImpl = vi
       .fn()

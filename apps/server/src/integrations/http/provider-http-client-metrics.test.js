@@ -86,6 +86,46 @@ describe('provider HTTP client metrics', () => {
     expect(recorded).not.toContain('upstream-body');
   });
 
+  it('records a locally suppressed Retry-After request before any provider attempt', async () => {
+    let nowMs = 1_000_000;
+    const metrics = { record: vi.fn() };
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(jsonResponse(429, { private: 'upstream-body' }, { 'retry-after': '60' }));
+    const client = createProviderHttpClient({
+      provider: 'test-provider',
+      fetchImpl,
+      retryMax: 0,
+      nowImpl: () => nowMs,
+      metrics,
+    });
+
+    await expect(client.requestJson('https://provider.example/secret-place')).rejects.toMatchObject(
+      {
+        code: 'PROVIDER_RATE_LIMITED',
+      },
+    );
+    await expect(
+      client.requestJson('https://provider.example/another-place'),
+    ).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMITED',
+    });
+
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    expect(metrics.record).toHaveBeenNthCalledWith(2, {
+      provider: 'test-provider',
+      outcome: 'rate_limited',
+      durationMs: expect.any(Number),
+      attempts: 0,
+    });
+    const recorded = JSON.stringify(metrics.record.mock.calls);
+    expect(recorded).not.toContain('secret-place');
+    expect(recorded).not.toContain('another-place');
+    expect(recorded).not.toContain('upstream-body');
+
+    nowMs += 60_000;
+  });
+
   it('records bounded-queue rejection as busy before any provider attempt', async () => {
     const firstFetch = deferredResponse();
     const metrics = { record: vi.fn() };
