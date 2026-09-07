@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CalendarDays,
   CircleDollarSign,
@@ -55,6 +55,10 @@ function parseChildrenAges(value) {
   return values.map((item) => Number(item));
 }
 
+function createPlannerIdempotencyKey() {
+  return `planner-${globalThis.crypto.randomUUID()}`;
+}
+
 /** @param {PlannerDraft} request */
 function formatDateRange(request, copy) {
   if (request?.dates?.flexible) {
@@ -74,6 +78,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
   const [submitState, setSubmitState] = useState({ type: 'idle', message: '' });
   const [drafts, setDrafts] = useState(/** @type {PlannerDraft[]} */ ([]));
   const [draftState, setDraftState] = useState('loading');
+  const submissionAttemptRef = useRef({ fingerprint: '', idempotencyKey: '', inFlight: false });
 
   const loadDrafts = useCallback(async () => {
     setDraftState('loading');
@@ -156,11 +161,21 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
       return;
     }
 
+    const attempt = submissionAttemptRef.current;
+    if (attempt.inFlight) return;
+
+    const fingerprint = JSON.stringify(parsed.data);
+    if (attempt.fingerprint !== fingerprint || !attempt.idempotencyKey) {
+      attempt.fingerprint = fingerprint;
+      attempt.idempotencyKey = createPlannerIdempotencyKey();
+    }
+    attempt.inFlight = true;
+
     setSubmitting(true);
     setSubmitState({ type: 'idle', message: '' });
 
     try {
-      const response = await apiClient.createBudgetPlanRequest(parsed.data);
+      const response = await apiClient.createBudgetPlanRequest(parsed.data, attempt.idempotencyKey);
       const saved = response?.planRequest;
       if (!saved?.id) throw new Error('Missing saved planning request.');
       setDrafts((current) =>
@@ -168,6 +183,8 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
       );
       setDraftState('success');
       setSubmitState({ type: 'success', message: copy.saved });
+      attempt.fingerprint = '';
+      attempt.idempotencyKey = '';
     } catch (error) {
       if (error instanceof ApiClientError && error.status === 401) {
         setDraftState('auth');
@@ -176,6 +193,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
         setSubmitState({ type: 'error', message: copy.saveFailed });
       }
     } finally {
+      attempt.inFlight = false;
       setSubmitting(false);
     }
   }
