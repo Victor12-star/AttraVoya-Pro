@@ -75,7 +75,9 @@ async function checkLibreTranslate() {
 async function checkGeoapifyWhenConfigured() {
   const apiKey = process.env.GEOAPIFY_API_KEY?.trim();
   if (!apiKey) {
-    console.log('[SKIP] Geoapify live check: GEOAPIFY_API_KEY is not configured in GitHub Secrets.');
+    console.log(
+      '[SKIP] Geoapify live check: GEOAPIFY_API_KEY is not configured in GitHub Secrets.',
+    );
     return;
   }
 
@@ -117,7 +119,9 @@ async function checkTicketmasterWhenConfigured() {
 async function checkNewsDataWhenConfigured() {
   const apiKey = process.env.NEWSDATA_API_KEY?.trim();
   if (!apiKey) {
-    console.log('[SKIP] NewsData live check: NEWSDATA_API_KEY is not configured in GitHub Secrets.');
+    console.log(
+      '[SKIP] NewsData live check: NEWSDATA_API_KEY is not configured in GitHub Secrets.',
+    );
     return;
   }
 
