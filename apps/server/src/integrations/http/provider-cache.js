@@ -1,3 +1,21 @@
+import { providerCacheMetrics as defaultProviderCacheMetrics } from '../../observability/provider-cache-metrics.js';
+
+/**
+ * @typedef {{ record: (event: { outcome: string }) => void }} ProviderCacheMetricsObserver
+ */
+
+/**
+ * @param {ProviderCacheMetricsObserver} metrics
+ * @param {string} outcome
+ */
+function recordCacheMetric(metrics, outcome) {
+  try {
+    metrics.record({ outcome });
+  } catch {
+    // Observability must never alter cache or provider request behavior.
+  }
+}
+
 /**
  * Small in-process TTL cache for low-cost provider responses.
  *
@@ -5,17 +23,28 @@
  * external API calls during local development without pretending to be a
  * distributed cache. A production deployment can later replace this behind
  * the same provider/service boundary with Redis or another shared cache.
+ *
+ * @param {{
+ *   maxEntries?: number,
+ *   maxInFlight?: number,
+ *   now?: () => number,
+ *   metrics?: ProviderCacheMetricsObserver
+ * }} [options]
  */
 export function createProviderCache({
   maxEntries = 500,
   maxInFlight = maxEntries,
   now = () => Date.now(),
+  metrics = defaultProviderCacheMetrics,
 } = {}) {
   if (!Number.isInteger(maxEntries) || maxEntries < 1) {
     throw new TypeError('Provider cache maxEntries must be a positive integer.');
   }
   if (!Number.isInteger(maxInFlight) || maxInFlight < 1) {
     throw new TypeError('Provider cache maxInFlight must be a positive integer.');
+  }
+  if (!metrics || typeof metrics.record !== 'function') {
+    throw new TypeError('Provider cache requires a metrics observer.');
   }
 
   const entries = new Map();
@@ -24,7 +53,10 @@ export function createProviderCache({
   function pruneExpired() {
     const currentTime = now();
     for (const [key, entry] of entries) {
-      if (entry.expiresAt <= currentTime) entries.delete(key);
+      if (entry.expiresAt <= currentTime) {
+        entries.delete(key);
+        recordCacheMetric(metrics, 'expiration');
+      }
     }
   }
 
@@ -32,14 +64,20 @@ export function createProviderCache({
     while (entries.size > maxEntries) {
       const oldestKey = entries.keys().next().value;
       entries.delete(oldestKey);
+      recordCacheMetric(metrics, 'eviction');
     }
   }
 
   function get(key) {
     const entry = entries.get(key);
-    if (!entry) return undefined;
+    if (!entry) {
+      recordCacheMetric(metrics, 'miss');
+      return undefined;
+    }
     if (entry.expiresAt <= now()) {
       entries.delete(key);
+      recordCacheMetric(metrics, 'expiration');
+      recordCacheMetric(metrics, 'miss');
       return undefined;
     }
 
@@ -47,6 +85,7 @@ export function createProviderCache({
     // eviction without introducing another dependency into the provider layer.
     entries.delete(key);
     entries.set(key, entry);
+    recordCacheMetric(metrics, 'hit');
     return entry.value;
   }
 
@@ -61,8 +100,14 @@ export function createProviderCache({
   }
 
   async function loadAndCache(key, loader, ttlSeconds) {
-    const value = await loader();
-    return set(key, value, ttlSeconds);
+    recordCacheMetric(metrics, 'load');
+    try {
+      const value = await loader();
+      return set(key, value, ttlSeconds);
+    } catch (error) {
+      recordCacheMetric(metrics, 'load_failure');
+      throw error;
+    }
   }
 
   return {
@@ -83,7 +128,10 @@ export function createProviderCache({
       if (cached !== undefined) return cached;
 
       const existingLoad = inFlight.get(key);
-      if (existingLoad) return existingLoad;
+      if (existingLoad) {
+        recordCacheMetric(metrics, 'coalesced');
+        return existingLoad;
+      }
 
       const loadPromise = loadAndCache(key, loader, ttlSeconds);
 
@@ -91,7 +139,10 @@ export function createProviderCache({
       // simultaneously, provider HTTP concurrency/backpressure still protects
       // the server; this cache simply skips coalescing additional unique keys
       // rather than allowing its own in-flight map to grow without limit.
-      if (inFlight.size >= maxInFlight) return loadPromise;
+      if (inFlight.size >= maxInFlight) {
+        recordCacheMetric(metrics, 'inflight_bypass');
+        return loadPromise;
+      }
 
       inFlight.set(key, loadPromise);
       try {
