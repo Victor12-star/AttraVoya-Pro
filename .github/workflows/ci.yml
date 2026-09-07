@@ -83,6 +83,9 @@ jobs:
       - name: Check JavaScript
         run: pnpm check:js
 
+      - name: Show canonical Travel Companion page formatting
+        run: pnpm exec prettier apps/web/src/features/language/travel-companion-page.jsx
+
       - name: Check translations
         run: pnpm translations:check
 
