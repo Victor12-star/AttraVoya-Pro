@@ -161,7 +161,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       setVoiceOutputSupported(
         Boolean(
           currentWindow?.speechSynthesis &&
-            typeof currentWindow?.SpeechSynthesisUtterance === 'function',
+          typeof currentWindow?.SpeechSynthesisUtterance === 'function',
         ),
       );
     }, 0);
