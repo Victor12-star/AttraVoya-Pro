@@ -139,7 +139,10 @@ function snapshotState(state, elapsedSeconds) {
  * Keep provider telemetry bounded and free of request/provider payload data.
  * Provider names come from configured adapters and are capped defensively.
  */
-export function createProviderMetrics({ now = Date.now, maxProviders = DEFAULT_MAX_PROVIDERS } = {}) {
+export function createProviderMetrics({
+  now = Date.now,
+  maxProviders = DEFAULT_MAX_PROVIDERS,
+} = {}) {
   if (typeof now !== 'function') throw new TypeError('now must be a function.');
   if (!Number.isInteger(maxProviders) || maxProviders < 1) {
     throw new RangeError('maxProviders must be a positive integer.');
