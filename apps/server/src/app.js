@@ -14,7 +14,7 @@ import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
 import { createAuthorizeHook } from './hooks/authorize.js';
-import { createLoggerOptions } from './logging/logger.js';
+import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
 import { authRepository } from './modules/auth/auth.repository.js';
 import { healthRoutes } from './modules/health/health.routes.js';
 import { countriesRoutes } from './modules/countries/countries.routes.js';
@@ -32,6 +32,10 @@ import { eventsRoutes } from './modules/events/events.routes.js';
 import { newsRoutes } from './modules/news/news.routes.js';
 import { imagesRoutes } from './modules/images/images.routes.js';
 import { plannerRoutes } from './modules/planner/planner.routes.js';
+import {
+  createHttpRequestMetrics,
+  createHttpRequestMetricsHook,
+} from './observability/http-request-metrics.js';
 
 export async function buildApp(options = {}) {
   const app = Fastify({
@@ -47,6 +51,10 @@ export async function buildApp(options = {}) {
   // route, service, and client boundaries.
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+
+  const requestMetrics = options.requestMetrics ?? createHttpRequestMetrics();
+  app.decorate('requestMetrics', requestMetrics);
+  app.addHook('onResponse', createHttpRequestMetricsHook(requestMetrics, requestRouteForLog));
 
   registerErrorHandler(app);
   await registerRequestContext(app);
