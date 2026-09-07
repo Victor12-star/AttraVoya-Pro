@@ -67,6 +67,7 @@ test('runner respects bounded concurrency against a real local HTTP server', asy
   let active = 0;
   let observedServerConcurrency = 0;
   const server = createServer((request, response) => {
+    void request;
     active += 1;
     observedServerConcurrency = Math.max(observedServerConcurrency, active);
     setTimeout(() => {
