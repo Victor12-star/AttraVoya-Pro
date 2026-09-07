@@ -10,4 +10,5 @@ export * from './subscriptions.js';
 export * from './budget-planner.js';
 export * from './accommodation.js';
 export * from './provider-requests.js';
+export * from './phrasebook.js';
 export * from './safety.js';
