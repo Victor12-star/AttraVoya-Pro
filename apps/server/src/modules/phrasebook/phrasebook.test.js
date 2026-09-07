@@ -125,6 +125,19 @@ describe('travel phrasebook endpoint', () => {
         expect.objectContaining({ id: 'medical' }),
       ]),
     );
+
+    const phrases = phrasebook.categories.flatMap((category) =>
+      category.phrases.map((phrase) => phrase.text),
+    );
+    expect(phrases).toEqual(
+      expect.arrayContaining([
+        'How are you?',
+        'How much is this?',
+        'Can you help me, please?',
+        'What is this place called?',
+        'I want to go to this place.',
+      ]),
+    );
   });
 
   it('does not claim an unavailable destination language is translatable', async () => {
