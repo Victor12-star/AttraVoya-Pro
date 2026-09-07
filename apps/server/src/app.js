@@ -27,6 +27,7 @@ import { destinationsRoutes } from './modules/destinations/destinations.routes.j
 import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { mapsRoutes } from './modules/maps/maps.routes.js';
+import { phrasebookRoutes } from './modules/phrasebook/phrasebook.routes.js';
 import { translationRoutes } from './modules/translation/translation.routes.js';
 import { accommodationRoutes } from './modules/accommodation/accommodation.routes.js';
 import { eventsRoutes } from './modules/events/events.routes.js';
@@ -169,6 +170,11 @@ export async function buildApp(options = {}) {
   await app.register(mapsRoutes, {
     prefix: `${API_PREFIX}/maps`,
     provider: options.mapsProvider,
+  });
+
+  await app.register(phrasebookRoutes, {
+    prefix: `${API_PREFIX}/phrasebook`,
+    provider: options.translationProvider,
   });
 
   await app.register(translationRoutes, {
