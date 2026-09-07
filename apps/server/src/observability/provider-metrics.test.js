@@ -68,7 +68,12 @@ describe('provider metrics', () => {
   it('normalizes unknown outcome labels instead of creating new metric dimensions', () => {
     const metrics = createProviderMetrics();
 
-    metrics.record({ provider: 'Example', outcome: 'user-controlled-value', durationMs: 10, attempts: 1 });
+    metrics.record({
+      provider: 'Example',
+      outcome: 'user-controlled-value',
+      durationMs: 10,
+      attempts: 1,
+    });
 
     expect(metrics.snapshot().providers[0]).toMatchObject({
       provider: 'example',
