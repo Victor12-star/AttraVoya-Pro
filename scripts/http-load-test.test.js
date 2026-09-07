@@ -77,22 +77,26 @@ test('runner respects bounded concurrency against a real local HTTP server', asy
     }, 15);
   });
 
-  await new Promise<void>((resolve, reject) => {
+  /** @type {Promise<void>} */
+  const listening = new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(0, '127.0.0.1', () => resolve());
   });
-  t.after(
-    () =>
-      new Promise<void>((resolve, reject) => {
-        server.close((error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        });
-      }),
-  );
+  await listening;
+
+  t.after(() => {
+    /** @type {Promise<void>} */
+    const closing = new Promise((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+    return closing;
+  });
 
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('Expected a TCP server address.');
