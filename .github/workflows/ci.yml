@@ -152,6 +152,11 @@ jobs:
       - name: Run database tests
         run: pnpm --filter @attravoya/database test
 
+      - name: Verify database pool exhaustion behavior
+        env:
+          DATABASE_POOL_EXHAUSTION_TEST: '1'
+        run: pnpm --filter @attravoya/database test:pool-exhaustion
+
   build:
     name: Production builds
     runs-on: ubuntu-latest
