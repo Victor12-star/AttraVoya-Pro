@@ -40,7 +40,7 @@ const userInterfaceRoots = [
 // ordinary text symbols such as copyright or mathematical operators.
 const emojiPresentationPattern = /\p{Emoji_Presentation}/gu;
 const emojiStylePattern = /[\u2600-\u27BF]\uFE0F/gu;
-const pseudoStatusIconPattern = /[\u2713\u2714\u2717\u2718]/gu;
+const pseudoStatusIconPattern = /[\u25CB\u2713\u2714\u2717\u2718]/gu;
 
 const disallowedUiIconNames = [
   'Bot',
