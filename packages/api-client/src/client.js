@@ -165,7 +165,11 @@ export function createApiClient(options) {
         headers: { 'Idempotency-Key': normalizeIdempotencyKey(idempotencyKey) },
         body,
       }),
-    listBudgetPlanRequests: () => request('/api/v1/planner/requests'),
+    listBudgetPlanRequests: (query = {}) => {
+      const params = toSearchParams(query);
+      const suffix = params.size ? `?${params}` : '';
+      return request(`/api/v1/planner/requests${suffix}`);
+    },
     getBudgetPlanRequest: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}`),
     getBudgetAllocation: (requestId) =>
