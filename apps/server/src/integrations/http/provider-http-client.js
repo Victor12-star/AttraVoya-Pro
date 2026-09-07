@@ -21,6 +21,7 @@ const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
  * @property {number} [maxQueued] Maximum requests allowed to wait for an in-flight slot.
  * @property {(milliseconds: number) => Promise<void>} [sleepImpl] Injectable retry delay.
  * @property {() => number} [randomImpl] Injectable random source for retry jitter.
+ * @property {() => number} [nowImpl] Injectable wall clock for Retry-After cooldowns.
  * @property {{ record: (event: object) => void }} [metrics] Injectable aggregate provider observer.
  */
 
@@ -111,6 +112,32 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued }) {
   return { acquire, release };
 }
 
+function finiteNow(nowImpl) {
+  const value = Number(nowImpl());
+  if (!Number.isFinite(value)) {
+    throw new TypeError('Provider HTTP client nowImpl must return a finite number.');
+  }
+
+  return value;
+}
+
+function retryAfterDeadlineMs(retryAfter, nowMs) {
+  if (typeof retryAfter !== 'string') return null;
+
+  const value = retryAfter.trim();
+  if (!value) return null;
+
+  if (/^\d+$/.test(value)) {
+    const delaySeconds = Number(value);
+    const maxDelaySeconds = Math.floor((Number.MAX_SAFE_INTEGER - nowMs) / 1000);
+    if (!Number.isSafeInteger(delaySeconds) || delaySeconds > maxDelaySeconds) return null;
+    return nowMs + delaySeconds * 1000;
+  }
+
+  const dateMs = Date.parse(value);
+  return Number.isFinite(dateMs) && dateMs > nowMs ? dateMs : null;
+}
+
 async function parseJsonResponse(response, provider) {
   try {
     return await response.json();
@@ -128,6 +155,7 @@ async function parseJsonResponse(response, provider) {
  * - Enforces a hard timeout.
  * - Bounds per-client/provider concurrency and queue growth.
  * - Retries only transient failures and never tight-loops on HTTP 429.
+ * - Honors valid Retry-After cooldowns across new requests in this process.
  * - Adds bounded retry jitter so concurrent failures do not retry in lockstep.
  * - Records aggregate provider latency/failure/retry telemetry without payload data.
  * - Keeps upstream response text out of application errors/logs by default.
@@ -145,6 +173,7 @@ export function createProviderHttpClient(options) {
     maxQueued = DEFAULT_MAX_QUEUED,
     sleepImpl = sleep,
     randomImpl = Math.random,
+    nowImpl = Date.now,
     metrics = defaultProviderMetrics,
   } = options ?? {};
 
@@ -156,6 +185,9 @@ export function createProviderHttpClient(options) {
   if (typeof randomImpl !== 'function') {
     throw new TypeError('Provider HTTP client requires a retry random function.');
   }
+  if (typeof nowImpl !== 'function') {
+    throw new TypeError('Provider HTTP client requires a clock function.');
+  }
   if (!metrics || typeof metrics.record !== 'function') {
     throw new TypeError('Provider HTTP client requires a metrics observer.');
   }
@@ -163,6 +195,28 @@ export function createProviderHttpClient(options) {
   assertNonNegativeInteger(maxQueued, 'maxQueued');
 
   const concurrencyGate = createConcurrencyGate({ provider, maxConcurrent, maxQueued });
+  let rateLimitUntilMs = 0;
+
+  function rememberRateLimit(retryAfter) {
+    const nowMs = finiteNow(nowImpl);
+    const deadlineMs = retryAfterDeadlineMs(retryAfter, nowMs);
+    if (deadlineMs !== null) {
+      rateLimitUntilMs = Math.max(rateLimitUntilMs, deadlineMs);
+    }
+  }
+
+  function currentRateLimitError() {
+    if (rateLimitUntilMs <= 0) return null;
+
+    const nowMs = finiteNow(nowImpl);
+    if (nowMs >= rateLimitUntilMs) {
+      rateLimitUntilMs = 0;
+      return null;
+    }
+
+    const retryAfter = String(Math.ceil((rateLimitUntilMs - nowMs) / 1000));
+    return mapProviderHttpError({ provider, status: 429, retryAfter });
+  }
 
   async function performRequestJson(url, requestOptions = {}, onAttempt = () => {}) {
     const method = String(requestOptions.method ?? 'GET').toUpperCase();
@@ -204,10 +258,15 @@ export function createProviderHttpClient(options) {
             continue;
           }
 
+          const retryAfter = response.headers.get('retry-after');
+          if (response.status === 429) {
+            rememberRateLimit(retryAfter);
+          }
+
           throw mapProviderHttpError({
             provider,
             status: response.status,
-            retryAfter: response.headers.get('retry-after'),
+            retryAfter,
           });
         }
 
@@ -250,8 +309,15 @@ export function createProviderHttpClient(options) {
     let acquired = false;
 
     try {
+      const rateLimitErrorBeforeQueue = currentRateLimitError();
+      if (rateLimitErrorBeforeQueue) throw rateLimitErrorBeforeQueue;
+
       await concurrencyGate.acquire();
       acquired = true;
+
+      const rateLimitErrorAfterQueue = currentRateLimitError();
+      if (rateLimitErrorAfterQueue) throw rateLimitErrorAfterQueue;
+
       const payload = await performRequestJson(url, requestOptions, () => {
         attempts += 1;
       });
