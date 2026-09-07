@@ -100,10 +100,14 @@ describe('provider HTTP client metrics', () => {
       metrics,
     });
 
-    await expect(client.requestJson('https://provider.example/secret-place')).rejects.toMatchObject({
-      code: 'PROVIDER_RATE_LIMITED',
-    });
-    await expect(client.requestJson('https://provider.example/another-place')).rejects.toMatchObject({
+    await expect(client.requestJson('https://provider.example/secret-place')).rejects.toMatchObject(
+      {
+        code: 'PROVIDER_RATE_LIMITED',
+      },
+    );
+    await expect(
+      client.requestJson('https://provider.example/another-place'),
+    ).rejects.toMatchObject({
       code: 'PROVIDER_RATE_LIMITED',
     });
 
