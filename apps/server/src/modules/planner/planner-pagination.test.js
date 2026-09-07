@@ -63,6 +63,8 @@ describe('planner request pagination', () => {
       userId: 'user-1',
       limit: 1,
     });
+    const nextCursor = firstPage.page.nextCursor;
+    if (typeof nextCursor !== 'string') throw new Error('Expected a planner next cursor.');
 
     const secondRepository = {
       listOwnedRequests: vi.fn().mockResolvedValue([
@@ -72,7 +74,7 @@ describe('planner request pagination', () => {
     const secondPage = await createPlannerService(secondRepository).listRequests({
       userId: 'user-1',
       limit: 1,
-      cursor: firstPage.page.nextCursor,
+      cursor: nextCursor,
     });
 
     expect(secondRepository.listOwnedRequests).toHaveBeenCalledWith('user-1', 1, {
