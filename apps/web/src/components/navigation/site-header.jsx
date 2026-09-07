@@ -2,16 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Coins, Globe2, Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-import {
-  CURRENCY_CODES,
-  UI_LOCALES,
-  getCurrencyDisplayName,
-  getCurrencyMetadata,
-} from '@attravoya/localization';
+import { UI_LOCALES } from '@attravoya/localization';
 
 import { readPreferences, savePreferences } from '../../lib/preferences.js';
 import { Brand } from '../common/brand.jsx';
@@ -30,7 +25,12 @@ function HeaderSelect({ icon, label, value, onChange, children }) {
   );
 }
 
-export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
+export function SiteHeader({
+  locale,
+  messages,
+  defaultCurrency = 'SEK',
+  currencyOptions = [],
+}) {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -40,16 +40,6 @@ export function SiteHeader({ locale, messages, defaultCurrency = 'SEK' }) {
     const stored = readPreferences();
     if (stored.currency) setCurrency(stored.currency);
   }, []);
-
-  const currencyOptions = useMemo(
-    () =>
-      CURRENCY_CODES.map((code) => ({
-        code,
-        label: getCurrencyDisplayName(code, locale) ?? code,
-        symbol: getCurrencyMetadata(code, locale)?.symbol ?? code,
-      })),
-    [locale],
-  );
 
   const navigation = [
     ['/', messages.navigation.explore],
