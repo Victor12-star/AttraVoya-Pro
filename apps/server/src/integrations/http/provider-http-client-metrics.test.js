@@ -62,16 +62,18 @@ describe('provider HTTP client metrics', () => {
       provider: 'test-provider',
       fetchImpl: vi
         .fn()
-        .mockResolvedValue(jsonResponse(429, { private: 'upstream-body' }, { 'retry-after': '60' })),
+        .mockResolvedValue(
+          jsonResponse(429, { private: 'upstream-body' }, { 'retry-after': '60' }),
+        ),
       retryMax: 2,
       metrics,
     });
 
-    await expect(
-      client.requestJson('https://provider.example/secret-place'),
-    ).rejects.toMatchObject({
-      code: 'PROVIDER_RATE_LIMITED',
-    });
+    await expect(client.requestJson('https://provider.example/secret-place')).rejects.toMatchObject(
+      {
+        code: 'PROVIDER_RATE_LIMITED',
+      },
+    );
 
     expect(metrics.record).toHaveBeenCalledWith({
       provider: 'test-provider',
