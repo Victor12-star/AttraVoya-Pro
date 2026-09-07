@@ -83,6 +83,18 @@ jobs:
       - name: Check JavaScript
         run: pnpm check:js
 
+      - name: Show canonical Travel Companion formatting
+        run: |
+          echo '=== BEGIN travel-companion-copy.js ==='
+          pnpm exec prettier apps/web/src/features/language/travel-companion-copy.js
+          echo '=== END travel-companion-copy.js ==='
+          echo '=== BEGIN travel-companion-page.jsx ==='
+          pnpm exec prettier apps/web/src/features/language/travel-companion-page.jsx
+          echo '=== END travel-companion-page.jsx ==='
+          echo '=== BEGIN travel-companion-page.test.jsx ==='
+          pnpm exec prettier apps/web/tests/unit/travel-companion-page.test.jsx
+          echo '=== END travel-companion-page.test.jsx ==='
+
       - name: Check translations
         run: pnpm translations:check
 
