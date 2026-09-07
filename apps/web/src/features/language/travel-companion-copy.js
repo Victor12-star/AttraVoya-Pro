@@ -42,8 +42,10 @@ const COPY = Object.freeze({
     listen: 'Écouter',
     voiceInput: 'Parler en anglais',
     listening: 'Écoute…',
-    voiceUnavailable: 'La saisie vocale est indisponible pour le moment. Vous pouvez continuer à écrire.',
-    sessionOnly: 'L’historique de conversation reste uniquement sur cette page et n’est pas enregistré.',
+    voiceUnavailable:
+      'La saisie vocale est indisponible pour le moment. Vous pouvez continuer à écrire.',
+    sessionOnly:
+      'L’historique de conversation reste uniquement sur cette page et n’est pas enregistré.',
   },
   de: {
     title: 'Reisebegleiter',
@@ -65,7 +67,8 @@ const COPY = Object.freeze({
     voiceInput: 'Parla in inglese',
     listening: 'In ascolto…',
     voiceUnavailable: 'L’input vocale non è disponibile al momento. Puoi continuare a scrivere.',
-    sessionOnly: 'La cronologia della conversazione resta solo su questa pagina e non viene salvata.',
+    sessionOnly:
+      'La cronologia della conversazione resta solo su questa pagina e non viene salvata.',
   },
   pt: {
     title: 'Companheiro de viagem',
