@@ -163,8 +163,14 @@ function main() {
     }
 
     for (const table of REFERENCE_TABLES) {
-      const sourceCount = psql(connection.database, `SELECT count(*) FROM ${quoteIdentifier(table)};`);
-      const restoredCount = psql(restoreDatabase, `SELECT count(*) FROM ${quoteIdentifier(table)};`);
+      const sourceCount = psql(
+        connection.database,
+        `SELECT count(*) FROM ${quoteIdentifier(table)};`,
+      );
+      const restoredCount = psql(
+        restoreDatabase,
+        `SELECT count(*) FROM ${quoteIdentifier(table)};`,
+      );
 
       if (sourceCount !== restoredCount || Number(sourceCount) <= 0) {
         fail(
