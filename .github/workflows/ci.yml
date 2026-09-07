@@ -83,11 +83,6 @@ jobs:
       - name: Check JavaScript
         run: pnpm check:js
 
-      - name: Show Travel Companion formatting diff
-        run: |
-          pnpm exec prettier apps/web/src/features/language/travel-companion-page.jsx > /tmp/travel-companion-page.jsx
-          diff -u apps/web/src/features/language/travel-companion-page.jsx /tmp/travel-companion-page.jsx || true
-
       - name: Check translations
         run: pnpm translations:check
 
