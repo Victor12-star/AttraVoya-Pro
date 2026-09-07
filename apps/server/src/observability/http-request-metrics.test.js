@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createHttpRequestMetrics, createHttpRequestMetricsHook } from './http-request-metrics.js';
+import {
+  createHttpRequestMetrics,
+  createHttpRequestMetricsHook,
+} from './http-request-metrics.js';
 
 describe('HTTP request metrics', () => {
   it('reports bounded request rate, 5xx error rate, status classes and latency percentiles', () => {
@@ -9,8 +12,18 @@ describe('HTTP request metrics', () => {
 
     metrics.record({ method: 'GET', route: '/health/live', statusCode: 200, durationMs: 10 });
     metrics.record({ method: 'GET', route: '/health/live', statusCode: 200, durationMs: 75 });
-    metrics.record({ method: 'POST', route: '/planner/requests', statusCode: 201, durationMs: 300 });
-    metrics.record({ method: 'POST', route: '/planner/requests', statusCode: 503, durationMs: 1_200 });
+    metrics.record({
+      method: 'POST',
+      route: '/planner/requests',
+      statusCode: 201,
+      durationMs: 300,
+    });
+    metrics.record({
+      method: 'POST',
+      route: '/planner/requests',
+      statusCode: 503,
+      durationMs: 1_200,
+    });
     metrics.record({ method: 'GET', route: '/places', statusCode: 404, durationMs: 9_000 });
 
     nowMs = 11_000;
