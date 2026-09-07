@@ -1,4 +1,6 @@
 import { ProviderResponseError, ProviderUnavailableError } from '../../errors/app-error.js';
+import { ERROR_CODES } from '../../errors/error-codes.js';
+import { providerMetrics as defaultProviderMetrics } from '../../observability/provider-metrics.js';
 import { mapProviderHttpError } from './provider-error-mapper.js';
 
 const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
@@ -19,6 +21,7 @@ const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
  * @property {number} [maxQueued] Maximum requests allowed to wait for an in-flight slot.
  * @property {(milliseconds: number) => Promise<void>} [sleepImpl] Injectable retry delay.
  * @property {() => number} [randomImpl] Injectable random source for retry jitter.
+ * @property {{ record: (event: object) => void }} [metrics] Injectable aggregate provider observer.
  */
 
 function assertPositiveInteger(value, name) {
@@ -42,6 +45,29 @@ function retryDelayWithJitter(attempt, randomImpl) {
     : 0.5;
 
   return floor + Math.floor(boundedRandom * (ceiling - floor + 1));
+}
+
+function providerOutcomeForError(error) {
+  if (error?.code === ERROR_CODES.PROVIDER_RATE_LIMITED) return 'rate_limited';
+  if (error?.code === ERROR_CODES.PROVIDER_AUTHENTICATION_ERROR) return 'authentication';
+  if (error?.code === ERROR_CODES.PROVIDER_RESPONSE_ERROR) return 'response';
+
+  if (error?.code === ERROR_CODES.PROVIDER_UNAVAILABLE) {
+    if (error?.details?.reason === 'busy') return 'busy';
+    if (error?.details?.reason === 'timeout') return 'timeout';
+    if (error?.details?.reason === 'network') return 'network';
+    return 'unavailable';
+  }
+
+  return 'other';
+}
+
+function recordProviderMetric(metrics, event) {
+  try {
+    metrics.record(event);
+  } catch {
+    // Observability must never alter provider request success/failure behavior.
+  }
 }
 
 function createConcurrencyGate({ provider, maxConcurrent, maxQueued }) {
@@ -103,6 +129,7 @@ async function parseJsonResponse(response, provider) {
  * - Bounds per-client/provider concurrency and queue growth.
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Adds bounded retry jitter so concurrent failures do not retry in lockstep.
+ * - Records aggregate provider latency/failure/retry telemetry without payload data.
  * - Keeps upstream response text out of application errors/logs by default.
  * - Accepts injected fetch/timing primitives for deterministic unit tests.
  *
@@ -118,6 +145,7 @@ export function createProviderHttpClient(options) {
     maxQueued = DEFAULT_MAX_QUEUED,
     sleepImpl = sleep,
     randomImpl = Math.random,
+    metrics = defaultProviderMetrics,
   } = options ?? {};
 
   if (!provider) throw new TypeError('Provider HTTP client requires a provider name.');
@@ -128,18 +156,22 @@ export function createProviderHttpClient(options) {
   if (typeof randomImpl !== 'function') {
     throw new TypeError('Provider HTTP client requires a retry random function.');
   }
+  if (!metrics || typeof metrics.record !== 'function') {
+    throw new TypeError('Provider HTTP client requires a metrics observer.');
+  }
   assertPositiveInteger(maxConcurrent, 'maxConcurrent');
   assertNonNegativeInteger(maxQueued, 'maxQueued');
 
   const concurrencyGate = createConcurrencyGate({ provider, maxConcurrent, maxQueued });
 
-  async function performRequestJson(url, requestOptions = {}) {
+  async function performRequestJson(url, requestOptions = {}, onAttempt = () => {}) {
     const method = String(requestOptions.method ?? 'GET').toUpperCase();
     const retriesAllowed =
       requestOptions.retry === false || !['GET', 'HEAD'].includes(method) ? 0 : retryMax;
     let attempt = 0;
 
     while (true) {
+      onAttempt();
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), requestOptions.timeoutMs ?? timeoutMs);
 
@@ -213,12 +245,33 @@ export function createProviderHttpClient(options) {
   }
 
   async function requestJson(url, requestOptions = {}) {
-    await concurrencyGate.acquire();
+    const startedAt = Date.now();
+    let attempts = 0;
+    let acquired = false;
 
     try {
-      return await performRequestJson(url, requestOptions);
+      await concurrencyGate.acquire();
+      acquired = true;
+      const payload = await performRequestJson(url, requestOptions, () => {
+        attempts += 1;
+      });
+      recordProviderMetric(metrics, {
+        provider,
+        outcome: 'success',
+        durationMs: Date.now() - startedAt,
+        attempts,
+      });
+      return payload;
+    } catch (error) {
+      recordProviderMetric(metrics, {
+        provider,
+        outcome: providerOutcomeForError(error),
+        durationMs: Date.now() - startedAt,
+        attempts,
+      });
+      throw error;
     } finally {
-      concurrencyGate.release();
+      if (acquired) concurrencyGate.release();
     }
   }
 
