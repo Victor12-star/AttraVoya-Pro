@@ -54,10 +54,12 @@ describe('planner request pagination', () => {
 
   it('decodes the next cursor into an owner-scoped keyset boundary', async () => {
     const firstRepository = {
-      listOwnedRequests: vi.fn().mockResolvedValue([
-        storedRequest('request-3', new Date('2026-09-07T12:00:00.000Z')),
-        storedRequest('request-2', new Date('2026-09-07T11:00:00.000Z')),
-      ]),
+      listOwnedRequests: vi
+        .fn()
+        .mockResolvedValue([
+          storedRequest('request-3', new Date('2026-09-07T12:00:00.000Z')),
+          storedRequest('request-2', new Date('2026-09-07T11:00:00.000Z')),
+        ]),
     };
     const firstPage = await createPlannerService(firstRepository).listRequests({
       userId: 'user-1',
@@ -67,9 +69,9 @@ describe('planner request pagination', () => {
     if (typeof nextCursor !== 'string') throw new Error('Expected a planner next cursor.');
 
     const secondRepository = {
-      listOwnedRequests: vi.fn().mockResolvedValue([
-        storedRequest('request-2', new Date('2026-09-07T11:00:00.000Z')),
-      ]),
+      listOwnedRequests: vi
+        .fn()
+        .mockResolvedValue([storedRequest('request-2', new Date('2026-09-07T11:00:00.000Z'))]),
     };
     const secondPage = await createPlannerService(secondRepository).listRequests({
       userId: 'user-1',
