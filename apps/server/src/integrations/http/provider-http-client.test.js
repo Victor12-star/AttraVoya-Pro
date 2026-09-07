@@ -97,7 +97,11 @@ describe('provider HTTP client', () => {
     const fetchImpl = vi
       .fn()
       .mockResolvedValueOnce(
-        jsonResponse(429, { error: 'slow down' }, { 'retry-after': new Date(retryAtMs).toUTCString() }),
+        jsonResponse(
+          429,
+          { error: 'slow down' },
+          { 'retry-after': new Date(retryAtMs).toUTCString() },
+        ),
       )
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
     const client = createProviderHttpClient({
