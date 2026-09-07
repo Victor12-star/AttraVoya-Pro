@@ -98,6 +98,14 @@ jobs:
       - name: Run unit tests
         run: pnpm test
 
+      - name: Install Playwright Chromium
+        run: pnpm --filter @attravoya/web exec playwright install --with-deps chromium
+
+      - name: Run web browser smoke and accessibility tests
+        env:
+          NODE_ENV: development
+        run: pnpm --filter @attravoya/web test:e2e:ci
+
       - name: Check formatting
         run: pnpm format:check
 
