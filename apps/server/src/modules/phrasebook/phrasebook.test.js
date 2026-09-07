@@ -40,10 +40,56 @@ function createTranslationProvider(targets = ['sv', 'es']) {
   };
 }
 
+function createPhrasebookRepository() {
+  const countries = {
+    SE: {
+      iso2: 'SE',
+      name: 'Sweden',
+      languages: [
+        {
+          isOfficial: true,
+          isCommon: true,
+          rank: 1,
+          language: {
+            code: 'sv',
+            name: 'Swedish',
+            nativeName: 'svenska',
+            direction: 'ltr',
+          },
+        },
+      ],
+    },
+    JP: {
+      iso2: 'JP',
+      name: 'Japan',
+      languages: [
+        {
+          isOfficial: true,
+          isCommon: true,
+          rank: 1,
+          language: {
+            code: 'ja',
+            name: 'Japanese',
+            nativeName: '日本語',
+            direction: 'ltr',
+          },
+        },
+      ],
+    },
+  };
+
+  return {
+    async findCountryByIso2(countryCode) {
+      return countries[countryCode] ?? null;
+    },
+  };
+}
+
 async function createApp(translationProvider) {
   const app = await buildApp({
     logger: false,
     translationProvider,
+    phrasebookRepository: createPhrasebookRepository(),
     countriesRepository: { list: async () => [] },
     languagesRepository: { list: async () => [] },
     healthRepository: { checkDatabase: async () => true },
@@ -66,6 +112,7 @@ describe('travel phrasebook endpoint', () => {
     expect(phrasebook.destination).toMatchObject({
       countryCode: 'SE',
       countryName: 'Sweden',
+      knownCountry: true,
       preferredTargetLanguage: 'sv',
     });
     expect(phrasebook.destination.languages).toEqual(
