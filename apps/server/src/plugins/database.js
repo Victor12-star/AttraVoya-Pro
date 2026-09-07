@@ -8,10 +8,7 @@ import { closeDatabase } from '@attravoya/database';
  * @param {import('fastify').FastifyInstance} app
  * @param {{ closeDatabaseConnection?: () => Promise<void> }} [options]
  */
-export function registerDatabaseLifecycle(
-  app,
-  { closeDatabaseConnection = closeDatabase } = {},
-) {
+export function registerDatabaseLifecycle(app, { closeDatabaseConnection = closeDatabase } = {}) {
   app.addHook('onClose', async () => {
     await closeDatabaseConnection();
   });
