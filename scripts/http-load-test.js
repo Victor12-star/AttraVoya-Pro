@@ -236,9 +236,7 @@ export async function runHttpLoadTest(config, dependencies = {}) {
 export function evaluateHttpLoadThresholds(summary, config) {
   const failures = [];
   if (summary.errorRate > config.maxErrorRate) {
-    failures.push(
-      `Error rate ${summary.errorRate} exceeded the allowed ${config.maxErrorRate}.`,
-    );
+    failures.push(`Error rate ${summary.errorRate} exceeded the allowed ${config.maxErrorRate}.`);
   }
   if (
     config.maxP95Ms !== null &&
