@@ -1,0 +1,40 @@
+name: Phase 8W Prettier Oracle
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    name: Print exact Prettier diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Print formatter-produced diff
+        run: |
+          pnpm exec prettier --write apps/server/src/integrations/http/provider-http-client-metrics.test.js
+          git diff -- apps/server/src/integrations/http/provider-http-client-metrics.test.js
+          exit 1
