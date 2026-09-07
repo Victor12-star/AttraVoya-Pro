@@ -1,0 +1,17 @@
+:root {
+  /* Keep small text and white-on-accent controls above WCAG AA's 4.5:1 contrast threshold. */
+  --text-muted: #62706f;
+  --brand-accent: #bd5037;
+  --brand-accent-hover: #a9432f;
+}
+
+[data-theme='dark'] {
+  /* Preserve the brighter dark-theme palette; accent controls use dark text below. */
+  --text-muted: #9ba9a7;
+  --brand-accent: #f28b72;
+  --brand-accent-hover: #f4a18d;
+}
+
+[data-theme='dark'] .button--accent {
+  color: #071315;
+}
