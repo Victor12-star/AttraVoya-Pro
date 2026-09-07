@@ -36,7 +36,7 @@ async function checkOpenMeteo() {
   assert.equal(result.provider, 'openmeteo');
   assert.ok(Number.isFinite(result.current.temperatureC));
   assert.equal(result.daily.length, 1);
-  console.log('✓ Open-Meteo live check passed.');
+  console.log('[PASS] Open-Meteo live check.');
 }
 
 async function checkFrankfurter() {
@@ -50,7 +50,7 @@ async function checkFrankfurter() {
   assert.equal(result.provider, 'frankfurter');
   assert.ok(result.rate > 0);
   assert.ok(result.convertedAmount > 0);
-  console.log('✓ Frankfurter live check passed.');
+  console.log('[PASS] Frankfurter live check.');
 }
 
 async function checkLibreTranslate() {
@@ -69,15 +69,13 @@ async function checkLibreTranslate() {
   assert.equal(result.provider, 'libretranslate');
   assert.ok(result.translatedText.trim().length > 0);
   assert.notEqual(result.translatedText.trim().toLowerCase(), 'hello');
-  console.log('✓ LibreTranslate live check passed.');
+  console.log('[PASS] LibreTranslate live check.');
 }
 
 async function checkGeoapifyWhenConfigured() {
   const apiKey = process.env.GEOAPIFY_API_KEY?.trim();
   if (!apiKey) {
-    console.log(
-      '○ Geoapify live check skipped: GEOAPIFY_API_KEY is not configured in GitHub Secrets.',
-    );
+    console.log('[SKIP] Geoapify live check: GEOAPIFY_API_KEY is not configured in GitHub Secrets.');
     return;
   }
 
@@ -91,14 +89,14 @@ async function checkGeoapifyWhenConfigured() {
   const result = await provider.autocomplete({ query: 'Stockholm', limit: 3, language: 'en' });
   assert.equal(result.provider, 'geoapify');
   assert.ok(result.results.length > 0);
-  console.log('✓ Geoapify live check passed.');
+  console.log('[PASS] Geoapify live check.');
 }
 
 async function checkTicketmasterWhenConfigured() {
   const apiKey = process.env.TICKETMASTER_API_KEY?.trim();
   if (!apiKey) {
     console.log(
-      '○ Ticketmaster live check skipped: TICKETMASTER_API_KEY is not configured in GitHub Secrets.',
+      '[SKIP] Ticketmaster live check: TICKETMASTER_API_KEY is not configured in GitHub Secrets.',
     );
     return;
   }
@@ -113,15 +111,13 @@ async function checkTicketmasterWhenConfigured() {
   const result = await provider.searchEvents({ countryCode: 'SE', size: 1, page: 0 });
   assert.equal(result.provider, 'ticketmaster');
   assert.ok(Array.isArray(result.events));
-  console.log('✓ Ticketmaster live check passed.');
+  console.log('[PASS] Ticketmaster live check.');
 }
 
 async function checkNewsDataWhenConfigured() {
   const apiKey = process.env.NEWSDATA_API_KEY?.trim();
   if (!apiKey) {
-    console.log(
-      '○ NewsData live check skipped: NEWSDATA_API_KEY is not configured in GitHub Secrets.',
-    );
+    console.log('[SKIP] NewsData live check: NEWSDATA_API_KEY is not configured in GitHub Secrets.');
     return;
   }
 
@@ -140,13 +136,13 @@ async function checkNewsDataWhenConfigured() {
   });
   assert.equal(result.provider, 'newsdata');
   assert.ok(Array.isArray(result.articles));
-  console.log('✓ NewsData live check passed.');
+  console.log('[PASS] NewsData live check.');
 }
 
 async function checkPexelsWhenConfigured() {
   const apiKey = process.env.PEXELS_API_KEY?.trim();
   if (!apiKey) {
-    console.log('○ Pexels live check skipped: PEXELS_API_KEY is not configured in GitHub Secrets.');
+    console.log('[SKIP] Pexels live check: PEXELS_API_KEY is not configured in GitHub Secrets.');
     return;
   }
 
@@ -167,7 +163,7 @@ async function checkPexelsWhenConfigured() {
   assert.equal(result.provider, 'pexels');
   assert.ok(Array.isArray(result.photos));
   assert.ok(result.attribution.providerLinkRequired);
-  console.log('✓ Pexels live check passed.');
+  console.log('[PASS] Pexels live check.');
 }
 
 async function main() {
@@ -182,7 +178,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Live provider verification failed.');
+  console.error('[FAIL] Live provider verification.');
   console.error(error);
   process.exitCode = 1;
 });
