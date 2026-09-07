@@ -15,6 +15,12 @@ const idempotencyHeadersSchema = z
       ),
   })
   .passthrough();
+const listRequestsQuerySchema = z
+  .object({
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    cursor: z.string().trim().min(1).max(512).optional(),
+  })
+  .strict();
 const requestIdParamsSchema = z.object({ requestId: z.string().trim().min(1).max(128) }).strict();
 const candidateEvidenceParamsSchema = z
   .object({
@@ -25,6 +31,7 @@ const candidateEvidenceParamsSchema = z
 
 export const plannerSchemas = Object.freeze({
   createRequest: { headers: idempotencyHeadersSchema, body: createBudgetPlanRequestSchema },
+  listRequests: { querystring: listRequestsQuerySchema },
   getRequest: { params: requestIdParamsSchema },
   getCandidateEvidence: { params: candidateEvidenceParamsSchema },
 });

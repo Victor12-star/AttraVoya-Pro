@@ -9,6 +9,7 @@ import {
   plannerRequestIdFromIdempotencyKey,
   plannerRequestMatchesInput,
 } from './planner-idempotency.js';
+import { decodePlannerRequestCursor, encodePlannerRequestCursor } from './planner-list-cursor.js';
 import { normalizePlannerCategoryPricingEvidence } from './pricing-evidence.js';
 
 function toDate(value) {
@@ -260,9 +261,25 @@ export function createPlannerService(repository, options = {}) {
       };
     },
 
-    async listRequests(userId) {
-      const records = await repository.listOwnedRequests(userId, 20);
-      return records.map(mapPlannerRequest);
+    async listRequests({ userId, limit = 20, cursor = '' }) {
+      const decodedCursor = cursor ? decodePlannerRequestCursor(cursor) : undefined;
+      const records = decodedCursor
+        ? await repository.listOwnedRequests(userId, limit, decodedCursor)
+        : await repository.listOwnedRequests(userId, limit);
+      const hasMore = records.length > limit;
+      const pageRecords = records.slice(0, limit);
+      const nextCursor = hasMore
+        ? encodePlannerRequestCursor(pageRecords[pageRecords.length - 1])
+        : null;
+
+      return {
+        requests: pageRecords.map(mapPlannerRequest),
+        page: {
+          limit,
+          hasMore,
+          nextCursor,
+        },
+      };
     },
 
     async getRequest({ userId, requestId }) {

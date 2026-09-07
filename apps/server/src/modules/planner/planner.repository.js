@@ -142,12 +142,22 @@ export function createPlannerRepository() {
       }
     },
 
-    async listOwnedRequests(userId, limit = 20) {
+    async listOwnedRequests(userId, limit = 20, cursor) {
       const { prisma } = await import('@attravoya/database');
       return prisma.travelPlanRequest.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: limit,
+        where: {
+          userId,
+          ...(cursor
+            ? {
+                OR: [
+                  { createdAt: { lt: cursor.createdAt } },
+                  { createdAt: cursor.createdAt, id: { lt: cursor.id } },
+                ],
+              }
+            : {}),
+        },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: limit + 1,
         select: plannerRequestSelect,
       });
     },

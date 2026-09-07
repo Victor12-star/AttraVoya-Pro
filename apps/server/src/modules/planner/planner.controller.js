@@ -25,8 +25,12 @@ export function createPlannerController(service) {
     },
 
     async listRequests(request, reply) {
-      const requests = await service.listRequests(authenticatedUserId(request));
-      return sendPrivate(reply, { requests });
+      const result = await service.listRequests({
+        userId: authenticatedUserId(request),
+        limit: request.query.limit,
+        cursor: request.query.cursor,
+      });
+      return sendPrivate(reply, result);
     },
 
     async getRequest(request, reply) {
