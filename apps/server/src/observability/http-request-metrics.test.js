@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  createHttpRequestMetrics,
-  createHttpRequestMetricsHook,
-} from './http-request-metrics.js';
+import { createHttpRequestMetrics, createHttpRequestMetricsHook } from './http-request-metrics.js';
 
 describe('HTTP request metrics', () => {
   it('reports bounded request rate, 5xx error rate, status classes and latency percentiles', () => {
