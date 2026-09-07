@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  decodePlannerRequestCursor,
-  encodePlannerRequestCursor,
-} from './planner-list-cursor.js';
+import { decodePlannerRequestCursor, encodePlannerRequestCursor } from './planner-list-cursor.js';
 
 describe('planner request list cursor', () => {
   it('round-trips only the stable pagination boundary', () => {
