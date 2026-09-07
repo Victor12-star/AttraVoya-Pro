@@ -266,11 +266,9 @@ export function createPlannerService(repository, options = {}) {
 
     async listRequests({ userId, limit = 20, cursor }) {
       const decodedCursor = cursor ? decodePlannerRequestCursor(cursor) : undefined;
-      const records = await repository.listOwnedRequests({
-        userId,
-        limit: limit + 1,
-        cursor: decodedCursor,
-      });
+      const records = decodedCursor
+        ? await repository.listOwnedRequests(userId, limit, decodedCursor)
+        : await repository.listOwnedRequests(userId, limit);
       const hasMore = records.length > limit;
       const pageRecords = records.slice(0, limit);
       const nextCursor = hasMore
