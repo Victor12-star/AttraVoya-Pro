@@ -29,7 +29,7 @@ export function SiteHeader({
   locale,
   messages,
   defaultCurrency = 'SEK',
-  currencyOptions = [],
+  currencyOptions = /** @type {Array<{ code: string, label: string }>} */ ([]),
 }) {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
