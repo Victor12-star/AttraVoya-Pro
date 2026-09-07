@@ -1,0 +1,34 @@
+name: Phase 9D format oracle
+
+on:
+  push:
+    branches:
+      - feature/phase-9d-http-load-harness
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Print exact Prettier diff
+        run: |
+          pnpm exec prettier --write scripts/http-load-test.js
+          git diff -- scripts/http-load-test.js
