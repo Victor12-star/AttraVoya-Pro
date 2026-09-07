@@ -4,16 +4,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { registerDatabaseLifecycle } from './database.js';
 
 describe('database lifecycle', () => {
-  it('disconnects the shared database client when Fastify closes', async () => {
+  it('closes the shared Prisma and PostgreSQL pool resources when Fastify closes', async () => {
     const app = Fastify({ logger: false });
-    const databaseClient = {
-      $disconnect: vi.fn().mockResolvedValue(undefined),
-    };
+    const closeDatabaseConnection = vi.fn().mockResolvedValue(undefined);
 
-    registerDatabaseLifecycle(app, { databaseClient });
+    registerDatabaseLifecycle(app, { closeDatabaseConnection });
     await app.ready();
     await app.close();
 
-    expect(databaseClient.$disconnect).toHaveBeenCalledTimes(1);
+    expect(closeDatabaseConnection).toHaveBeenCalledTimes(1);
   });
 });
