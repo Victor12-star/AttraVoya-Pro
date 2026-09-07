@@ -31,7 +31,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
-  Sparkles,
+  Mountain,
   ThermometerSun,
   Utensils,
   Waves,
@@ -284,7 +284,7 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     },
     {
       href: buildDestinationChildHref(destination, 'attractions'),
-      icon: Sparkles,
+      icon: Mountain,
       label: messages.navigation.thingsToDo,
     },
     {
