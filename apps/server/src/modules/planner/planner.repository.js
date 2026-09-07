@@ -142,7 +142,7 @@ export function createPlannerRepository() {
       }
     },
 
-    async listOwnedRequests({ userId, limit = 21, cursor }) {
+    async listOwnedRequests(userId, limit = 20, cursor) {
       const { prisma } = await import('@attravoya/database');
       return prisma.travelPlanRequest.findMany({
         where: {
@@ -157,7 +157,7 @@ export function createPlannerRepository() {
             : {}),
         },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: limit,
+        take: limit + 1,
         select: plannerRequestSelect,
       });
     },
