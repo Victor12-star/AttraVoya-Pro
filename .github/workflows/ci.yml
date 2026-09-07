@@ -89,9 +89,6 @@ jobs:
       - name: Check professional presentation
         run: pnpm presentation:check
 
-      - name: Show canonical presentation guard formatting
-        run: pnpm exec prettier scripts/check-professional-presentation.js
-
       - name: Run provider smoke tests
         run: pnpm providers:smoke
 
