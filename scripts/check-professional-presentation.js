@@ -26,7 +26,10 @@ const textExtensions = new Set([
   '.yml',
 ]);
 
-const excludedFiles = new Set(['pnpm-lock.yaml', 'scripts/check-professional-presentation.js']);
+const excludedFiles = new Set([
+  'pnpm-lock.yaml',
+  'scripts/check-professional-presentation.js',
+]);
 const userInterfaceRoots = [
   'apps/admin/',
   'apps/mobile/',
@@ -118,7 +121,9 @@ for (const [packageFile, requiredPackage] of requiredBrowserIconPackages) {
     const packageJson = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
     const dependencies = packageJson.dependencies ?? {};
     if (!dependencies[requiredPackage]) {
-      findings.push(`${packageFile}:1 required professional icon package "${requiredPackage}" is missing`);
+      findings.push(
+        `${packageFile}:1 required professional icon package "${requiredPackage}" is missing`,
+      );
     }
   } catch {
     findings.push(`${packageFile}:1 unable to verify professional icon package`);
