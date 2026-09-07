@@ -47,6 +47,8 @@ describe('provider cache metrics', () => {
   });
 
   it('rejects an invalid clock dependency', () => {
-    expect(() => createProviderCacheMetrics({ now: null })).toThrow('now must be a function.');
+    /** @type {any} */
+    const invalidNow = null;
+    expect(() => createProviderCacheMetrics({ now: invalidNow })).toThrow('now must be a function.');
   });
 });
