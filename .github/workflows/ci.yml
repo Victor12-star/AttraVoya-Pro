@@ -83,9 +83,6 @@ jobs:
       - name: Check JavaScript
         run: pnpm check:js
 
-      - name: Show canonical phrasebook formatting
-        run: pnpm exec prettier apps/server/src/modules/phrasebook/phrasebook.service.js
-
       - name: Check translations
         run: pnpm translations:check
 
