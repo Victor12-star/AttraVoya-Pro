@@ -101,10 +101,11 @@ describe('TravelCompanionPage', () => {
     mocks.request.mockResolvedValue(phrasebookResponse());
     mocks.translateText.mockResolvedValue(translationResponse());
 
-    delete window.SpeechRecognition;
-    delete window.webkitSpeechRecognition;
-    delete window.SpeechSynthesisUtterance;
-    delete window.speechSynthesis;
+    const currentWindow = /** @type {any} */ (window);
+    delete currentWindow.SpeechRecognition;
+    delete currentWindow.webkitSpeechRecognition;
+    delete currentWindow.SpeechSynthesisUtterance;
+    delete currentWindow.speechSynthesis;
   });
 
   it('uses destination-aware quick phrases and always sends English as the source language', async () => {
@@ -124,6 +125,8 @@ describe('TravelCompanionPage', () => {
     });
     expect(screen.getByText('English')).toBeInTheDocument();
     expect(screen.getAllByText('Swedish').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'How are you?' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'How much is this?' })).toBeInTheDocument();
   });
 
   it('translates traveller-entered everyday text and keeps the result in session-only chat history', async () => {
@@ -166,6 +169,7 @@ describe('TravelCompanionPage', () => {
     const cancel = vi.fn();
     const voice = { lang: 'sv-SE' };
     class FakeUtterance {
+      /** @param {string} text */
       constructor(text) {
         this.text = text;
         this.lang = '';
@@ -191,7 +195,7 @@ describe('TravelCompanionPage', () => {
     fireEvent.click(listenButton);
 
     await waitFor(() => expect(speak).toHaveBeenCalledTimes(1));
-    const utterance = speak.mock.calls[0][0];
+    const utterance = /** @type {any} */ (speak.mock.calls[0]?.[0]);
     expect(utterance.text).toBe('Hej.');
     expect(utterance.lang).toBe('sv');
     expect(utterance.voice).toBe(voice);
