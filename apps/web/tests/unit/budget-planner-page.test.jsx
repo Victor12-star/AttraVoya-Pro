@@ -133,7 +133,9 @@ describe('BudgetPlannerPage', () => {
     fillFixedPlan();
     fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Planning brief could not be saved.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The planning brief could not be saved right now.',
+    );
     expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1);
     const firstKey = mocks.createBudgetPlanRequest.mock.calls[0][1];
 
