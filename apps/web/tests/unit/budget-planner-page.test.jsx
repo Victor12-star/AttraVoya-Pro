@@ -50,6 +50,21 @@ function savedRequest(overrides = {}) {
   };
 }
 
+function fillFixedPlan({ budget = '25000' } = {}) {
+  fireEvent.change(screen.getByLabelText('Where are you travelling from?'), {
+    target: { value: 'Stockholm' },
+  });
+  fireEvent.click(screen.getByLabelText('I know my dates'));
+  fireEvent.change(screen.getByLabelText('Departure'), { target: { value: '2026-10-10' } });
+  fireEvent.change(screen.getByLabelText('Return'), { target: { value: '2026-10-17' } });
+  fireEvent.change(screen.getByLabelText('Budget'), { target: { value: budget } });
+  fireEvent.change(screen.getByLabelText('Adults'), { target: { value: '2' } });
+  fireEvent.change(screen.getByLabelText('Children ages'), { target: { value: '4, 8' } });
+  fireEvent.change(screen.getByLabelText('Interests'), {
+    target: { value: 'history, food' },
+  });
+}
+
 describe('BudgetPlannerPage', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
@@ -80,19 +95,7 @@ describe('BudgetPlannerPage', () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     await screen.findByText('No saved planning briefs yet.');
 
-    fireEvent.change(screen.getByLabelText('Where are you travelling from?'), {
-      target: { value: 'Stockholm' },
-    });
-    fireEvent.click(screen.getByLabelText('I know my dates'));
-    fireEvent.change(screen.getByLabelText('Departure'), { target: { value: '2026-10-10' } });
-    fireEvent.change(screen.getByLabelText('Return'), { target: { value: '2026-10-17' } });
-    fireEvent.change(screen.getByLabelText('Budget'), { target: { value: '25000' } });
-    fireEvent.change(screen.getByLabelText('Adults'), { target: { value: '2' } });
-    fireEvent.change(screen.getByLabelText('Children ages'), { target: { value: '4, 8' } });
-    fireEvent.change(screen.getByLabelText('Interests'), {
-      target: { value: 'history, food' },
-    });
-
+    fillFixedPlan();
     fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
 
     await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1));
@@ -112,10 +115,54 @@ describe('BudgetPlannerPage', () => {
           types: ['HOTEL', 'GUEST_HOUSE', 'HOSTEL', 'SHORT_TERM_RENTAL'],
         }),
       }),
+      expect.stringMatching(/^planner-[0-9a-f-]{36}$/),
     );
     expect(await screen.findByText('Planning brief saved')).toBeInTheDocument();
     expect(screen.getByText('25000 SEK')).toBeInTheDocument();
     expect(screen.getByText('2026-10-10 – 2026-10-17')).toBeInTheDocument();
+  });
+
+  it('reuses the same idempotency key when the same failed planning brief is retried', async () => {
+    mocks.createBudgetPlanRequest
+      .mockRejectedValueOnce(new Error('temporary network failure'))
+      .mockResolvedValueOnce({ planRequest: savedRequest() });
+
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    await screen.findByText('No saved planning briefs yet.');
+
+    fillFixedPlan();
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Planning brief could not be saved.');
+    expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1);
+    const firstKey = mocks.createBudgetPlanRequest.mock.calls[0][1];
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(2));
+
+    expect(mocks.createBudgetPlanRequest.mock.calls[1][1]).toBe(firstKey);
+    expect(await screen.findByText('Planning brief saved')).toBeInTheDocument();
+  });
+
+  it('blocks duplicate in-flight planner submissions before the disabled state renders', async () => {
+    mocks.createBudgetPlanRequest.mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      return { planRequest: savedRequest() };
+    });
+
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    await screen.findByText('No saved planning briefs yet.');
+
+    fillFixedPlan();
+    const button = screen.getByRole('button', { name: 'Save planning brief' });
+    const form = button.closest('form');
+    expect(form).not.toBeNull();
+
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText('Planning brief saved')).toBeInTheDocument();
   });
 
   it('rejects an incomplete flexible window before calling the server', async () => {
