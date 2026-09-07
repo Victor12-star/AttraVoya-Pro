@@ -83,6 +83,9 @@ jobs:
       - name: Check JavaScript
         run: pnpm check:js
 
+      - name: Show canonical recovery script formatting
+        run: pnpm exec prettier scripts/postgres-recovery-check.js
+
       - name: Check translations
         run: pnpm translations:check
 
