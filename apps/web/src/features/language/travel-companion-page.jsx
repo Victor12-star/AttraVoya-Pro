@@ -164,18 +164,22 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       });
 
     const currentWindow = browserWindow();
-    setVoiceInputSupported(typeof speechRecognitionConstructor() === 'function');
-    setVoiceOutputSupported(
-      Boolean(
-        currentWindow?.speechSynthesis &&
-          typeof currentWindow?.SpeechSynthesisUtterance === 'function',
-      ),
-    );
+    const capabilityTimer = currentWindow?.setTimeout?.(() => {
+      if (!active) return;
+      setVoiceInputSupported(typeof speechRecognitionConstructor() === 'function');
+      setVoiceOutputSupported(
+        Boolean(
+          currentWindow?.speechSynthesis &&
+            typeof currentWindow?.SpeechSynthesisUtterance === 'function',
+        ),
+      );
+    }, 0);
 
     return () => {
       active = false;
       recognitionRef.current?.abort?.();
       currentWindow?.speechSynthesis?.cancel?.();
+      if (capabilityTimer !== undefined) currentWindow?.clearTimeout?.(capabilityTimer);
     };
   }, []);
 
@@ -296,7 +300,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     void performTranslation(phrase);
   }
 
-  function useQuickPhrase(value) {
+  function handleQuickPhrase(value) {
     setPhrase(value);
     void performTranslation(value);
   }
@@ -443,7 +447,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
                     key={`${item.categoryId}-${item.id}`}
                     type="button"
                     disabled={translationStatus === 'loading'}
-                    onClick={() => useQuickPhrase(item.text)}
+                    onClick={() => handleQuickPhrase(item.text)}
                   >
                     {item.text}
                   </button>
