@@ -15,9 +15,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { TravelCompanionPage } = await import(
-  '../../src/features/language/travel-companion-page.jsx'
-);
+const { TravelCompanionPage } =
+  await import('../../src/features/language/travel-companion-page.jsx');
 
 const messages = {
   common: {
