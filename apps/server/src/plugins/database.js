@@ -1,16 +1,15 @@
-import { prisma } from '@attravoya/database';
-
-/** @typedef {{ $disconnect: () => Promise<void> }} DatabaseLifecycleClient */
+import { closeDatabase } from '@attravoya/database';
 
 /**
- * Tie the process-wide Prisma client to Fastify's lifecycle so rolling deploys
- * and replica termination explicitly release PostgreSQL pool connections.
+ * Tie the process-wide Prisma client and externally owned PostgreSQL pool to
+ * Fastify's lifecycle so rolling deploys and replica termination explicitly
+ * release every database connection.
  *
  * @param {import('fastify').FastifyInstance} app
- * @param {{ databaseClient?: DatabaseLifecycleClient }} [options]
+ * @param {{ closeDatabaseConnection?: () => Promise<void> }} [options]
  */
-export function registerDatabaseLifecycle(app, { databaseClient = prisma } = {}) {
+export function registerDatabaseLifecycle(app, { closeDatabaseConnection = closeDatabase } = {}) {
   app.addHook('onClose', async () => {
-    await databaseClient.$disconnect();
+    await closeDatabaseConnection();
   });
 }

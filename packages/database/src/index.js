@@ -1,5 +1,5 @@
 // Public entry point for @attravoya/database.
-// Re-exports the shared Prisma client so the API server can
-// `import { prisma } from '@attravoya/database'`.
+// Runtime consumers receive the shared Prisma client plus narrow lifecycle and
+// aggregate pool-observability helpers without direct access to pool secrets.
 
-export { prisma, default } from './client.js';
+export { closeDatabase, getDatabasePoolMetrics, prisma, default } from './client.js';

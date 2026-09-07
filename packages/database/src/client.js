@@ -1,33 +1,53 @@
-// Singleton PrismaClient for the AttraVoya Pro backend.
-// A single instance is shared across the Node process to avoid exhausting
+// Singleton PrismaClient and PostgreSQL pool for the AttraVoya Pro backend.
+// A single resource bundle is shared across the Node process to avoid exhausting
 // PostgreSQL connection limits during hot reload / serverless warm-ups.
-// Prisma 7 connects through the `pg` driver adapter (@prisma/adapter-pg);
-// DATABASE_URL is read from the environment (see prisma.config.js).
 
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
+import { createDatabaseCloser } from './lifecycle.js';
 import { databasePoolConfig } from './pool-config.js';
+import { snapshotDatabasePool } from './pool-metrics.js';
 
-// Reuse a global slot so hot reload does not spawn duplicate pools.
-// The JSDoc cast satisfies the no-emit JS checker (globalThis has no
-// index signature), mirroring the official Prisma singleton pattern.
-const globalForPrisma = /** @type {{ prisma?: import('@prisma/client').PrismaClient }} */ (
-  globalThis
-);
-
-function createClient() {
-  const adapter = new PrismaPg({
+function createDatabaseResources() {
+  const databasePool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     ...databasePoolConfig,
   });
-  return new PrismaClient({ adapter });
+  const adapter = new PrismaPg(databasePool);
+  const prisma = new PrismaClient({ adapter });
+
+  return { databasePool, prisma };
 }
 
-export const prisma = globalForPrisma.prisma ?? createClient();
+// Store both resources together so hot reload never reuses a Prisma client with
+// a different pool or creates an untracked pool beside the shared singleton.
+const globalForDatabase =
+  /** @type {{
+   * databaseResources?: ReturnType<typeof createDatabaseResources>
+   * }} */ (globalThis);
+
+const databaseResources = globalForDatabase.databaseResources ?? createDatabaseResources();
+
+export const prisma = databaseResources.prisma;
+const databasePool = databaseResources.databasePool;
 
 if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+  globalForDatabase.databaseResources = databaseResources;
+}
+
+export const closeDatabase = createDatabaseCloser({
+  prismaClient: prisma,
+  pool: databasePool,
+});
+
+/**
+ * Read instantaneous process-local PostgreSQL pool gauges. The returned object
+ * contains only bounded counts/ratios and never connection or query details.
+ */
+export function getDatabasePoolMetrics() {
+  return snapshotDatabasePool(databasePool);
 }
 
 export default prisma;
