@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Languages,
-  LoaderCircle,
-  MessageCircleMore,
-  Mic,
-  Send,
-  Volume2,
-} from 'lucide-react';
+import { Languages, LoaderCircle, MessageCircleMore, Mic, Send, Volume2 } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getLanguagePageCopy } from '../destinations/language-page-copy.js';
@@ -88,9 +81,7 @@ function normalizePhrasebook(response) {
     })
     .filter(Boolean);
 
-  const preferredTargetLanguage = languageCode(
-    phrasebook?.destination?.preferredTargetLanguage,
-  );
+  const preferredTargetLanguage = languageCode(phrasebook?.destination?.preferredTargetLanguage);
   const provider = textValue(phrasebook?.provider?.name, 80);
 
   return {
@@ -486,7 +477,9 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
                     ) : (
                       <Mic size={17} aria-hidden="true" />
                     )}
-                    {voiceStatus === 'listening' ? companionCopy.listening : companionCopy.voiceInput}
+                    {voiceStatus === 'listening'
+                      ? companionCopy.listening
+                      : companionCopy.voiceInput}
                   </button>
                 ) : null}
 
