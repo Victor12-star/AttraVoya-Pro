@@ -26,10 +26,7 @@ const textExtensions = new Set([
   '.yml',
 ]);
 
-const excludedFiles = new Set([
-  'pnpm-lock.yaml',
-  'scripts/check-professional-presentation.js',
-]);
+const excludedFiles = new Set(['pnpm-lock.yaml', 'scripts/check-professional-presentation.js']);
 const userInterfaceRoots = [
   'apps/admin/',
   'apps/mobile/',
