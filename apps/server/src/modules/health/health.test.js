@@ -16,6 +16,7 @@ process.env.COOKIE_SECRET = 'c'.repeat(64);
 process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 
 const { buildApp } = await import('../../app.js');
+const { createReadinessState } = await import('../../lifecycle/readiness-state.js');
 
 const apps = [];
 afterEach(async () => {
@@ -90,5 +91,43 @@ describe('health endpoints', () => {
       },
     });
     expect(response.body).not.toContain('database password');
+  });
+
+  it('stops advertising readiness while draining but keeps liveness available', async () => {
+    const readinessState = createReadinessState();
+    let databaseChecks = 0;
+    const app = await buildApp({
+      logger: false,
+      readinessState,
+      healthRepository: {
+        checkDatabase: async () => {
+          databaseChecks += 1;
+          return true;
+        },
+      },
+    });
+    apps.push(app);
+
+    readinessState.markDraining();
+
+    const readiness = await app.inject({
+      method: 'GET',
+      url: '/api/v1/health/ready',
+    });
+    const liveness = await app.inject({
+      method: 'GET',
+      url: '/api/v1/health/live',
+    });
+
+    expect(readiness.statusCode).toBe(503);
+    expect(readiness.json()).toMatchObject({
+      error: {
+        code: 'SERVICE_UNAVAILABLE',
+        message: 'AttraVoya Pro is not ready to accept traffic yet.',
+      },
+    });
+    expect(databaseChecks).toBe(0);
+    expect(liveness.statusCode).toBe(200);
+    expect(liveness.json()).toMatchObject({ status: 'ok' });
   });
 });
