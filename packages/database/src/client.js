@@ -23,9 +23,10 @@ function createDatabaseResources() {
 
 // Store both resources together so hot reload never reuses a Prisma client with
 // a different pool or creates an untracked pool beside the shared singleton.
-const globalForDatabase = /** @type {{
- * databaseResources?: ReturnType<typeof createDatabaseResources>
- * }} */ (globalThis);
+const globalForDatabase =
+  /** @type {{
+   * databaseResources?: ReturnType<typeof createDatabaseResources>
+   * }} */ (globalThis);
 
 const databaseResources = globalForDatabase.databaseResources ?? createDatabaseResources();
 
