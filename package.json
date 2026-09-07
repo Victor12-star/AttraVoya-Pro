@@ -44,6 +44,7 @@
     "db:seed": "pnpm --filter @attravoya/database seed",
     "db:studio": "pnpm --filter @attravoya/database studio",
     "translations:check": "node scripts/check-translations.js",
+    "presentation:check": "node scripts/check-professional-presentation.js",
     "providers:smoke": "node scripts/provider-smoke-test.js"
   },
   "devDependencies": {

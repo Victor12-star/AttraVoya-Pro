@@ -9,7 +9,7 @@ import {
   LockKeyhole,
   RefreshCw,
   Save,
-  Sparkles,
+  FileText,
   Users,
 } from 'lucide-react';
 
@@ -216,7 +216,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
         <div className={styles.layout}>
           <form className={styles.formCard} onSubmit={submit} noValidate>
             <div className={styles.sectionHeading}>
-              <Sparkles size={20} aria-hidden="true" />
+              <FileText size={20} aria-hidden="true" />
               <div>
                 <h2>{copy.openDestination}</h2>
                 <p>{copy.openDestinationHint}</p>

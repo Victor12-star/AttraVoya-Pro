@@ -4,7 +4,7 @@ export default function EmergencyPage() {
   return (
     <AdminSectionPage
       title="Emergency records"
-      description="Only authoritative, verified emergency records will be managed here. AI-generated emergency numbers are never accepted."
+      description="Only authoritative, verified emergency records are managed here. Unverified emergency numbers are never accepted."
     />
   );
 }

@@ -69,7 +69,7 @@ for (const [providerKey, credentialKey] of [
 
 if (errors.length > 0) {
   console.error('Environment validation failed:\n');
-  for (const error of errors) console.error(`  ✗ ${error}`);
+  for (const error of errors) console.error(`  [FAIL] ${error}`);
   process.exit(1);
 }
 
@@ -77,5 +77,5 @@ console.log('Core environment validation passed.');
 
 if (warnings.length > 0) {
   console.log('\nProvider setup warnings (expected until free API accounts are created):');
-  for (const warning of warnings) console.log(`  ! ${warning}`);
+  for (const warning of warnings) console.log(`  [WARN] ${warning}`);
 }

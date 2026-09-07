@@ -35,7 +35,7 @@ for (const file of trackedFiles) {
 
 if (findings.length) {
   console.error('Potential committed secrets detected:');
-  for (const finding of findings) console.error(`  ✗ ${finding}`);
+  for (const finding of findings) console.error(`  [FAIL] ${finding}`);
   process.exit(1);
 }
 
