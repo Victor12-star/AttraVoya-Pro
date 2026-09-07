@@ -44,7 +44,6 @@ export async function buildApp(options = {}) {
     logger: options.logger ?? createLoggerOptions(),
     genReqId: () => randomUUID(),
     trustProxy: env.NODE_ENV === 'production',
-    disableRequestLogging: false,
     bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
   });
 
