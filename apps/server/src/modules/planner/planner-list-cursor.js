@@ -16,7 +16,11 @@ export function encodePlannerRequestCursor(record) {
   if (!(record?.createdAt instanceof Date) || Number.isNaN(record.createdAt.getTime())) {
     throw new TypeError('Planner cursor requires a valid createdAt date.');
   }
-  if (typeof record.id !== 'string' || record.id.length < 1 || record.id.length > MAX_CURSOR_ID_LENGTH) {
+  if (
+    typeof record.id !== 'string' ||
+    record.id.length < 1 ||
+    record.id.length > MAX_CURSOR_ID_LENGTH
+  ) {
     throw new TypeError('Planner cursor requires a bounded request id.');
   }
 
