@@ -19,7 +19,9 @@ function parseDatabaseUrl() {
   }
 
   const rawUrl = process.env.DATABASE_URL?.trim();
-  if (!rawUrl) fail('DATABASE_URL is required for the recovery drill.');
+  if (!rawUrl) {
+    throw new Error('DATABASE_URL is required for the recovery drill.');
+  }
 
   const databaseUrl = new URL(rawUrl);
   if (!['postgres:', 'postgresql:'].includes(databaseUrl.protocol)) {
