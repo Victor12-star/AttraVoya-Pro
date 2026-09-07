@@ -38,10 +38,8 @@ const userInterfaceRoots = [
   'packages/localization/',
 ];
 
-// Lucide is the canonical functional icon system for the browser applications.
-// Mobile may use lucide-react-native when icons are introduced there. Competing
-// general-purpose icon libraries are rejected so the product keeps one coherent
-// visual language instead of mixing icon styles between screens.
+// Lucide is the canonical functional icon system for browser applications.
+// Mobile may use lucide-react-native when icons are introduced there.
 const requiredBrowserIconPackages = new Map([
   ['apps/admin/package.json', 'lucide-react'],
   ['apps/web/package.json', 'lucide-react'],
@@ -59,9 +57,6 @@ const competingIconPackageNames = [
   'react-icons',
 ];
 
-// Emoji-presentation characters cover decorative pictographs such as rockets, bots,
-// sparkles, stars, celebration marks, and similar UI decoration without banning
-// ordinary text symbols such as copyright or mathematical operators.
 const emojiPresentationPattern = /\p{Emoji_Presentation}/gu;
 const emojiStylePattern = /[\u2600-\u27BF]\uFE0F/gu;
 const pseudoStatusIconPattern = /[\u25CB\u2713\u2714\u2717\u2718]/gu;
@@ -91,7 +86,8 @@ const disallowedUiCopyPatterns = [
 
 function isTextFile(file) {
   const extension = path.extname(file).toLowerCase();
-  return textExtensions.has(extension) || path.basename(file).startsWith('.env.');
+  const isEnvironmentFile = path.basename(file).startsWith('.env.');
+  return textExtensions.has(extension) || isEnvironmentFile;
 }
 
 function isUiFile(file) {
@@ -105,13 +101,16 @@ function lineNumberAt(text, index) {
 function addMatches(findings, file, text, pattern, description) {
   pattern.lastIndex = 0;
   for (const match of text.matchAll(pattern)) {
-    findings.push(`${file}:${lineNumberAt(text, match.index ?? 0)} ${description}`);
+    const line = lineNumberAt(text, match.index ?? 0);
+    findings.push(`${file}:${line} ${description}`);
   }
 }
 
 function addLiteralMatch(findings, file, text, value, description) {
   const index = text.indexOf(value);
-  if (index >= 0) findings.push(`${file}:${lineNumberAt(text, index)} ${description}`);
+  if (index < 0) return;
+  const line = lineNumberAt(text, index);
+  findings.push(`${file}:${line} ${description}`);
 }
 
 const findings = [];
@@ -121,12 +120,10 @@ for (const [packageFile, requiredPackage] of requiredBrowserIconPackages) {
     const packageJson = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
     const dependencies = packageJson.dependencies ?? {};
     if (!dependencies[requiredPackage]) {
-      findings.push(
-        `${packageFile}:1 required professional icon package "${requiredPackage}" is missing`,
-      );
+      findings.push(`${packageFile}:1 missing required ${requiredPackage}`);
     }
   } catch {
-    findings.push(`${packageFile}:1 unable to verify professional icon package`);
+    findings.push(`${packageFile}:1 unable to verify icon package`);
   }
 }
 
@@ -140,25 +137,21 @@ for (const file of trackedFiles) {
     continue;
   }
 
-  addMatches(findings, file, text, emojiPresentationPattern, 'decorative emoji/pictograph');
+  addMatches(findings, file, text, emojiPresentationPattern, 'decorative emoji');
   addMatches(findings, file, text, emojiStylePattern, 'emoji-style symbol');
-  addMatches(findings, file, text, pseudoStatusIconPattern, 'decorative status glyph');
+  addMatches(findings, file, text, pseudoStatusIconPattern, 'status glyph');
 
   if (!isUiFile(file)) continue;
 
   for (const packageName of competingIconPackageNames) {
-    addLiteralMatch(
-      findings,
-      file,
-      text,
-      packageName,
-      `non-Lucide general-purpose icon library "${packageName}"; use Lucide functional icons`,
-    );
+    const description = `non-Lucide icon library "${packageName}"`;
+    addLiteralMatch(findings, file, text, packageName, description);
   }
 
   for (const iconName of disallowedUiIconNames) {
     const iconPattern = new RegExp(`\\b${iconName}\\b`, 'g');
-    addMatches(findings, file, text, iconPattern, `AI/decorative icon identifier "${iconName}"`);
+    const description = `AI/decorative icon "${iconName}"`;
+    addMatches(findings, file, text, iconPattern, description);
   }
 
   for (const copyPattern of disallowedUiCopyPatterns) {
@@ -169,10 +162,10 @@ for (const file of trackedFiles) {
 if (findings.length > 0) {
   console.error('Professional presentation check failed:');
   for (const finding of findings) console.error(`  - ${finding}`);
-  console.error(
-    '\nUse professional Lucide functional icons and remove decorative emoji, AI-style iconography, and AI-presentation copy.',
-  );
+  console.error('Use professional Lucide functional icons.');
+  console.error('Remove decorative emoji and AI-style presentation cues.');
   process.exit(1);
 }
 
-console.log(`Professional presentation check passed across ${trackedFiles.length} tracked files.`);
+const count = trackedFiles.length;
+console.log(`Professional presentation check passed across ${count} tracked files.`);
