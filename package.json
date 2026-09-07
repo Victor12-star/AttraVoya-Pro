@@ -33,6 +33,8 @@
     "check:js": "node scripts/check-javascript.js . apps/admin apps/mobile apps/mobile/tooling apps/server apps/web packages/api-client packages/constants packages/database packages/design-tokens packages/localization packages/shared-types packages/utilities packages/validation",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
+    "load:test": "node scripts/http-load-test.js",
+    "load:harness:test": "node --test scripts/http-load-test.test.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean",

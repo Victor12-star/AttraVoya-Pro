@@ -92,6 +92,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Test HTTP load harness
+        run: pnpm load:harness:test
+
       - name: Run unit tests
         run: pnpm test
 
