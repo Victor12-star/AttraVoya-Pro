@@ -35,6 +35,17 @@ const userInterfaceRoots = [
   'packages/localization/',
 ];
 
+// Lucide is the canonical functional icon system for the browser applications.
+// Mobile may use lucide-react-native when icons are introduced there. Competing
+// general-purpose icon libraries are rejected so the product keeps one coherent
+// visual language instead of mixing icon styles between screens.
+const requiredBrowserIconPackages = new Map([
+  ['apps/admin/package.json', 'lucide-react'],
+  ['apps/web/package.json', 'lucide-react'],
+]);
+const competingIconPackagePattern =
+  /(?:from\s+|require\()['"](?:@expo\/vector-icons|@fortawesome\/[^'"]+|@heroicons\/[^'"]+|@mui\/icons-material(?:\/[^'"]*)?|@phosphor-icons\/react|iconoir-react|material-icons(?:\/[^'"]*)?|phosphor-react|react-feather|react-icons(?:\/[^'"]*)?)['"]/g;
+
 // Emoji-presentation characters cover decorative pictographs such as rockets, bots,
 // sparkles, stars, celebration marks, and similar UI decoration without banning
 // ordinary text symbols such as copyright or mathematical operators.
@@ -87,6 +98,18 @@ function addMatches(findings, file, text, pattern, description) {
 
 const findings = [];
 
+for (const [packageFile, requiredPackage] of requiredBrowserIconPackages) {
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
+    const dependencies = packageJson.dependencies ?? {};
+    if (!dependencies[requiredPackage]) {
+      findings.push(`${packageFile}:1 required professional icon package "${requiredPackage}" is missing`);
+    }
+  } catch {
+    findings.push(`${packageFile}:1 unable to verify professional icon package`);
+  }
+}
+
 for (const file of trackedFiles) {
   if (excludedFiles.has(file) || !isTextFile(file)) continue;
 
@@ -103,6 +126,14 @@ for (const file of trackedFiles) {
 
   if (!isUiFile(file)) continue;
 
+  addMatches(
+    findings,
+    file,
+    text,
+    competingIconPackagePattern,
+    'non-Lucide general-purpose icon library; use Lucide functional icons',
+  );
+
   for (const iconName of disallowedUiIconNames) {
     const iconPattern = new RegExp(`\\b${iconName}\\b`, 'g');
     addMatches(findings, file, text, iconPattern, `AI/decorative icon identifier "${iconName}"`);
@@ -117,7 +148,7 @@ if (findings.length > 0) {
   console.error('Professional presentation check failed:');
   for (const finding of findings) console.error(`  - ${finding}`);
   console.error(
-    '\nRemove decorative emoji/AI-style presentation cues or replace them with professional text/functional UI.',
+    '\nUse professional Lucide functional icons and remove decorative emoji, AI-style iconography, and AI-presentation copy.',
   );
   process.exit(1);
 }
