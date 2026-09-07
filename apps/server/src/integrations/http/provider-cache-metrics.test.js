@@ -69,9 +69,13 @@ describe('provider cache metrics integration', () => {
 
     await expect(cache.getOrLoad('second-key', async () => 'second', 60)).resolves.toBe('second');
     await expect(
-      cache.getOrLoad('failed-key', async () => {
-        throw new Error('upstream failed');
-      }, 60),
+      cache.getOrLoad(
+        'failed-key',
+        async () => {
+          throw new Error('upstream failed');
+        },
+        60,
+      ),
     ).rejects.toThrow('upstream failed');
 
     gate.resolve(undefined);
