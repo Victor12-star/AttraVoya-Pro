@@ -34,7 +34,11 @@ export async function plannerRoutes(app, options = {}) {
     },
     controller.createRequest,
   );
-  app.get('/', authenticated, controller.listRequests);
+  app.get(
+    '/',
+    { ...authenticated, schema: plannerSchemas.listRequests },
+    controller.listRequests,
+  );
   app.get(
     '/:requestId/allocation',
     { ...authenticated, schema: plannerSchemas.getRequest },
