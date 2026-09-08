@@ -1,5 +1,14 @@
 const EARTH_RADIUS_METERS = 6_371_000;
 
+/** @typedef {'idle'|'unavailable'|'low-accuracy'|'on-route'|'checking'|'deviated'} RouteWatchStatus */
+/**
+ * @typedef {object} RouteWatchState
+ * @property {RouteWatchStatus} status
+ * @property {number|null} offRouteSince
+ * @property {number} offRouteSamples
+ * @property {number|null} distanceFromRouteMeters
+ */
+
 export const SAFE_RIDE_DEFAULTS = Object.freeze({
   corridorMeters: 120,
   poorAccuracyMeters: 100,
@@ -84,15 +93,22 @@ export function distanceFromRouteMeters(position, routePath) {
   return Number.isFinite(minimum) ? minimum : null;
 }
 
-export function createRouteWatchState() {
+/**
+ * Create a fresh route-watch state with a deliberately broad status type so
+ * React state and refs can safely move through every monitoring state.
+ * @param {RouteWatchStatus} [status]
+ * @returns {Readonly<RouteWatchState>}
+ */
+export function createRouteWatchState(status = 'idle') {
   return Object.freeze({
-    status: 'idle',
+    status,
     offRouteSince: null,
     offRouteSamples: 0,
     distanceFromRouteMeters: null,
   });
 }
 
+/** @returns {RouteWatchState} */
 export function evaluateRoutePosition({
   position,
   accuracyMeters,
