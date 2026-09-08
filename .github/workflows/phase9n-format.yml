@@ -1,0 +1,60 @@
+name: Phase 9N canonical formatter
+
+on:
+  push:
+    branches:
+      - feature/phase-9n-accommodation-budget-range
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/phase-9n-accommodation-budget-range
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply canonical Prettier formatting
+        run: |
+          pnpm exec prettier --write \
+            'apps/web/src/app/(main)/plan-by-budget/page.jsx' \
+            apps/web/src/features/destinations/accommodation-page.jsx \
+            apps/web/src/features/destinations/accommodation-photo-copy.js \
+            apps/web/src/features/planner/budget-accommodation-copy.js \
+            apps/web/tests/unit/accommodation-page.test.jsx
+
+      - name: Commit canonical formatting
+        run: |
+          git add -- \
+            'apps/web/src/app/(main)/plan-by-budget/page.jsx' \
+            apps/web/src/features/destinations/accommodation-page.jsx \
+            apps/web/src/features/destinations/accommodation-photo-copy.js \
+            apps/web/src/features/planner/budget-accommodation-copy.js \
+            apps/web/tests/unit/accommodation-page.test.jsx
+          if git diff --cached --quiet; then
+            echo 'Canonical formatting already applied.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Phase 9N: apply canonical Prettier formatting'
+          git push origin HEAD:feature/phase-9n-accommodation-budget-range
