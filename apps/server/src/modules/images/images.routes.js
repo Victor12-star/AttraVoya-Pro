@@ -1,3 +1,4 @@
+import { PROVIDER_DISCOVERY_RATE_LIMIT } from '../../config/constants.js';
 import { createImageProvider } from '../../integrations/images/image-provider.factory.js';
 import { createImagesController } from './images.controller.js';
 import { imagesSchemas } from './images.schema.js';
@@ -10,6 +11,7 @@ export async function imagesRoutes(app, options = {}) {
 
   app.get('/search', {
     schema: imagesSchemas.search,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
     handler: controller.search,
   });
 }
