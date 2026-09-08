@@ -56,8 +56,11 @@ test.describe('public home page', () => {
     const response = await page.goto('/plan-by-budget?origin=Stockholm&budget=10000&currency=SEK');
 
     expect(response?.ok()).toBe(true);
-    await expect(page.locator('.query-summary')).toContainText('Stockholm');
-    await expect(page.locator('.query-summary')).toContainText('10000 SEK');
+    await expect(
+      page.getByRole('textbox', { name: 'Where are you travelling from?' }),
+    ).toHaveValue('Stockholm');
+    await expect(page.getByRole('spinbutton', { name: 'Budget' })).toHaveValue('10000');
+    await expect(page.getByRole('combobox', { name: 'Currency' })).toHaveValue('SEK');
   });
 
   test('has no serious or critical automated accessibility violations', async ({ page }) => {
