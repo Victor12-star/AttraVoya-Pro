@@ -1,39 +1,28 @@
-import { FeaturePage } from '../../../components/common/feature-page.jsx';
+import { CURRENCY_CODES } from '@attravoya/localization';
+
+import { BudgetPlannerPage } from '../../../features/planner/budget-planner-page.jsx';
+import { getBudgetPlannerCopy } from '../../../features/planner/budget-planner-copy.js';
 import { getRequestLocale } from '../../../i18n/request-locale.js';
-import { loadMessages } from '../../../i18n/messages.js';
 
 export default async function PlanByBudgetPage({ searchParams }) {
-  const params = await searchParams;
-  const locale = await getRequestLocale();
-  const messages = await loadMessages(locale);
+  const [params, locale] = await Promise.all([searchParams, getRequestLocale()]);
+  const copy = getBudgetPlannerCopy(locale);
 
-  const origin = typeof params?.origin === 'string' ? params.origin.slice(0, 120) : '';
-  const budget = typeof params?.budget === 'string' ? params.budget.slice(0, 30) : '';
-  const currency =
-    typeof params?.currency === 'string' ? params.currency.slice(0, 3).toUpperCase() : '';
+  const origin = typeof params?.origin === 'string' ? params.origin.trim().slice(0, 120) : '';
+  const rawBudget = typeof params?.budget === 'string' ? params.budget.trim().slice(0, 30) : '';
+  const budgetNumber = Number(rawBudget);
+  const initialBudget = Number.isFinite(budgetNumber) && budgetNumber > 0 ? String(budgetNumber) : '';
+  const requestedCurrency =
+    typeof params?.currency === 'string' ? params.currency.trim().slice(0, 3).toUpperCase() : '';
+  const defaultCurrency = CURRENCY_CODES.includes(requestedCurrency) ? requestedCurrency : 'SEK';
 
   return (
-    <FeaturePage
-      eyebrow={messages.budget.title}
-      title={messages.home.budgetTitle}
-      description={messages.home.budgetDescription}
-      backLabel={messages.navigation.explore}
-    >
-      {origin || budget ? (
-        <div className="query-summary">
-          {origin ? (
-            <div>
-              <strong>{messages.budget.origin}:</strong> {origin}
-            </div>
-          ) : null}
-          {budget ? (
-            <div>
-              <strong>{messages.budget.totalBudget}:</strong> {budget} {currency}
-            </div>
-          ) : null}
-          <div>{messages.common.unavailable}</div>
-        </div>
-      ) : null}
-    </FeaturePage>
+    <BudgetPlannerPage
+      copy={copy}
+      defaultCurrency={defaultCurrency}
+      initialBudget={initialBudget}
+      initialOrigin={origin}
+      locale={locale}
+    />
   );
 }
