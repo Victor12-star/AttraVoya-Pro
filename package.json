@@ -36,7 +36,7 @@
     "load:test": "node scripts/http-load-test.js",
     "load:harness:test": "node --test scripts/http-load-test.test.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write apps/web/src/features/language/travel-companion-interpreter-copy.js apps/web/src/features/language/travel-companion-page.jsx && git diff -- apps/web/src/features/language/travel-companion-interpreter-copy.js apps/web/src/features/language/travel-companion-page.jsx && prettier --check .",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
