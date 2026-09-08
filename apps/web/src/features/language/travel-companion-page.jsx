@@ -152,7 +152,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   const companionCopy = getTravelCompanionCopy(locale);
   const interpreterCopy = getTravelCompanionInterpreterCopy(locale);
   const recognitionRef = useRef(/** @type {any} */ (null));
-  const showToLocalCloseRef = useRef(null);
+  const showToLocalCloseRef = useRef(/** @type {any} */ (null));
   const historyIdRef = useRef(0);
   const [countriesState, setCountriesState] = useState(
     /** @type {any} */ ({ status: 'loading', data: [] }),
@@ -715,12 +715,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       </div>
 
       {showToLocalItem ? (
-        <div
-          className={styles.showLocalBackdrop}
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setShowToLocalItem(null);
-          }}
-        >
+        <div className={styles.showLocalBackdrop}>
           <section
             className={styles.showLocalCard}
             role="dialog"
