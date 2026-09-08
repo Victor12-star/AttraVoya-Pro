@@ -1,3 +1,4 @@
+import { PROVIDER_DISCOVERY_RATE_LIMIT } from '../../config/constants.js';
 import { createMapsController } from './maps.controller.js';
 import { mapsSchemas } from './maps.schema.js';
 import { createMapsService } from './maps.service.js';
@@ -16,5 +17,9 @@ export async function mapsRoutes(app, options = {}) {
   const service = createMapsService(provider);
   const controller = createMapsController(service);
 
-  app.get('/route', { schema: mapsSchemas.route, handler: controller.route });
+  app.get('/route', {
+    schema: mapsSchemas.route,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
+    handler: controller.route,
+  });
 }
