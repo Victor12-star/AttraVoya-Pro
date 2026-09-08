@@ -1,0 +1,305 @@
+.card {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+}
+
+.header h2 {
+  margin: 0.3rem 0 0.4rem;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.header p,
+.sessionNote,
+.selection p,
+.driverCardFooter,
+.originalInstruction {
+  color: var(--color-text-muted);
+}
+
+.header p {
+  max-width: 68ch;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.searchForm {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.searchForm > label {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+}
+
+.searchRow input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.searchRow input:focus-visible,
+.placeButton:focus-visible,
+.closeButton:focus-visible {
+  outline: 3px solid var(--color-focus, currentColor);
+  outline-offset: 3px;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.results {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.placeButton {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.placeButton:hover,
+.placeButtonSelected {
+  border-color: currentColor;
+}
+
+.placeButton span {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.placeButton small {
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.selection {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.selection h3 {
+  margin: 0.25rem 0;
+  font-size: 1.1rem;
+}
+
+.selection p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.error {
+  margin: 0;
+  padding: 0.8rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.sessionNote {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 72%);
+}
+
+.driverCard {
+  display: grid;
+  gap: 1.25rem;
+  width: min(50rem, 100%);
+  max-height: calc(100dvh - 2rem);
+  padding: clamp(1.2rem, 4vw, 2.2rem);
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.driverCardHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.driverCardHeader h2 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+}
+
+.closeButton {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.destinationBlock {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.destinationBlock div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.destinationBlock strong {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+}
+
+.destinationBlock span {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.translatedInstruction {
+  margin: 0;
+  padding: clamp(1rem, 4vw, 1.8rem);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-subtle);
+  font-size: clamp(1.7rem, 6vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.originalInstruction {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.originalInstruction p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.driverCardFooter {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.driverCardFooter small {
+  flex: 0 0 auto;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+@media (max-width: 42rem) {
+  .searchRow {
+    grid-template-columns: 1fr;
+  }
+
+  .selection,
+  .driverCardFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .selection > button {
+    width: 100%;
+  }
+}
