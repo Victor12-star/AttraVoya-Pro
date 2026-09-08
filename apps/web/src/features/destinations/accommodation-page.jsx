@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   BedDouble,
@@ -245,6 +245,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const [selectedType, setSelectedType] = useState(/** @type {string|null} */ (null));
   const [galleryStay, setGalleryStay] = useState(/** @type {any|null} */ (null));
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const galleryCloseButtonRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
   const [accommodationState, setAccommodationState] = useState(
     /** @type {AccommodationState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -271,6 +272,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
 
   useEffect(() => {
     if (!galleryStay) return undefined;
+
+    galleryCloseButtonRef.current?.focus();
 
     function handleKeyDown(event) {
       if (event.key === 'Escape') {
@@ -535,13 +538,12 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
       </div>
 
       {galleryStay && activePhoto ? (
-        <div className={styles.galleryBackdrop} role="presentation" onMouseDown={closeGallery}>
+        <div className={styles.galleryBackdrop} role="presentation">
           <section
             className={styles.galleryDialog}
             role="dialog"
             aria-modal="true"
             aria-labelledby="accommodation-gallery-title"
-            onMouseDown={(event) => event.stopPropagation()}
           >
             <header className={styles.galleryHeader}>
               <div>
@@ -551,11 +553,11 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                 </h2>
               </div>
               <button
+                ref={galleryCloseButtonRef}
                 className={styles.iconButton}
                 type="button"
                 onClick={closeGallery}
                 aria-label={photoCopy.close}
-                autoFocus
               >
                 <X size={20} aria-hidden="true" />
               </button>
