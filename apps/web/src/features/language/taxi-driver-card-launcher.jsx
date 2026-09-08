@@ -41,7 +41,9 @@ function normalizeDestinationLanguages(response, expectedCountryCode) {
   const countryCode = textValue(phrasebook?.destination?.countryCode, 2)?.toUpperCase();
   if (countryCode !== expectedCountryCode) return null;
 
-  const languages = (Array.isArray(phrasebook?.destination?.languages) ? phrasebook.destination.languages : [])
+  const languages = (
+    Array.isArray(phrasebook?.destination?.languages) ? phrasebook.destination.languages : []
+  )
     .map((language) => {
       const code = languageCode(language?.code);
       if (!code || language?.available !== true) return null;
@@ -134,9 +136,7 @@ export function TaxiDriverCardLauncher({
     else setLanguageState({ status: 'idle', data: [] });
   }
 
-  const targetReference = languageState.data.find(
-    (language) => language.code === targetLanguage,
-  );
+  const targetReference = languageState.data.find((language) => language.code === targetLanguage);
 
   return (
     <section className={`shell ${styles.section}`} aria-label="Taxi / Driver Card">
@@ -160,7 +160,10 @@ export function TaxiDriverCardLauncher({
         {languageState.status === 'success' ? (
           <label className={styles.field}>
             <span>{languageCopy.targetLanguage}</span>
-            <select value={targetLanguage} onChange={(event) => setTargetLanguage(event.target.value)}>
+            <select
+              value={targetLanguage}
+              onChange={(event) => setTargetLanguage(event.target.value)}
+            >
               {languageState.data.map((language) => (
                 <option key={language.code} value={language.code}>
                   {language.name}
