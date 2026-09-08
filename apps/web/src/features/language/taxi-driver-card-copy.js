@@ -4,7 +4,8 @@ const COPY = Object.freeze({
   en: {
     eyebrow: 'Travel Companion',
     title: 'Taxi / Driver Card',
-    intro: 'Find the exact place, translate the instruction, and show the destination clearly to your driver.',
+    intro:
+      'Find the exact place, translate the instruction, and show the destination clearly to your driver.',
     searchLabel: 'Where do you want to go?',
     searchPlaceholder: 'Hotel, restaurant, attraction or address',
     search: 'Find place',
@@ -16,10 +17,13 @@ const COPY = Object.freeze({
     creating: 'Creating card…',
     showCard: 'Show driver card',
     close: 'Close',
-    showHint: 'Turn the screen toward the driver and confirm the destination before the ride starts.',
+    showHint:
+      'Turn the screen toward the driver and confirm the destination before the ride starts.',
     original: 'English instruction',
-    translationUnavailable: 'The driver instruction could not be translated. No translation was invented.',
-    sessionOnly: 'The selected destination and driver card stay on this page only and are not saved.',
+    translationUnavailable:
+      'The driver instruction could not be translated. No translation was invented.',
+    sessionOnly:
+      'The selected destination and driver card stay on this page only and are not saved.',
   },
   sv: {
     eyebrow: 'Resekompis',
@@ -38,25 +42,29 @@ const COPY = Object.freeze({
     close: 'Stäng',
     showHint: 'Vänd skärmen mot föraren och bekräfta destinationen innan resan börjar.',
     original: 'Engelsk instruktion',
-    translationUnavailable: 'Förarinstruktionen kunde inte översättas. Ingen översättning hittades på.',
+    translationUnavailable:
+      'Förarinstruktionen kunde inte översättas. Ingen översättning hittades på.',
     sessionOnly: 'Vald destination och förarkort finns bara på den här sidan och sparas inte.',
   },
   es: {
     eyebrow: 'Compañero de viaje',
     title: 'Tarjeta para taxi / conductor',
-    intro: 'Encuentra el lugar exacto, traduce la indicación y muestra claramente el destino al conductor.',
+    intro:
+      'Encuentra el lugar exacto, traduce la indicación y muestra claramente el destino al conductor.',
     searchLabel: '¿Adónde quieres ir?',
     searchPlaceholder: 'Hotel, restaurante, atracción o dirección',
     search: 'Buscar lugar',
     searchHint: 'Introduce al menos 2 caracteres.',
     noResults: 'No se encontró ningún lugar. Prueba con un nombre o una dirección más específicos.',
-    searchUnavailable: 'La búsqueda de lugares no está disponible ahora. No se inventó ningún destino.',
+    searchUnavailable:
+      'La búsqueda de lugares no está disponible ahora. No se inventó ningún destino.',
     address: 'Dirección',
     createCard: 'Crear tarjeta',
     creating: 'Creando tarjeta…',
     showCard: 'Mostrar al conductor',
     close: 'Cerrar',
-    showHint: 'Gira la pantalla hacia el conductor y confirma el destino antes de iniciar el viaje.',
+    showHint:
+      'Gira la pantalla hacia el conductor y confirma el destino antes de iniciar el viaje.',
     original: 'Indicación en inglés',
     translationUnavailable: 'No se pudo traducir la indicación. No se inventó ninguna traducción.',
     sessionOnly: 'El destino y la tarjeta permanecen solo en esta página y no se guardan.',
@@ -64,13 +72,15 @@ const COPY = Object.freeze({
   fr: {
     eyebrow: 'Compagnon de voyage',
     title: 'Carte taxi / chauffeur',
-    intro: 'Trouvez le lieu exact, traduisez l’instruction et montrez clairement la destination au chauffeur.',
+    intro:
+      'Trouvez le lieu exact, traduisez l’instruction et montrez clairement la destination au chauffeur.',
     searchLabel: 'Où voulez-vous aller ?',
     searchPlaceholder: 'Hôtel, restaurant, attraction ou adresse',
     search: 'Trouver le lieu',
     searchHint: 'Saisissez au moins 2 caractères.',
     noResults: 'Aucun lieu correspondant. Essayez un nom ou une adresse plus précis.',
-    searchUnavailable: 'La recherche de lieux est indisponible. Aucune destination n’a été inventée.',
+    searchUnavailable:
+      'La recherche de lieux est indisponible. Aucune destination n’a été inventée.',
     address: 'Adresse',
     createCard: 'Créer la carte',
     creating: 'Création…',
@@ -78,8 +88,10 @@ const COPY = Object.freeze({
     close: 'Fermer',
     showHint: 'Tournez l’écran vers le chauffeur et confirmez la destination avant le départ.',
     original: 'Instruction en anglais',
-    translationUnavailable: 'L’instruction n’a pas pu être traduite. Aucune traduction n’a été inventée.',
-    sessionOnly: 'La destination et la carte restent uniquement sur cette page et ne sont pas enregistrées.',
+    translationUnavailable:
+      'L’instruction n’a pas pu être traduite. Aucune traduction n’a été inventée.',
+    sessionOnly:
+      'La destination et la carte restent uniquement sur cette page et ne sont pas enregistrées.',
   },
   de: {
     eyebrow: 'Reisebegleiter',
@@ -98,19 +110,22 @@ const COPY = Object.freeze({
     close: 'Schließen',
     showHint: 'Halte den Bildschirm zum Fahrer und bestätige das Ziel vor Fahrtbeginn.',
     original: 'Englische Anweisung',
-    translationUnavailable: 'Die Anweisung konnte nicht übersetzt werden. Es wurde nichts erfunden.',
+    translationUnavailable:
+      'Die Anweisung konnte nicht übersetzt werden. Es wurde nichts erfunden.',
     sessionOnly: 'Ziel und Fahrerkarte bleiben nur auf dieser Seite und werden nicht gespeichert.',
   },
   it: {
     eyebrow: 'Compagno di viaggio',
     title: 'Scheda taxi / autista',
-    intro: 'Trova il luogo esatto, traduci l’istruzione e mostra chiaramente la destinazione all’autista.',
+    intro:
+      'Trova il luogo esatto, traduci l’istruzione e mostra chiaramente la destinazione all’autista.',
     searchLabel: 'Dove vuoi andare?',
     searchPlaceholder: 'Hotel, ristorante, attrazione o indirizzo',
     search: 'Trova luogo',
     searchHint: 'Inserisci almeno 2 caratteri.',
     noResults: 'Nessun luogo corrispondente. Prova un nome o un indirizzo più specifico.',
-    searchUnavailable: 'La ricerca dei luoghi non è disponibile. Non è stata inventata alcuna destinazione.',
+    searchUnavailable:
+      'La ricerca dei luoghi non è disponibile. Non è stata inventata alcuna destinazione.',
     address: 'Indirizzo',
     createCard: 'Crea scheda autista',
     creating: 'Creazione…',
@@ -118,13 +133,15 @@ const COPY = Object.freeze({
     close: 'Chiudi',
     showHint: 'Rivolgi lo schermo verso l’autista e conferma la destinazione prima della partenza.',
     original: 'Istruzione in inglese',
-    translationUnavailable: 'Non è stato possibile tradurre l’istruzione. Nessuna traduzione è stata inventata.',
+    translationUnavailable:
+      'Non è stato possibile tradurre l’istruzione. Nessuna traduzione è stata inventata.',
     sessionOnly: 'Destinazione e scheda restano solo in questa pagina e non vengono salvate.',
   },
   pt: {
     eyebrow: 'Companheiro de viagem',
     title: 'Cartão de táxi / motorista',
-    intro: 'Encontre o local exato, traduza a instrução e mostre claramente o destino ao motorista.',
+    intro:
+      'Encontre o local exato, traduza a instrução e mostre claramente o destino ao motorista.',
     searchLabel: 'Para onde quer ir?',
     searchPlaceholder: 'Hotel, restaurante, atração ou endereço',
     search: 'Procurar local',
@@ -138,7 +155,8 @@ const COPY = Object.freeze({
     close: 'Fechar',
     showHint: 'Vire o ecrã para o motorista e confirme o destino antes da viagem.',
     original: 'Instrução em inglês',
-    translationUnavailable: 'Não foi possível traduzir a instrução. Nenhuma tradução foi inventada.',
+    translationUnavailable:
+      'Não foi possível traduzir a instrução. Nenhuma tradução foi inventada.',
     sessionOnly: 'O destino e o cartão ficam apenas nesta página e não são guardados.',
   },
   pl: {
@@ -164,7 +182,8 @@ const COPY = Object.freeze({
   nl: {
     eyebrow: 'Reisgenoot',
     title: 'Taxi- / chauffeurskaart',
-    intro: 'Vind de exacte plek, vertaal de instructie en toon de bestemming duidelijk aan de chauffeur.',
+    intro:
+      'Vind de exacte plek, vertaal de instructie en toon de bestemming duidelijk aan de chauffeur.',
     searchLabel: 'Waar wil je naartoe?',
     searchPlaceholder: 'Hotel, restaurant, attractie of adres',
     search: 'Plaats zoeken',
@@ -178,7 +197,8 @@ const COPY = Object.freeze({
     close: 'Sluiten',
     showHint: 'Draai het scherm naar de chauffeur en bevestig de bestemming voor vertrek.',
     original: 'Engelse instructie',
-    translationUnavailable: 'De instructie kon niet worden vertaald. Er is geen vertaling verzonnen.',
+    translationUnavailable:
+      'De instructie kon niet worden vertaald. Er is geen vertaling verzonnen.',
     sessionOnly: 'Bestemming en kaart blijven alleen op deze pagina en worden niet opgeslagen.',
   },
   no: {
@@ -198,7 +218,8 @@ const COPY = Object.freeze({
     close: 'Lukk',
     showHint: 'Vend skjermen mot sjåføren og bekreft reisemålet før turen starter.',
     original: 'Engelsk instruksjon',
-    translationUnavailable: 'Instruksjonen kunne ikke oversettes. Ingen oversettelse ble funnet på.',
+    translationUnavailable:
+      'Instruksjonen kunne ikke oversettes. Ingen oversettelse ble funnet på.',
     sessionOnly: 'Destinasjonen og kortet blir bare på denne siden og lagres ikke.',
   },
   da: {
@@ -218,7 +239,8 @@ const COPY = Object.freeze({
     close: 'Luk',
     showHint: 'Vend skærmen mod chaufføren og bekræft destinationen før turen starter.',
     original: 'Engelsk instruktion',
-    translationUnavailable: 'Instruktionen kunne ikke oversættes. Ingen oversættelse blev opfundet.',
+    translationUnavailable:
+      'Instruktionen kunne ikke oversættes. Ingen oversættelse blev opfundet.',
     sessionOnly: 'Destination og kort findes kun på denne side og gemmes ikke.',
   },
   fi: {
