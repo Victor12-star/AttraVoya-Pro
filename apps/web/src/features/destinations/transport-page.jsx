@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, LoaderCircle, MapPin, RefreshCw, Route, Search } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { SafeRideRouteWatch } from '../safety/safe-ride-route-watch.jsx';
 import { buildDestinationHref } from './destination-route.js';
 import { getTransportPageCopy } from './transport-page-copy.js';
 import styles from './transport-page.module.css';
@@ -199,8 +200,16 @@ function formatDistance(formatter, meters) {
  * @param {TransportDestination|null} props.destination
  * @param {string} [props.locale]
  * @param {any} props.messages
+ * @param {string} [props.googleMapsBrowserKey]
+ * @param {boolean} [props.safeRideGoogleEnabled]
  */
-export function TransportDestinationPage({ destination, locale = 'en', messages }) {
+export function TransportDestinationPage({
+  destination,
+  locale = 'en',
+  messages,
+  googleMapsBrowserKey = '',
+  safeRideGoogleEnabled = false,
+}) {
   const copy = getTransportPageCopy(locale);
   const [query, setQuery] = useState('');
   const [searchState, setSearchState] = useState(
@@ -476,6 +485,16 @@ export function TransportDestinationPage({ destination, locale = 'en', messages 
             <p className={styles.disclaimer}>{copy.disclaimer}</p>
           </aside>
         </div>
+
+        {selectedPlace && mode === 'drive' ? (
+          <SafeRideRouteWatch
+            key={`${selectedPlace.externalId ?? selectedPlace.name}:${selectedPlace.latitude}:${selectedPlace.longitude}`}
+            destination={selectedPlace}
+            locale={locale}
+            googleMapsBrowserKey={googleMapsBrowserKey}
+            enabled={safeRideGoogleEnabled}
+          />
+        ) : null}
       </div>
     </section>
   );
