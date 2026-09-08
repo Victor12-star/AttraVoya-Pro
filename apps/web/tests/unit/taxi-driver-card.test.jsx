@@ -115,7 +115,9 @@ describe('TaxiDriverCard', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Find place' }));
 
-    expect(await screen.findByRole('button', { name: /Grand Hotel Stockholm/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: /Grand Hotel Stockholm/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Wrong country')).not.toBeInTheDocument();
     expect(screen.queryByText('Bad latitude')).not.toBeInTheDocument();
   });
@@ -198,7 +200,9 @@ describe('TaxiDriverCard', () => {
     );
     mocks.autocompletePlaces.mockResolvedValue({
       places: {
-        results: [validPlace({ countryCode: 'AE', name: 'Dubai Hotel', formattedAddress: 'Dubai' })],
+        results: [
+          validPlace({ countryCode: 'AE', name: 'Dubai Hotel', formattedAddress: 'Dubai' }),
+        ],
       },
     });
     fireEvent.change(screen.getByLabelText('Where do you want to go?'), {
