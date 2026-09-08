@@ -1,1 +1,0 @@
-Remove temporary notes now.
