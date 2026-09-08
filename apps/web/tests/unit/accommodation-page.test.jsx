@@ -55,6 +55,7 @@ function accommodationResponse() {
           accommodationType: 'HOTEL',
           livePrice: null,
           liveAvailability: null,
+          photos: [],
         },
         {
           provider: 'geoapify',
@@ -68,6 +69,60 @@ function accommodationResponse() {
           accommodationType: 'HOSTEL',
           livePrice: null,
           liveAvailability: null,
+          photos: [],
+        },
+      ],
+    },
+  };
+}
+
+function accommodationPhotoResponse() {
+  return {
+    accommodation: {
+      provider: 'authorized-stay-provider',
+      fetchedAt: '2026-09-08T10:00:00.000Z',
+      inventoryDataAvailable: true,
+      results: [
+        {
+          provider: 'authorized-stay-provider',
+          externalId: 'hotel-with-media',
+          name: 'Example Hotel',
+          formattedAddress: 'Stockholm, Sweden',
+          latitude: 59.34,
+          longitude: 18.07,
+          distanceMeters: 1800,
+          accommodationType: 'HOTEL',
+          photos: [
+            {
+              id: 'exterior',
+              url: 'https://media.example.com/hotel/exterior.jpg',
+              thumbnailUrl: 'https://media.example.com/hotel/exterior-thumb.jpg',
+              category: 'EXTERIOR',
+              alt: 'Example Hotel exterior',
+              provider: 'Authorized Stay Provider',
+              attribution: 'Authorized Stay Provider media',
+            },
+            {
+              id: 'room',
+              url: 'https://media.example.com/hotel/room.jpg',
+              category: 'ROOM',
+              alt: 'Example Hotel room interior',
+              provider: 'Authorized Stay Provider',
+            },
+            {
+              id: 'bed',
+              url: 'https://media.example.com/hotel/bed.jpg',
+              category: 'BED',
+              alt: 'Example Hotel bed',
+              provider: 'Authorized Stay Provider',
+            },
+            {
+              id: 'unsafe',
+              url: 'javascript:alert(1)',
+              category: 'ROOM',
+              alt: 'Unsafe image',
+            },
+          ],
         },
       ],
     },
@@ -80,7 +135,7 @@ describe('AccommodationPage', () => {
     mocks.getNearbyAccommodation.mockResolvedValue(accommodationResponse());
   });
 
-  it('renders real lodging locations without inventing live inventory data', async () => {
+  it('renders real lodging locations without inventing live inventory or property photos', async () => {
     render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
@@ -98,6 +153,10 @@ describe('AccommodationPage', () => {
         'Location data only. Live room prices and availability are not connected yet.',
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.getAllByText('Property photos are not available from this provider.'),
+    ).toHaveLength(2);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Website' })).toHaveAttribute(
       'href',
       'https://example.com/',
@@ -112,6 +171,42 @@ describe('AccommodationPage', () => {
       language: 'en',
       types: [],
     });
+  });
+
+  it('shows provider-supplied exterior, room and bed photos in an accessible gallery', async () => {
+    mocks.getNearbyAccommodation.mockResolvedValue(accommodationPhotoResponse());
+
+    render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
+
+    await screen.findByRole('heading', { name: 'Example Hotel', level: 2 });
+    expect(screen.getByRole('img', { name: 'Example Hotel exterior' })).toHaveAttribute(
+      'src',
+      'https://media.example.com/hotel/exterior.jpg',
+    );
+    expect(screen.queryByRole('img', { name: 'Unsafe image' })).not.toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'View photos: Example Hotel' }).click();
+
+    const dialog = await screen.findByRole('dialog', { name: 'Example Hotel photos' });
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByText('Exterior')).toBeInTheDocument();
+    expect(screen.getByText('1 of 3')).toBeInTheDocument();
+    expect(screen.getByText('Photo source: Authorized Stay Provider media')).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Next photo' }).click();
+    expect(
+      await screen.findByRole('img', { name: 'Example Hotel room interior' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Room')).toBeInTheDocument();
+    expect(screen.getByText('2 of 3')).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Next photo' }).click();
+    expect(await screen.findByRole('img', { name: 'Example Hotel bed' })).toBeInTheDocument();
+    expect(screen.getByText('Bed')).toBeInTheDocument();
+    expect(screen.getByText('3 of 3')).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Close photos' }).click();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('refetches through the dedicated accommodation API when a supported type is selected', async () => {

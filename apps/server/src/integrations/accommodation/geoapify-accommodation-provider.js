@@ -61,7 +61,9 @@ export function createGeoapifyAccommodationProvider({ placesProvider }) {
         results: deduplicated,
         unsupportedTypes,
         inventoryDataAvailable: false,
-        message: 'Location data only. Live room price and availability are not connected yet.',
+        photoDataAvailable: false,
+        message:
+          'Location data only. Live room prices, availability and property photos are not connected yet.',
       };
     },
   };

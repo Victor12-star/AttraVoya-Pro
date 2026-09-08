@@ -1,26 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   BedDouble,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
+  ImageOff,
+  Images,
   Info,
   LoaderCircle,
   MapPin,
   Navigation,
   RefreshCw,
+  X,
 } from 'lucide-react';
 import { ACCOMMODATION_TYPES } from '@attravoya/constants';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getAccommodationPageCopy } from './accommodation-page-copy.js';
+import { getAccommodationPhotoCopy } from './accommodation-photo-copy.js';
 import styles from './accommodation-page.module.css';
 import { buildDestinationHref } from './destination-route.js';
 
 const SEARCH_RADIUS_METERS = 10_000;
 const SEARCH_LIMIT = 24;
+const MAX_PROPERTY_PHOTOS = 24;
+const PHOTO_CATEGORIES = new Set(['EXTERIOR', 'ROOM', 'BED', 'BATHROOM', 'INTERIOR', 'OTHER']);
 const FILTER_TYPES = Object.freeze([
   null,
   ACCOMMODATION_TYPES.HOTEL,
@@ -59,8 +67,8 @@ function finiteNumber(value) {
 }
 
 /** @param {unknown} value */
-function safeWebsite(value) {
-  const candidate = textValue(value, 1000);
+function safeHttpUrl(value) {
+  const candidate = textValue(value, 2000);
   if (!candidate) return null;
 
   try {
@@ -80,6 +88,46 @@ function providerDisplayName(provider) {
   return value ? value.charAt(0).toUpperCase() + value.slice(1) : null;
 }
 
+/** @param {unknown} value */
+function photoCategory(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toUpperCase();
+  return PHOTO_CATEGORIES.has(normalized) ? normalized : 'OTHER';
+}
+
+/** @param {any} photo @param {number} index */
+function normalizeAccommodationPhoto(photo, index) {
+  const url = safeHttpUrl(photo?.url);
+  if (!url) return null;
+
+  return {
+    key: textValue(photo?.id, 240) ?? `${url}:${index}`,
+    url,
+    thumbnailUrl: safeHttpUrl(photo?.thumbnailUrl) ?? url,
+    category: photoCategory(photo?.category),
+    alt: textValue(photo?.alt, 300),
+    provider: textValue(photo?.provider, 80),
+    attribution: textValue(photo?.attribution, 300),
+  };
+}
+
+/** @param {unknown} rows */
+function normalizeAccommodationPhotos(rows) {
+  if (!Array.isArray(rows)) return [];
+
+  const seen = new Set();
+  const photos = [];
+  rows.slice(0, MAX_PROPERTY_PHOTOS * 2).forEach((photo, index) => {
+    const normalized = normalizeAccommodationPhoto(photo, index);
+    if (!normalized || seen.has(normalized.url)) return;
+    seen.add(normalized.url);
+    photos.push(normalized);
+  });
+
+  return photos.slice(0, MAX_PROPERTY_PHOTOS);
+}
+
 /** @param {any} place @param {number} index */
 function normalizeAccommodationPlace(place, index) {
   const name = textValue(place?.name, 180);
@@ -91,8 +139,9 @@ function normalizeAccommodationPlace(place, index) {
   const longitude = finiteNumber(place?.longitude);
   const formattedAddress = textValue(place?.formattedAddress, 500);
   const distanceMeters = finiteNumber(place?.distanceMeters);
-  const website = safeWebsite(place?.website);
+  const website = safeHttpUrl(place?.website);
   const accommodationType = textValue(place?.accommodationType, 60);
+  const photos = normalizeAccommodationPhotos(place?.photos);
   const fallbackKey = `${name}:${latitude ?? ''}:${longitude ?? ''}:${index}`;
 
   return {
@@ -103,6 +152,7 @@ function normalizeAccommodationPlace(place, index) {
     distanceMeters: distanceMeters !== null && distanceMeters >= 0 ? distanceMeters : null,
     website,
     accommodationType,
+    photos,
   };
 }
 
@@ -175,6 +225,14 @@ function destinationText(template, destinationName) {
   return template.replace('{destination}', destinationName);
 }
 
+/** @param {string} template @param {Record<string, string|number>} values */
+function interpolate(template, values) {
+  return Object.entries(values).reduce(
+    (result, [key, value]) => result.replace(`{${key}}`, String(value)),
+    template,
+  );
+}
+
 /**
  * @param {object} props
  * @param {AccommodationDestination|null} props.destination
@@ -183,7 +241,11 @@ function destinationText(template, destinationName) {
  */
 export function AccommodationPage({ destination, locale = 'en', messages }) {
   const copy = getAccommodationPageCopy(locale);
+  const photoCopy = getAccommodationPhotoCopy(locale);
   const [selectedType, setSelectedType] = useState(/** @type {string|null} */ (null));
+  const [galleryStay, setGalleryStay] = useState(/** @type {any|null} */ (null));
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const galleryCloseButtonRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
   const [accommodationState, setAccommodationState] = useState(
     /** @type {AccommodationState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -208,17 +270,59 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     };
   }, [destination, locale, selectedType]);
 
+  useEffect(() => {
+    if (!galleryStay) return undefined;
+
+    galleryCloseButtonRef.current?.focus();
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setGalleryStay(null);
+        setActivePhotoIndex(0);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [galleryStay]);
+
   /** @param {string|null} nextType */
   function chooseType(nextType) {
     if (nextType === selectedType) return;
+    setGalleryStay(null);
+    setActivePhotoIndex(0);
     setAccommodationState({ status: 'loading', data: null });
     setSelectedType(nextType);
   }
 
   function retryAccommodation() {
     if (!destination) return;
+    setGalleryStay(null);
+    setActivePhotoIndex(0);
     setAccommodationState({ status: 'loading', data: null });
     void requestAccommodation(destination, locale, selectedType).then(setAccommodationState);
+  }
+
+  /** @param {any} stay */
+  function openGallery(stay) {
+    if (!stay?.photos?.length) return;
+    setGalleryStay(stay);
+    setActivePhotoIndex(0);
+  }
+
+  function closeGallery() {
+    setGalleryStay(null);
+    setActivePhotoIndex(0);
+  }
+
+  function previousPhoto() {
+    if (!galleryStay?.photos?.length) return;
+    setActivePhotoIndex((current) => (current === 0 ? galleryStay.photos.length - 1 : current - 1));
+  }
+
+  function nextPhoto() {
+    if (!galleryStay?.photos?.length) return;
+    setActivePhotoIndex((current) => (current + 1) % galleryStay.photos.length);
   }
 
   if (!destination) {
@@ -241,6 +345,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const providerName = providerDisplayName(accommodationState.data?.provider);
   const backHref = buildDestinationHref(destination);
   const inventoryDataAvailable = accommodationState.data?.inventoryDataAvailable === true;
+  const activePhoto = galleryStay?.photos?.[activePhotoIndex] ?? null;
 
   return (
     <section className={styles.page} aria-labelledby="accommodation-title">
@@ -342,8 +447,36 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
             {stays.map((stay) => {
               const distance = formatDistance(numberFormatter, stay.distanceMeters);
               const typeLabel = stay.accommodationType ? copy.types[stay.accommodationType] : null;
+              const coverPhoto = stay.photos[0] ?? null;
+              const coverAlt = coverPhoto
+                ? (coverPhoto.alt ??
+                  `${stay.name} — ${photoCopy.categories[coverPhoto.category] ?? photoCopy.categories.OTHER}`)
+                : '';
+
               return (
                 <article className={styles.card} key={stay.key}>
+                  {coverPhoto ? (
+                    <button
+                      className={styles.photoPreview}
+                      type="button"
+                      onClick={() => openGallery(stay)}
+                      aria-label={`${photoCopy.viewPhotos}: ${stay.name}`}
+                    >
+                      {/* Remote property-media domains are provider-controlled and cannot be statically allowlisted. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={coverPhoto.url} alt={coverAlt} loading="lazy" decoding="async" />
+                      <span className={styles.photoCount}>
+                        <Images size={15} aria-hidden="true" />
+                        {stay.photos.length}
+                      </span>
+                    </button>
+                  ) : (
+                    <div className={styles.photoUnavailable} role="note">
+                      <ImageOff size={24} aria-hidden="true" />
+                      <span>{photoCopy.noPhotos}</span>
+                    </div>
+                  )}
+
                   <div className={styles.cardHeading}>
                     <span className={styles.cardIcon} aria-hidden="true">
                       <BedDouble size={20} />
@@ -358,6 +491,17 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                       <MapPin size={16} aria-hidden="true" />
                       <span>{stay.formattedAddress}</span>
                     </p>
+                  ) : null}
+
+                  {stay.photos.length > 0 ? (
+                    <button
+                      className={styles.galleryButton}
+                      type="button"
+                      onClick={() => openGallery(stay)}
+                    >
+                      <Images size={16} aria-hidden="true" />
+                      {photoCopy.viewPhotos}
+                    </button>
                   ) : null}
 
                   <div className={styles.cardFooter}>
@@ -390,6 +534,101 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
           </div>
         ) : null}
       </div>
+
+      {galleryStay && activePhoto ? (
+        <div className={styles.galleryBackdrop} role="presentation">
+          <section
+            className={styles.galleryDialog}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="accommodation-gallery-title"
+          >
+            <header className={styles.galleryHeader}>
+              <div>
+                <span className="eyebrow">{photoCopy.viewPhotos}</span>
+                <h2 id="accommodation-gallery-title">
+                  {interpolate(photoCopy.galleryTitle, { property: galleryStay.name })}
+                </h2>
+              </div>
+              <button
+                ref={galleryCloseButtonRef}
+                className={styles.iconButton}
+                type="button"
+                onClick={closeGallery}
+                aria-label={photoCopy.close}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </header>
+
+            <div className={styles.galleryMain}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activePhoto.url}
+                alt={
+                  activePhoto.alt ??
+                  `${galleryStay.name} — ${photoCopy.categories[activePhoto.category] ?? photoCopy.categories.OTHER}`
+                }
+                decoding="async"
+              />
+              <div className={styles.galleryMeta}>
+                <span className={styles.typeBadge}>
+                  {photoCopy.categories[activePhoto.category] ?? photoCopy.categories.OTHER}
+                </span>
+                <span>
+                  {interpolate(photoCopy.count, {
+                    current: activePhotoIndex + 1,
+                    total: galleryStay.photos.length,
+                  })}
+                </span>
+                {activePhoto.provider || activePhoto.attribution ? (
+                  <span>
+                    {photoCopy.source}: {activePhoto.attribution ?? activePhoto.provider}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            {galleryStay.photos.length > 1 ? (
+              <div className={styles.galleryNavigation}>
+                <button
+                  className={styles.iconButton}
+                  type="button"
+                  onClick={previousPhoto}
+                  aria-label={photoCopy.previous}
+                >
+                  <ChevronLeft size={20} aria-hidden="true" />
+                </button>
+                <div className={styles.thumbnailList}>
+                  {galleryStay.photos.map((photo, index) => (
+                    <button
+                      className={`${styles.thumbnailButton} ${
+                        index === activePhotoIndex ? styles.thumbnailButtonActive : ''
+                      }`}
+                      type="button"
+                      key={photo.key}
+                      onClick={() => setActivePhotoIndex(index)}
+                      aria-label={`${photoCopy.categories[photo.category] ?? photoCopy.categories.OTHER}: ${index + 1}`}
+                      aria-pressed={index === activePhotoIndex}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photo.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+                    </button>
+                  ))}
+                </div>
+                <button
+                  className={styles.iconButton}
+                  type="button"
+                  onClick={nextPhoto}
+                  aria-label={photoCopy.next}
+                >
+                  <ChevronRight size={20} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

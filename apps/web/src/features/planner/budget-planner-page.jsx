@@ -14,11 +14,12 @@ import {
 } from 'lucide-react';
 
 import { ApiClientError } from '@attravoya/api-client';
-import { ACCOMMODATION_TYPES } from '@attravoya/constants';
+import { ACCOMMODATION_TYPES, STAY_UNIT_TYPES } from '@attravoya/constants';
 import { CURRENCY_CODES } from '@attravoya/localization';
 import { createBudgetPlanRequestSchema } from '@attravoya/validation';
 
 import { apiClient } from '../../lib/api-client.js';
+import { getBudgetAccommodationCopy } from './budget-accommodation-copy.js';
 import styles from './budget-planner-page.module.css';
 
 /**
@@ -41,6 +42,53 @@ const DEFAULT_LODGING = [
   ACCOMMODATION_TYPES.HOSTEL,
   ACCOMMODATION_TYPES.SHORT_TERM_RENTAL,
 ];
+
+const LODGING_STRATEGIES = Object.freeze({
+  CUSTOM: DEFAULT_LODGING,
+  CHEAPEST: [
+    ACCOMMODATION_TYPES.HOSTEL,
+    ACCOMMODATION_TYPES.BUDGET_HOTEL,
+    ACCOMMODATION_TYPES.GUEST_HOUSE,
+    ACCOMMODATION_TYPES.BED_AND_BREAKFAST,
+    ACCOMMODATION_TYPES.CAMPSITE,
+    ACCOMMODATION_TYPES.HOLIDAY_PARK,
+  ],
+  BUDGET: [
+    ACCOMMODATION_TYPES.BUDGET_HOTEL,
+    ACCOMMODATION_TYPES.GUEST_HOUSE,
+    ACCOMMODATION_TYPES.BED_AND_BREAKFAST,
+    ACCOMMODATION_TYPES.HOSTEL,
+    ACCOMMODATION_TYPES.SHORT_TERM_RENTAL,
+    ACCOMMODATION_TYPES.CAMPSITE,
+    ACCOMMODATION_TYPES.HOLIDAY_PARK,
+  ],
+  VALUE: [
+    ACCOMMODATION_TYPES.HOTEL,
+    ACCOMMODATION_TYPES.BUDGET_HOTEL,
+    ACCOMMODATION_TYPES.GUEST_HOUSE,
+    ACCOMMODATION_TYPES.BED_AND_BREAKFAST,
+    ACCOMMODATION_TYPES.HOSTEL,
+    ACCOMMODATION_TYPES.SERVICED_APARTMENT,
+    ACCOMMODATION_TYPES.APARTHOTEL,
+    ACCOMMODATION_TYPES.SHORT_TERM_RENTAL,
+    ACCOMMODATION_TYPES.VACATION_HOME,
+  ],
+  COMFORT: [
+    ACCOMMODATION_TYPES.HOTEL,
+    ACCOMMODATION_TYPES.SERVICED_APARTMENT,
+    ACCOMMODATION_TYPES.APARTHOTEL,
+    ACCOMMODATION_TYPES.VACATION_HOME,
+    ACCOMMODATION_TYPES.RESORT,
+    ACCOMMODATION_TYPES.COTTAGE,
+  ],
+  PREMIUM: [
+    ACCOMMODATION_TYPES.HOTEL,
+    ACCOMMODATION_TYPES.RESORT,
+    ACCOMMODATION_TYPES.VILLA,
+    ACCOMMODATION_TYPES.SERVICED_APARTMENT,
+  ],
+  ALL: LODGING_TYPES,
+});
 
 function splitList(value) {
   return String(value ?? '')
@@ -69,10 +117,19 @@ function formatDateRange(request, copy) {
   return fixed.length === 2 ? `${fixed[0]} – ${fixed[1]}` : copy.fixedSummary;
 }
 
-export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
+export function BudgetPlannerPage({
+  copy,
+  defaultCurrency = 'SEK',
+  initialBudget = '',
+  initialOrigin = '',
+  locale = 'en',
+}) {
+  const accommodationCopy = getBudgetAccommodationCopy(locale);
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
+  const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
   const [lodgingTypes, setLodgingTypes] = useState(DEFAULT_LODGING);
+  const [unitType, setUnitType] = useState(/** @type {string} */ (STAY_UNIT_TYPES.ANY));
   const [familyFriendly, setFamilyFriendly] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitState, setSubmitState] = useState({ type: 'idle', message: '' });
@@ -116,14 +173,25 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
   const selectedLodging = useMemo(() => new Set(lodgingTypes), [lodgingTypes]);
 
   function toggleLodging(type) {
+    setLodgingStrategy('CUSTOM');
     setLodgingTypes((current) =>
       current.includes(type) ? current.filter((item) => item !== type) : [...current, type],
     );
   }
 
+  function chooseLodgingStrategy(event) {
+    const strategy = event.target.value;
+    const types = LODGING_STRATEGIES[strategy];
+    if (!types) return;
+    setLodgingStrategy(strategy);
+    setLodgingTypes([...types]);
+  }
+
   async function submit(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
+    const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
 
     const raw = {
       originLabel: String(form.get('originLabel') ?? '').trim(),
@@ -140,6 +208,9 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
       accommodation: lodgingTypes.length
         ? {
             types: lodgingTypes,
+            unitType,
+            ...(maxNightlyAmount ? { maxNightlyAmount: Number(maxNightlyAmount) } : {}),
+            ...(maxTotalStayAmount ? { maxTotalStayAmount: Number(maxTotalStayAmount) } : {}),
             familyFriendly,
           }
         : undefined,
@@ -232,6 +303,7 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 maxLength={160}
                 placeholder={copy.originPlaceholder}
                 autoComplete="address-level2"
+                defaultValue={initialOrigin}
                 required
               />
             </label>
@@ -315,7 +387,14 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
               <div className={styles.gridThree}>
                 <label>
                   <span>{copy.amount}</span>
-                  <input name="budgetAmount" type="number" min="1" step="0.01" required />
+                  <input
+                    name="budgetAmount"
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    defaultValue={initialBudget}
+                    required
+                  />
                 </label>
                 <label>
                   <span>{copy.currency}</span>
@@ -381,6 +460,41 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
             <fieldset className={styles.fieldset}>
               <legend>{copy.lodging}</legend>
               <p className={styles.hint}>{copy.lodgingHint}</p>
+
+              <label className={styles.fieldFull}>
+                <span>{accommodationCopy.strategyLabel}</span>
+                <select value={lodgingStrategy} onChange={chooseLodgingStrategy}>
+                  {Object.entries(accommodationCopy.strategies).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className={styles.hint}>{accommodationCopy.strategyHint}</p>
+
+              <div className={styles.gridThree}>
+                <label>
+                  <span>{accommodationCopy.unitType}</span>
+                  <select value={unitType} onChange={(event) => setUnitType(event.target.value)}>
+                    {Object.values(STAY_UNIT_TYPES).map((value) => (
+                      <option key={value} value={value}>
+                        {accommodationCopy.unitTypes[value]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>{accommodationCopy.maxNightly}</span>
+                  <input name="maxNightlyAmount" type="number" min="0.01" step="0.01" />
+                </label>
+                <label>
+                  <span>{accommodationCopy.maxTotal}</span>
+                  <input name="maxTotalStayAmount" type="number" min="0.01" step="0.01" />
+                </label>
+              </div>
+              <p className={styles.hint}>{accommodationCopy.priceLimitHint}</p>
+
               <div className={styles.checkGrid}>
                 {LODGING_TYPES.map((type) => (
                   <label className={styles.checkOption} key={type}>
@@ -401,6 +515,10 @@ export function BudgetPlannerPage({ copy, defaultCurrency = 'SEK' }) {
                 />
                 <span>{copy.familyFriendly}</span>
               </label>
+              <p className={styles.privacy}>
+                <LockKeyhole size={15} aria-hidden="true" />
+                <span>{accommodationCopy.providerTruth}</span>
+              </p>
             </fieldset>
 
             {submitState.message ? (
