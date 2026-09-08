@@ -1,3 +1,4 @@
+import { PROVIDER_DISCOVERY_RATE_LIMIT } from '../../config/constants.js';
 import { createNewsProvider } from '../../integrations/news/news-provider.factory.js';
 import { createNewsController } from './news.controller.js';
 import { newsSchemas } from './news.schema.js';
@@ -8,5 +9,9 @@ export async function newsRoutes(app, options = {}) {
   const service = createNewsService(provider);
   const controller = createNewsController(service);
 
-  app.get('/', { schema: newsSchemas.search, handler: controller.search });
+  app.get('/', {
+    schema: newsSchemas.search,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
+    handler: controller.search,
+  });
 }
