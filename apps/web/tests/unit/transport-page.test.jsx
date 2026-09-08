@@ -137,6 +137,27 @@ describe('TransportDestinationPage', () => {
     );
   });
 
+  it('keeps Google Safe Ride disabled without an explicit deployment flag and key', async () => {
+    mocks.getMapRoute
+      .mockResolvedValueOnce(routeResponse('walk'))
+      .mockResolvedValueOnce(routeResponse('drive'));
+
+    render(<TransportDestinationPage destination={destination} locale="en" messages={messages} />);
+    await searchAndSelectVasa();
+    await screen.findByText('2.4 km');
+
+    fireEvent.change(screen.getByLabelText('Travel mode'), { target: { value: 'drive' } });
+
+    expect(
+      await screen.findByRole('heading', { name: 'Safe Ride route watch', level: 2 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Google Safe Ride is not configured on this deployment yet/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Start Safe Ride' })).not.toBeInTheDocument();
+    expect(mocks.getMapRoute).toHaveBeenLastCalledWith(expect.objectContaining({ mode: 'drive' }));
+  });
+
   it('rejects mismatched-country place rows instead of routing to altered provider data', async () => {
     mocks.autocompletePlaces.mockResolvedValue({
       places: {

@@ -13,6 +13,8 @@ export default async function DestinationTransportRoutePage({ params, searchPara
   ]);
   const messages = await loadMessages(locale);
   const destination = parseDestinationSelection({ slug, searchParams: resolvedSearchParams });
+  const googleMapsBrowserKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY ?? '';
+  const safeRideGoogleEnabled = process.env.NEXT_PUBLIC_SAFE_RIDE_GOOGLE_ENABLED === 'true';
 
   return (
     <TransportDestinationPage
@@ -27,6 +29,8 @@ export default async function DestinationTransportRoutePage({ params, searchPara
       }
       locale={locale}
       messages={messages}
+      googleMapsBrowserKey={googleMapsBrowserKey}
+      safeRideGoogleEnabled={safeRideGoogleEnabled}
     />
   );
 }
