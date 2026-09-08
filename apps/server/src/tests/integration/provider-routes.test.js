@@ -13,6 +13,9 @@ process.env.COOKIE_SECRET = 'c'.repeat(64);
 process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 
 const { buildApp } = await import('../../app.js');
+const { PROVIDER_DISCOVERY_RATE_LIMIT, PROVIDER_SEARCH_RATE_LIMIT } = await import(
+  '../../config/constants.js'
+);
 const apps = [];
 
 afterEach(async () => Promise.all(apps.splice(0).map((app) => app.close())));
@@ -182,6 +185,79 @@ describe('real-provider API contracts', () => {
     expect(images.statusCode).toBe(200);
     expect(images.json().images.photos[0].alt).toBe('Stockholm waterfront');
     expect(images.json().images.query.orientation).toBe('landscape');
+  });
+
+  it('rate-limits provider-backed search before an extra provider call', async () => {
+    let providerCalls = 0;
+    const options = baseOptions();
+    options.destinationsProvider = {
+      autocomplete: async ({ query }) => {
+        providerCalls += 1;
+        return {
+          provider: 'test',
+          results: [
+            {
+              provider: 'test',
+              externalId: 'stockholm',
+              name: query,
+              city: query,
+              formattedAddress: `${query}, Sweden`,
+              country: 'Sweden',
+              countryCode: 'SE',
+              latitude: 59.3293,
+              longitude: 18.0686,
+              resultType: 'city',
+            },
+          ],
+        };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    for (let index = 0; index < PROVIDER_SEARCH_RATE_LIMIT.max; index += 1) {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/destinations/search?query=Stockholm&limit=8',
+      });
+      expect(response.statusCode).toBe(200);
+    }
+
+    const blocked = await app.inject({
+      method: 'GET',
+      url: '/api/v1/destinations/search?query=Stockholm&limit=8',
+    });
+    expect(blocked.statusCode).toBe(429);
+    expect(blocked.json().error.code).toBe('RATE_LIMITED');
+    expect(providerCalls).toBe(PROVIDER_SEARCH_RATE_LIMIT.max);
+  });
+
+  it('rate-limits heavier nearby discovery before an extra provider call', async () => {
+    let providerCalls = 0;
+    const options = baseOptions();
+    options.placesProvider = {
+      ...options.placesProvider,
+      searchNearby: async ({ categoryGroup }) => {
+        providerCalls += 1;
+        return { provider: 'test', categoryGroup, results: [] };
+      },
+    };
+
+    const app = await buildApp(options);
+    apps.push(app);
+
+    const url =
+      '/api/v1/places/nearby?categoryGroup=beaches&latitude=41.3874&longitude=2.1686&radiusMeters=20000&limit=24&language=en';
+    for (let index = 0; index < PROVIDER_DISCOVERY_RATE_LIMIT.max; index += 1) {
+      const response = await app.inject({ method: 'GET', url });
+      expect(response.statusCode).toBe(200);
+    }
+
+    const blocked = await app.inject({ method: 'GET', url });
+    expect(blocked.statusCode).toBe(429);
+    expect(blocked.json().error.code).toBe('RATE_LIMITED');
+    expect(providerCalls).toBe(PROVIDER_DISCOVERY_RATE_LIMIT.max);
   });
 
   it('rejects short destination queries before calling the provider', async () => {
