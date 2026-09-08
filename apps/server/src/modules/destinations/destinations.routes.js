@@ -1,3 +1,4 @@
+import { PROVIDER_SEARCH_RATE_LIMIT } from '../../config/constants.js';
 import { createPlacesProvider } from '../../integrations/places/places-provider.factory.js';
 import { createDestinationsController } from './destinations.controller.js';
 import { destinationsSchemas } from './destinations.schema.js';
@@ -10,6 +11,7 @@ export async function destinationsRoutes(app, options = {}) {
 
   app.get('/search', {
     schema: destinationsSchemas.search,
+    config: { rateLimit: PROVIDER_SEARCH_RATE_LIMIT },
     handler: controller.search,
   });
 }
