@@ -22,10 +22,7 @@ describe('Safe Ride route deviation evaluation', () => {
   });
 
   it('treats a point near the expected path as on route', () => {
-    const distance = distanceFromRouteMeters(
-      { latitude: 59.3298, longitude: 18.0799 },
-      ROUTE,
-    );
+    const distance = distanceFromRouteMeters({ latitude: 59.3298, longitude: 18.0799 }, ROUTE);
     expect(distance).not.toBeNull();
     expect(distance).toBeLessThan(100);
 
