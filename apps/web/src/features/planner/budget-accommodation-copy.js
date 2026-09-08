@@ -1,0 +1,162 @@
+import { normalizeLocale } from '@attravoya/localization';
+
+const COPY = Object.freeze({
+  en: {
+    strategyLabel: 'Accommodation price & comfort range',
+    strategyHint: 'Choose how widely AttraVoya may search, from very cheap stays to premium hotels.',
+    strategies: {
+      CUSTOM: 'Custom selection',
+      CHEAPEST: 'Cheapest possible',
+      BUDGET: 'Budget',
+      VALUE: 'Best value',
+      COMFORT: 'Comfort',
+      PREMIUM: 'Premium / luxury',
+      ALL: 'Compare everything',
+    },
+    unitType: 'Room or stay type',
+    unitTypes: {
+      ANY: 'Any',
+      ENTIRE_PLACE: 'Entire place',
+      PRIVATE_ROOM: 'Private room',
+      SHARED_ROOM: 'Shared room',
+    },
+    maxNightly: 'Maximum price per night',
+    maxTotal: 'Maximum accommodation total',
+    priceLimitHint: 'Optional spending limits in your selected trip currency.',
+    providerTruth:
+      'Live room prices and official star ratings, including 5-star labels, are shown only when a connected accommodation provider verifies them. Until then these are your spending limits, not hotel quotes.',
+  },
+  sv: {
+    strategyLabel: 'Pris- och komfortnivå för boende',
+    strategyHint: 'Välj hur brett AttraVoya får söka, från mycket billigt boende till premiumhotell.',
+    strategies: {
+      CUSTOM: 'Eget urval', CHEAPEST: 'Billigast möjligt', BUDGET: 'Budget', VALUE: 'Bäst värde', COMFORT: 'Komfort', PREMIUM: 'Premium / lyx', ALL: 'Jämför allt',
+    },
+    unitType: 'Rum eller boendetyp',
+    unitTypes: { ANY: 'Valfritt', ENTIRE_PLACE: 'Hela boendet', PRIVATE_ROOM: 'Privat rum', SHARED_ROOM: 'Delat rum' },
+    maxNightly: 'Högsta pris per natt',
+    maxTotal: 'Högsta totalpris för boende',
+    priceLimitHint: 'Valfria utgiftsgränser i din valda resevaluta.',
+    providerTruth: 'Livepriser och officiella stjärnklassningar, inklusive 5-stjärnigt, visas bara när en ansluten boendeleverantör verifierar dem. Tills dess är detta dina budgetgränser, inte hotellofferter.',
+  },
+  es: {
+    strategyLabel: 'Rango de precio y comodidad del alojamiento',
+    strategyHint: 'Elige desde alojamientos muy baratos hasta hoteles premium.',
+    strategies: { CUSTOM: 'Selección personalizada', CHEAPEST: 'Lo más barato posible', BUDGET: 'Económico', VALUE: 'Mejor relación calidad-precio', COMFORT: 'Confort', PREMIUM: 'Premium / lujo', ALL: 'Comparar todo' },
+    unitType: 'Tipo de habitación o estancia',
+    unitTypes: { ANY: 'Cualquiera', ENTIRE_PLACE: 'Alojamiento entero', PRIVATE_ROOM: 'Habitación privada', SHARED_ROOM: 'Habitación compartida' },
+    maxNightly: 'Precio máximo por noche', maxTotal: 'Máximo total de alojamiento',
+    priceLimitHint: 'Límites opcionales en la moneda elegida para el viaje.',
+    providerTruth: 'Los precios en vivo y las estrellas oficiales, incluidas 5 estrellas, solo se muestran cuando un proveedor conectado los verifica. Hasta entonces son límites de gasto, no cotizaciones de hotel.',
+  },
+  fr: {
+    strategyLabel: 'Fourchette de prix et de confort', strategyHint: 'Choisissez des séjours très économiques aux hôtels premium.',
+    strategies: { CUSTOM: 'Sélection personnalisée', CHEAPEST: 'Le moins cher possible', BUDGET: 'Économique', VALUE: 'Meilleur rapport qualité-prix', COMFORT: 'Confort', PREMIUM: 'Premium / luxe', ALL: 'Tout comparer' },
+    unitType: 'Type de chambre ou de séjour', unitTypes: { ANY: 'Indifférent', ENTIRE_PLACE: 'Logement entier', PRIVATE_ROOM: 'Chambre privée', SHARED_ROOM: 'Chambre partagée' },
+    maxNightly: 'Prix maximum par nuit', maxTotal: 'Budget hébergement maximum', priceLimitHint: 'Limites facultatives dans la devise choisie.',
+    providerTruth: 'Les prix en direct et les classements officiels, y compris 5 étoiles, ne sont affichés que lorsqu’un fournisseur connecté les vérifie. Sinon, il s’agit de limites de dépense et non de devis hôteliers.',
+  },
+  de: {
+    strategyLabel: 'Preis- und Komfortbereich der Unterkunft', strategyHint: 'Wähle von sehr günstigen Unterkünften bis zu Premiumhotels.',
+    strategies: { CUSTOM: 'Eigene Auswahl', CHEAPEST: 'So günstig wie möglich', BUDGET: 'Budget', VALUE: 'Bestes Preis-Leistungs-Verhältnis', COMFORT: 'Komfort', PREMIUM: 'Premium / Luxus', ALL: 'Alles vergleichen' },
+    unitType: 'Zimmer- oder Unterkunftstyp', unitTypes: { ANY: 'Beliebig', ENTIRE_PLACE: 'Ganze Unterkunft', PRIVATE_ROOM: 'Privatzimmer', SHARED_ROOM: 'Mehrbettzimmer' },
+    maxNightly: 'Maximalpreis pro Nacht', maxTotal: 'Maximales Unterkunftsbudget', priceLimitHint: 'Optionale Ausgabenlimits in deiner Reisewährung.',
+    providerTruth: 'Live-Zimmerpreise und offizielle Sternebewertungen, einschließlich 5 Sterne, werden nur angezeigt, wenn ein verbundener Anbieter sie bestätigt. Bis dahin sind dies Budgetgrenzen, keine Hotelangebote.',
+  },
+  it: {
+    strategyLabel: 'Fascia di prezzo e comfort', strategyHint: 'Scegli da alloggi molto economici a hotel premium.',
+    strategies: { CUSTOM: 'Selezione personalizzata', CHEAPEST: 'Il più economico possibile', BUDGET: 'Economico', VALUE: 'Miglior rapporto qualità-prezzo', COMFORT: 'Comfort', PREMIUM: 'Premium / lusso', ALL: 'Confronta tutto' },
+    unitType: 'Tipo di camera o soggiorno', unitTypes: { ANY: 'Qualsiasi', ENTIRE_PLACE: 'Intero alloggio', PRIVATE_ROOM: 'Camera privata', SHARED_ROOM: 'Camera condivisa' },
+    maxNightly: 'Prezzo massimo per notte', maxTotal: 'Totale massimo per l’alloggio', priceLimitHint: 'Limiti facoltativi nella valuta scelta.',
+    providerTruth: 'Prezzi live e classificazioni ufficiali, incluse le 5 stelle, compaiono solo se verificati da un provider collegato. Fino ad allora sono limiti di spesa, non preventivi hotel.',
+  },
+  pt: {
+    strategyLabel: 'Faixa de preço e conforto', strategyHint: 'Escolha desde alojamentos muito baratos até hotéis premium.',
+    strategies: { CUSTOM: 'Seleção personalizada', CHEAPEST: 'O mais barato possível', BUDGET: 'Económico', VALUE: 'Melhor relação qualidade-preço', COMFORT: 'Conforto', PREMIUM: 'Premium / luxo', ALL: 'Comparar tudo' },
+    unitType: 'Tipo de quarto ou estadia', unitTypes: { ANY: 'Qualquer', ENTIRE_PLACE: 'Alojamento inteiro', PRIVATE_ROOM: 'Quarto privado', SHARED_ROOM: 'Quarto partilhado' },
+    maxNightly: 'Preço máximo por noite', maxTotal: 'Total máximo de alojamento', priceLimitHint: 'Limites opcionais na moeda da viagem.',
+    providerTruth: 'Preços em tempo real e classificações oficiais, incluindo 5 estrelas, só aparecem quando um fornecedor ligado os verifica. Até lá são limites de despesa, não cotações de hotel.',
+  },
+  pl: {
+    strategyLabel: 'Zakres ceny i komfortu noclegu', strategyHint: 'Wybierz od bardzo tanich noclegów po hotele premium.',
+    strategies: { CUSTOM: 'Własny wybór', CHEAPEST: 'Najtaniej jak to możliwe', BUDGET: 'Budżetowo', VALUE: 'Najlepsza wartość', COMFORT: 'Komfort', PREMIUM: 'Premium / luksus', ALL: 'Porównaj wszystko' },
+    unitType: 'Typ pokoju lub pobytu', unitTypes: { ANY: 'Dowolny', ENTIRE_PLACE: 'Cały obiekt', PRIVATE_ROOM: 'Pokój prywatny', SHARED_ROOM: 'Pokój współdzielony' },
+    maxNightly: 'Maksymalna cena za noc', maxTotal: 'Maksymalny koszt noclegu', priceLimitHint: 'Opcjonalne limity w wybranej walucie podróży.',
+    providerTruth: 'Ceny na żywo i oficjalne oceny gwiazdkowe, w tym 5 gwiazdek, są pokazywane tylko po weryfikacji przez podłączonego dostawcę. Do tego czasu są to limity wydatków, nie oferty hotelowe.',
+  },
+  nl: {
+    strategyLabel: 'Prijs- en comfortbereik', strategyHint: 'Kies van zeer goedkope verblijven tot premiumhotels.',
+    strategies: { CUSTOM: 'Eigen selectie', CHEAPEST: 'Zo goedkoop mogelijk', BUDGET: 'Budget', VALUE: 'Beste prijs-kwaliteit', COMFORT: 'Comfort', PREMIUM: 'Premium / luxe', ALL: 'Alles vergelijken' },
+    unitType: 'Kamer- of verblijfstype', unitTypes: { ANY: 'Alle', ENTIRE_PLACE: 'Hele accommodatie', PRIVATE_ROOM: 'Privékamer', SHARED_ROOM: 'Gedeelde kamer' },
+    maxNightly: 'Maximumprijs per nacht', maxTotal: 'Maximaal totaal voor verblijf', priceLimitHint: 'Optionele limieten in je gekozen reisvaluta.',
+    providerTruth: 'Live kamerprijzen en officiële sterren, inclusief 5 sterren, verschijnen alleen wanneer een aangesloten provider ze verifieert. Tot die tijd zijn dit bestedingslimieten, geen hoteloffertes.',
+  },
+  no: {
+    strategyLabel: 'Pris- og komfortnivå for overnatting', strategyHint: 'Velg fra svært rimelige steder til premiumhoteller.',
+    strategies: { CUSTOM: 'Eget utvalg', CHEAPEST: 'Billigst mulig', BUDGET: 'Budsjett', VALUE: 'Best verdi', COMFORT: 'Komfort', PREMIUM: 'Premium / luksus', ALL: 'Sammenlign alt' },
+    unitType: 'Rom- eller overnattingstype', unitTypes: { ANY: 'Valgfritt', ENTIRE_PLACE: 'Hele stedet', PRIVATE_ROOM: 'Privat rom', SHARED_ROOM: 'Delt rom' },
+    maxNightly: 'Makspris per natt', maxTotal: 'Maks totalpris for overnatting', priceLimitHint: 'Valgfrie grenser i valgt reisevaluta.',
+    providerTruth: 'Livepriser og offisielle stjerner, inkludert 5 stjerner, vises bare når en tilkoblet leverandør verifiserer dem. Inntil da er dette budsjettgrenser, ikke hotelltilbud.',
+  },
+  da: {
+    strategyLabel: 'Pris- og komfortniveau for overnatning', strategyHint: 'Vælg fra meget billige ophold til premiumhoteller.',
+    strategies: { CUSTOM: 'Eget valg', CHEAPEST: 'Billigst muligt', BUDGET: 'Budget', VALUE: 'Bedste værdi', COMFORT: 'Komfort', PREMIUM: 'Premium / luksus', ALL: 'Sammenlign alt' },
+    unitType: 'Værelses- eller opholdstype', unitTypes: { ANY: 'Valgfrit', ENTIRE_PLACE: 'Hele stedet', PRIVATE_ROOM: 'Privat værelse', SHARED_ROOM: 'Delt værelse' },
+    maxNightly: 'Maksimal pris pr. nat', maxTotal: 'Maksimalt samlet overnatningsbeløb', priceLimitHint: 'Valgfrie grænser i den valgte rejsevaluta.',
+    providerTruth: 'Livepriser og officielle stjerner, inklusive 5 stjerner, vises kun, når en tilsluttet udbyder verificerer dem. Indtil da er dette budgetgrænser, ikke hoteltilbud.',
+  },
+  fi: {
+    strategyLabel: 'Majoituksen hinta- ja mukavuustaso', strategyHint: 'Valitse erittäin edullisista majoituksista premium-hotelleihin.',
+    strategies: { CUSTOM: 'Oma valinta', CHEAPEST: 'Mahdollisimman halpa', BUDGET: 'Budjetti', VALUE: 'Paras vastine', COMFORT: 'Mukavuus', PREMIUM: 'Premium / luksus', ALL: 'Vertaa kaikkea' },
+    unitType: 'Huone- tai majoitustyyppi', unitTypes: { ANY: 'Mikä tahansa', ENTIRE_PLACE: 'Koko majoitus', PRIVATE_ROOM: 'Yksityinen huone', SHARED_ROOM: 'Jaettu huone' },
+    maxNightly: 'Enimmäishinta yöltä', maxTotal: 'Majoituksen enimmäissumma', priceLimitHint: 'Valinnaiset rajat valitussa matkavaluutassa.',
+    providerTruth: 'Live-hinnat ja viralliset tähtiluokitukset, myös 5 tähteä, näytetään vain liitetyn palveluntarjoajan vahvistamina. Siihen asti nämä ovat budjettirajoja, eivät hotellitarjouksia.',
+  },
+  tr: {
+    strategyLabel: 'Konaklama fiyat ve konfor aralığı', strategyHint: 'Çok ucuz konaklamalardan premium otellere kadar seçim yapın.',
+    strategies: { CUSTOM: 'Özel seçim', CHEAPEST: 'Mümkün olan en ucuz', BUDGET: 'Bütçe', VALUE: 'En iyi değer', COMFORT: 'Konfor', PREMIUM: 'Premium / lüks', ALL: 'Tümünü karşılaştır' },
+    unitType: 'Oda veya konaklama türü', unitTypes: { ANY: 'Farketmez', ENTIRE_PLACE: 'Tüm yer', PRIVATE_ROOM: 'Özel oda', SHARED_ROOM: 'Paylaşımlı oda' },
+    maxNightly: 'Gecelik azami fiyat', maxTotal: 'Toplam konaklama üst sınırı', priceLimitHint: 'Seçtiğiniz seyahat para biriminde isteğe bağlı limitler.',
+    providerTruth: 'Canlı fiyatlar ve 5 yıldız dahil resmi yıldız dereceleri yalnızca bağlı sağlayıcı doğruladığında gösterilir. O zamana kadar bunlar bütçe sınırlarıdır, otel teklifi değildir.',
+  },
+  ar: {
+    strategyLabel: 'نطاق سعر وراحة الإقامة', strategyHint: 'اختر من الإقامات الرخيصة جداً إلى الفنادق الفاخرة.',
+    strategies: { CUSTOM: 'اختيار مخصص', CHEAPEST: 'الأرخص قدر الإمكان', BUDGET: 'اقتصادي', VALUE: 'أفضل قيمة', COMFORT: 'مريح', PREMIUM: 'فاخر / متميز', ALL: 'مقارنة الكل' },
+    unitType: 'نوع الغرفة أو الإقامة', unitTypes: { ANY: 'أي نوع', ENTIRE_PLACE: 'المكان بالكامل', PRIVATE_ROOM: 'غرفة خاصة', SHARED_ROOM: 'غرفة مشتركة' },
+    maxNightly: 'الحد الأقصى للسعر لكل ليلة', maxTotal: 'الحد الأقصى لإجمالي الإقامة', priceLimitHint: 'حدود اختيارية بعملة الرحلة المحددة.',
+    providerTruth: 'لا تظهر الأسعار المباشرة والتصنيفات الرسمية، بما فيها 5 نجوم، إلا عند تحقق مزود إقامة متصل منها. وحتى ذلك الحين فهي حدود إنفاق وليست عروض أسعار فندقية.',
+  },
+  zh: {
+    strategyLabel: '住宿价格与舒适度范围', strategyHint: '从非常便宜的住宿到高端酒店进行选择。',
+    strategies: { CUSTOM: '自定义选择', CHEAPEST: '尽可能便宜', BUDGET: '经济型', VALUE: '最佳性价比', COMFORT: '舒适', PREMIUM: '高端 / 豪华', ALL: '比较全部' },
+    unitType: '房间或住宿类型', unitTypes: { ANY: '不限', ENTIRE_PLACE: '整套住宿', PRIVATE_ROOM: '私人房间', SHARED_ROOM: '共享房间' },
+    maxNightly: '每晚最高价格', maxTotal: '住宿总价上限', priceLimitHint: '以所选旅行货币设置可选支出上限。',
+    providerTruth: '实时房价和官方星级（包括五星）仅在已连接的住宿供应商验证后显示。在此之前，这些只是支出上限，不是酒店报价。',
+  },
+  ja: {
+    strategyLabel: '宿泊料金と快適さの範囲', strategyHint: '非常に安い宿泊先からプレミアムホテルまで選べます。',
+    strategies: { CUSTOM: 'カスタム選択', CHEAPEST: 'できるだけ安く', BUDGET: '低予算', VALUE: '最もお得', COMFORT: '快適', PREMIUM: 'プレミアム / 高級', ALL: 'すべて比較' },
+    unitType: '部屋・宿泊タイプ', unitTypes: { ANY: '指定なし', ENTIRE_PLACE: '貸切', PRIVATE_ROOM: '個室', SHARED_ROOM: '相部屋' },
+    maxNightly: '1泊あたりの上限', maxTotal: '宿泊費合計の上限', priceLimitHint: '選択した旅行通貨で任意の上限を設定します。',
+    providerTruth: 'リアルタイム料金と5つ星を含む公式星評価は、接続された宿泊プロバイダーが確認した場合のみ表示されます。それまでは予算上限であり、ホテルの見積りではありません。',
+  },
+  ko: {
+    strategyLabel: '숙박 가격 및 편안함 범위', strategyHint: '매우 저렴한 숙소부터 프리미엄 호텔까지 선택하세요.',
+    strategies: { CUSTOM: '직접 선택', CHEAPEST: '가능한 가장 저렴하게', BUDGET: '저예산', VALUE: '최고의 가성비', COMFORT: '편안함', PREMIUM: '프리미엄 / 럭셔리', ALL: '모두 비교' },
+    unitType: '객실 또는 숙박 유형', unitTypes: { ANY: '상관없음', ENTIRE_PLACE: '숙소 전체', PRIVATE_ROOM: '개인실', SHARED_ROOM: '공용실' },
+    maxNightly: '1박 최대 금액', maxTotal: '숙박 총액 한도', priceLimitHint: '선택한 여행 통화로 설정하는 선택적 한도입니다.',
+    providerTruth: '실시간 객실 가격과 5성을 포함한 공식 등급은 연결된 숙박 제공자가 확인한 경우에만 표시됩니다. 그 전에는 지출 한도이며 호텔 견적이 아닙니다.',
+  },
+  hi: {
+    strategyLabel: 'रहने की कीमत और आराम की सीमा', strategyHint: 'बहुत सस्ते ठहराव से लेकर प्रीमियम होटल तक चुनें।',
+    strategies: { CUSTOM: 'अपना चयन', CHEAPEST: 'जितना संभव हो उतना सस्ता', BUDGET: 'बजट', VALUE: 'सबसे अच्छा मूल्य', COMFORT: 'आराम', PREMIUM: 'प्रीमियम / लक्ज़री', ALL: 'सबकी तुलना करें' },
+    unitType: 'कमरे या ठहरने का प्रकार', unitTypes: { ANY: 'कोई भी', ENTIRE_PLACE: 'पूरा स्थान', PRIVATE_ROOM: 'निजी कमरा', SHARED_ROOM: 'साझा कमरा' },
+    maxNightly: 'प्रति रात अधिकतम कीमत', maxTotal: 'कुल आवास अधिकतम', priceLimitHint: 'चुनी गई यात्रा मुद्रा में वैकल्पिक सीमा।',
+    providerTruth: 'लाइव कमरे की कीमतें और 5-स्टार सहित आधिकारिक स्टार रेटिंग केवल तभी दिखाई जाती हैं जब जुड़ा हुआ आवास प्रदाता उन्हें सत्यापित करे। तब तक ये खर्च सीमा हैं, होटल कोट नहीं।',
+  },
+});
+
+export function getBudgetAccommodationCopy(locale = 'en') {
+  const normalized = normalizeLocale(locale);
+  return COPY[normalized] ?? COPY.en;
+}
