@@ -6,6 +6,7 @@ import { mapProviderHttpError } from './provider-error-mapper.js';
 const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
 const DEFAULT_MAX_CONCURRENT = 8;
 const DEFAULT_MAX_QUEUED = 32;
+const DEFAULT_MAX_QUEUE_WAIT_MS = 5000;
 const RETRY_BASE_DELAY_MS = 250;
 const RETRY_MAX_DELAY_MS = 1500;
 
@@ -19,6 +20,7 @@ const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
  * @property {number} [retryMax] Maximum transient retries for safe idempotent requests.
  * @property {number} [maxConcurrent] Maximum logical requests allowed in flight for this client.
  * @property {number} [maxQueued] Maximum requests allowed to wait for an in-flight slot.
+ * @property {number} [maxQueueWaitMs] Maximum time a request may wait for an in-flight slot.
  * @property {(milliseconds: number) => Promise<void>} [sleepImpl] Injectable retry delay.
  * @property {() => number} [randomImpl] Injectable random source for retry jitter.
  * @property {() => number} [nowImpl] Injectable wall clock for Retry-After cooldowns.
@@ -71,8 +73,9 @@ function recordProviderMetric(metrics, event) {
   }
 }
 
-function createConcurrencyGate({ provider, maxConcurrent, maxQueued }) {
+function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWaitMs }) {
   let activeCount = 0;
+  /** @type {{ settled: boolean, resolveSlot: () => boolean }[]} */
   const waiters = [];
 
   async function acquire() {
@@ -92,18 +95,53 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued }) {
       });
     }
 
-    await new Promise((resolve) => {
-      waiters.push(resolve);
+    await new Promise((resolve, reject) => {
+      const waiter = {
+        settled: false,
+        resolveSlot: () => false,
+      };
+
+      const timeout = setTimeout(() => {
+        if (waiter.settled) return;
+        waiter.settled = true;
+
+        const index = waiters.indexOf(waiter);
+        if (index !== -1) waiters.splice(index, 1);
+
+        reject(
+          new ProviderUnavailableError(`${provider} is temporarily busy.`, {
+            details: {
+              provider,
+              reason: 'busy',
+              maxConcurrent,
+              maxQueued,
+              maxQueueWaitMs,
+            },
+          }),
+        );
+      }, maxQueueWaitMs);
+
+      waiter.resolveSlot = () => {
+        if (waiter.settled) return false;
+        waiter.settled = true;
+        clearTimeout(timeout);
+        resolve(undefined);
+        return true;
+      };
+
+      waiters.push(waiter);
     });
   }
 
   function release() {
-    const next = waiters.shift();
-    if (next) {
-      // Hand the existing slot directly to the oldest waiter so a new caller
-      // cannot race in between release and queue wake-up and exceed the cap.
-      next();
-      return;
+    while (waiters.length > 0) {
+      const next = waiters.shift();
+      if (next?.resolveSlot()) {
+        // Hand the existing slot directly to the oldest live waiter so a new
+        // caller cannot race in between release and queue wake-up and exceed
+        // the configured in-flight cap.
+        return;
+      }
     }
 
     activeCount -= 1;
@@ -153,7 +191,7 @@ async function parseJsonResponse(response, provider) {
  * Resilient JSON transport shared by external provider adapters.
  *
  * - Enforces a hard timeout.
- * - Bounds per-client/provider concurrency and queue growth.
+ * - Bounds per-client/provider concurrency, queue growth, and queue wait time.
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Honors valid Retry-After cooldowns across new requests in this process.
  * - Adds bounded retry jitter so concurrent failures do not retry in lockstep.
@@ -171,6 +209,7 @@ export function createProviderHttpClient(options) {
     retryMax = 2,
     maxConcurrent = DEFAULT_MAX_CONCURRENT,
     maxQueued = DEFAULT_MAX_QUEUED,
+    maxQueueWaitMs = DEFAULT_MAX_QUEUE_WAIT_MS,
     sleepImpl = sleep,
     randomImpl = Math.random,
     nowImpl = Date.now,
@@ -193,8 +232,14 @@ export function createProviderHttpClient(options) {
   }
   assertPositiveInteger(maxConcurrent, 'maxConcurrent');
   assertNonNegativeInteger(maxQueued, 'maxQueued');
+  assertPositiveInteger(maxQueueWaitMs, 'maxQueueWaitMs');
 
-  const concurrencyGate = createConcurrencyGate({ provider, maxConcurrent, maxQueued });
+  const concurrencyGate = createConcurrencyGate({
+    provider,
+    maxConcurrent,
+    maxQueued,
+    maxQueueWaitMs,
+  });
   let rateLimitUntilMs = 0;
 
   function rememberRateLimit(retryAfter) {
