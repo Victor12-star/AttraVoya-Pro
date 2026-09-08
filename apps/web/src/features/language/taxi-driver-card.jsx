@@ -227,7 +227,9 @@ export function TaxiDriverCard({
   }
 
   const safeRideConfigured =
-    safeRideGoogleEnabled === true && Boolean(googleMapsBrowserKey.trim()) && Boolean(selectedPlace);
+    safeRideGoogleEnabled === true &&
+    Boolean(googleMapsBrowserKey.trim()) &&
+    Boolean(selectedPlace);
 
   return (
     <section className={styles.card} aria-labelledby="taxi-driver-card-title">
@@ -325,7 +327,11 @@ export function TaxiDriverCard({
       ) : null}
 
       {cardState.status === 'success' && cardState.data && !cardOpen ? (
-        <button className="button button--secondary" type="button" onClick={() => setCardOpen(true)}>
+        <button
+          className="button button--secondary"
+          type="button"
+          onClick={() => setCardOpen(true)}
+        >
           <Maximize2 size={17} aria-hidden="true" />
           {copy.showCard}
         </button>
@@ -374,7 +380,9 @@ export function TaxiDriverCard({
               <MapPin size={27} aria-hidden="true" />
               <div>
                 <strong>{selectedPlace.name}</strong>
-                {selectedPlace.formattedAddress ? <span>{selectedPlace.formattedAddress}</span> : null}
+                {selectedPlace.formattedAddress ? (
+                  <span>{selectedPlace.formattedAddress}</span>
+                ) : null}
               </div>
             </div>
 
