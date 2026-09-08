@@ -1,3 +1,4 @@
+import { TaxiDriverCardLauncher } from '../../../features/language/taxi-driver-card-launcher.jsx';
 import { TravelCompanionPage } from '../../../features/language/travel-companion-page.jsx';
 import { getRequestLocale } from '../../../i18n/request-locale.js';
 import { loadMessages } from '../../../i18n/messages.js';
@@ -9,11 +10,14 @@ export default async function Page() {
   const safeRideGoogleEnabled = process.env.NEXT_PUBLIC_SAFE_RIDE_GOOGLE_ENABLED === 'true';
 
   return (
-    <TravelCompanionPage
-      locale={locale}
-      messages={messages}
-      googleMapsBrowserKey={googleMapsBrowserKey}
-      safeRideGoogleEnabled={safeRideGoogleEnabled}
-    />
+    <>
+      <TravelCompanionPage locale={locale} messages={messages} />
+      <TaxiDriverCardLauncher
+        locale={locale}
+        messages={messages}
+        googleMapsBrowserKey={googleMapsBrowserKey}
+        safeRideGoogleEnabled={safeRideGoogleEnabled}
+      />
+    </>
   );
 }
