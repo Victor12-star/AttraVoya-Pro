@@ -129,7 +129,7 @@ export function BudgetPlannerPage({
   const [currency, setCurrency] = useState(defaultCurrency);
   const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
   const [lodgingTypes, setLodgingTypes] = useState(DEFAULT_LODGING);
-  const [unitType, setUnitType] = useState(STAY_UNIT_TYPES.ANY);
+  const [unitType, setUnitType] = useState(/** @type {string} */ (STAY_UNIT_TYPES.ANY));
   const [familyFriendly, setFamilyFriendly] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitState, setSubmitState] = useState({ type: 'idle', message: '' });
