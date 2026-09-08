@@ -123,12 +123,7 @@ function normalizeTranslation(response, expectedSource, expectedTarget) {
   const translatedText = textValue(translation?.translatedText, 12_000);
   const provider = textValue(translation?.provider, 80);
 
-  if (
-    source !== expectedSource ||
-    target !== expectedTarget ||
-    !translatedText ||
-    !provider
-  ) {
+  if (source !== expectedSource || target !== expectedTarget || !translatedText || !provider) {
     return null;
   }
   return { source, target, translatedText, provider };
