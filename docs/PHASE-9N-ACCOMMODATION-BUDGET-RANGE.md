@@ -16,7 +16,7 @@ Live room prices, availability, and official star ratings may be displayed only 
 
 ## Property photo truthfulness
 
-Accommodation results support a provider-neutral property-media gallery for real exterior, room, bed, bathroom, interior, and other property views. Each accepted photo uses an HTTP(S) provider URL and may retain its provider and attribution text so the user can understand the image source.
+Accommodation results support a provider-neutral property-media gallery for real **exterior / whole-property, room, bed / sleeping area, bathroom, interior, and other property views**. Each accepted photo uses an HTTP(S) provider URL and may retain its provider and attribution text so the user can understand the image source.
 
 Geoapify does **not** provide the property-specific room-media contract used by AttraVoya, so Geoapify results deliberately return an empty photo list. The UI shows that property photos are unavailable from the current provider instead of substituting destination stock photography or presenting unrelated images as a particular hotel, hostel, guest house, apartment, campsite, or resort.
 
