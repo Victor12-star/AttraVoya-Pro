@@ -74,27 +74,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prepare canonical Prettier output
-        run: |
-          pnpm exec prettier --write \
-            'apps/web/src/app/(main)/plan-by-budget/page.jsx' \
-            apps/web/src/features/destinations/accommodation-page.jsx \
-            apps/web/src/features/destinations/accommodation-photo-copy.js \
-            apps/web/src/features/planner/budget-accommodation-copy.js \
-            apps/web/tests/unit/accommodation-page.test.jsx
-
-      - name: Upload canonical Prettier output
-        uses: actions/upload-artifact@v4
-        with:
-          name: phase9n-prettier-output
-          path: |
-            apps/web/src/app/(main)/plan-by-budget/page.jsx
-            apps/web/src/features/destinations/accommodation-page.jsx
-            apps/web/src/features/destinations/accommodation-photo-copy.js
-            apps/web/src/features/planner/budget-accommodation-copy.js
-            apps/web/tests/unit/accommodation-page.test.jsx
-          retention-days: 1
-
       - name: Validate environment contract
         run: pnpm env:check
 
