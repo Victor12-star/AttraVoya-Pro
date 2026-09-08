@@ -210,7 +210,28 @@ export function SafeRideRouteWatch({
     clearMapObjects();
   }
 
-  useEffect(() => cleanupRide, []);
+  useEffect(() => {
+    return () => {
+      const geolocation = browserNavigator()?.geolocation;
+      if (watchIdRef.current !== null && geolocation?.clearWatch) {
+        geolocation.clearWatch(watchIdRef.current);
+      }
+      watchIdRef.current = null;
+      if (etaTimerRef.current) clearInterval(etaTimerRef.current);
+      etaTimerRef.current = null;
+      routePolylinesRef.current.forEach((polyline) => polyline?.setMap?.(null));
+      routePolylinesRef.current = [];
+      currentCircleRef.current?.setMap?.(null);
+      destinationCircleRef.current?.setMap?.(null);
+      currentCircleRef.current = null;
+      destinationCircleRef.current = null;
+      mapRef.current = null;
+      googleMapsRef.current = null;
+      expectedPathRef.current = [];
+      latestPositionRef.current = null;
+      routeWatchRef.current = createRouteWatchState();
+    };
+  }, []);
 
   function renderCurrentPosition(position) {
     const googleMaps = googleMapsRef.current;
@@ -254,6 +275,15 @@ export function SafeRideRouteWatch({
     if (next.status === 'deviated' && previous.status !== 'deviated') {
       browserNavigator()?.vibrate?.([180, 100, 180]);
     }
+  }
+
+  function handlePositionError() {
+    const reset = {
+      ...createRouteWatchState(),
+      status: 'low-accuracy',
+    };
+    routeWatchRef.current = reset;
+    setWatchState(reset);
   }
 
   async function refreshEta() {
@@ -349,14 +379,15 @@ export function SafeRideRouteWatch({
 
       watchIdRef.current = geolocation.watchPosition(
         handlePositionUpdate,
-        () => setWatchState((current) => ({ ...current, status: 'low-accuracy' })),
+        handlePositionError,
         GEOLOCATION_OPTIONS,
       );
       etaTimerRef.current = setInterval(() => void refreshEta(), ETA_REFRESH_MS);
       setStatus('active');
     } catch (error) {
       cleanupRide();
-      const denied = Number(error?.code) === 1;
+      const safeError = /** @type {any} */ (error);
+      const denied = Number(safeError?.code) === 1;
       setStatus(denied ? 'denied' : 'unavailable');
     }
   }
