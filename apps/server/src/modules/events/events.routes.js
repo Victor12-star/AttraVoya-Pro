@@ -1,3 +1,4 @@
+import { PROVIDER_DISCOVERY_RATE_LIMIT } from '../../config/constants.js';
 import { createEventsProvider } from '../../integrations/events/events-provider.factory.js';
 import { createEventsController } from './events.controller.js';
 import { eventsSchemas } from './events.schema.js';
@@ -8,5 +9,9 @@ export async function eventsRoutes(app, options = {}) {
   const service = createEventsService(provider);
   const controller = createEventsController(service);
 
-  app.get('/', { schema: eventsSchemas.search, handler: controller.search });
+  app.get('/', {
+    schema: eventsSchemas.search,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
+    handler: controller.search,
+  });
 }
