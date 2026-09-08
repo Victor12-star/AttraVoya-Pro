@@ -1,12 +1,29 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Languages, LoaderCircle, MessageCircleMore, Mic, Send, Volume2 } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  Languages,
+  LoaderCircle,
+  Maximize2,
+  MessageCircleMore,
+  Mic,
+  Send,
+  Volume2,
+  X,
+} from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getLanguagePageCopy } from '../destinations/language-page-copy.js';
 import { getTravelCompanionCopy } from './travel-companion-copy.js';
+import { getTravelCompanionInterpreterCopy } from './travel-companion-interpreter-copy.js';
 import styles from './travel-companion-page.module.css';
+
+const ENGLISH_LANGUAGE = Object.freeze({
+  code: 'en',
+  name: 'English',
+  direction: 'ltr',
+});
 
 function textValue(value, maxLength = 3000) {
   if (typeof value !== 'string') return null;
@@ -96,16 +113,25 @@ function normalizePhrasebook(response) {
 
 /**
  * @param {any} response
+ * @param {string} expectedSource
  * @param {string} expectedTarget
  */
-function normalizeTranslation(response, expectedTarget) {
+function normalizeTranslation(response, expectedSource, expectedTarget) {
   const translation = response?.translation;
+  const source = languageCode(translation?.source);
   const target = languageCode(translation?.target);
   const translatedText = textValue(translation?.translatedText, 12_000);
   const provider = textValue(translation?.provider, 80);
 
-  if (target !== expectedTarget || !translatedText || !provider) return null;
-  return { target, translatedText, provider };
+  if (
+    source !== expectedSource ||
+    target !== expectedTarget ||
+    !translatedText ||
+    !provider
+  ) {
+    return null;
+  }
+  return { source, target, translatedText, provider };
 }
 
 function providerDisplayName(provider) {
@@ -124,7 +150,9 @@ function providerDisplayName(provider) {
 export function TravelCompanionPage({ locale = 'en', messages }) {
   const languageCopy = getLanguagePageCopy(locale);
   const companionCopy = getTravelCompanionCopy(locale);
+  const interpreterCopy = getTravelCompanionInterpreterCopy(locale);
   const recognitionRef = useRef(/** @type {any} */ (null));
+  const showToLocalCloseRef = useRef(null);
   const historyIdRef = useRef(0);
   const [countriesState, setCountriesState] = useState(
     /** @type {any} */ ({ status: 'loading', data: [] }),
@@ -134,9 +162,11 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     /** @type {any} */ ({ status: 'idle', data: null }),
   );
   const [targetLanguage, setTargetLanguage] = useState('');
+  const [translationDirection, setTranslationDirection] = useState('traveller-to-local');
   const [phrase, setPhrase] = useState('');
   const [translationStatus, setTranslationStatus] = useState('idle');
   const [history, setHistory] = useState(/** @type {any[]} */ ([]));
+  const [showToLocalItem, setShowToLocalItem] = useState(/** @type {any} */ (null));
   const [voiceInputSupported, setVoiceInputSupported] = useState(false);
   const [voiceOutputSupported, setVoiceOutputSupported] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState('idle');
@@ -174,6 +204,22 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showToLocalItem) return undefined;
+
+    const currentWindow = browserWindow();
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setShowToLocalItem(null);
+    };
+    currentWindow?.addEventListener?.('keydown', handleKeyDown);
+    const focusTimer = currentWindow?.setTimeout?.(() => showToLocalCloseRef.current?.focus(), 0);
+
+    return () => {
+      currentWindow?.removeEventListener?.('keydown', handleKeyDown);
+      if (focusTimer !== undefined) currentWindow?.clearTimeout?.(focusTimer);
+    };
+  }, [showToLocalItem]);
+
   const phrasebook = phrasebookState.data;
   const availableDestinationLanguages = useMemo(
     () => phrasebook?.destinationLanguages.filter((language) => language.available) ?? [],
@@ -189,12 +235,19 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       ) ?? [],
     [phrasebook],
   );
+  const travellerToLocal = translationDirection === 'traveller-to-local';
+  const sourceReference = travellerToLocal ? ENGLISH_LANGUAGE : targetReference;
+  const outputReference = travellerToLocal ? targetReference : ENGLISH_LANGUAGE;
+  const sourceLanguage = sourceReference?.code ?? '';
+  const outputLanguage = outputReference?.code ?? '';
 
   async function loadPhrasebook(countryCode) {
     setPhrasebookState({ status: 'loading', data: null });
     setTargetLanguage('');
+    setTranslationDirection('traveller-to-local');
     setPhrase('');
     setHistory([]);
+    setShowToLocalItem(null);
     setTranslationStatus('idle');
     setVoiceStatus('idle');
 
@@ -233,7 +286,9 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     else {
       setPhrasebookState({ status: 'idle', data: null });
       setTargetLanguage('');
+      setTranslationDirection('traveller-to-local');
       setHistory([]);
+      setShowToLocalItem(null);
       setPhrase('');
     }
   }
@@ -242,13 +297,28 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     const code = languageCode(event.target.value);
     if (!code || !availableDestinationLanguages.some((language) => language.code === code)) return;
     setTargetLanguage(code);
+    setShowToLocalItem(null);
     setTranslationStatus('idle');
+  }
+
+  function toggleTranslationDirection() {
+    recognitionRef.current?.abort?.();
+    recognitionRef.current = null;
+    setTranslationDirection((current) =>
+      current === 'traveller-to-local' ? 'local-to-traveller' : 'traveller-to-local',
+    );
+    setPhrase('');
+    setShowToLocalItem(null);
+    setTranslationStatus('idle');
+    setVoiceStatus('idle');
   }
 
   async function performTranslation(sourceText) {
     const normalizedText = textValue(sourceText, 3000);
     if (
       !normalizedText ||
+      !sourceLanguage ||
+      !outputLanguage ||
       !targetLanguage ||
       !availableDestinationLanguages.some((language) => language.code === targetLanguage)
     ) {
@@ -260,10 +330,10 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     try {
       const response = await apiClient.translateText({
         text: normalizedText,
-        source: 'en',
-        target: targetLanguage,
+        source: sourceLanguage,
+        target: outputLanguage,
       });
-      const translation = normalizeTranslation(response, targetLanguage);
+      const translation = normalizeTranslation(response, sourceLanguage, outputLanguage);
       if (!translation) {
         setTranslationStatus('error');
         return;
@@ -276,6 +346,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
           id: historyIdRef.current,
           sourceText: normalizedText,
           translatedText: translation.translatedText,
+          source: translation.source,
           target: translation.target,
           provider: translation.provider,
         },
@@ -292,17 +363,18 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   }
 
   function handleQuickPhrase(value) {
+    if (!travellerToLocal) return;
     setPhrase(value);
     void performTranslation(value);
   }
 
   function startVoiceInput() {
     const Recognition = speechRecognitionConstructor();
-    if (typeof Recognition !== 'function') return;
+    if (typeof Recognition !== 'function' || !sourceLanguage) return;
 
     recognitionRef.current?.abort?.();
     const recognition = new Recognition();
-    recognition.lang = 'en';
+    recognition.lang = sourceLanguage;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (event) => {
@@ -421,35 +493,63 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
 
         {phrasebookState.status === 'success' && availableDestinationLanguages.length ? (
           <div className={styles.workspace}>
-            <section className={styles.quickPanel} aria-labelledby="quick-phrases-title">
-              <div className={styles.sectionHeading}>
-                <div>
-                  <span className="eyebrow">English</span>
-                  <h2 id="quick-phrases-title">{companionCopy.quickPhrases}</h2>
-                </div>
-                <span className={styles.destinationBadge}>
-                  {phrasebook?.countryName ?? selectedCountry}
-                </span>
+            <section className={styles.interpreterPanel} aria-labelledby="interpreter-title">
+              <div>
+                <span className="eyebrow">{phrasebook?.countryName ?? selectedCountry}</span>
+                <h2 id="interpreter-title">{interpreterCopy.interpreter}</h2>
+                <p>{interpreterCopy.directionHint}</p>
               </div>
-              <div className={styles.quickPhrases}>
-                {quickPhrases.map((item) => (
-                  <button
-                    className={styles.quickPhrase}
-                    key={`${item.categoryId}-${item.id}`}
-                    type="button"
-                    disabled={translationStatus === 'loading'}
-                    onClick={() => handleQuickPhrase(item.text)}
-                  >
-                    {item.text}
-                  </button>
-                ))}
-              </div>
+              <button
+                className={`button button--secondary ${styles.directionButton}`}
+                type="button"
+                onClick={toggleTranslationDirection}
+                aria-label={interpreterCopy.swapDirection}
+                title={interpreterCopy.swapDirection}
+              >
+                <ArrowRightLeft size={17} aria-hidden="true" />
+                <span>{sourceReference?.name ?? sourceLanguage}</span>
+                <span aria-hidden="true">→</span>
+                <span>{outputReference?.name ?? outputLanguage}</span>
+              </button>
             </section>
 
+            {travellerToLocal ? (
+              <section className={styles.quickPanel} aria-labelledby="quick-phrases-title">
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <span className="eyebrow">English</span>
+                    <h2 id="quick-phrases-title">{companionCopy.quickPhrases}</h2>
+                  </div>
+                  <span className={styles.destinationBadge}>
+                    {phrasebook?.countryName ?? selectedCountry}
+                  </span>
+                </div>
+                <div className={styles.quickPhrases}>
+                  {quickPhrases.map((item) => (
+                    <button
+                      className={styles.quickPhrase}
+                      key={`${item.categoryId}-${item.id}`}
+                      type="button"
+                      disabled={translationStatus === 'loading'}
+                      onClick={() => handleQuickPhrase(item.text)}
+                    >
+                      {item.text}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             <form className={styles.composer} onSubmit={translate}>
+              <div className={styles.composerDirection}>
+                <strong>{sourceReference?.name ?? sourceLanguage}</strong>
+                <span aria-hidden="true">→</span>
+                <strong>{outputReference?.name ?? outputLanguage}</strong>
+              </div>
               <label className={styles.field}>
                 <span>{languageCopy.phrase}</span>
                 <textarea
+                  dir={sourceReference?.direction ?? 'ltr'}
                   maxLength={3000}
                   placeholder={languageCopy.placeholder}
                   rows={4}
@@ -469,8 +569,8 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
                     type="button"
                     disabled={voiceStatus === 'listening' || translationStatus === 'loading'}
                     onClick={startVoiceInput}
-                    aria-label={companionCopy.voiceInput}
-                    title={companionCopy.voiceInput}
+                    aria-label={`${interpreterCopy.speak}: ${sourceReference?.name ?? sourceLanguage}`}
+                    title={`${interpreterCopy.speak}: ${sourceReference?.name ?? sourceLanguage}`}
                   >
                     {voiceStatus === 'listening' ? (
                       <LoaderCircle className={styles.spin} size={17} aria-hidden="true" />
@@ -479,7 +579,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
                     )}
                     {voiceStatus === 'listening'
                       ? companionCopy.listening
-                      : companionCopy.voiceInput}
+                      : `${interpreterCopy.speak} · ${sourceReference?.name ?? sourceLanguage}`}
                   </button>
                 ) : null}
 
@@ -524,7 +624,10 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
                   <button
                     className="button button--secondary button--compact"
                     type="button"
-                    onClick={() => setHistory([])}
+                    onClick={() => {
+                      setHistory([]);
+                      setShowToLocalItem(null);
+                    }}
                   >
                     {messages.common.clear}
                   </button>
@@ -539,34 +642,54 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
               ) : (
                 <div className={styles.messages} aria-live="polite">
                   {history.map((item) => {
-                    const reference = availableDestinationLanguages.find(
-                      (language) => language.code === item.target,
+                    const localReference = availableDestinationLanguages.find(
+                      (language) => language.code === item.source || language.code === item.target,
                     );
+                    const itemSourceReference =
+                      item.source === 'en' ? ENGLISH_LANGUAGE : localReference;
+                    const itemTargetReference =
+                      item.target === 'en' ? ENGLISH_LANGUAGE : localReference;
                     return (
                       <article className={styles.exchange} key={item.id}>
-                        <div className={`${styles.bubble} ${styles.sourceBubble}`}>
-                          <span>English</span>
+                        <div
+                          className={`${styles.bubble} ${styles.sourceBubble}`}
+                          dir={itemSourceReference?.direction ?? 'ltr'}
+                        >
+                          <span>{itemSourceReference?.name ?? item.source}</span>
                           <p>{item.sourceText}</p>
                         </div>
                         <div
                           className={`${styles.bubble} ${styles.translationBubble}`}
-                          dir={reference?.direction ?? 'ltr'}
+                          dir={itemTargetReference?.direction ?? 'ltr'}
                         >
-                          <span>{reference?.name ?? item.target}</span>
+                          <span>{itemTargetReference?.name ?? item.target}</span>
                           <p>{item.translatedText}</p>
                           <div className={styles.translationMeta}>
                             <small dir="ltr">{providerDisplayName(item.provider)}</small>
-                            {voiceOutputSupported ? (
-                              <button
-                                className={styles.listenButton}
-                                type="button"
-                                onClick={() => speakTranslation(item.translatedText, item.target)}
-                                aria-label={`${companionCopy.listen}: ${reference?.name ?? item.target}`}
-                              >
-                                <Volume2 size={16} aria-hidden="true" />
-                                {companionCopy.listen}
-                              </button>
-                            ) : null}
+                            <div className={styles.translationActions}>
+                              {voiceOutputSupported ? (
+                                <button
+                                  className={styles.listenButton}
+                                  type="button"
+                                  onClick={() => speakTranslation(item.translatedText, item.target)}
+                                  aria-label={`${companionCopy.listen}: ${itemTargetReference?.name ?? item.target}`}
+                                >
+                                  <Volume2 size={16} aria-hidden="true" />
+                                  {companionCopy.listen}
+                                </button>
+                              ) : null}
+                              {item.target !== 'en' ? (
+                                <button
+                                  className={styles.listenButton}
+                                  type="button"
+                                  onClick={() => setShowToLocalItem(item)}
+                                  aria-label={interpreterCopy.showToLocal}
+                                >
+                                  <Maximize2 size={16} aria-hidden="true" />
+                                  {interpreterCopy.showToLocal}
+                                </button>
+                              ) : null}
+                            </div>
                           </div>
                         </div>
                       </article>
@@ -590,6 +713,45 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
           </div>
         ) : null}
       </div>
+
+      {showToLocalItem ? (
+        <div
+          className={styles.showLocalBackdrop}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setShowToLocalItem(null);
+          }}
+        >
+          <section
+            className={styles.showLocalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="show-local-title"
+          >
+            <header className={styles.showLocalHeader}>
+              <div>
+                <span className="eyebrow">{phrasebook?.countryName ?? selectedCountry}</span>
+                <h2 id="show-local-title">{interpreterCopy.showToLocal}</h2>
+              </div>
+              <button
+                ref={showToLocalCloseRef}
+                className={styles.showLocalClose}
+                type="button"
+                onClick={() => setShowToLocalItem(null)}
+                aria-label={interpreterCopy.close}
+              >
+                <X size={24} aria-hidden="true" />
+              </button>
+            </header>
+            <p className={styles.showLocalText} dir={targetReference?.direction ?? 'ltr'}>
+              {showToLocalItem.translatedText}
+            </p>
+            <footer className={styles.showLocalFooter}>
+              <strong>{targetReference?.name ?? showToLocalItem.target}</strong>
+              <span>{interpreterCopy.showToLocalHint}</span>
+            </footer>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }
