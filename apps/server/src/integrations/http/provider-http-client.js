@@ -125,7 +125,7 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
         if (waiter.settled) return false;
         waiter.settled = true;
         clearTimeout(timeout);
-        resolve();
+        resolve(undefined);
         return true;
       };
 
