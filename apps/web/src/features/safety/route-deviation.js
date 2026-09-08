@@ -3,7 +3,7 @@ const EARTH_RADIUS_METERS = 6_371_000;
 /** @typedef {'idle'|'unavailable'|'low-accuracy'|'on-route'|'checking'|'deviated'} RouteWatchStatus */
 /**
  * @typedef {object} RouteWatchState
- * @property {RouteWatchStatus} status
+ * @property {string} status
  * @property {number|null} offRouteSince
  * @property {number} offRouteSamples
  * @property {number|null} distanceFromRouteMeters
@@ -94,8 +94,8 @@ export function distanceFromRouteMeters(position, routePath) {
 }
 
 /**
- * Create a fresh route-watch state with a deliberately broad status type so
- * React state and refs can safely move through every monitoring state.
+ * Create a fresh route-watch state. The state shape is intentionally shared
+ * by React refs and state as monitoring moves through several runtime statuses.
  * @param {RouteWatchStatus} [status]
  * @returns {Readonly<RouteWatchState>}
  */
