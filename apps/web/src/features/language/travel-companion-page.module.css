@@ -10,6 +10,7 @@
 
 .hero,
 .setup,
+.interpreterPanel,
 .quickPanel,
 .composer,
 .conversation,
@@ -90,7 +91,8 @@
 .field select:focus-visible,
 .field textarea:focus-visible,
 .quickPhrase:focus-visible,
-.listenButton:focus-visible {
+.listenButton:focus-visible,
+.showLocalClose:focus-visible {
   outline: 3px solid var(--color-focus, currentColor);
   outline-offset: 3px;
 }
@@ -113,11 +115,39 @@
   gap: 1rem;
 }
 
+.interpreterPanel,
 .quickPanel,
 .composer,
 .conversation,
 .privacyNote {
   padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.interpreterPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.interpreterPanel h2 {
+  margin: 0.3rem 0 0.45rem;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.interpreterPanel p {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.directionButton {
+  flex: 0 0 auto;
+}
+
+.directionButton span {
+  white-space: nowrap;
 }
 
 .sectionHeading {
@@ -181,6 +211,23 @@
 .composer {
   display: grid;
   gap: 0.85rem;
+}
+
+.composerDirection {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.composerDirection strong {
+  color: var(--color-text);
 }
 
 .actions {
@@ -275,6 +322,13 @@
   color: var(--color-text-muted);
 }
 
+.translationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
 .listenButton {
   display: inline-flex;
   align-items: center;
@@ -311,6 +365,79 @@
   margin-top: 0.65rem;
 }
 
+.showLocalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 2rem);
+  background: rgb(0 0 0 / 72%);
+}
+
+.showLocalCard {
+  display: grid;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  width: min(96vw, 64rem);
+  max-height: 94vh;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg, 0 1.5rem 4rem rgb(0 0 0 / 35%));
+}
+
+.showLocalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.showLocalHeader h2 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.showLocalClose {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.showLocalText {
+  display: grid;
+  place-items: center;
+  min-height: clamp(12rem, 38vh, 25rem);
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(2rem, 7vw, 5rem);
+  font-weight: 800;
+  line-height: 1.12;
+  text-align: center;
+}
+
+.showLocalFooter {
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.showLocalFooter span {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
 .spin {
   animation: travel-companion-spin 0.85s linear infinite;
 }
@@ -326,6 +453,15 @@
     grid-template-columns: 1fr;
   }
 
+  .interpreterPanel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .directionButton {
+    justify-content: center;
+  }
+
   .bubble {
     width: 94%;
   }
@@ -338,10 +474,12 @@
 
   .hero,
   .setup,
+  .interpreterPanel,
   .quickPanel,
   .composer,
   .conversation,
-  .privacyNote {
+  .privacyNote,
+  .showLocalCard {
     border-radius: var(--radius-lg);
   }
 
@@ -370,6 +508,20 @@
   .translationMeta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .translationActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .showLocalBackdrop {
+    padding: 0.5rem;
+  }
+
+  .showLocalCard {
+    width: 100%;
+    max-height: 98vh;
   }
 }
 

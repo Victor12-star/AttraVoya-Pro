@@ -107,7 +107,7 @@ describe('TravelCompanionPage', () => {
     delete currentWindow.speechSynthesis;
   });
 
-  it('uses destination-aware quick phrases and always sends English as the source language', async () => {
+  it('uses destination-aware quick phrases and sends English to the selected local language by default', async () => {
     render(<TravelCompanionPage locale="en" messages={messages} />);
     await chooseSweden();
 
@@ -126,6 +126,28 @@ describe('TravelCompanionPage', () => {
     expect(screen.getAllByText('Swedish').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'How are you?' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'How much is this?' })).toBeInTheDocument();
+  });
+
+  it('switches the interpreter direction and translates the local language back to English', async () => {
+    mocks.translateText.mockResolvedValue(
+      translationResponse({ source: 'sv', target: 'en', translatedText: 'Hello.' }),
+    );
+
+    render(<TravelCompanionPage locale="en" messages={messages} />);
+    await chooseSweden();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Swap speaking direction' }));
+    fireEvent.change(screen.getByLabelText('Phrase'), { target: { value: 'Hej.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Translate' }));
+
+    expect(await screen.findByText('Hello.')).toBeInTheDocument();
+    expect(mocks.translateText).toHaveBeenCalledWith({
+      text: 'Hej.',
+      source: 'sv',
+      target: 'en',
+    });
+    expect(screen.queryByRole('button', { name: 'How are you?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Show to local' })).not.toBeInTheDocument();
   });
 
   it('translates traveller-entered everyday text and keeps the result in session-only chat history', async () => {
@@ -148,7 +170,24 @@ describe('TravelCompanionPage', () => {
     expect(screen.getByText('Your translated phrases will appear here.')).toBeInTheDocument();
   });
 
-  it('rejects a translation returned for the wrong target language', async () => {
+  it('presents a translated destination-language phrase in an accessible Show to Local card', async () => {
+    render(<TravelCompanionPage locale="en" messages={messages} />);
+    await chooseSweden();
+    fireEvent.click(screen.getByRole('button', { name: 'Hello.' }));
+    await screen.findByText('Hej.');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show to local' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Show to local' });
+    expect(dialog).toHaveTextContent('Hej.');
+    expect(dialog).toHaveTextContent('Swedish');
+    expect(dialog).toHaveTextContent('Turn the screen toward the person you are speaking with.');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog', { name: 'Show to local' })).not.toBeInTheDocument();
+  });
+
+  it('rejects a translation returned for the wrong source or target language', async () => {
     mocks.translateText.mockResolvedValue(
       translationResponse({ target: 'de', translatedText: 'Hallo.' }),
     );
