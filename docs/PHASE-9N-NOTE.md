@@ -1,0 +1,1 @@
+Phase 9N must not be described as providing live hotel prices until an authorized inventory/pricing provider is connected and verified. The current implementation stores traveller accommodation budget limits and lodging preferences and prepares the existing planner evidence path for verified provider pricing.
