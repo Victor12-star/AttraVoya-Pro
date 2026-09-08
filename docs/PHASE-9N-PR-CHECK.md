@@ -1,0 +1,1 @@
+Pre-PR checkpoint: feature branch is based on verified `develop` commit `9fda4708e4c6643bda34dfc1a9646947fb84022b`. No merge is permitted until the exact final PR head has all five canonical CI jobs green.
