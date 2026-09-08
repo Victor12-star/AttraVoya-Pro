@@ -31,7 +31,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Accommodation locations could not be loaded right now.',
       website: 'Website',
       distance: 'Distance',
-      dataNotice: 'Location data only. Live room prices and availability are not connected yet.',
+      dataNotice:
+        'Location data only. Live room prices, availability and property photos are not connected yet.',
       filterLabel: 'Accommodation type',
       allTypes: 'All stays',
       types: {
@@ -53,7 +54,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Boenden kunde inte hämtas just nu.',
       website: 'Webbplats',
       distance: 'Avstånd',
-      dataNotice: 'Endast platsdata. Livepriser och tillgänglighet för rum är inte anslutna ännu.',
+      dataNotice:
+        'Endast platsdata. Livepriser, tillgänglighet och boendebilder är inte anslutna ännu.',
       filterLabel: 'Boendetyp',
       allTypes: 'Alla boenden',
       types: {
@@ -76,7 +78,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Sitio web',
       distance: 'Distancia',
       dataNotice:
-        'Solo datos de ubicación. Los precios y la disponibilidad en tiempo real aún no están conectados.',
+        'Solo datos de ubicación. Los precios, la disponibilidad y las fotos del alojamiento en tiempo real aún no están conectados.',
       filterLabel: 'Tipo de alojamiento',
       allTypes: 'Todos los alojamientos',
       types: {
@@ -99,7 +101,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Site web',
       distance: 'Distance',
       dataNotice:
-        'Données de localisation uniquement. Les prix et disponibilités en direct ne sont pas encore connectés.',
+        'Données de localisation uniquement. Les prix, disponibilités et photos de l’hébergement en direct ne sont pas encore connectés.',
       filterLabel: 'Type d’hébergement',
       allTypes: 'Tous les hébergements',
       types: {
@@ -123,7 +125,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Webseite',
       distance: 'Entfernung',
       dataNotice:
-        'Nur Standortdaten. Live-Zimmerpreise und Verfügbarkeit sind noch nicht verbunden.',
+        'Nur Standortdaten. Live-Zimmerpreise, Verfügbarkeit und Unterkunftsfotos sind noch nicht verbunden.',
       filterLabel: 'Unterkunftsart',
       allTypes: 'Alle Unterkünfte',
       types: {
@@ -146,7 +148,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Sito web',
       distance: 'Distanza',
       dataNotice:
-        'Solo dati sulla posizione. Prezzi e disponibilità in tempo reale non sono ancora collegati.',
+        'Solo dati sulla posizione. Prezzi, disponibilità e foto della struttura in tempo reale non sono ancora collegati.',
       filterLabel: 'Tipo di alloggio',
       allTypes: 'Tutti gli alloggi',
       types: {
@@ -169,7 +171,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Site',
       distance: 'Distância',
       dataNotice:
-        'Apenas dados de localização. Preços e disponibilidade em tempo real ainda não estão ligados.',
+        'Apenas dados de localização. Preços, disponibilidade e fotos do alojamento em tempo real ainda não estão ligados.',
       filterLabel: 'Tipo de alojamento',
       allTypes: 'Todos os alojamentos',
       types: {
@@ -192,7 +194,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Strona internetowa',
       distance: 'Odległość',
       dataNotice:
-        'Tylko dane lokalizacyjne. Ceny i dostępność pokoi na żywo nie są jeszcze podłączone.',
+        'Tylko dane lokalizacyjne. Ceny, dostępność i zdjęcia obiektu na żywo nie są jeszcze podłączone.',
       filterLabel: 'Typ noclegu',
       allTypes: 'Wszystkie noclegi',
       types: {
@@ -216,7 +218,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Website',
       distance: 'Afstand',
       dataNotice:
-        'Alleen locatiegegevens. Live kamerprijzen en beschikbaarheid zijn nog niet aangesloten.',
+        'Alleen locatiegegevens. Live kamerprijzen, beschikbaarheid en accommodatiebeelden zijn nog niet aangesloten.',
       filterLabel: 'Type verblijf',
       allTypes: 'Alle verblijven',
       types: {
@@ -238,7 +240,8 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Overnatting kan ikke lastes inn akkurat nå.',
       website: 'Nettsted',
       distance: 'Avstand',
-      dataNotice: 'Kun stedsdata. Live rompriser og tilgjengelighet er ikke koblet til ennå.',
+      dataNotice:
+        'Kun stedsdata. Live rompriser, tilgjengelighet og bilder av overnattingsstedet er ikke koblet til ennå.',
       filterLabel: 'Overnattingstype',
       allTypes: 'Alle overnattingssteder',
       types: {
@@ -261,7 +264,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Websted',
       distance: 'Afstand',
       dataNotice:
-        'Kun placeringsdata. Live værelsespriser og tilgængelighed er endnu ikke tilsluttet.',
+        'Kun placeringsdata. Live værelsespriser, tilgængelighed og billeder af overnatningsstedet er endnu ikke tilsluttet.',
       filterLabel: 'Overnatningstype',
       allTypes: 'Alle overnatningssteder',
       types: {
@@ -284,7 +287,7 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       website: 'Verkkosivusto',
       distance: 'Etäisyys',
       dataNotice:
-        'Vain sijaintitiedot. Huoneiden reaaliaikaisia hintoja ja saatavuutta ei ole vielä yhdistetty.',
+        'Vain sijaintitiedot. Reaaliaikaisia hintoja, saatavuutta ja majoituspaikan kuvia ei ole vielä yhdistetty.',
       filterLabel: 'Majoitustyyppi',
       allTypes: 'Kaikki majoitukset',
       types: {
@@ -307,133 +310,133 @@ const ACCOMMODATION_PAGE_COPY = /** @type {Readonly<Record<string, Accommodation
       unavailable: 'Konaklama yerleri şu anda yüklenemiyor.',
       website: 'Web sitesi',
       distance: 'Mesafe',
-      dataNotice: 'Yalnızca konum verileri. Canlı oda fiyatları ve müsaitlik henüz bağlı değil.',
+      dataNotice:
+        'Yalnızca konum verileri. Canlı oda fiyatları, müsaitlik ve tesis fotoğrafları henüz bağlı değil.',
       filterLabel: 'Konaklama türü',
       allTypes: 'Tüm konaklamalar',
       types: {
         HOTEL: 'Oteller',
         GUEST_HOUSE: 'Konukevleri',
         HOSTEL: 'Hosteller',
-        SHORT_TERM_RENTAL: 'Daireler ve kiralıklar',
+        SHORT_TERM_RENTAL: 'Daireler ve kiralık yerler',
         OTHER: 'Diğer konaklama',
       },
     },
     ar: {
-      eyebrow: 'الإقامة',
+      eyebrow: 'أماكن الإقامة',
       title: 'أماكن إقامة بالقرب من {destination}',
-      intro: 'اكتشف أماكن إقامة حقيقية يعرضها مزود الإقامة المهيأ.',
+      intro: 'اكتشف مواقع إقامة حقيقية يعرضها مزود الإقامة المهيأ.',
       back: 'العودة إلى الوجهة',
       searchArea: 'ضمن 10 كم',
       results: 'النتائج',
       noResults: 'لم يتم العثور على أماكن إقامة في منطقة البحث هذه.',
-      unavailable: 'يتعذر تحميل أماكن الإقامة الآن.',
+      unavailable: 'تعذر تحميل أماكن الإقامة الآن.',
       website: 'الموقع الإلكتروني',
       distance: 'المسافة',
-      dataNotice: 'بيانات الموقع فقط. أسعار الغرف والتوافر المباشر غير متصلين بعد.',
+      dataNotice: 'بيانات الموقع فقط. الأسعار والتوافر وصور مكان الإقامة المباشرة غير متصلة بعد.',
       filterLabel: 'نوع الإقامة',
       allTypes: 'كل أماكن الإقامة',
       types: {
         HOTEL: 'فنادق',
         GUEST_HOUSE: 'بيوت ضيافة',
-        HOSTEL: 'نزل',
+        HOSTEL: 'نُزل',
         SHORT_TERM_RENTAL: 'شقق وإيجارات',
         OTHER: 'إقامة أخرى',
       },
     },
-    zh: {
-      eyebrow: '住宿',
-      title: '{destination}附近的住宿',
-      intro: '探索由已配置住宿提供商返回的真实住宿地点。',
-      back: '返回目的地',
-      searchArea: '10 公里范围内',
-      results: '结果',
-      noResults: '此搜索区域内未找到住宿地点。',
-      unavailable: '目前无法加载住宿地点。',
-      website: '网站',
-      distance: '距离',
-      dataNotice: '仅提供位置数据。实时房价和空房情况尚未接入。',
-      filterLabel: '住宿类型',
-      allTypes: '全部住宿',
+    hi: {
+      eyebrow: 'ठहरने की जगहें',
+      title: '{destination} के पास ठहरने की जगहें',
+      intro: 'कॉन्फ़िगर किए गए आवास प्रदाता से मिली वास्तविक ठहरने की जगहें देखें।',
+      back: 'डेस्टिनेशन पर वापस जाएँ',
+      searchArea: '10 किमी के भीतर',
+      results: 'नतीजे',
+      noResults: 'इस खोज क्षेत्र में कोई ठहरने की जगह नहीं मिली।',
+      unavailable: 'ठहरने की जगहें अभी लोड नहीं हो सकीं।',
+      website: 'वेबसाइट',
+      distance: 'दूरी',
+      dataNotice:
+        'केवल स्थान डेटा। लाइव कमरे की कीमतें, उपलब्धता और प्रॉपर्टी फ़ोटो अभी कनेक्ट नहीं हैं।',
+      filterLabel: 'आवास का प्रकार',
+      allTypes: 'सभी ठहरने की जगहें',
       types: {
-        HOTEL: '酒店',
-        GUEST_HOUSE: '旅馆',
-        HOSTEL: '青年旅舍',
-        SHORT_TERM_RENTAL: '公寓和短租',
-        OTHER: '其他住宿',
+        HOTEL: 'होटल',
+        GUEST_HOUSE: 'गेस्ट हाउस',
+        HOSTEL: 'हॉस्टल',
+        SHORT_TERM_RENTAL: 'अपार्टमेंट और किराये',
+        OTHER: 'अन्य आवास',
       },
     },
     ja: {
-      eyebrow: '宿泊',
+      eyebrow: '宿泊施設',
       title: '{destination}周辺の宿泊施設',
-      intro: '設定済みの宿泊プロバイダーから返された実在する宿泊施設を探せます。',
+      intro: '設定された宿泊施設プロバイダーから返された実在の宿泊場所を確認できます。',
       back: '目的地に戻る',
       searchArea: '10 km以内',
-      results: '結果',
+      results: '件',
       noResults: 'この検索範囲では宿泊施設が見つかりませんでした。',
       unavailable: '現在、宿泊施設を読み込めません。',
       website: 'ウェブサイト',
       distance: '距離',
-      dataNotice: '位置情報のみです。客室のリアルタイム料金と空室状況はまだ接続されていません。',
+      dataNotice: '位置情報のみです。リアルタイムの料金、空室状況、施設写真はまだ接続されていません。',
       filterLabel: '宿泊タイプ',
       allTypes: 'すべての宿泊施設',
       types: {
         HOTEL: 'ホテル',
         GUEST_HOUSE: 'ゲストハウス',
         HOSTEL: 'ホステル',
-        SHORT_TERM_RENTAL: 'アパート・短期賃貸',
-        OTHER: 'その他の宿泊',
+        SHORT_TERM_RENTAL: 'アパート・レンタル',
+        OTHER: 'その他',
       },
     },
     ko: {
       eyebrow: '숙박',
-      title: '{destination} 주변 숙박시설',
-      intro: '설정된 숙박 제공자가 반환한 실제 숙박 위치를 둘러보세요.',
-      back: '목적지로 돌아가기',
-      searchArea: '10 km 이내',
+      title: '{destination} 주변 숙박 시설',
+      intro: '설정된 숙박 제공업체가 반환한 실제 숙박 위치를 확인하세요.',
+      back: '여행지로 돌아가기',
+      searchArea: '10km 이내',
       results: '결과',
-      noResults: '이 검색 지역에서 숙박시설을 찾지 못했습니다.',
-      unavailable: '현재 숙박시설을 불러올 수 없습니다.',
+      noResults: '이 검색 범위에서 숙박 시설을 찾지 못했습니다.',
+      unavailable: '현재 숙박 시설을 불러올 수 없습니다.',
       website: '웹사이트',
       distance: '거리',
-      dataNotice:
-        '위치 데이터만 제공합니다. 실시간 객실 가격과 예약 가능 여부는 아직 연결되지 않았습니다.',
+      dataNotice: '위치 데이터만 제공됩니다. 실시간 객실 요금, 예약 가능 여부 및 숙소 사진은 아직 연결되지 않았습니다.',
       filterLabel: '숙박 유형',
       allTypes: '모든 숙박',
       types: {
         HOTEL: '호텔',
         GUEST_HOUSE: '게스트하우스',
         HOSTEL: '호스텔',
-        SHORT_TERM_RENTAL: '아파트 및 단기 임대',
+        SHORT_TERM_RENTAL: '아파트 및 임대',
         OTHER: '기타 숙박',
       },
     },
-    hi: {
-      eyebrow: 'ठहरने की जगह',
-      title: '{destination} के पास ठहरने की जगहें',
-      intro: 'कॉन्फ़िगर किए गए आवास प्रदाता से मिली वास्तविक ठहरने की जगहें देखें।',
-      back: 'गंतव्य पर वापस जाएँ',
-      searchArea: '10 किमी के भीतर',
-      results: 'परिणाम',
-      noResults: 'इस खोज क्षेत्र में कोई ठहरने की जगह नहीं मिली।',
-      unavailable: 'अभी ठहरने की जगहें लोड नहीं की जा सकतीं।',
-      website: 'वेबसाइट',
-      distance: 'दूरी',
-      dataNotice: 'केवल स्थान डेटा। लाइव कमरे की कीमत और उपलब्धता अभी जुड़ी नहीं है।',
-      filterLabel: 'आवास प्रकार',
-      allTypes: 'सभी ठहरने की जगहें',
+    zh: {
+      eyebrow: '住宿',
+      title: '{destination}附近的住宿',
+      intro: '查看由已配置住宿提供商返回的真实住宿地点。',
+      back: '返回目的地',
+      searchArea: '10 公里内',
+      results: '个结果',
+      noResults: '此搜索范围内未找到住宿地点。',
+      unavailable: '目前无法加载住宿地点。',
+      website: '网站',
+      distance: '距离',
+      dataNotice: '仅提供位置数据。实时房价、可订状态和住宿照片尚未连接。',
+      filterLabel: '住宿类型',
+      allTypes: '全部住宿',
       types: {
-        HOTEL: 'होटल',
-        GUEST_HOUSE: 'गेस्ट हाउस',
-        HOSTEL: 'होस्टल',
-        SHORT_TERM_RENTAL: 'अपार्टमेंट और किराये',
-        OTHER: 'अन्य आवास',
+        HOTEL: '酒店',
+        GUEST_HOUSE: '旅馆',
+        HOSTEL: '青年旅舍',
+        SHORT_TERM_RENTAL: '公寓与短租',
+        OTHER: '其他住宿',
       },
     },
-  })
+  }),
 );
 
-/** @param {string} locale */
-export function getAccommodationPageCopy(locale) {
+export function getAccommodationPageCopy(locale = 'en') {
   const normalizedLocale = normalizeLocale(locale);
   return ACCOMMODATION_PAGE_COPY[normalizedLocale] ?? ACCOMMODATION_PAGE_COPY.en;
 }
