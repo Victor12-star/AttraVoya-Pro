@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Clock3, ExternalLink, LoaderCircle, Phone, ShieldAlert } from 'lucide-react';
+import {
+  Clock3,
+  ExternalLink,
+  LoaderCircle,
+  Phone,
+  ShieldAlert,
+} from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getTravelEmergencyCopy } from './travel-emergency-copy.js';
@@ -46,7 +52,9 @@ export function normalizeEmergencyCountries(response) {
       return iso2 && /^[A-Z]{2}$/.test(iso2) && name ? { iso2, name } : null;
     })
     .filter(Boolean)
-    .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
+    .sort((left, right) =>
+      left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }),
+    );
 }
 
 /** @param {any} response @param {string} expectedCountryCode */
@@ -132,7 +140,10 @@ export function TravelEmergencyMode({ locale = 'en', messages }) {
       .then((response) => {
         if (!active) return;
         const countries = normalizeEmergencyCountries(response);
-        setCountriesState({ status: countries.length ? 'success' : 'error', data: countries });
+        setCountriesState({
+          status: countries.length ? 'success' : 'error',
+          data: countries,
+        });
       })
       .catch(() => {
         if (active) setCountriesState({ status: 'error', data: [] });
