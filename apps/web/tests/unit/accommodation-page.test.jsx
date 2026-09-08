@@ -153,9 +153,9 @@ describe('AccommodationPage', () => {
         'Location data only. Live room prices and availability are not connected yet.',
       ),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('Property photos are not available from this provider.')).toHaveLength(
-      2,
-    );
+    expect(
+      screen.getAllByText('Property photos are not available from this provider.'),
+    ).toHaveLength(2);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Website' })).toHaveAttribute(
       'href',

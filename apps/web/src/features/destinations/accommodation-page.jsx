@@ -317,9 +317,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
 
   function previousPhoto() {
     if (!galleryStay?.photos?.length) return;
-    setActivePhotoIndex((current) =>
-      current === 0 ? galleryStay.photos.length - 1 : current - 1,
-    );
+    setActivePhotoIndex((current) => (current === 0 ? galleryStay.photos.length - 1 : current - 1));
   }
 
   function nextPhoto() {
@@ -451,8 +449,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
               const typeLabel = stay.accommodationType ? copy.types[stay.accommodationType] : null;
               const coverPhoto = stay.photos[0] ?? null;
               const coverAlt = coverPhoto
-                ? coverPhoto.alt ??
-                  `${stay.name} — ${photoCopy.categories[coverPhoto.category] ?? photoCopy.categories.OTHER}`
+                ? (coverPhoto.alt ??
+                  `${stay.name} — ${photoCopy.categories[coverPhoto.category] ?? photoCopy.categories.OTHER}`)
                 : '';
 
               return (
