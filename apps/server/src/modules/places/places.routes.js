@@ -1,3 +1,7 @@
+import {
+  PROVIDER_DISCOVERY_RATE_LIMIT,
+  PROVIDER_SEARCH_RATE_LIMIT,
+} from '../../config/constants.js';
 import { createPlacesProvider } from '../../integrations/places/places-provider.factory.js';
 import { createPlacesController } from './places.controller.js';
 import { placesSchemas } from './places.schema.js';
@@ -10,7 +14,12 @@ export async function placesRoutes(app, options = {}) {
 
   app.get('/autocomplete', {
     schema: placesSchemas.autocomplete,
+    config: { rateLimit: PROVIDER_SEARCH_RATE_LIMIT },
     handler: controller.autocomplete,
   });
-  app.get('/nearby', { schema: placesSchemas.nearby, handler: controller.nearby });
+  app.get('/nearby', {
+    schema: placesSchemas.nearby,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
+    handler: controller.nearby,
+  });
 }

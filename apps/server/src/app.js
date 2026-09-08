@@ -109,6 +109,7 @@ export async function buildApp(options = {}) {
     ...DEFAULT_RATE_LIMIT,
     errorResponseBuilder(request) {
       return {
+        statusCode: 429,
         error: {
           code: 'RATE_LIMITED',
           message: 'Too many requests. Please try again shortly.',
