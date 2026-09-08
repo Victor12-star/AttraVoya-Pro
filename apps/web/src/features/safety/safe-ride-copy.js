@@ -20,11 +20,14 @@ const COPY = Object.freeze({
     deviated:
       'Route deviation detected. You may be away from the expected route. This can also happen because of GPS error, road closures, or a legitimate detour. Check the map and ask the driver if you are unsure.',
     lowAccuracy: 'GPS accuracy is too low to make a reliable route-safety check right now.',
-    denied: 'Location access is required for Safe Ride. You can keep using the normal route summary.',
-    unavailable: 'Safe Ride could not be started right now. The normal route summary is still available.',
+    denied:
+      'Location access is required for Safe Ride. You can keep using the normal route summary.',
+    unavailable:
+      'Safe Ride could not be started right now. The normal route summary is still available.',
     notConfigured:
       'Google Safe Ride is not configured on this deployment yet. The normal route summary is still available.',
-    keepOpen: 'Keep AttraVoya open during the ride. Browsers can pause location tracking in the background.',
+    keepOpen:
+      'Keep AttraVoya open during the ride. Browsers can pause location tracking in the background.',
     privacy:
       'Ride location is not saved by AttraVoya. Your current location and destination are sent to Google Maps only when Safe Ride calculates or refreshes the route.',
     advisory:
@@ -51,8 +54,10 @@ const COPY = Object.freeze({
     deviated:
       'Ruttavvikelse upptäckt. Du kan vara utanför den förväntade rutten. Det kan också bero på GPS-fel, vägarbeten eller en legitim omväg. Kontrollera kartan och fråga föraren om du är osäker.',
     lowAccuracy: 'GPS-noggrannheten är för låg för en tillförlitlig säkerhetskontroll just nu.',
-    denied: 'Platsåtkomst krävs för Safe Ride. Du kan fortsätta använda den vanliga ruttsammanfattningen.',
-    unavailable: 'Safe Ride kunde inte startas just nu. Den vanliga ruttsammanfattningen finns kvar.',
+    denied:
+      'Platsåtkomst krävs för Safe Ride. Du kan fortsätta använda den vanliga ruttsammanfattningen.',
+    unavailable:
+      'Safe Ride kunde inte startas just nu. Den vanliga ruttsammanfattningen finns kvar.',
     notConfigured: 'Google Safe Ride är ännu inte konfigurerat i denna miljö.',
     keepOpen: 'Håll AttraVoya öppet under resan. Webbläsare kan pausa platsbevakning i bakgrunden.',
     privacy:
@@ -80,13 +85,16 @@ const COPY = Object.freeze({
     deviated:
       'Se detectó una desviación de la ruta. Podrías estar fuera de la ruta prevista. También puede deberse a un error de GPS, un cierre de carretera o un desvío legítimo. Revisa el mapa y pregunta al conductor si tienes dudas.',
     lowAccuracy: 'La precisión del GPS es demasiado baja para una comprobación fiable ahora.',
-    denied: 'Safe Ride necesita acceso a tu ubicación. Puedes seguir usando el resumen normal de ruta.',
+    denied:
+      'Safe Ride necesita acceso a tu ubicación. Puedes seguir usando el resumen normal de ruta.',
     unavailable: 'Safe Ride no se puede iniciar ahora. El resumen normal de ruta sigue disponible.',
     notConfigured: 'Google Safe Ride aún no está configurado en este entorno.',
-    keepOpen: 'Mantén AttraVoya abierto durante el viaje. El navegador puede pausar la ubicación en segundo plano.',
+    keepOpen:
+      'Mantén AttraVoya abierto durante el viaje. El navegador puede pausar la ubicación en segundo plano.',
     privacy:
       'AttraVoya no guarda la ubicación del viaje. Tu ubicación actual y destino se envían a Google Maps solo al calcular o actualizar la ruta.',
-    advisory: 'Safe Ride es una ayuda de seguridad orientativa, no un servicio de emergencia ni una garantía.',
+    advisory:
+      'Safe Ride es una ayuda de seguridad orientativa, no un servicio de emergencia ni una garantía.',
     minutes: 'min',
     google: 'Google Maps',
   },
@@ -112,7 +120,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride nécessite l’accès à votre position. Le résumé normal reste disponible.',
     unavailable: 'Safe Ride ne peut pas démarrer maintenant. Le résumé normal reste disponible.',
     notConfigured: 'Google Safe Ride n’est pas encore configuré dans cet environnement.',
-    keepOpen: 'Gardez AttraVoya ouvert pendant le trajet. Le navigateur peut suspendre le suivi en arrière-plan.',
+    keepOpen:
+      'Gardez AttraVoya ouvert pendant le trajet. Le navigateur peut suspendre le suivi en arrière-plan.',
     privacy:
       'AttraVoya ne conserve pas la position du trajet. Votre position actuelle et votre destination sont envoyées à Google Maps uniquement lors du calcul ou de l’actualisation.',
     advisory: 'Safe Ride est une aide de sécurité, pas un service d’urgence ni une garantie.',
@@ -139,12 +148,15 @@ const COPY = Object.freeze({
       'Routenabweichung erkannt. Du könntest von der erwarteten Route entfernt sein. GPS-Fehler, Straßensperren oder legitime Umwege sind ebenfalls möglich. Prüfe die Karte und frage bei Unsicherheit den Fahrer.',
     lowAccuracy: 'Die GPS-Genauigkeit ist derzeit zu gering für eine zuverlässige Prüfung.',
     denied: 'Safe Ride benötigt Standortzugriff. Die normale Routenübersicht bleibt verfügbar.',
-    unavailable: 'Safe Ride kann gerade nicht gestartet werden. Die normale Routenübersicht bleibt verfügbar.',
+    unavailable:
+      'Safe Ride kann gerade nicht gestartet werden. Die normale Routenübersicht bleibt verfügbar.',
     notConfigured: 'Google Safe Ride ist in dieser Umgebung noch nicht konfiguriert.',
-    keepOpen: 'Lass AttraVoya während der Fahrt geöffnet. Browser können die Ortung im Hintergrund pausieren.',
+    keepOpen:
+      'Lass AttraVoya während der Fahrt geöffnet. Browser können die Ortung im Hintergrund pausieren.',
     privacy:
       'AttraVoya speichert den Fahrtstandort nicht. Standort und Ziel werden nur zur Routenberechnung oder Aktualisierung an Google Maps gesendet.',
-    advisory: 'Safe Ride ist eine unterstützende Sicherheitsfunktion, kein Notdienst und keine Garantie.',
+    advisory:
+      'Safe Ride ist eine unterstützende Sicherheitsfunktion, kein Notdienst und keine Garantie.',
     minutes: 'Min.',
     google: 'Google Maps',
   },
@@ -170,7 +182,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride richiede l’accesso alla posizione. Il riepilogo normale resta disponibile.',
     unavailable: 'Safe Ride non può essere avviato ora. Il riepilogo normale resta disponibile.',
     notConfigured: 'Google Safe Ride non è ancora configurato in questo ambiente.',
-    keepOpen: 'Tieni AttraVoya aperto durante il viaggio. Il browser può sospendere la posizione in background.',
+    keepOpen:
+      'Tieni AttraVoya aperto durante il viaggio. Il browser può sospendere la posizione in background.',
     privacy:
       'AttraVoya non salva la posizione del viaggio. Posizione e destinazione vengono inviate a Google Maps solo per calcolare o aggiornare il percorso.',
     advisory: 'Safe Ride è un supporto di sicurezza, non un servizio di emergenza né una garanzia.',
@@ -196,10 +209,12 @@ const COPY = Object.freeze({
     deviated:
       'Foi detetado um desvio de rota. Pode estar afastado da rota esperada. Erro de GPS, estradas fechadas ou um desvio legítimo também podem explicar isto. Verifique o mapa e pergunte ao motorista se tiver dúvidas.',
     lowAccuracy: 'A precisão do GPS é demasiado baixa para uma verificação fiável neste momento.',
-    denied: 'O Safe Ride precisa de acesso à localização. O resumo normal da rota continua disponível.',
+    denied:
+      'O Safe Ride precisa de acesso à localização. O resumo normal da rota continua disponível.',
     unavailable: 'O Safe Ride não pode iniciar agora. O resumo normal da rota continua disponível.',
     notConfigured: 'O Google Safe Ride ainda não está configurado neste ambiente.',
-    keepOpen: 'Mantenha o AttraVoya aberto durante a viagem. O navegador pode pausar a localização em segundo plano.',
+    keepOpen:
+      'Mantenha o AttraVoya aberto durante a viagem. O navegador pode pausar a localização em segundo plano.',
     privacy:
       'O AttraVoya não guarda a localização da viagem. A localização atual e o destino são enviados ao Google Maps apenas ao calcular ou atualizar a rota.',
     advisory: 'O Safe Ride é um apoio de segurança, não um serviço de emergência nem uma garantia.',
@@ -228,7 +243,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride wymaga dostępu do lokalizacji. Zwykłe podsumowanie trasy nadal działa.',
     unavailable: 'Safe Ride nie może teraz wystartować. Zwykłe podsumowanie trasy nadal działa.',
     notConfigured: 'Google Safe Ride nie jest jeszcze skonfigurowany w tym środowisku.',
-    keepOpen: 'Pozostaw AttraVoya otwartą podczas jazdy. Przeglądarka może wstrzymać lokalizację w tle.',
+    keepOpen:
+      'Pozostaw AttraVoya otwartą podczas jazdy. Przeglądarka może wstrzymać lokalizację w tle.',
     privacy:
       'AttraVoya nie zapisuje lokalizacji przejazdu. Bieżąca lokalizacja i cel są wysyłane do Google Maps tylko podczas obliczania lub odświeżania trasy.',
     advisory: 'Safe Ride to pomoc bezpieczeństwa, a nie służba ratunkowa ani gwarancja.',
@@ -254,10 +270,12 @@ const COPY = Object.freeze({
     deviated:
       'Routeafwijking gedetecteerd. Je bent mogelijk buiten de verwachte route. GPS-fouten, wegafsluitingen of een legitieme omleiding kunnen dit ook veroorzaken. Controleer de kaart en vraag de chauffeur bij twijfel.',
     lowAccuracy: 'De GPS-nauwkeurigheid is nu te laag voor een betrouwbare controle.',
-    denied: 'Safe Ride heeft locatietoegang nodig. De normale routesamenvatting blijft beschikbaar.',
+    denied:
+      'Safe Ride heeft locatietoegang nodig. De normale routesamenvatting blijft beschikbaar.',
     unavailable: 'Safe Ride kan nu niet starten. De normale routesamenvatting blijft beschikbaar.',
     notConfigured: 'Google Safe Ride is nog niet geconfigureerd in deze omgeving.',
-    keepOpen: 'Houd AttraVoya open tijdens de rit. De browser kan locatietracking op de achtergrond pauzeren.',
+    keepOpen:
+      'Houd AttraVoya open tijdens de rit. De browser kan locatietracking op de achtergrond pauzeren.',
     privacy:
       'AttraVoya bewaart de ritlocatie niet. Je huidige locatie en bestemming gaan alleen naar Google Maps bij het berekenen of vernieuwen van de route.',
     advisory: 'Safe Ride is een ondersteunend veiligheidsmiddel, geen nooddienst of garantie.',
@@ -286,7 +304,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride krever posisjonstilgang. Vanlig ruteoppsummering er fortsatt tilgjengelig.',
     unavailable: 'Safe Ride kan ikke startes nå. Vanlig ruteoppsummering er fortsatt tilgjengelig.',
     notConfigured: 'Google Safe Ride er ikke konfigurert i dette miljøet ennå.',
-    keepOpen: 'Hold AttraVoya åpen under turen. Nettleseren kan pause posisjonssporing i bakgrunnen.',
+    keepOpen:
+      'Hold AttraVoya åpen under turen. Nettleseren kan pause posisjonssporing i bakgrunnen.',
     privacy:
       'AttraVoya lagrer ikke turposisjonen. Nåværende posisjon og destinasjon sendes til Google Maps bare ved beregning eller oppdatering av ruten.',
     advisory: 'Safe Ride er et rådgivende sikkerhetsverktøy, ikke en nødtjeneste eller garanti.',
@@ -312,10 +331,12 @@ const COPY = Object.freeze({
     deviated:
       'Ruteafvigelse registreret. Du kan være væk fra den forventede rute. GPS-fejl, vejlukninger eller en legitim omvej kan også være årsagen. Tjek kortet og spørg chaufføren, hvis du er i tvivl.',
     lowAccuracy: 'GPS-nøjagtigheden er for lav til en pålidelig kontrol lige nu.',
-    denied: 'Safe Ride kræver adgang til din position. Den normale ruteoversigt er stadig tilgængelig.',
+    denied:
+      'Safe Ride kræver adgang til din position. Den normale ruteoversigt er stadig tilgængelig.',
     unavailable: 'Safe Ride kan ikke starte nu. Den normale ruteoversigt er stadig tilgængelig.',
     notConfigured: 'Google Safe Ride er endnu ikke konfigureret i dette miljø.',
-    keepOpen: 'Hold AttraVoya åben under turen. Browseren kan sætte positionssporing på pause i baggrunden.',
+    keepOpen:
+      'Hold AttraVoya åben under turen. Browseren kan sætte positionssporing på pause i baggrunden.',
     privacy:
       'AttraVoya gemmer ikke turens position. Aktuel position og destination sendes kun til Google Maps ved beregning eller opdatering af ruten.',
     advisory: 'Safe Ride er et rådgivende sikkerhedsværktøj, ikke en nødtjeneste eller garanti.',
@@ -341,10 +362,13 @@ const COPY = Object.freeze({
     deviated:
       'Reittipoikkeama havaittu. Saatat olla odotetun reitin ulkopuolella. Syynä voi olla myös GPS-virhe, tiesulku tai oikea kiertotie. Tarkista kartta ja kysy kuljettajalta, jos olet epävarma.',
     lowAccuracy: 'GPS-tarkkuus on nyt liian heikko luotettavaan tarkistukseen.',
-    denied: 'Safe Ride tarvitsee sijaintiluvan. Tavallinen reittiyhteenveto on edelleen käytettävissä.',
-    unavailable: 'Safe Ride ei voi käynnistyä nyt. Tavallinen reittiyhteenveto on edelleen käytettävissä.',
+    denied:
+      'Safe Ride tarvitsee sijaintiluvan. Tavallinen reittiyhteenveto on edelleen käytettävissä.',
+    unavailable:
+      'Safe Ride ei voi käynnistyä nyt. Tavallinen reittiyhteenveto on edelleen käytettävissä.',
     notConfigured: 'Google Safe Ridea ei ole vielä määritetty tässä ympäristössä.',
-    keepOpen: 'Pidä AttraVoya avoinna matkan aikana. Selain voi keskeyttää sijainnin seurannan taustalla.',
+    keepOpen:
+      'Pidä AttraVoya avoinna matkan aikana. Selain voi keskeyttää sijainnin seurannan taustalla.',
     privacy:
       'AttraVoya ei tallenna matkan sijaintia. Nykyinen sijainti ja kohde lähetetään Google Mapsille vain reitin laskemista tai päivittämistä varten.',
     advisory: 'Safe Ride on turvallisuutta tukeva apu, ei hätäpalvelu eikä takuu.',
@@ -373,7 +397,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride konum erişimi gerektirir. Normal rota özeti kullanılmaya devam edebilir.',
     unavailable: 'Safe Ride şu anda başlatılamıyor. Normal rota özeti kullanılabilir.',
     notConfigured: 'Google Safe Ride bu ortamda henüz yapılandırılmadı.',
-    keepOpen: 'Yolculuk sırasında AttraVoya’yı açık tutun. Tarayıcı arka planda konum takibini duraklatabilir.',
+    keepOpen:
+      'Yolculuk sırasında AttraVoya’yı açık tutun. Tarayıcı arka planda konum takibini duraklatabilir.',
     privacy:
       'AttraVoya yolculuk konumunu kaydetmez. Mevcut konum ve hedef yalnızca rota hesaplanırken veya yenilenirken Google Maps’e gönderilir.',
     advisory: 'Safe Ride yardımcı bir güvenlik aracıdır; acil durum hizmeti veya garanti değildir.',
@@ -431,7 +456,8 @@ const COPY = Object.freeze({
     unavailable: 'Safe Ride 目前无法启动。普通路线摘要仍可使用。',
     notConfigured: '此环境尚未配置 Google Safe Ride。',
     keepOpen: '乘车期间请保持 AttraVoya 打开。浏览器在后台时可能暂停位置跟踪。',
-    privacy: 'AttraVoya 不保存乘车位置。只有在计算或刷新路线时，当前位置和目的地才会发送给 Google Maps。',
+    privacy:
+      'AttraVoya 不保存乘车位置。只有在计算或刷新路线时，当前位置和目的地才会发送给 Google Maps。',
     advisory: 'Safe Ride 只是辅助安全工具，不是紧急服务，也不能保证司机走错路线。',
     minutes: '分钟',
     google: 'Google Maps',
@@ -455,10 +481,12 @@ const COPY = Object.freeze({
     deviated:
       'ルート逸脱を検出しました。想定ルートから離れている可能性があります。GPS の誤差、通行止め、正当な迂回でも起こります。地図を確認し、不安な場合は運転手に確認してください。',
     lowAccuracy: '現在の GPS 精度では信頼できる安全確認ができません。',
-    denied: 'Safe Ride には位置情報へのアクセスが必要です。通常のルート概要は引き続き利用できます。',
+    denied:
+      'Safe Ride には位置情報へのアクセスが必要です。通常のルート概要は引き続き利用できます。',
     unavailable: 'Safe Ride を現在開始できません。通常のルート概要は利用できます。',
     notConfigured: 'この環境では Google Safe Ride がまだ設定されていません。',
-    keepOpen: '乗車中は AttraVoya を開いたままにしてください。ブラウザはバックグラウンドで位置追跡を停止することがあります。',
+    keepOpen:
+      '乗車中は AttraVoya を開いたままにしてください。ブラウザはバックグラウンドで位置追跡を停止することがあります。',
     privacy:
       'AttraVoya は乗車位置を保存しません。現在地と目的地は、ルートの計算または更新時にのみ Google Maps に送信されます。',
     advisory: 'Safe Ride は補助的な安全機能であり、緊急サービスでも保証でもありません。',
@@ -487,7 +515,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride에는 위치 접근이 필요합니다. 일반 경로 요약은 계속 사용할 수 있습니다.',
     unavailable: '지금 Safe Ride를 시작할 수 없습니다. 일반 경로 요약은 계속 사용할 수 있습니다.',
     notConfigured: '이 환경에는 Google Safe Ride가 아직 설정되지 않았습니다.',
-    keepOpen: '이동 중 AttraVoya를 열어 두세요. 브라우저가 백그라운드 위치 추적을 일시 중지할 수 있습니다.',
+    keepOpen:
+      '이동 중 AttraVoya를 열어 두세요. 브라우저가 백그라운드 위치 추적을 일시 중지할 수 있습니다.',
     privacy:
       'AttraVoya는 이동 위치를 저장하지 않습니다. 현재 위치와 목적지는 경로 계산 또는 새로고침 때만 Google Maps로 전송됩니다.',
     advisory: 'Safe Ride는 보조 안전 기능이며 긴급 서비스나 보장이 아닙니다.',
@@ -516,7 +545,8 @@ const COPY = Object.freeze({
     denied: 'Safe Ride के लिए स्थान अनुमति चाहिए। सामान्य मार्ग सारांश फिर भी उपलब्ध है।',
     unavailable: 'Safe Ride अभी शुरू नहीं हो सकता। सामान्य मार्ग सारांश उपलब्ध है।',
     notConfigured: 'इस वातावरण में Google Safe Ride अभी कॉन्फ़िगर नहीं है।',
-    keepOpen: 'यात्रा के दौरान AttraVoya खुला रखें। ब्राउज़र पृष्ठभूमि में स्थान ट्रैकिंग रोक सकता है।',
+    keepOpen:
+      'यात्रा के दौरान AttraVoya खुला रखें। ब्राउज़र पृष्ठभूमि में स्थान ट्रैकिंग रोक सकता है।',
     privacy:
       'AttraVoya यात्रा स्थान सहेजता नहीं है। वर्तमान स्थान और गंतव्य केवल मार्ग गणना या अपडेट के समय Google Maps को भेजे जाते हैं।',
     advisory: 'Safe Ride एक सहायक सुरक्षा सुविधा है, आपातकालीन सेवा या गारंटी नहीं।',
