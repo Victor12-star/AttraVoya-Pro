@@ -11,7 +11,8 @@ export default async function PlanByBudgetPage({ searchParams }) {
   const origin = typeof params?.origin === 'string' ? params.origin.trim().slice(0, 120) : '';
   const rawBudget = typeof params?.budget === 'string' ? params.budget.trim().slice(0, 30) : '';
   const budgetNumber = Number(rawBudget);
-  const initialBudget = Number.isFinite(budgetNumber) && budgetNumber > 0 ? String(budgetNumber) : '';
+  const initialBudget =
+    Number.isFinite(budgetNumber) && budgetNumber > 0 ? String(budgetNumber) : '';
   const requestedCurrency =
     typeof params?.currency === 'string' ? params.currency.trim().slice(0, 3).toUpperCase() : '';
   const defaultCurrency = CURRENCY_CODES.includes(requestedCurrency) ? requestedCurrency : 'SEK';
