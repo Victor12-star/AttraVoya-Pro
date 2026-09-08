@@ -209,6 +209,6 @@ const COPY = Object.freeze({
 });
 
 export function getAccommodationPhotoCopy(locale = 'en') {
-  const normalized = normalizeLocale(locale);
-  return COPY[normalized] ?? COPY.en;
+  const normalizedLocale = normalizeLocale(locale);
+  return COPY[normalizedLocale] ?? COPY.en;
 }
