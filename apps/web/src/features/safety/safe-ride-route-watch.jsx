@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, LoaderCircle, MapPinned, Navigation, RefreshCw, ShieldCheck } from 'lucide-react';
+import {
+  AlertTriangle,
+  LoaderCircle,
+  MapPinned,
+  Navigation,
+  RefreshCw,
+  ShieldCheck,
+} from 'lucide-react';
 
 import { createRouteWatchState, evaluateRoutePosition } from './route-deviation.js';
 import { getSafeRideCopy } from './safe-ride-copy.js';
