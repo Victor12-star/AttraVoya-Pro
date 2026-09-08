@@ -74,6 +74,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Diagnose Prettier differences
+        run: |
+          pnpm exec prettier --write \
+            'apps/web/src/app/(main)/plan-by-budget/page.jsx' \
+            apps/web/src/features/destinations/accommodation-page.jsx \
+            apps/web/src/features/destinations/accommodation-photo-copy.js \
+            apps/web/src/features/planner/budget-accommodation-copy.js \
+            apps/web/tests/unit/accommodation-page.test.jsx
+          git diff -- \
+            'apps/web/src/app/(main)/plan-by-budget/page.jsx' \
+            apps/web/src/features/destinations/accommodation-page.jsx \
+            apps/web/src/features/destinations/accommodation-photo-copy.js \
+            apps/web/src/features/planner/budget-accommodation-copy.js \
+            apps/web/tests/unit/accommodation-page.test.jsx
+
       - name: Validate environment contract
         run: pnpm env:check
 
@@ -179,7 +194,7 @@ jobs:
   build:
     name: Production builds
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -206,7 +221,7 @@ jobs:
       - name: Build workspace
         run: pnpm build
 
-  live-providers:
+  providers:
     name: Live no-cost provider checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -232,38 +247,27 @@ jobs:
 
       - name: Start local LibreTranslate
         run: |
-          docker run -d --name attravoya-libretranslate \
-            -p 5001:5000 \
-            -e LT_DISABLE_WEB_UI=true \
-            -e LT_DISABLE_FILES_TRANSLATION=true \
-            -e LT_LOAD_ONLY=en,es \
-            -e LT_UPDATE_MODELS=false \
-            libretranslate/libretranslate:v1.9.6
+          docker run -d --name libretranslate -p 5001:5000 \
+            -e LT_LOAD_ONLY=en,sv,es,fr,de,it,pt,pl,nl,no,da,fi,tr,ar,hi,ja,ko,zh \
+            libretranslate/libretranslate:v1.7.0
 
       - name: Wait for LibreTranslate
         run: |
-          for attempt in {1..36}; do
+          for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:5001/languages >/dev/null; then
-              echo "LibreTranslate is ready."
               exit 0
             fi
-            echo "Waiting for LibreTranslate ($attempt/36)..."
-            sleep 10
+            sleep 2
           done
-          docker logs attravoya-libretranslate
+          echo "LibreTranslate did not become ready in time."
           exit 1
 
       - name: Run live provider checks
-        env:
-          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
-          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
-          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-        run: node scripts/live-provider-check.js
+        run: pnpm providers:live
 
       - name: Show LibreTranslate logs on failure
         if: failure()
-        run: docker logs attravoya-libretranslate || true
+        run: docker logs libretranslate
 
   security:
     name: Dependency and secret checks
@@ -273,8 +277,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -292,18 +294,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Scan tracked files for common secret patterns
-        run: node scripts/secret-scan.js
+        run: pnpm secrets:check
 
       - name: Audit production dependencies
-        run: |
-          for attempt in 1 2 3; do
-            if pnpm audit --prod --audit-level=high; then
-              exit 0
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "Dependency audit failed after 3 attempts."
-              exit 1
-            fi
-            echo "Dependency audit attempt $attempt failed; retrying after a short delay."
-            sleep $((attempt * 10))
-          done
+        run: pnpm audit --prod --audit-level=high
