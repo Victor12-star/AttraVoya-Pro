@@ -1,1 +1,0 @@
-Documentation additions are frozen for this slice. Next actions are CI validation, fixing only real failures, cleanup of redundant temporary notes, exact-head 5/5 validation, merge, and exact post-merge 5/5 validation.
