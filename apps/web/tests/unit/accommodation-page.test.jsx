@@ -187,24 +187,26 @@ describe('AccommodationPage', () => {
 
     screen.getByRole('button', { name: 'View photos: Example Hotel' }).click();
 
-    const dialog = screen.getByRole('dialog', { name: 'Example Hotel photos' });
+    const dialog = await screen.findByRole('dialog', { name: 'Example Hotel photos' });
     expect(dialog).toBeInTheDocument();
     expect(screen.getByText('Exterior')).toBeInTheDocument();
     expect(screen.getByText('1 of 3')).toBeInTheDocument();
     expect(screen.getByText('Photo source: Authorized Stay Provider media')).toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Next photo' }).click();
-    expect(screen.getByRole('img', { name: 'Example Hotel room interior' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('img', { name: 'Example Hotel room interior' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Room')).toBeInTheDocument();
     expect(screen.getByText('2 of 3')).toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Next photo' }).click();
-    expect(screen.getByRole('img', { name: 'Example Hotel bed' })).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: 'Example Hotel bed' })).toBeInTheDocument();
     expect(screen.getByText('Bed')).toBeInTheDocument();
     expect(screen.getByText('3 of 3')).toBeInTheDocument();
 
     screen.getByRole('button', { name: 'Close photos' }).click();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('refetches through the dedicated accommodation API when a supported type is selected', async () => {
