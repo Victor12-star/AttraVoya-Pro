@@ -13,9 +13,8 @@ process.env.COOKIE_SECRET = 'c'.repeat(64);
 process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 
 const { buildApp } = await import('../../app.js');
-const { PROVIDER_DISCOVERY_RATE_LIMIT, PROVIDER_SEARCH_RATE_LIMIT } = await import(
-  '../../config/constants.js'
-);
+const { PROVIDER_DISCOVERY_RATE_LIMIT, PROVIDER_SEARCH_RATE_LIMIT } =
+  await import('../../config/constants.js');
 const apps = [];
 
 afterEach(async () => Promise.all(apps.splice(0).map((app) => app.close())));
