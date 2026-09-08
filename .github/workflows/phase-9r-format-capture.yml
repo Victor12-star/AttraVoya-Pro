@@ -1,0 +1,52 @@
+name: Phase 9R format capture
+
+on:
+  push:
+    branches:
+      - phase-9r-taxi-driver-card
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply repository Prettier config to failing files
+        run: |
+          pnpm exec prettier --write \
+            apps/web/src/features/language/taxi-driver-card-copy.js \
+            apps/web/src/features/language/taxi-driver-card-launcher.jsx \
+            apps/web/src/features/language/taxi-driver-card.jsx \
+            apps/web/tests/unit/taxi-driver-card.test.jsx
+
+      - name: Upload exact formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9r-prettier-output
+          path: |
+            apps/web/src/features/language/taxi-driver-card-copy.js
+            apps/web/src/features/language/taxi-driver-card-launcher.jsx
+            apps/web/src/features/language/taxi-driver-card.jsx
+            apps/web/tests/unit/taxi-driver-card.test.jsx
+          if-no-files-found: error
+          retention-days: 1
