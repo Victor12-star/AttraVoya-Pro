@@ -93,7 +93,8 @@ const COPY = Object.freeze({
   },
   da: {
     interpreter: 'Tovejstolk',
-    directionHint: 'Vælg hvem der taler. AttraVoya sender kun den sætning, du beder om at få oversat.',
+    directionHint:
+      'Vælg hvem der taler. AttraVoya sender kun den sætning, du beder om at få oversat.',
     swapDirection: 'Skift taleretning',
     speak: 'Tal',
     showToLocal: 'Vis til personen',
@@ -102,7 +103,8 @@ const COPY = Object.freeze({
   },
   fi: {
     interpreter: 'Kaksisuuntainen tulkki',
-    directionHint: 'Valitse, kumpi puhuu. AttraVoya lähettää vain käännettäväksi pyytämäsi lauseen.',
+    directionHint:
+      'Valitse, kumpi puhuu. AttraVoya lähettää vain käännettäväksi pyytämäsi lauseen.',
     swapDirection: 'Vaihda puhesuuntaa',
     speak: 'Puhu',
     showToLocal: 'Näytä henkilölle',
@@ -111,7 +113,8 @@ const COPY = Object.freeze({
   },
   tr: {
     interpreter: 'İki yönlü tercüman',
-    directionHint: 'Kimin konuştuğunu seçin. AttraVoya yalnızca çevrilmesini istediğiniz ifadeyi gönderir.',
+    directionHint:
+      'Kimin konuştuğunu seçin. AttraVoya yalnızca çevrilmesini istediğiniz ifadeyi gönderir.',
     swapDirection: 'Konuşma yönünü değiştir',
     speak: 'Konuş',
     showToLocal: 'Kişiye göster',
@@ -156,7 +159,8 @@ const COPY = Object.freeze({
   },
   hi: {
     interpreter: 'दो-तरफ़ा दुभाषिया',
-    directionHint: 'चुनें कि कौन बोल रहा है। AttraVoya केवल वही वाक्य भेजता है जिसका अनुवाद आप चाहते हैं।',
+    directionHint:
+      'चुनें कि कौन बोल रहा है। AttraVoya केवल वही वाक्य भेजता है जिसका अनुवाद आप चाहते हैं।',
     swapDirection: 'बातचीत की दिशा बदलें',
     speak: 'बोलें',
     showToLocal: 'सामने वाले को दिखाएँ',
