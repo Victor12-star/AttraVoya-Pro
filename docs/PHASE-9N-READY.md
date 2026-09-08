@@ -1,1 +1,0 @@
-Phase 9N implementation is ready for pull-request CI validation. This note does not mark the phase complete; completion still requires exact-head 5/5 CI, squash merge, and exact post-merge `develop` 5/5 CI.
