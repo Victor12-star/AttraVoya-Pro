@@ -16,9 +16,10 @@ export function accommodationTypeFromCategories(categories = []) {
 }
 
 /**
- * Geoapify tells us where a property exists; it is not a live inventory API.
- * Price, availability, breakfast, kitchen and cancellation data therefore stay
- * explicitly unknown instead of being invented from the place category.
+ * Geoapify tells us where a property exists; it is not a live inventory or
+ * property-media API. Price, availability, star rating, room photos, breakfast,
+ * kitchen and cancellation data therefore stay explicitly unknown instead of
+ * being invented from the place category or filled with unrelated stock images.
  */
 export function normalizeAccommodationPlace(place) {
   return {
@@ -26,8 +27,11 @@ export function normalizeAccommodationPlace(place) {
     accommodationType: accommodationTypeFromCategories(place.categories),
     livePrice: null,
     liveAvailability: null,
+    starRating: null,
     cancellationPolicy: null,
     amenities: [],
+    photos: [],
+    photoDataAvailable: false,
     inventoryDataAvailable: false,
   };
 }
