@@ -17,7 +17,7 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ci": "playwright test --project=chromium --project=mobile-chromium",
+    "test:e2e:ci": "playwright test --project=chromium --project=firefox --project=webkit --project=mobile-chromium",
     "clean": "node -e \"const fs=require('node:fs'); for(const path of ['.next','coverage','playwright-report','test-results']) fs.rmSync(path,{recursive:true,force:true});\""
   },
   "dependencies": {
