@@ -23,6 +23,7 @@ export const PLACE_CATEGORY_GROUPS = Object.freeze({
   ATMS: 'atms',
   PARKING: 'parking',
   AIRPORTS: 'airports',
+  EMBASSIES: 'embassies',
 });
 
 export const PLACE_CATEGORY_GROUP_VALUES = Object.freeze(Object.values(PLACE_CATEGORY_GROUPS));
