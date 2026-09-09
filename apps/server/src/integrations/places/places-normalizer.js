@@ -37,6 +37,7 @@ export function normalizeGeoapifyPlaceFeature(feature) {
     distanceMeters: finiteNumber(properties.distance),
     website: properties.website ?? properties.datasource?.raw?.website ?? null,
     phone: properties.contact?.phone ?? properties.datasource?.raw?.phone ?? null,
+    email: properties.contact?.email ?? properties.datasource?.raw?.email ?? null,
     openingHours: properties.opening_hours ?? properties.datasource?.raw?.opening_hours ?? null,
     source: {
       provider: 'geoapify',
