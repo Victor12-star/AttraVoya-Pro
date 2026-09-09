@@ -58,7 +58,9 @@ export function evaluateApiCapacityCheck({ steady, burst }) {
   }
 
   if (burst.successful < 1) {
-    failures.push('Burst load did not complete any successful requests before backpressure engaged.');
+    failures.push(
+      'Burst load did not complete any successful requests before backpressure engaged.',
+    );
   }
 
   return failures;
@@ -118,7 +120,9 @@ async function main() {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
-    console.error(`CAPACITY CHECK ERROR: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error(
+      `CAPACITY CHECK ERROR: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
     process.exitCode = 1;
   });
 }
