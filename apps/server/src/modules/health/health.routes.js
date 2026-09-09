@@ -15,14 +15,6 @@ export async function healthRoutes(app, options = {}) {
   // which is what an orchestrator should use before routing application work.
   // Give both probes their own bounded rate budget so ordinary overload cannot
   // make a healthy instance look dead while still preventing unbounded probing.
-  app.get(
-    '/live',
-    { config: { rateLimit: HEALTH_PROBE_RATE_LIMIT } },
-    controller.liveness,
-  );
-  app.get(
-    '/ready',
-    { config: { rateLimit: HEALTH_PROBE_RATE_LIMIT } },
-    controller.readiness,
-  );
+  app.get('/live', { config: { rateLimit: HEALTH_PROBE_RATE_LIMIT } }, controller.liveness);
+  app.get('/ready', { config: { rateLimit: HEALTH_PROBE_RATE_LIMIT } }, controller.readiness);
 }
