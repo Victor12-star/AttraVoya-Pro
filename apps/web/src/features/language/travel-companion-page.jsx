@@ -318,7 +318,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     () => phrasebook?.destinationLanguages.filter((language) => language.available) ?? [],
     [phrasebook],
   );
-  const companionTrips = tripContextState.data?.trips ?? [];
+  const companionTrips = useMemo(() => tripContextState.data?.trips ?? [], [tripContextState.data]);
   const selectedTrip = useMemo(
     () => companionTrips.find((trip) => trip.id === selectedTripId) ?? null,
     [companionTrips, selectedTripId],
@@ -339,45 +339,48 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   const sourceLanguage = sourceReference?.code ?? '';
   const outputLanguage = outputReference?.code ?? '';
 
-  const loadPhrasebook = useCallback(async (countryCode) => {
-    phrasebookRequestRef.current += 1;
-    const requestId = phrasebookRequestRef.current;
-    setPhrasebookState({ status: 'loading', data: null });
-    setTargetLanguage('');
-    setTranslationDirection('traveller-to-local');
-    setPhrase('');
-    setHistory([]);
-    setShowToLocalItem(null);
-    setTranslationStatus('idle');
-    setVoiceStatus('idle');
+  const loadPhrasebook = useCallback(
+    async (countryCode) => {
+      phrasebookRequestRef.current += 1;
+      const requestId = phrasebookRequestRef.current;
+      setPhrasebookState({ status: 'loading', data: null });
+      setTargetLanguage('');
+      setTranslationDirection('traveller-to-local');
+      setPhrase('');
+      setHistory([]);
+      setShowToLocalItem(null);
+      setTranslationStatus('idle');
+      setVoiceStatus('idle');
 
-    try {
-      const response = await apiClient.request(
-        `/api/v1/phrasebook?countryCode=${encodeURIComponent(countryCode)}`,
-        { cache: 'force-cache' },
-      );
-      if (requestId !== phrasebookRequestRef.current) return;
-      const nextPhrasebook = normalizePhrasebook(response);
-      if (!nextPhrasebook || nextPhrasebook.countryCode !== countryCode) {
-        setPhrasebookState({ status: 'error', data: null });
-        return;
-      }
+      try {
+        const response = await apiClient.request(
+          `/api/v1/phrasebook?countryCode=${encodeURIComponent(countryCode)}`,
+          { cache: 'force-cache' },
+        );
+        if (requestId !== phrasebookRequestRef.current) return;
+        const nextPhrasebook = normalizePhrasebook(response);
+        if (!nextPhrasebook || nextPhrasebook.countryCode !== countryCode) {
+          setPhrasebookState({ status: 'error', data: null });
+          return;
+        }
 
-      setPhrasebookState({ status: 'success', data: nextPhrasebook });
-      const preferred = nextPhrasebook.destinationLanguages.find(
-        (language) =>
-          language.available && language.code === nextPhrasebook.preferredTargetLanguage,
-      );
-      const firstAvailable = nextPhrasebook.destinationLanguages.find(
-        (language) => language.available,
-      );
-      setTargetLanguage(preferred?.code ?? firstAvailable?.code ?? '');
-    } catch {
-      if (requestId === phrasebookRequestRef.current) {
-        setPhrasebookState({ status: 'error', data: null });
+        setPhrasebookState({ status: 'success', data: nextPhrasebook });
+        const preferred = nextPhrasebook.destinationLanguages.find(
+          (language) =>
+            language.available && language.code === nextPhrasebook.preferredTargetLanguage,
+        );
+        const firstAvailable = nextPhrasebook.destinationLanguages.find(
+          (language) => language.available,
+        );
+        setTargetLanguage(preferred?.code ?? firstAvailable?.code ?? '');
+      } catch {
+        if (requestId === phrasebookRequestRef.current) {
+          setPhrasebookState({ status: 'error', data: null });
+        }
       }
-    }
-  }, []);
+    },
+    [setShowToLocalItem],
+  );
 
   useEffect(() => {
     if (
@@ -396,10 +399,18 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     const countryCode = suggestedTrip.destination.countryCode;
     if (!countriesState.data.some((country) => country.iso2 === countryCode)) return;
 
-    suggestedTripAppliedRef.current = true;
-    setSelectedTripId(suggestedTrip.id);
-    setSelectedCountry(countryCode);
-    void loadPhrasebook(countryCode);
+    const currentWindow = browserWindow();
+    const applyTimer = currentWindow?.setTimeout?.(() => {
+      if (manualCountrySelectionRef.current || suggestedTripAppliedRef.current) return;
+      suggestedTripAppliedRef.current = true;
+      setSelectedTripId(suggestedTrip.id);
+      setSelectedCountry(countryCode);
+      void loadPhrasebook(countryCode);
+    }, 0);
+
+    return () => {
+      if (applyTimer !== undefined) currentWindow?.clearTimeout?.(applyTimer);
+    };
   }, [
     countriesState.data,
     countriesState.status,
