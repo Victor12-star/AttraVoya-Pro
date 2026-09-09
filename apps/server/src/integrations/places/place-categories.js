@@ -15,6 +15,7 @@ export const PLACE_CATEGORY_GROUPS = Object.freeze({
   [GROUPS.HOSPITALS]: ['healthcare.hospital'],
   [GROUPS.PHARMACIES]: ['healthcare.pharmacy'],
   [GROUPS.POLICE]: ['service.police'],
+  [GROUPS.EMBASSIES]: ['office.government.embassy'],
   [GROUPS.SHOPPING]: ['commercial.shopping_mall'],
   [GROUPS.SUPERMARKETS]: ['commercial.supermarket'],
   [GROUPS.PLAYGROUNDS]: ['leisure.playground'],
