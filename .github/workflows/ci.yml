@@ -212,6 +212,64 @@ jobs:
       - name: Build workspace
         run: pnpm build
 
+      - name: Build and smoke-test API container
+        run: |
+          set -euo pipefail
+
+          image="attravoya-api:ci"
+          container="attravoya-api-ci"
+
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              docker logs "$container" || true
+            fi
+            docker rm --force "$container" >/dev/null 2>&1 || true
+            exit "$status"
+          }
+          trap cleanup EXIT
+
+          docker build --file apps/server/Dockerfile --tag "$image" .
+
+          test "$(docker image inspect "$image" --format '{{.Config.User}}')" = "node"
+          docker image inspect "$image" --format '{{json .Config.Env}}' | grep -F '"NODE_ENV=production"' >/dev/null
+          docker image inspect "$image" --format '{{json .Config.Env}}' | grep -F '"API_HOST=0.0.0.0"' >/dev/null
+          docker image inspect "$image" --format '{{json .Config.Env}}' | grep -F '"API_PORT=5000"' >/dev/null
+          docker image inspect "$image" --format '{{json .Config.Healthcheck.Test}}' | grep -F '/api/v1/health/live' >/dev/null
+
+          docker run --detach --name "$container" \
+            --publish 127.0.0.1:5050:5000 \
+            --env NODE_ENV=test \
+            --env API_HOST=0.0.0.0 \
+            --env API_PORT=5000 \
+            --env WEB_URL \
+            --env ADMIN_URL \
+            --env API_URL \
+            --env DATABASE_URL \
+            --env JWT_ACCESS_SECRET \
+            --env COOKIE_SECRET \
+            --env DATA_ENCRYPTION_KEY \
+            "$image"
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5050/api/v1/health/live > /tmp/attravoya-api-health.json; then
+              node -e "const fs = require('node:fs'); const health = JSON.parse(fs.readFileSync('/tmp/attravoya-api-health.json', 'utf8')); if (health.status !== 'ok' || health.service !== 'attravoya-api') process.exit(1);"
+              echo "API container liveness contract passed."
+              exit 0
+            fi
+
+            if [ "$(docker inspect "$container" --format '{{.State.Running}}' 2>/dev/null || true)" != "true" ]; then
+              echo "API container exited before becoming live."
+              exit 1
+            fi
+
+            echo "Waiting for API container ($attempt/30)..."
+            sleep 1
+          done
+
+          echo "API container did not become live within 30 seconds."
+          exit 1
+
   live-providers:
     name: Live no-cost provider checks
     runs-on: ubuntu-latest
