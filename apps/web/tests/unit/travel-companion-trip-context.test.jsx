@@ -122,11 +122,11 @@ describe('TravelCompanionPage trip context', () => {
     const countrySelect = await screen.findByRole('combobox', { name: 'Choose country' });
     await waitFor(() => expect(countrySelect).toHaveValue('SE'));
 
-    const tripSelect = screen.getByRole('combobox', { name: 'Your trip' });
+    const tripSelect = screen.getByRole('combobox', { name: /^Your trip/ });
     expect(tripSelect).toHaveValue('trip-active');
     expect(screen.getByText(/Current destination selected from Stockholm now/)).toBeInTheDocument();
     expect(await screen.findByText('Hello.')).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Target language' })).toHaveValue('sv');
+    expect(screen.getByRole('combobox', { name: 'Translate to' })).toHaveValue('sv');
     expect(mocks.request).toHaveBeenCalledWith('/api/v1/trips/companion-context', {
       cache: 'no-store',
     });
@@ -138,7 +138,7 @@ describe('TravelCompanionPage trip context', () => {
   it('lets the traveller switch to another saved trip without inventing destination data', async () => {
     render(<TravelCompanionPage locale="en" messages={messages} />);
 
-    const tripSelect = await screen.findByRole('combobox', { name: 'Your trip' });
+    const tripSelect = await screen.findByRole('combobox', { name: /^Your trip/ });
     await waitFor(() => expect(tripSelect).toHaveValue('trip-active'));
     fireEvent.change(tripSelect, { target: { value: 'trip-planned' } });
 
@@ -146,7 +146,7 @@ describe('TravelCompanionPage trip context', () => {
       expect(screen.getByRole('combobox', { name: 'Choose country' })).toHaveValue('ES'),
     );
     expect(screen.getByText(/Current destination selected from Madrid next/)).toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Target language' })).toHaveValue('es');
+    expect(screen.getByRole('combobox', { name: 'Translate to' })).toHaveValue('es');
   });
 
   it('never overwrites a manual country choice when saved trip context arrives later', async () => {
@@ -167,7 +167,7 @@ describe('TravelCompanionPage trip context', () => {
     await waitFor(() => expect(countrySelect).toHaveValue('ES'));
 
     resolveTrips(tripContextResponse());
-    await screen.findByRole('combobox', { name: 'Your trip' });
+    await screen.findByRole('combobox', { name: /^Your trip/ });
     await waitFor(() => expect(countrySelect).toHaveValue('ES'));
     expect(mocks.request).not.toHaveBeenCalledWith('/api/v1/phrasebook?countryCode=SE', {
       cache: 'force-cache',
@@ -190,6 +190,6 @@ describe('TravelCompanionPage trip context', () => {
     fireEvent.change(countrySelect, { target: { value: 'SE' } });
 
     expect(await screen.findByText('Hello.')).toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: 'Your trip' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /^Your trip/ })).not.toBeInTheDocument();
   });
 });
