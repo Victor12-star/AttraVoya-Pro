@@ -1,0 +1,52 @@
+name: Phase 10A branch formatter
+
+on:
+  push:
+    branches:
+      - feature/phase-10a-api-capacity-backpressure
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/phase-10a-api-capacity-backpressure
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Phase 10A test
+        run: pnpm exec prettier --write scripts/http-capacity-check.test.js
+
+      - name: Commit exact formatter output
+        run: |
+          if git diff --quiet -- scripts/http-capacity-check.test.js; then
+            echo "Pinned Prettier made no changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/http-capacity-check.test.js
+          git commit -m "Phase 10A: apply pinned Prettier output"
+          git push origin HEAD:feature/phase-10a-api-capacity-backpressure
