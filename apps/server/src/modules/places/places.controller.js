@@ -10,5 +10,10 @@ export function createPlacesController(service) {
       reply.header('Cache-Control', 'public, max-age=300, stale-while-revalidate=1800');
       return reply.send({ places });
     },
+    async consularMissions(request, reply) {
+      const consular = await service.searchConsularMissions(request.query);
+      reply.header('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
+      return reply.send({ consular });
+    },
   };
 }
