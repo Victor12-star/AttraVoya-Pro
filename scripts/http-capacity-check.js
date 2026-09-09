@@ -4,6 +4,8 @@ import { assertHttpLoadTargetAllowed, runHttpLoadTest } from './http-load-test.j
 
 const DEFAULT_BASE_URL = 'http://127.0.0.1:5000';
 const DEFAULT_PATH = '/api/v1/countries';
+const LIVENESS_PATH = '/api/v1/health/live';
+const READINESS_PATH = '/api/v1/health/ready';
 const STEADY_REQUESTS = 50;
 const STEADY_CONCURRENCY = 10;
 const BURST_REQUESTS = 100;
@@ -21,7 +23,20 @@ function countStatuses(summary, predicate) {
   }, 0);
 }
 
-export function evaluateApiCapacityCheck({ steady, burst }) {
+function evaluateHealthProbe(summary, label) {
+  if (
+    summary.totalRequests === 1 &&
+    summary.successful === 1 &&
+    summary.statusCounts?.[200] === 1 &&
+    totalTransportErrors(summary) === 0
+  ) {
+    return null;
+  }
+
+  return `${label} probe did not return one successful HTTP 200 response after overload.`;
+}
+
+export function evaluateApiCapacityCheck({ steady, burst, liveness, readiness }) {
   const failures = [];
 
   if (steady.errorRate !== 0) {
@@ -63,6 +78,12 @@ export function evaluateApiCapacityCheck({ steady, burst }) {
     );
   }
 
+  const livenessFailure = evaluateHealthProbe(liveness, 'Liveness');
+  if (livenessFailure) failures.push(livenessFailure);
+
+  const readinessFailure = evaluateHealthProbe(readiness, 'Readiness');
+  if (readinessFailure) failures.push(readinessFailure);
+
   return failures;
 }
 
@@ -70,6 +91,8 @@ export async function runApiCapacityCheck(options = {}, dependencies = {}) {
   const baseUrl = options.baseUrl ?? process.env.CAPACITY_TEST_BASE_URL ?? DEFAULT_BASE_URL;
   const path = options.path ?? process.env.CAPACITY_TEST_PATH ?? DEFAULT_PATH;
   const targetUrl = assertHttpLoadTargetAllowed(new URL(path, baseUrl), false);
+  const livenessUrl = assertHttpLoadTargetAllowed(new URL(LIVENESS_PATH, baseUrl), false);
+  const readinessUrl = assertHttpLoadTargetAllowed(new URL(READINESS_PATH, baseUrl), false);
 
   const steady = await runHttpLoadTest(
     {
@@ -91,6 +114,28 @@ export async function runApiCapacityCheck(options = {}, dependencies = {}) {
     dependencies,
   );
 
+  // Probe the same process immediately after ordinary traffic has crossed the
+  // global backpressure boundary. Orchestrators need these signals precisely
+  // when the application is overloaded, but the probes remain rate bounded.
+  const liveness = await runHttpLoadTest(
+    {
+      targetUrl: livenessUrl,
+      requests: 1,
+      concurrency: 1,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    },
+    dependencies,
+  );
+  const readiness = await runHttpLoadTest(
+    {
+      targetUrl: readinessUrl,
+      requests: 1,
+      concurrency: 1,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    },
+    dependencies,
+  );
+
   return {
     target: `${targetUrl.origin}${targetUrl.pathname}`,
     thresholds: {
@@ -101,10 +146,13 @@ export async function runApiCapacityCheck(options = {}, dependencies = {}) {
       burstConcurrency: BURST_CONCURRENCY,
       requestTimeoutMs: REQUEST_TIMEOUT_MS,
       burstExpectedBackpressureStatus: 429,
+      postOverloadHealthStatus: 200,
     },
     steady,
     burst,
-    failures: evaluateApiCapacityCheck({ steady, burst }),
+    liveness,
+    readiness,
+    failures: evaluateApiCapacityCheck({ steady, burst, liveness, readiness }),
   };
 }
 
