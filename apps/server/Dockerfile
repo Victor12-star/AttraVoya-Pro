@@ -30,7 +30,7 @@ RUN --mount=type=cache,id=attravoya-pnpm-store,target=/pnpm/store \
 
 RUN pnpm --filter @attravoya/database generate \
   && pnpm --filter @attravoya/server build \
-  && pnpm --filter @attravoya/server --prod deploy --legacy /opt/attravoya-server
+  && pnpm --config.inject-workspace-packages=true --filter @attravoya/server --prod deploy /opt/attravoya-server
 
 # The production deploy intentionally omits Prisma's development CLI. Reuse the
 # client generated above, but copy it into the exact @prisma/client instance
