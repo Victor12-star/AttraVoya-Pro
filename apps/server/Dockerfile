@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-ARG NODE_VERSION=24.19.0
+ARG NODE_VERSION=24.20.0
 ARG PNPM_VERSION=11.22.0
 
 FROM node:${NODE_VERSION}-bookworm-slim AS operating-system
@@ -40,9 +40,9 @@ RUN cd /opt/attravoya-server \
 
 FROM operating-system AS runtime
 
-ENV HOST=0.0.0.0
+ENV API_HOST=0.0.0.0
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV API_PORT=5000
 
 LABEL org.opencontainers.image.title="AttraVoya Pro API" \
   org.opencontainers.image.description="AttraVoya Pro Fastify REST API"
@@ -53,7 +53,9 @@ USER node
 
 EXPOSE 5000
 
+# Liveness proves only that this API process can answer. Deployment platforms
+# should use /api/v1/health/ready separately before routing application traffic.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e 'fetch("http://127.0.0.1:" + process.env.PORT + "/health/live", { signal: AbortSignal.timeout(4000) }).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));'
+  CMD node -e 'fetch("http://127.0.0.1:" + process.env.API_PORT + "/api/v1/health/live", { signal: AbortSignal.timeout(4000) }).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));'
 
 CMD ["node", "src/server.js"]
