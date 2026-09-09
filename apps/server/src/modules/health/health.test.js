@@ -130,4 +130,50 @@ describe('health endpoints', () => {
     expect(liveness.statusCode).toBe(200);
     expect(liveness.json()).toMatchObject({ status: 'ok' });
   });
+
+  it('keeps bounded orchestrator probes available after ordinary API traffic is rate limited', async () => {
+    const app = await buildApp({
+      logger: false,
+      healthRepository: {
+        checkDatabase: async () => true,
+      },
+      countriesRepository: {
+        list: async () => [],
+      },
+    });
+    apps.push(app);
+
+    let overloadedResponse = await app.inject({
+      method: 'GET',
+      url: '/api/v1/countries',
+    });
+    for (let requestNumber = 1; requestNumber < 121; requestNumber += 1) {
+      overloadedResponse = await app.inject({
+        method: 'GET',
+        url: '/api/v1/countries',
+      });
+    }
+
+    expect(overloadedResponse.statusCode).toBe(429);
+    expect(overloadedResponse.json()).toMatchObject({
+      error: { code: 'RATE_LIMITED' },
+    });
+
+    const liveness = await app.inject({
+      method: 'GET',
+      url: '/api/v1/health/live',
+    });
+    const readiness = await app.inject({
+      method: 'GET',
+      url: '/api/v1/health/ready',
+    });
+
+    expect(liveness.statusCode).toBe(200);
+    expect(liveness.json()).toMatchObject({ status: 'ok' });
+    expect(readiness.statusCode).toBe(200);
+    expect(readiness.json()).toMatchObject({
+      status: 'ready',
+      database: 'available',
+    });
+  });
 });

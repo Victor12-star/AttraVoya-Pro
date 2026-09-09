@@ -12,6 +12,14 @@ export const DEFAULT_RATE_LIMIT = Object.freeze({
   timeWindow: '1 minute',
 });
 
+// Orchestrators must still be able to distinguish a live/ready instance while
+// ordinary API traffic is being shed. Give health probes a separate, bounded
+// ceiling rather than disabling abuse protection entirely.
+export const HEALTH_PROBE_RATE_LIMIT = Object.freeze({
+  max: 300,
+  timeWindow: '1 minute',
+});
+
 // Public provider-backed discovery is more expensive than ordinary API reads.
 // Keep typeahead/search usable while bounding automated provider amplification.
 export const PROVIDER_SEARCH_RATE_LIMIT = Object.freeze({

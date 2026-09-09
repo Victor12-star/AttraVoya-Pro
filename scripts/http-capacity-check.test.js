@@ -15,7 +15,17 @@ function summary({ successful, failed, errorRate, p95, statusCounts, transportEr
   };
 }
 
-test('capacity evaluation accepts healthy steady load and bounded 429 backpressure', () => {
+function healthyProbe() {
+  return summary({
+    successful: 1,
+    failed: 0,
+    errorRate: 0,
+    p95: 10,
+    statusCounts: { 200: 1 },
+  });
+}
+
+test('capacity evaluation accepts healthy steady load, bounded 429 backpressure, and healthy probes', () => {
   const failures = evaluateApiCapacityCheck({
     steady: summary({
       successful: 50,
@@ -31,12 +41,14 @@ test('capacity evaluation accepts healthy steady load and bounded 429 backpressu
       p95: 90,
       statusCounts: { 200: 70, 429: 30 },
     }),
+    liveness: healthyProbe(),
+    readiness: healthyProbe(),
   });
 
   assert.deepEqual(failures, []);
 });
 
-test('capacity evaluation rejects latency, transport, server, and missing-backpressure failures', () => {
+test('capacity evaluation rejects latency, transport, server, missing-backpressure, and probe failures', () => {
   const failures = evaluateApiCapacityCheck({
     steady: summary({
       successful: 49,
@@ -53,6 +65,21 @@ test('capacity evaluation rejects latency, transport, server, and missing-backpr
       statusCounts: { 200: 99, 503: 1 },
       transportErrors: { AbortError: 1 },
     }),
+    liveness: summary({
+      successful: 0,
+      failed: 1,
+      errorRate: 1,
+      p95: 10,
+      statusCounts: { 429: 1 },
+    }),
+    readiness: summary({
+      successful: 0,
+      failed: 1,
+      errorRate: 1,
+      p95: 10,
+      statusCounts: {},
+      transportErrors: { AbortError: 1 },
+    }),
   });
 
   assert.ok(failures.some((failure) => failure.includes('Steady-load error rate')));
@@ -60,6 +87,8 @@ test('capacity evaluation rejects latency, transport, server, and missing-backpr
   assert.ok(failures.some((failure) => failure.includes('transport error')));
   assert.ok(failures.some((failure) => failure.includes('server error response')));
   assert.ok(failures.some((failure) => failure.includes('HTTP 429 backpressure boundary')));
+  assert.ok(failures.some((failure) => failure.includes('Liveness probe')));
+  assert.ok(failures.some((failure) => failure.includes('Readiness probe')));
 });
 
 test('capacity check refuses remote targets', async () => {
