@@ -22,6 +22,7 @@ export const PLACE_CATEGORY_GROUPS = Object.freeze({
   [GROUPS.ATMS]: ['service.financial.atm'],
   [GROUPS.PARKING]: ['parking'],
   [GROUPS.AIRPORTS]: ['airport'],
+  [GROUPS.EMBASSIES]: ['office.government.embassy'],
 });
 
 export const PLACE_CATEGORY_GROUP_NAMES = Object.freeze(Object.keys(PLACE_CATEGORY_GROUPS));
