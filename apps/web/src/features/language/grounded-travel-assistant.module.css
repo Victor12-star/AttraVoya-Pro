@@ -3,8 +3,8 @@
   padding: clamp(1rem, 2vw, 1.5rem);
   border: 1px solid var(--border-subtle);
   border-radius: 1.25rem;
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-sm);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-soft);
 }
 
 .header {
@@ -31,7 +31,7 @@
   height: 3rem;
   place-items: center;
   border-radius: 0.9rem;
-  background: var(--surface-soft);
+  background: var(--surface-muted);
 }
 
 .trustBadge {
@@ -103,7 +103,7 @@
 .promptButton {
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
-  background: var(--surface-soft);
+  background: var(--surface-muted);
   color: var(--text-primary);
   padding: 0.55rem 0.75rem;
   font: inherit;
@@ -136,7 +136,7 @@
   padding: 0.8rem;
   border: 1px solid var(--border-subtle);
   border-radius: 0.85rem;
-  background: var(--surface-soft);
+  background: var(--surface-muted);
 }
 
 .conversation {
@@ -172,7 +172,7 @@
 
 .userBubble {
   justify-self: end;
-  background: var(--surface-soft);
+  background: var(--surface-muted);
 }
 
 .answerBubble {
