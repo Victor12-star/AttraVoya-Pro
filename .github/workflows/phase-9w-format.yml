@@ -39,6 +39,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply exact JavaScript type fix
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'apps/web/src/features/language/travel-companion-page.jsx';
+          const source = fs.readFileSync(path, 'utf8');
+          const before = "        !['ACTIVE', 'PLANNED'].includes(status) ||";
+          const after = "        !status ||\n        !['ACTIVE', 'PLANNED'].includes(status) ||";
+          if (!source.includes(before)) {
+            throw new Error('Expected nullable trip-status guard was not found.');
+          }
+          fs.writeFileSync(path, source.replace(before, after));
+          NODE
+
       - name: Format Phase 9W files
         run: >-
           pnpm exec prettier --write
@@ -54,7 +69,7 @@ jobs:
           apps/web/src/features/language/travel-companion-trip-copy.js
           apps/web/tests/unit/travel-companion-trip-context.test.jsx
 
-      - name: Commit formatting only when needed
+      - name: Commit source changes only when needed
         shell: bash
         run: |
           if git diff --quiet -- \
@@ -69,7 +84,7 @@ jobs:
             apps/web/src/features/language/travel-companion-page.jsx \
             apps/web/src/features/language/travel-companion-trip-copy.js \
             apps/web/tests/unit/travel-companion-trip-context.test.jsx; then
-            echo "Phase 9W files are already formatted."
+            echo "Phase 9W source files are already fixed and formatted."
             exit 0
           fi
 
@@ -87,5 +102,5 @@ jobs:
             apps/web/src/features/language/travel-companion-page.jsx \
             apps/web/src/features/language/travel-companion-trip-copy.js \
             apps/web/tests/unit/travel-companion-trip-context.test.jsx
-          git commit -m "Phase 9W: apply repository formatting"
+          git commit -m "Phase 9W: finish JavaScript type fixes"
           git push origin HEAD:feature/phase-9w-itinerary-aware-travel-companion
