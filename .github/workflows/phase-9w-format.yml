@@ -1,0 +1,91 @@
+name: Phase 9W formatter
+
+on:
+  push:
+    branches:
+      - feature/phase-9w-itinerary-aware-travel-companion
+
+permissions:
+  contents: write
+
+concurrency:
+  group: phase-9w-formatter
+  cancel-in-progress: true
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/phase-9w-itinerary-aware-travel-companion
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Phase 9W files
+        run: >-
+          pnpm exec prettier --write
+          apps/server/src/app.js
+          apps/server/src/modules/trips/trips.contracts.js
+          apps/server/src/modules/trips/trips.controller.js
+          apps/server/src/modules/trips/trips.repository.js
+          apps/server/src/modules/trips/trips.routes.js
+          apps/server/src/modules/trips/trips.schema.js
+          apps/server/src/modules/trips/trips.service.js
+          apps/server/src/modules/trips/trips.test.js
+          apps/web/src/features/language/travel-companion-page.jsx
+          apps/web/src/features/language/travel-companion-trip-copy.js
+          apps/web/tests/unit/travel-companion-trip-context.test.jsx
+
+      - name: Commit formatting only when needed
+        shell: bash
+        run: |
+          if git diff --quiet -- \
+            apps/server/src/app.js \
+            apps/server/src/modules/trips/trips.contracts.js \
+            apps/server/src/modules/trips/trips.controller.js \
+            apps/server/src/modules/trips/trips.repository.js \
+            apps/server/src/modules/trips/trips.routes.js \
+            apps/server/src/modules/trips/trips.schema.js \
+            apps/server/src/modules/trips/trips.service.js \
+            apps/server/src/modules/trips/trips.test.js \
+            apps/web/src/features/language/travel-companion-page.jsx \
+            apps/web/src/features/language/travel-companion-trip-copy.js \
+            apps/web/tests/unit/travel-companion-trip-context.test.jsx; then
+            echo "Phase 9W files are already formatted."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            apps/server/src/app.js \
+            apps/server/src/modules/trips/trips.contracts.js \
+            apps/server/src/modules/trips/trips.controller.js \
+            apps/server/src/modules/trips/trips.repository.js \
+            apps/server/src/modules/trips/trips.routes.js \
+            apps/server/src/modules/trips/trips.schema.js \
+            apps/server/src/modules/trips/trips.service.js \
+            apps/server/src/modules/trips/trips.test.js \
+            apps/web/src/features/language/travel-companion-page.jsx \
+            apps/web/src/features/language/travel-companion-trip-copy.js \
+            apps/web/tests/unit/travel-companion-trip-context.test.jsx
+          git commit -m "Phase 9W: apply repository formatting"
+          git push origin HEAD:feature/phase-9w-itinerary-aware-travel-companion

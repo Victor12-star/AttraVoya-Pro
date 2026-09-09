@@ -34,6 +34,7 @@ import { eventsRoutes } from './modules/events/events.routes.js';
 import { newsRoutes } from './modules/news/news.routes.js';
 import { imagesRoutes } from './modules/images/images.routes.js';
 import { plannerRoutes } from './modules/planner/planner.routes.js';
+import { tripsRoutes } from './modules/trips/trips.routes.js';
 import {
   createHttpRequestMetrics,
   createHttpRequestMetricsHook,
@@ -215,6 +216,12 @@ export async function buildApp(options = {}) {
     childrenActivitiesPricingCollector: options.plannerChildrenActivitiesPricingCollector,
     airportTransferPricingCollector: options.plannerAirportTransferPricingCollector,
     travelInsurancePricingCollector: options.plannerTravelInsurancePricingCollector,
+  });
+
+  await app.register(tripsRoutes, {
+    prefix: `${API_PREFIX}/trips`,
+    repository: options.tripsRepository,
+    now: options.tripsNow,
   });
 
   return app;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRightLeft,
   Languages,
@@ -17,6 +17,10 @@ import { apiClient } from '../../lib/api-client.js';
 import { getLanguagePageCopy } from '../destinations/language-page-copy.js';
 import { getTravelCompanionCopy } from './travel-companion-copy.js';
 import { getTravelCompanionInterpreterCopy } from './travel-companion-interpreter-copy.js';
+import {
+  formatTravelCompanionTripCopy,
+  getTravelCompanionTripCopy,
+} from './travel-companion-trip-copy.js';
 import styles from './travel-companion-page.module.css';
 
 const ENGLISH_LANGUAGE = Object.freeze({
@@ -60,6 +64,73 @@ function normalizeCountries(response) {
     })
     .filter(Boolean)
     .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
+}
+
+function dateValue(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+    ? value
+    : null;
+}
+
+/** @param {any} response */
+function normalizeTripContext(response) {
+  const context = response?.tripContext;
+  if (!context || typeof context !== 'object') return null;
+
+  const trips = (Array.isArray(context.trips) ? context.trips : [])
+    .slice(0, 10)
+    .map((trip) => {
+      const id = textValue(trip?.id, 128);
+      const title = textValue(trip?.title, 240);
+      const status = textValue(trip?.status, 20);
+      const startDate = dateValue(trip?.startDate);
+      const endDate = dateValue(trip?.endDate);
+      const destinationId = textValue(trip?.destination?.id, 128);
+      const slug = textValue(trip?.destination?.slug, 180);
+      const name = textValue(trip?.destination?.name, 180);
+      const countryCode = textValue(trip?.destination?.countryCode, 2)?.toUpperCase();
+      const countryName = textValue(trip?.destination?.countryName, 180);
+
+      if (
+        !id ||
+        !title ||
+        !['ACTIVE', 'PLANNED'].includes(status) ||
+        !startDate ||
+        !endDate ||
+        !destinationId ||
+        !slug ||
+        !name ||
+        !countryCode ||
+        !/^[A-Z]{2}$/.test(countryCode) ||
+        !countryName
+      ) {
+        return null;
+      }
+
+      return {
+        id,
+        title,
+        status,
+        startDate,
+        endDate,
+        destination: { id: destinationId, slug, name, countryCode, countryName },
+      };
+    })
+    .filter(Boolean);
+
+  const suggestedTripId = textValue(context.suggestedTripId, 128);
+  const suggestedTrip = suggestedTripId
+    ? trips.find((trip) => trip.id === suggestedTripId) ?? null
+    : null;
+  const source = ['ACTIVE_TRIP', 'PLANNED_TRIP'].includes(context.source) ? context.source : null;
+
+  return {
+    suggestedTripId: suggestedTrip?.id ?? null,
+    source: suggestedTrip ? source : null,
+    trips,
+  };
 }
 
 /** @param {any} response */
@@ -146,12 +217,20 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   const languageCopy = getLanguagePageCopy(locale);
   const companionCopy = getTravelCompanionCopy(locale);
   const interpreterCopy = getTravelCompanionInterpreterCopy(locale);
+  const tripCopy = getTravelCompanionTripCopy(locale);
   const recognitionRef = useRef(/** @type {any} */ (null));
   const showToLocalCloseRef = useRef(/** @type {any} */ (null));
   const historyIdRef = useRef(0);
+  const phrasebookRequestRef = useRef(0);
+  const manualCountrySelectionRef = useRef(false);
+  const suggestedTripAppliedRef = useRef(false);
   const [countriesState, setCountriesState] = useState(
     /** @type {any} */ ({ status: 'loading', data: [] }),
   );
+  const [tripContextState, setTripContextState] = useState(
+    /** @type {any} */ ({ status: 'loading', data: null }),
+  );
+  const [selectedTripId, setSelectedTripId] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [phrasebookState, setPhrasebookState] = useState(
     /** @type {any} */ ({ status: 'idle', data: null }),
@@ -179,6 +258,25 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
         if (active) setCountriesState({ status: 'error', data: [] });
       });
 
+    void apiClient
+      .request('/api/v1/trips/companion-context', { cache: 'no-store' })
+      .then((response) => {
+        if (!active) return;
+        const tripContext = normalizeTripContext(response);
+        setTripContextState(
+          tripContext
+            ? { status: 'success', data: tripContext }
+            : { status: 'error', data: null },
+        );
+      })
+      .catch((error) => {
+        if (!active) return;
+        setTripContextState({
+          status: error?.status === 401 ? 'signed-out' : 'error',
+          data: null,
+        });
+      });
+
     const currentWindow = browserWindow();
     const capabilityTimer = currentWindow?.setTimeout?.(() => {
       if (!active) return;
@@ -186,13 +284,14 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       setVoiceOutputSupported(
         Boolean(
           currentWindow?.speechSynthesis &&
-          typeof currentWindow?.SpeechSynthesisUtterance === 'function',
+            typeof currentWindow?.SpeechSynthesisUtterance === 'function',
         ),
       );
     }, 0);
 
     return () => {
       active = false;
+      phrasebookRequestRef.current += 1;
       recognitionRef.current?.abort?.();
       currentWindow?.speechSynthesis?.cancel?.();
       if (capabilityTimer !== undefined) currentWindow?.clearTimeout?.(capabilityTimer);
@@ -220,6 +319,11 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
     () => phrasebook?.destinationLanguages.filter((language) => language.available) ?? [],
     [phrasebook],
   );
+  const companionTrips = tripContextState.data?.trips ?? [];
+  const selectedTrip = useMemo(
+    () => companionTrips.find((trip) => trip.id === selectedTripId) ?? null,
+    [companionTrips, selectedTripId],
+  );
   const targetReference = availableDestinationLanguages.find(
     (language) => language.code === targetLanguage,
   );
@@ -236,7 +340,9 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
   const sourceLanguage = sourceReference?.code ?? '';
   const outputLanguage = outputReference?.code ?? '';
 
-  async function loadPhrasebook(countryCode) {
+  const loadPhrasebook = useCallback(async (countryCode) => {
+    phrasebookRequestRef.current += 1;
+    const requestId = phrasebookRequestRef.current;
     setPhrasebookState({ status: 'loading', data: null });
     setTargetLanguage('');
     setTranslationDirection('traveller-to-local');
@@ -251,6 +357,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
         `/api/v1/phrasebook?countryCode=${encodeURIComponent(countryCode)}`,
         { cache: 'force-cache' },
       );
+      if (requestId !== phrasebookRequestRef.current) return;
       const nextPhrasebook = normalizePhrasebook(response);
       if (!nextPhrasebook || nextPhrasebook.countryCode !== countryCode) {
         setPhrasebookState({ status: 'error', data: null });
@@ -267,18 +374,53 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       );
       setTargetLanguage(preferred?.code ?? firstAvailable?.code ?? '');
     } catch {
-      setPhrasebookState({ status: 'error', data: null });
+      if (requestId === phrasebookRequestRef.current) {
+        setPhrasebookState({ status: 'error', data: null });
+      }
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (
+      countriesState.status !== 'success' ||
+      tripContextState.status !== 'success' ||
+      manualCountrySelectionRef.current ||
+      suggestedTripAppliedRef.current
+    ) {
+      return;
+    }
+
+    const suggestedTrip = tripContextState.data?.trips.find(
+      (trip) => trip.id === tripContextState.data?.suggestedTripId,
+    );
+    if (!suggestedTrip) return;
+    const countryCode = suggestedTrip.destination.countryCode;
+    if (!countriesState.data.some((country) => country.iso2 === countryCode)) return;
+
+    suggestedTripAppliedRef.current = true;
+    setSelectedTripId(suggestedTrip.id);
+    setSelectedCountry(countryCode);
+    void loadPhrasebook(countryCode);
+  }, [
+    countriesState.data,
+    countriesState.status,
+    loadPhrasebook,
+    tripContextState.data,
+    tripContextState.status,
+  ]);
 
   function handleCountryChange(event) {
     const countryCode = String(event.target.value ?? '')
       .trim()
       .toUpperCase();
     if (countryCode && !/^[A-Z]{2}$/.test(countryCode)) return;
+    manualCountrySelectionRef.current = true;
+    suggestedTripAppliedRef.current = true;
+    if (selectedTrip?.destination.countryCode !== countryCode) setSelectedTripId('');
     setSelectedCountry(countryCode);
     if (countryCode) void loadPhrasebook(countryCode);
     else {
+      phrasebookRequestRef.current += 1;
       setPhrasebookState({ status: 'idle', data: null });
       setTargetLanguage('');
       setTranslationDirection('traveller-to-local');
@@ -286,6 +428,21 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       setShowToLocalItem(null);
       setPhrase('');
     }
+  }
+
+  function handleTripChange(event) {
+    const tripId = String(event.target.value ?? '').trim();
+    manualCountrySelectionRef.current = true;
+    suggestedTripAppliedRef.current = true;
+    setSelectedTripId(tripId);
+    if (!tripId) return;
+
+    const trip = companionTrips.find((item) => item.id === tripId);
+    if (!trip) return;
+    const countryCode = trip.destination.countryCode;
+    if (!countriesState.data.some((country) => country.iso2 === countryCode)) return;
+    setSelectedCountry(countryCode);
+    void loadPhrasebook(countryCode);
   }
 
   function handleTargetChange(event) {
@@ -428,6 +585,26 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
         </header>
 
         <section className={styles.setup} aria-label={messages.common.chooseCountry}>
+          {tripContextState.status === 'success' && companionTrips.length ? (
+            <label className={styles.field}>
+              <span>{tripCopy.tripSelector}</span>
+              <select value={selectedTripId} onChange={handleTripChange}>
+                <option value="">{tripCopy.chooseTrip}</option>
+                {companionTrips.map((trip) => (
+                  <option key={trip.id} value={trip.id}>
+                    {trip.status === 'ACTIVE' ? tripCopy.activeTrip : tripCopy.plannedTrip} ·{' '}
+                    {trip.title} · {trip.destination.countryName}
+                  </option>
+                ))}
+              </select>
+              {selectedTrip ? (
+                <small role="status">
+                  {formatTravelCompanionTripCopy(tripCopy.tripApplied, selectedTrip.title)}
+                </small>
+              ) : null}
+            </label>
+          ) : null}
+
           <label className={styles.field}>
             <span>{messages.common.chooseCountry}</span>
             <select
@@ -460,6 +637,12 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
             </label>
           ) : null}
         </section>
+
+        {tripContextState.status === 'error' ? (
+          <div className={styles.feedback} role="status">
+            <span>{tripCopy.unavailable}</span>
+          </div>
+        ) : null}
 
         {countriesState.status === 'loading' || phrasebookState.status === 'loading' ? (
           <div className={styles.feedback} role="status" aria-live="polite">
