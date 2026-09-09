@@ -34,8 +34,10 @@ RUN pnpm --filter @attravoya/database generate \
 
 # pnpm deploy installs only production dependencies. Generate once more against
 # that isolated dependency tree so the JavaScript Prisma Client is deployable.
+# Prisma is intentionally pinned as a development dependency of the database
+# package, so invoke that package-local CLI rather than assuming a root binary.
 RUN cd /opt/attravoya-server \
-  && /workspace/node_modules/.bin/prisma generate \
+  && /workspace/packages/database/node_modules/.bin/prisma generate \
     --schema=/opt/attravoya-server/node_modules/@attravoya/database/prisma/schema.prisma
 
 FROM operating-system AS runtime
