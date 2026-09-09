@@ -22,4 +22,9 @@ export async function placesRoutes(app, options = {}) {
     config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
     handler: controller.nearby,
   });
+  app.get('/consular-missions', {
+    schema: placesSchemas.consularMissions,
+    config: { rateLimit: PROVIDER_DISCOVERY_RATE_LIMIT },
+    handler: controller.consularMissions,
+  });
 }
