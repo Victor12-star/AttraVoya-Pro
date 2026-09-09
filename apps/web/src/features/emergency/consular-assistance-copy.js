@@ -9,7 +9,8 @@ const COPY = Object.freeze({
     passportHint:
       'This selection does not filter Geoapify results. Confirm that a facility represents your country before relying on it.',
     nearbyTitle: 'Find nearby embassy facilities',
-    locationPrivacy: 'Your precise location is used only for this search and is not saved by this tool.',
+    locationPrivacy:
+      'Your precise location is used only for this search and is not saved by this tool.',
     useLocation: 'Use my current location',
     manualLabel: 'Or search a city or place',
     manualPlaceholder: 'City, airport, or area',
@@ -49,7 +50,8 @@ const COPY = Object.freeze({
     passportHint:
       'Valet filtrerar inte Geoapify-resultat. Bekräfta att en beskickning företräder ditt land innan du förlitar dig på den.',
     nearbyTitle: 'Hitta närliggande ambassader',
-    locationPrivacy: 'Din exakta plats används endast för denna sökning och sparas inte av verktyget.',
+    locationPrivacy:
+      'Din exakta plats används endast för denna sökning och sparas inte av verktyget.',
     useLocation: 'Använd min nuvarande plats',
     manualLabel: 'Eller sök efter en stad eller plats',
     manualPlaceholder: 'Stad, flygplats eller område',
@@ -89,7 +91,8 @@ const COPY = Object.freeze({
     passportHint:
       'Esta selección no filtra los resultados de Geoapify. Confirma que una sede representa a tu país antes de confiar en ella.',
     nearbyTitle: 'Buscar embajadas cercanas',
-    locationPrivacy: 'Tu ubicación precisa se usa solo para esta búsqueda y esta herramienta no la guarda.',
+    locationPrivacy:
+      'Tu ubicación precisa se usa solo para esta búsqueda y esta herramienta no la guarda.',
     useLocation: 'Usar mi ubicación actual',
     manualLabel: 'O busca una ciudad o lugar',
     manualPlaceholder: 'Ciudad, aeropuerto o zona',
@@ -129,7 +132,8 @@ const COPY = Object.freeze({
     passportHint:
       'Ce choix ne filtre pas les résultats Geoapify. Vérifiez qu’un établissement représente votre pays avant de vous y fier.',
     nearbyTitle: 'Trouver des ambassades proches',
-    locationPrivacy: 'Votre position précise sert uniquement à cette recherche et n’est pas enregistrée par cet outil.',
+    locationPrivacy:
+      'Votre position précise sert uniquement à cette recherche et n’est pas enregistrée par cet outil.',
     useLocation: 'Utiliser ma position actuelle',
     manualLabel: 'Ou rechercher une ville ou un lieu',
     manualPlaceholder: 'Ville, aéroport ou zone',
@@ -169,7 +173,8 @@ const COPY = Object.freeze({
     passportHint:
       'Diese Auswahl filtert Geoapify-Ergebnisse nicht. Bestätigen Sie, dass eine Vertretung Ihr Land vertritt, bevor Sie sich darauf verlassen.',
     nearbyTitle: 'Botschaften in der Nähe finden',
-    locationPrivacy: 'Ihr genauer Standort wird nur für diese Suche verwendet und von diesem Tool nicht gespeichert.',
+    locationPrivacy:
+      'Ihr genauer Standort wird nur für diese Suche verwendet und von diesem Tool nicht gespeichert.',
     useLocation: 'Meinen aktuellen Standort verwenden',
     manualLabel: 'Oder Stadt bzw. Ort suchen',
     manualPlaceholder: 'Stadt, Flughafen oder Gebiet',
@@ -209,7 +214,8 @@ const COPY = Object.freeze({
     passportHint:
       'Questa scelta non filtra i risultati Geoapify. Verifica che una sede rappresenti il tuo Paese prima di farvi affidamento.',
     nearbyTitle: 'Trova ambasciate vicine',
-    locationPrivacy: 'La tua posizione precisa viene usata solo per questa ricerca e non viene salvata da questo strumento.',
+    locationPrivacy:
+      'La tua posizione precisa viene usata solo per questa ricerca e non viene salvata da questo strumento.',
     useLocation: 'Usa la mia posizione attuale',
     manualLabel: 'Oppure cerca una città o un luogo',
     manualPlaceholder: 'Città, aeroporto o area',
@@ -249,7 +255,8 @@ const COPY = Object.freeze({
     passportHint:
       'Esta seleção não filtra os resultados Geoapify. Confirme que uma representação serve o seu país antes de confiar nela.',
     nearbyTitle: 'Encontrar embaixadas próximas',
-    locationPrivacy: 'A sua localização exata é usada apenas nesta pesquisa e não é guardada por esta ferramenta.',
+    locationPrivacy:
+      'A sua localização exata é usada apenas nesta pesquisa e não é guardada por esta ferramenta.',
     useLocation: 'Usar a minha localização atual',
     manualLabel: 'Ou pesquisar uma cidade ou local',
     manualPlaceholder: 'Cidade, aeroporto ou zona',
@@ -289,7 +296,8 @@ const COPY = Object.freeze({
     passportHint:
       'Ten wybór nie filtruje wyników Geoapify. Potwierdź, że placówka reprezentuje Twój kraj, zanim na niej polegniesz.',
     nearbyTitle: 'Znajdź pobliskie ambasady',
-    locationPrivacy: 'Dokładna lokalizacja jest używana tylko do tego wyszukiwania i nie jest zapisywana przez to narzędzie.',
+    locationPrivacy:
+      'Dokładna lokalizacja jest używana tylko do tego wyszukiwania i nie jest zapisywana przez to narzędzie.',
     useLocation: 'Użyj mojej bieżącej lokalizacji',
     manualLabel: 'Lub wyszukaj miasto albo miejsce',
     manualPlaceholder: 'Miasto, lotnisko lub obszar',
@@ -329,7 +337,8 @@ const COPY = Object.freeze({
     passportHint:
       'Deze keuze filtert Geoapify-resultaten niet. Bevestig dat een locatie jouw land vertegenwoordigt voordat je erop vertrouwt.',
     nearbyTitle: 'Vind ambassades in de buurt',
-    locationPrivacy: 'Je precieze locatie wordt alleen voor deze zoekopdracht gebruikt en niet door deze tool opgeslagen.',
+    locationPrivacy:
+      'Je precieze locatie wordt alleen voor deze zoekopdracht gebruikt en niet door deze tool opgeslagen.',
     useLocation: 'Mijn huidige locatie gebruiken',
     manualLabel: 'Of zoek een stad of plaats',
     manualPlaceholder: 'Stad, luchthaven of gebied',
@@ -369,7 +378,8 @@ const COPY = Object.freeze({
     passportHint:
       'Valget filtrerer ikke Geoapify-resultater. Bekreft at et sted representerer landet ditt før du stoler på det.',
     nearbyTitle: 'Finn ambassader i nærheten',
-    locationPrivacy: 'Den nøyaktige posisjonen brukes bare til dette søket og lagres ikke av verktøyet.',
+    locationPrivacy:
+      'Den nøyaktige posisjonen brukes bare til dette søket og lagres ikke av verktøyet.',
     useLocation: 'Bruk min nåværende posisjon',
     manualLabel: 'Eller søk etter en by eller et sted',
     manualPlaceholder: 'By, flyplass eller område',
@@ -409,7 +419,8 @@ const COPY = Object.freeze({
     passportHint:
       'Valget filtrerer ikke Geoapify-resultater. Bekræft, at en repræsentation dækker dit land, før du stoler på den.',
     nearbyTitle: 'Find ambassader i nærheden',
-    locationPrivacy: 'Din præcise placering bruges kun til denne søgning og gemmes ikke af værktøjet.',
+    locationPrivacy:
+      'Din præcise placering bruges kun til denne søgning og gemmes ikke af værktøjet.',
     useLocation: 'Brug min aktuelle placering',
     manualLabel: 'Eller søg efter en by eller et sted',
     manualPlaceholder: 'By, lufthavn eller område',
@@ -449,7 +460,8 @@ const COPY = Object.freeze({
     passportHint:
       'Valinta ei suodata Geoapify-tuloksia. Varmista, että edustusto edustaa maatasi ennen kuin luotat siihen.',
     nearbyTitle: 'Etsi lähellä olevia suurlähetystöjä',
-    locationPrivacy: 'Tarkkaa sijaintiasi käytetään vain tähän hakuun eikä tämä työkalu tallenna sitä.',
+    locationPrivacy:
+      'Tarkkaa sijaintiasi käytetään vain tähän hakuun eikä tämä työkalu tallenna sitä.',
     useLocation: 'Käytä nykyistä sijaintiani',
     manualLabel: 'Tai hae kaupunkia tai paikkaa',
     manualPlaceholder: 'Kaupunki, lentoasema tai alue',
@@ -489,7 +501,8 @@ const COPY = Object.freeze({
     passportHint:
       'Bu seçim Geoapify sonuçlarını filtrelemez. Güvenmeden önce temsilciliğin ülkenizi temsil ettiğini doğrulayın.',
     nearbyTitle: 'Yakındaki büyükelçilikleri bul',
-    locationPrivacy: 'Kesin konumunuz yalnızca bu arama için kullanılır ve bu araç tarafından kaydedilmez.',
+    locationPrivacy:
+      'Kesin konumunuz yalnızca bu arama için kullanılır ve bu araç tarafından kaydedilmez.',
     useLocation: 'Mevcut konumumu kullan',
     manualLabel: 'Veya şehir ya da yer arayın',
     manualPlaceholder: 'Şehir, havaalanı veya bölge',
@@ -539,10 +552,8 @@ const COPY = Object.freeze({
       'المصدر: بيانات الأماكن من Geoapify. هذه النتائج ليست تحققاً حكومياً رسمياً وقد تكون ناقصة أو قديمة.',
     empty:
       'لم يتم العثور على سفارات قريبة. ابحث عن الموقع الرسمي لوزارة الخارجية أو السفارة الخاصة ببلد جواز سفرك ووجهتك الحالية.',
-    error:
-      'تعذر جلب المرافق الدبلوماسية القريبة. لم يتم اختلاق أي جهة اتصال أو إجراء.',
-    permissionDenied:
-      'الموقع غير متاح أو لم يُسمح به. يمكنك البحث يدوياً عن مدينة أو مكان.',
+    error: 'تعذر جلب المرافق الدبلوماسية القريبة. لم يتم اختلاق أي جهة اتصال أو إجراء.',
+    permissionDenied: 'الموقع غير متاح أو لم يُسمح به. يمكنك البحث يدوياً عن مدينة أو مكان.',
     navigation: 'فتح الاتجاهات',
     distance: 'المسافة',
     lostTitle: 'جواز سفر مفقود أو مسروق',
@@ -590,14 +601,17 @@ const COPY = Object.freeze({
       '确认遗失对后续行程的影响。',
       '如果其他身份或支付证件同时遗失，请及时保护相关账户和资料。',
     ],
-    lostDisclaimer: '警方报案并非在所有情况下都强制要求。所需文件、照片、费用、处理时间及紧急证件资格必须向主管机构确认。',
+    lostDisclaimer:
+      '警方报案并非在所有情况下都强制要求。所需文件、照片、费用、处理时间及紧急证件资格必须向主管机构确认。',
     findEmbassy: '查找使馆帮助',
   },
   ja: {
     title: '大使館・領事支援',
-    intro: '場所データで近くの大使館を探し、その後、旅券国を担当する正しい在外公館と公式手続きを確認してください。',
+    intro:
+      '場所データで近くの大使館を探し、その後、旅券国を担当する正しい在外公館と公式手続きを確認してください。',
     passportCountry: '旅券または国籍の国',
-    passportHint: 'この選択は Geoapify の結果を絞り込みません。利用する前に、その公館が自国を担当していることを確認してください。',
+    passportHint:
+      'この選択は Geoapify の結果を絞り込みません。利用する前に、その公館が自国を担当していることを確認してください。',
     nearbyTitle: '近くの大使館を探す',
     locationPrivacy: '正確な位置情報はこの検索にのみ使用され、このツールには保存されません。',
     useLocation: '現在地を使用',
@@ -605,14 +619,18 @@ const COPY = Object.freeze({
     manualPlaceholder: '都市、空港、地域',
     searchPlace: '場所を検索',
     choosePlace: 'この場所を選ぶ',
-    sourceNotice: '出典: Geoapify の場所データ。政府による公式確認ではなく、不完全または古い場合があります。',
-    empty: '近くの大使館が見つかりませんでした。旅券国と現在地に対応する外務省または大使館の公式サイトを検索してください。',
+    sourceNotice:
+      '出典: Geoapify の場所データ。政府による公式確認ではなく、不完全または古い場合があります。',
+    empty:
+      '近くの大使館が見つかりませんでした。旅券国と現在地に対応する外務省または大使館の公式サイトを検索してください。',
     error: '近くの外交施設を取得できませんでした。連絡先や手続きは推測していません。',
-    permissionDenied: '位置情報を利用できないか、許可されませんでした。都市や場所を手動で検索できます。',
+    permissionDenied:
+      '位置情報を利用できないか、許可されませんでした。都市や場所を手動で検索できます。',
     navigation: '経路を開く',
     distance: '距離',
     lostTitle: '旅券の紛失・盗難',
-    lostIntro: '必要条件は国籍と場所により異なります。以下の一般的な手順を参考にし、正確な手続きは担当の大使館または領事館で確認してください。',
+    lostIntro:
+      '必要条件は国籍と場所により異なります。以下の一般的な手順を参考にし、正確な手続きは担当の大使館または領事館で確認してください。',
     lostSteps: [
       '旅券が紛失か盗難かを確認します。',
       '盗難の場合は現地警察への連絡を検討します。',
@@ -622,14 +640,17 @@ const COPY = Object.freeze({
       '今後の旅行への影響を確認します。',
       '同時に紛失した他の身分証明書や支払手段も保護します。',
     ],
-    lostDisclaimer: '警察への届出が常に必須とは限りません。必要書類、写真、料金、処理時間、緊急文書の対象条件は担当当局に確認してください。',
+    lostDisclaimer:
+      '警察への届出が常に必須とは限りません。必要書類、写真、料金、処理時間、緊急文書の対象条件は担当当局に確認してください。',
     findEmbassy: '大使館の支援を探す',
   },
   ko: {
     title: '대사관 및 영사 지원',
-    intro: '장소 데이터로 가까운 대사관을 찾은 뒤 여권 국가를 담당하는 올바른 공관과 공식 절차를 확인하세요.',
+    intro:
+      '장소 데이터로 가까운 대사관을 찾은 뒤 여권 국가를 담당하는 올바른 공관과 공식 절차를 확인하세요.',
     passportCountry: '여권 또는 시민권 국가',
-    passportHint: '이 선택은 Geoapify 결과를 필터링하지 않습니다. 이용하기 전에 해당 시설이 본인 국가를 대표하는지 확인하세요.',
+    passportHint:
+      '이 선택은 Geoapify 결과를 필터링하지 않습니다. 이용하기 전에 해당 시설이 본인 국가를 대표하는지 확인하세요.',
     nearbyTitle: '가까운 대사관 찾기',
     locationPrivacy: '정확한 위치는 이 검색에만 사용되며 이 도구에 저장되지 않습니다.',
     useLocation: '현재 위치 사용',
@@ -637,14 +658,18 @@ const COPY = Object.freeze({
     manualPlaceholder: '도시, 공항 또는 지역',
     searchPlace: '장소 검색',
     choosePlace: '이 장소 선택',
-    sourceNotice: '출처: Geoapify 장소 데이터. 정부의 공식 검증이 아니며 정보가 불완전하거나 오래되었을 수 있습니다.',
-    empty: '가까운 대사관을 찾지 못했습니다. 여권 국가와 현재 목적지에 해당하는 외교부 또는 대사관 공식 웹사이트를 검색하세요.',
+    sourceNotice:
+      '출처: Geoapify 장소 데이터. 정부의 공식 검증이 아니며 정보가 불완전하거나 오래되었을 수 있습니다.',
+    empty:
+      '가까운 대사관을 찾지 못했습니다. 여권 국가와 현재 목적지에 해당하는 외교부 또는 대사관 공식 웹사이트를 검색하세요.',
     error: '가까운 외교 시설을 불러오지 못했습니다. 연락처나 절차를 임의로 만들지 않았습니다.',
-    permissionDenied: '위치를 사용할 수 없거나 허용되지 않았습니다. 도시나 장소를 직접 검색할 수 있습니다.',
+    permissionDenied:
+      '위치를 사용할 수 없거나 허용되지 않았습니다. 도시나 장소를 직접 검색할 수 있습니다.',
     navigation: '길찾기 열기',
     distance: '거리',
     lostTitle: '여권 분실 또는 도난',
-    lostIntro: '요건은 국적과 위치에 따라 다릅니다. 아래 일반 단계를 참고한 뒤 정확한 절차를 관련 대사관이나 영사관에 확인하세요.',
+    lostIntro:
+      '요건은 국적과 위치에 따라 다릅니다. 아래 일반 단계를 참고한 뒤 정확한 절차를 관련 대사관이나 영사관에 확인하세요.',
     lostSteps: [
       '여권이 분실되었는지 도난당했는지 확인합니다.',
       '도난이라면 현지 경찰에 연락하는 것을 고려합니다.',
@@ -654,29 +679,38 @@ const COPY = Object.freeze({
       '분실이 이후 여행에 미칠 영향을 확인합니다.',
       '동시에 잃어버린 다른 신분 또는 결제 문서도 보호합니다.',
     ],
-    lostDisclaimer: '경찰 신고가 항상 의무인 것은 아닙니다. 필요한 문서, 사진, 수수료, 처리 시간 및 긴급 문서 자격은 담당 기관에 확인해야 합니다.',
+    lostDisclaimer:
+      '경찰 신고가 항상 의무인 것은 아닙니다. 필요한 문서, 사진, 수수료, 처리 시간 및 긴급 문서 자격은 담당 기관에 확인해야 합니다.',
     findEmbassy: '대사관 지원 찾기',
   },
   hi: {
     title: 'दूतावास और वाणिज्य दूतावास सहायता',
-    intro: 'स्थान डेटा से पास के दूतावास खोजें, फिर अपने पासपोर्ट देश के लिए सही प्रतिनिधित्व और आधिकारिक प्रक्रिया की पुष्टि करें।',
+    intro:
+      'स्थान डेटा से पास के दूतावास खोजें, फिर अपने पासपोर्ट देश के लिए सही प्रतिनिधित्व और आधिकारिक प्रक्रिया की पुष्टि करें।',
     passportCountry: 'पासपोर्ट या नागरिकता का देश',
-    passportHint: 'यह चयन Geoapify परिणामों को फ़िल्टर नहीं करता। भरोसा करने से पहले पुष्टि करें कि कार्यालय आपके देश का प्रतिनिधित्व करता है।',
+    passportHint:
+      'यह चयन Geoapify परिणामों को फ़िल्टर नहीं करता। भरोसा करने से पहले पुष्टि करें कि कार्यालय आपके देश का प्रतिनिधित्व करता है।',
     nearbyTitle: 'पास के दूतावास खोजें',
-    locationPrivacy: 'आपका सटीक स्थान केवल इस खोज के लिए उपयोग होता है और यह टूल इसे सेव नहीं करता।',
+    locationPrivacy:
+      'आपका सटीक स्थान केवल इस खोज के लिए उपयोग होता है और यह टूल इसे सेव नहीं करता।',
     useLocation: 'मेरी वर्तमान लोकेशन उपयोग करें',
     manualLabel: 'या शहर अथवा स्थान खोजें',
     manualPlaceholder: 'शहर, हवाई अड्डा या क्षेत्र',
     searchPlace: 'स्थान खोजें',
     choosePlace: 'यह स्थान चुनें',
-    sourceNotice: 'स्रोत: Geoapify स्थान डेटा। ये परिणाम सरकारी आधिकारिक सत्यापन नहीं हैं और अधूरे या पुराने हो सकते हैं।',
-    empty: 'पास में कोई दूतावास नहीं मिला। अपने पासपोर्ट देश और वर्तमान गंतव्य के लिए विदेश मंत्रालय या दूतावास की आधिकारिक वेबसाइट खोजें।',
-    error: 'पास की राजनयिक सुविधाएँ अभी प्राप्त नहीं हो सकीं। कोई संपर्क या प्रक्रिया बनाई नहीं गई।',
-    permissionDenied: 'लोकेशन उपलब्ध नहीं थी या अनुमति नहीं मिली। आप शहर या स्थान को मैन्युअल रूप से खोज सकते हैं।',
+    sourceNotice:
+      'स्रोत: Geoapify स्थान डेटा। ये परिणाम सरकारी आधिकारिक सत्यापन नहीं हैं और अधूरे या पुराने हो सकते हैं।',
+    empty:
+      'पास में कोई दूतावास नहीं मिला। अपने पासपोर्ट देश और वर्तमान गंतव्य के लिए विदेश मंत्रालय या दूतावास की आधिकारिक वेबसाइट खोजें।',
+    error:
+      'पास की राजनयिक सुविधाएँ अभी प्राप्त नहीं हो सकीं। कोई संपर्क या प्रक्रिया बनाई नहीं गई।',
+    permissionDenied:
+      'लोकेशन उपलब्ध नहीं थी या अनुमति नहीं मिली। आप शहर या स्थान को मैन्युअल रूप से खोज सकते हैं।',
     navigation: 'दिशा खोलें',
     distance: 'दूरी',
     lostTitle: 'पासपोर्ट खो गया या चोरी हो गया',
-    lostIntro: 'आवश्यकताएँ राष्ट्रीयता और स्थान के अनुसार बदलती हैं। इन सामान्य चरणों का उपयोग करें और सटीक प्रक्रिया संबंधित दूतावास या वाणिज्य दूतावास से पुष्टि करें।',
+    lostIntro:
+      'आवश्यकताएँ राष्ट्रीयता और स्थान के अनुसार बदलती हैं। इन सामान्य चरणों का उपयोग करें और सटीक प्रक्रिया संबंधित दूतावास या वाणिज्य दूतावास से पुष्टि करें।',
     lostSteps: [
       'तय करें कि पासपोर्ट खोया है या चोरी हुआ है।',
       'यदि चोरी हुआ है तो स्थानीय पुलिस से संपर्क करने पर विचार करें।',
@@ -686,7 +720,8 @@ const COPY = Object.freeze({
       'जाँचें कि इसका आगे की यात्रा पर क्या प्रभाव पड़ सकता है।',
       'यदि अन्य पहचान या भुगतान दस्तावेज भी खो गए हों तो उन्हें सुरक्षित करें।',
     ],
-    lostDisclaimer: 'पुलिस रिपोर्ट हमेशा अनिवार्य नहीं होती। आवश्यक दस्तावेज, फोटो, शुल्क, समय और आपात दस्तावेज की पात्रता जिम्मेदार प्राधिकरण से पुष्टि करें।',
+    lostDisclaimer:
+      'पुलिस रिपोर्ट हमेशा अनिवार्य नहीं होती। आवश्यक दस्तावेज, फोटो, शुल्क, समय और आपात दस्तावेज की पात्रता जिम्मेदार प्राधिकरण से पुष्टि करें।',
     findEmbassy: 'दूतावास सहायता खोजें',
   },
 });

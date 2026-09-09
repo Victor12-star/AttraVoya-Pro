@@ -13,9 +13,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { ConsularAssistance, normalizeDiplomaticPlaces } = await import(
-  '../../src/features/emergency/consular-assistance.jsx'
-);
+const { ConsularAssistance, normalizeDiplomaticPlaces } =
+  await import('../../src/features/emergency/consular-assistance.jsx');
 
 const countries = [
   { iso2: 'SE', name: 'Sweden' },
@@ -128,13 +127,17 @@ describe('ConsularAssistance', () => {
     render(<ConsularAssistance locale="en" countries={countries} />);
 
     expect(screen.getByRole('heading', { name: 'Lost or stolen passport' })).toBeInTheDocument();
-    expect(screen.getByText('If it was stolen, consider contacting local police.')).toBeInTheDocument();
+    expect(
+      screen.getByText('If it was stolen, consider contacting local police.'),
+    ).toBeInTheDocument();
     expect(screen.getByText(/A police report is not always mandatory/)).toBeInTheDocument();
     expect(screen.queryByText(/must file a police report/i)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Find embassy help' }));
     await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Embassy & consular help' }).closest('section')).toHaveFocus(),
+      expect(
+        screen.getByRole('heading', { name: 'Embassy & consular help' }).closest('section'),
+      ).toHaveFocus(),
     );
   });
 

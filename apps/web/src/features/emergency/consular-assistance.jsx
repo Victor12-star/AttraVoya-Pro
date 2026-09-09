@@ -366,7 +366,10 @@ export function ConsularAssistance({ locale = 'en', countries = [] }) {
           ) : null}
 
           {manualState.status === 'empty' || manualState.status === 'error' ? (
-            <div className={styles.feedback} role={manualState.status === 'error' ? 'alert' : 'status'}>
+            <div
+              className={styles.feedback}
+              role={manualState.status === 'error' ? 'alert' : 'status'}
+            >
               <MapPin size={20} aria-hidden="true" />
               <span>{manualState.status === 'error' ? copy.error : copy.empty}</span>
             </div>
