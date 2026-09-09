@@ -6,17 +6,19 @@ on:
       - develop
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
-    name: Generate exact Phase 9T fixes
+    name: Generate and apply exact Phase 9T fixes
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repository
+      - name: Checkout feature branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -56,14 +58,23 @@ jobs:
           PY
           pnpm install --lockfile-only --no-frozen-lockfile
 
-      - name: Upload exact generated files
-        uses: actions/upload-artifact@v4
-        with:
-          name: phase-9t-generated-fixes
-          if-no-files-found: error
-          retention-days: 1
-          path: |
-            apps/web/src/features/emergency/travel-emergency-copy.js
+      - name: Verify generated fixes
+        run: |
+          pnpm exec prettier --check \
+            apps/web/src/features/emergency/travel-emergency-copy.js \
             apps/web/src/features/emergency/travel-emergency-mode.jsx
-            pnpm-workspace.yaml
+          pnpm audit --prod --audit-level=high
+          git diff --check
+
+      - name: Commit generated fixes to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            apps/web/src/features/emergency/travel-emergency-copy.js \
+            apps/web/src/features/emergency/travel-emergency-mode.jsx \
+            pnpm-workspace.yaml \
             pnpm-lock.yaml
+          git diff --cached --check
+          git commit -m "Phase 9T: format emergency UI and patch js-yaml"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
