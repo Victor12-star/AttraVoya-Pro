@@ -18,6 +18,7 @@ import { createReadinessState } from './lifecycle/readiness-state.js';
 import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
 import { authRepository } from './modules/auth/auth.repository.js';
 import { healthRoutes } from './modules/health/health.routes.js';
+import { serviceMetricsRoutes } from './modules/operations/service-metrics.routes.js';
 import { countriesRoutes } from './modules/countries/countries.routes.js';
 import { languagesRoutes } from './modules/languages/languages.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
@@ -132,6 +133,14 @@ export async function buildApp(options = {}) {
     prefix: `${API_PREFIX}/health`,
     repository: options.healthRepository,
     readinessState,
+  });
+
+  await app.register(serviceMetricsRoutes, {
+    prefix: `${API_PREFIX}/operations/service-metrics`,
+    requestMetrics,
+    providerMetrics: options.serviceMetricsProviderMetrics,
+    providerCacheMetrics: options.serviceMetricsProviderCacheMetrics,
+    getDatabasePoolMetrics: options.serviceMetricsDatabasePoolMetrics,
   });
 
   await app.register(countriesRoutes, {
