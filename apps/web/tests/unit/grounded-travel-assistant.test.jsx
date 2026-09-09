@@ -85,6 +85,8 @@ function emergencyResponse() {
 
 async function chooseSweden() {
   const select = await screen.findByRole('combobox', { name: 'Assistant destination' });
+  await waitFor(() => expect(select).not.toBeDisabled());
+  expect(screen.getByRole('option', { name: 'Sweden' })).toBeInTheDocument();
   fireEvent.change(select, { target: { value: 'SE' } });
   await waitFor(() =>
     expect(mocks.request).toHaveBeenCalledWith('/api/v1/phrasebook?countryCode=SE', {
