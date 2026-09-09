@@ -7,7 +7,9 @@ function textValue(value, maxLength) {
 }
 
 function isoDate(value) {
-  return value instanceof Date && Number.isFinite(value.getTime()) ? value.toISOString().slice(0, 10) : null;
+  return value instanceof Date && Number.isFinite(value.getTime())
+    ? value.toISOString().slice(0, 10)
+    : null;
 }
 
 function countryCode(value) {

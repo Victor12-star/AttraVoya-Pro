@@ -7,7 +7,8 @@ const COPY = Object.freeze({
     activeTrip: 'Current trip',
     plannedTrip: 'Upcoming trip',
     tripApplied: 'Current destination selected from {trip}. You can change it manually.',
-    unavailable: 'Saved trip context is unavailable right now. Manual destination selection still works.',
+    unavailable:
+      'Saved trip context is unavailable right now. Manual destination selection still works.',
   },
   sv: {
     tripSelector: 'Din resa',
@@ -15,7 +16,8 @@ const COPY = Object.freeze({
     activeTrip: 'Pågående resa',
     plannedTrip: 'Kommande resa',
     tripApplied: 'Nuvarande destination valdes från {trip}. Du kan ändra den manuellt.',
-    unavailable: 'Sparad reseinformation är inte tillgänglig just nu. Manuellt destinationsval fungerar fortfarande.',
+    unavailable:
+      'Sparad reseinformation är inte tillgänglig just nu. Manuellt destinationsval fungerar fortfarande.',
   },
   es: {
     tripSelector: 'Tu viaje',
@@ -23,15 +25,18 @@ const COPY = Object.freeze({
     activeTrip: 'Viaje actual',
     plannedTrip: 'Próximo viaje',
     tripApplied: 'El destino actual se seleccionó desde {trip}. Puedes cambiarlo manualmente.',
-    unavailable: 'El contexto del viaje guardado no está disponible ahora. La selección manual sigue funcionando.',
+    unavailable:
+      'El contexto del viaje guardado no está disponible ahora. La selección manual sigue funcionando.',
   },
   fr: {
     tripSelector: 'Votre voyage',
     chooseTrip: 'Choisir un voyage enregistré',
     activeTrip: 'Voyage en cours',
     plannedTrip: 'Voyage à venir',
-    tripApplied: 'La destination actuelle a été sélectionnée depuis {trip}. Vous pouvez la modifier manuellement.',
-    unavailable: 'Le contexte du voyage enregistré est indisponible pour le moment. La sélection manuelle reste disponible.',
+    tripApplied:
+      'La destination actuelle a été sélectionnée depuis {trip}. Vous pouvez la modifier manuellement.',
+    unavailable:
+      'Le contexte du voyage enregistré est indisponible pour le moment. La sélection manuelle reste disponible.',
   },
   de: {
     tripSelector: 'Deine Reise',
@@ -39,15 +44,18 @@ const COPY = Object.freeze({
     activeTrip: 'Aktuelle Reise',
     plannedTrip: 'Kommende Reise',
     tripApplied: 'Das aktuelle Reiseziel wurde aus {trip} gewählt. Du kannst es manuell ändern.',
-    unavailable: 'Gespeicherter Reisekontext ist derzeit nicht verfügbar. Die manuelle Zielauswahl funktioniert weiterhin.',
+    unavailable:
+      'Gespeicherter Reisekontext ist derzeit nicht verfügbar. Die manuelle Zielauswahl funktioniert weiterhin.',
   },
   it: {
     tripSelector: 'Il tuo viaggio',
     chooseTrip: 'Scegli un viaggio salvato',
     activeTrip: 'Viaggio attuale',
     plannedTrip: 'Prossimo viaggio',
-    tripApplied: 'La destinazione attuale è stata selezionata da {trip}. Puoi cambiarla manualmente.',
-    unavailable: 'Il contesto del viaggio salvato non è disponibile al momento. La selezione manuale funziona comunque.',
+    tripApplied:
+      'La destinazione attuale è stata selezionata da {trip}. Puoi cambiarla manualmente.',
+    unavailable:
+      'Il contesto del viaggio salvato non è disponibile al momento. La selezione manuale funziona comunque.',
   },
   pt: {
     tripSelector: 'A sua viagem',
@@ -55,7 +63,8 @@ const COPY = Object.freeze({
     activeTrip: 'Viagem atual',
     plannedTrip: 'Próxima viagem',
     tripApplied: 'O destino atual foi selecionado a partir de {trip}. Pode alterá-lo manualmente.',
-    unavailable: 'O contexto da viagem guardada não está disponível agora. A seleção manual continua disponível.',
+    unavailable:
+      'O contexto da viagem guardada não está disponível agora. A seleção manual continua disponível.',
   },
   pl: {
     tripSelector: 'Twoja podróż',
@@ -63,7 +72,8 @@ const COPY = Object.freeze({
     activeTrip: 'Bieżąca podróż',
     plannedTrip: 'Nadchodząca podróż',
     tripApplied: 'Bieżący cel wybrano z {trip}. Możesz zmienić go ręcznie.',
-    unavailable: 'Kontekst zapisanej podróży jest teraz niedostępny. Ręczny wybór celu nadal działa.',
+    unavailable:
+      'Kontekst zapisanej podróży jest teraz niedostępny. Ręczny wybór celu nadal działa.',
   },
   nl: {
     tripSelector: 'Je reis',
@@ -71,7 +81,8 @@ const COPY = Object.freeze({
     activeTrip: 'Huidige reis',
     plannedTrip: 'Aankomende reis',
     tripApplied: 'De huidige bestemming is gekozen uit {trip}. Je kunt deze handmatig wijzigen.',
-    unavailable: 'Opgeslagen reiscontext is nu niet beschikbaar. Handmatige bestemmingskeuze blijft werken.',
+    unavailable:
+      'Opgeslagen reiscontext is nu niet beschikbaar. Handmatige bestemmingskeuze blijft werken.',
   },
   no: {
     tripSelector: 'Reisen din',
@@ -79,7 +90,8 @@ const COPY = Object.freeze({
     activeTrip: 'Nåværende reise',
     plannedTrip: 'Kommende reise',
     tripApplied: 'Gjeldende reisemål ble valgt fra {trip}. Du kan endre det manuelt.',
-    unavailable: 'Lagret reisekontekst er ikke tilgjengelig nå. Manuelt valg av reisemål fungerer fortsatt.',
+    unavailable:
+      'Lagret reisekontekst er ikke tilgjengelig nå. Manuelt valg av reisemål fungerer fortsatt.',
   },
   da: {
     tripSelector: 'Din rejse',
@@ -87,7 +99,8 @@ const COPY = Object.freeze({
     activeTrip: 'Aktuel rejse',
     plannedTrip: 'Kommende rejse',
     tripApplied: 'Den aktuelle destination blev valgt fra {trip}. Du kan ændre den manuelt.',
-    unavailable: 'Gemt rejsekontekst er ikke tilgængelig lige nu. Manuelt destinationsvalg virker stadig.',
+    unavailable:
+      'Gemt rejsekontekst er ikke tilgængelig lige nu. Manuelt destinationsvalg virker stadig.',
   },
   fi: {
     tripSelector: 'Matkasi',
@@ -95,7 +108,8 @@ const COPY = Object.freeze({
     activeTrip: 'Nykyinen matka',
     plannedTrip: 'Tuleva matka',
     tripApplied: 'Nykyinen kohde valittiin matkasta {trip}. Voit muuttaa sitä käsin.',
-    unavailable: 'Tallennetun matkan tiedot eivät ole nyt käytettävissä. Kohteen voi silti valita käsin.',
+    unavailable:
+      'Tallennetun matkan tiedot eivät ole nyt käytettävissä. Kohteen voi silti valita käsin.',
   },
   tr: {
     tripSelector: 'Seyahatiniz',
@@ -103,7 +117,8 @@ const COPY = Object.freeze({
     activeTrip: 'Mevcut seyahat',
     plannedTrip: 'Yaklaşan seyahat',
     tripApplied: 'Geçerli varış noktası {trip} seyahatinden seçildi. Elle değiştirebilirsiniz.',
-    unavailable: 'Kayıtlı seyahat bağlamı şu anda kullanılamıyor. Varış noktasını elle seçebilirsiniz.',
+    unavailable:
+      'Kayıtlı seyahat bağlamı şu anda kullanılamıyor. Varış noktasını elle seçebilirsiniz.',
   },
   ar: {
     tripSelector: 'رحلتك',
@@ -143,7 +158,8 @@ const COPY = Object.freeze({
     activeTrip: 'वर्तमान यात्रा',
     plannedTrip: 'आगामी यात्रा',
     tripApplied: 'वर्तमान गंतव्य {trip} से चुना गया है। आप इसे मैन्युअल रूप से बदल सकते हैं।',
-    unavailable: 'सेव की गई यात्रा की जानकारी अभी उपलब्ध नहीं है। मैन्युअल गंतव्य चयन अभी भी काम करता है।',
+    unavailable:
+      'सेव की गई यात्रा की जानकारी अभी उपलब्ध नहीं है। मैन्युअल गंतव्य चयन अभी भी काम करता है।',
   },
 });
 

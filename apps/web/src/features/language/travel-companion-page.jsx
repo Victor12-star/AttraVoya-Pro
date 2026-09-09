@@ -122,7 +122,7 @@ function normalizeTripContext(response) {
 
   const suggestedTripId = textValue(context.suggestedTripId, 128);
   const suggestedTrip = suggestedTripId
-    ? trips.find((trip) => trip.id === suggestedTripId) ?? null
+    ? (trips.find((trip) => trip.id === suggestedTripId) ?? null)
     : null;
   const source = ['ACTIVE_TRIP', 'PLANNED_TRIP'].includes(context.source) ? context.source : null;
 
@@ -264,9 +264,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
         if (!active) return;
         const tripContext = normalizeTripContext(response);
         setTripContextState(
-          tripContext
-            ? { status: 'success', data: tripContext }
-            : { status: 'error', data: null },
+          tripContext ? { status: 'success', data: tripContext } : { status: 'error', data: null },
         );
       })
       .catch((error) => {
@@ -284,7 +282,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       setVoiceOutputSupported(
         Boolean(
           currentWindow?.speechSynthesis &&
-            typeof currentWindow?.SpeechSynthesisUtterance === 'function',
+          typeof currentWindow?.SpeechSynthesisUtterance === 'function',
         ),
       );
     }, 0);
