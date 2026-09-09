@@ -21,6 +21,37 @@ const EMBASSY_RADIUS_METERS = 50_000;
 const EMBASSY_RESULT_LIMIT = 16;
 const MANUAL_RESULT_LIMIT = 6;
 
+/**
+ * @typedef {object} SearchLocation
+ * @property {string} name
+ * @property {number} latitude
+ * @property {number} longitude
+ */
+
+/**
+ * @typedef {SearchLocation & {
+ *   key: string,
+ *   formattedAddress: string|null,
+ * }} LocationPlace
+ */
+
+/**
+ * @typedef {object} DiplomaticPlace
+ * @property {string} key
+ * @property {string} provider
+ * @property {string|null} sourcePlaceId
+ * @property {string} name
+ * @property {string|null} address
+ * @property {number|null} latitude
+ * @property {number|null} longitude
+ * @property {number|null} distanceMeters
+ * @property {string[]} categories
+ * @property {'provider-place-data'} trust
+ */
+
+/** @typedef {{status:string, results:LocationPlace[]}} ManualState */
+/** @typedef {{status:string, results:DiplomaticPlace[]}} EmbassyState */
+
 function textValue(value, maxLength) {
   if (typeof value !== 'string') return null;
   const normalized = value.trim();
@@ -32,31 +63,36 @@ function coordinate(value, min, max) {
   return Number.isFinite(number) && number >= min && number <= max ? number : null;
 }
 
+/** @param {any} response @returns {LocationPlace[]} */
 function normalizeLocationPlaces(response) {
   const rows = Array.isArray(response?.places?.results) ? response.places.results : [];
-  return rows
-    .map((place, index) => {
-      const latitude = coordinate(place?.latitude, -90, 90);
-      const longitude = coordinate(place?.longitude, -180, 180);
-      const name = textValue(place?.name, 180);
-      if (latitude === null || longitude === null || !name) return null;
-      const formattedAddress = textValue(place?.formattedAddress, 500);
-      const externalId = textValue(place?.externalId, 240);
-      return {
-        key: externalId ?? `${name}:${latitude}:${longitude}:${index}`,
-        name,
-        formattedAddress,
-        latitude,
-        longitude,
-      };
-    })
-    .filter(Boolean);
+  const results = /** @type {LocationPlace[]} */ ([]);
+
+  rows.forEach((place, index) => {
+    const latitude = coordinate(place?.latitude, -90, 90);
+    const longitude = coordinate(place?.longitude, -180, 180);
+    const name = textValue(place?.name, 180);
+    if (latitude === null || longitude === null || !name) return;
+
+    const formattedAddress = textValue(place?.formattedAddress, 500);
+    const externalId = textValue(place?.externalId, 240);
+    results.push({
+      key: externalId ?? `${name}:${latitude}:${longitude}:${index}`,
+      name,
+      formattedAddress,
+      latitude,
+      longitude,
+    });
+  });
+
+  return results;
 }
 
+/** @param {any} response @returns {DiplomaticPlace[]} */
 export function normalizeDiplomaticPlaces(response) {
   const rows = Array.isArray(response?.places?.results) ? response.places.results : [];
   const seen = new Set();
-  const results = [];
+  const results = /** @type {DiplomaticPlace[]} */ ([]);
 
   rows.forEach((place, index) => {
     const name = textValue(place?.name, 180);
@@ -69,9 +105,13 @@ export function normalizeDiplomaticPlaces(response) {
     const address = textValue(place?.formattedAddress, 500);
     const distance = Number(place?.distanceMeters);
     const distanceMeters = Number.isFinite(distance) && distance >= 0 ? distance : null;
-    const categories = Array.isArray(place?.categories)
-      ? place.categories.map((value) => textValue(value, 120)).filter(Boolean)
-      : [];
+    const categories = /** @type {string[]} */ ([]);
+    if (Array.isArray(place?.categories)) {
+      place.categories.forEach((value) => {
+        const category = textValue(value, 120);
+        if (category) categories.push(category);
+      });
+    }
     const key = sourcePlaceId
       ? `${provider}:${sourcePlaceId}`
       : `${name}:${latitude ?? ''}:${longitude ?? ''}:${index}`;
@@ -100,12 +140,14 @@ export function normalizeDiplomaticPlaces(response) {
   });
 }
 
+/** @param {DiplomaticPlace} place */
 function navigationUrl(place) {
   if (place.latitude === null || place.longitude === null) return null;
   const query = encodeURIComponent(`${place.latitude},${place.longitude}`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
+/** @param {Intl.NumberFormat} formatter @param {number|null} meters */
 function formatDistance(formatter, meters) {
   if (meters === null) return null;
   if (meters < 1000) return `${formatter.format(Math.round(meters))} m`;
@@ -116,22 +158,31 @@ function formatDistance(formatter, meters) {
  * Geoapify is used only to discover diplomatic facilities. The component
  * deliberately drops provider phone, website and opening-hours fields so
  * place data can never be mistaken for verified consular instructions.
+ *
+ * @param {object} props
+ * @param {string} [props.locale]
+ * @param {Array<{iso2:string, name:string}>} [props.countries]
  */
 export function ConsularAssistance({ locale = 'en', countries = [] }) {
   const copy = getConsularAssistanceCopy(locale);
-  const embassySectionRef = useRef(null);
+  const embassySectionRef = useRef(/** @type {HTMLElement|null} */ (null));
   const embassyRequestRef = useRef(0);
   const manualRequestRef = useRef(0);
   const [passportCountryCode, setPassportCountryCode] = useState('');
   const [manualQuery, setManualQuery] = useState('');
-  const [manualState, setManualState] = useState({ status: 'idle', results: [] });
+  const [manualState, setManualState] = useState(
+    /** @type {ManualState} */ ({ status: 'idle', results: [] }),
+  );
   const [locationMessage, setLocationMessage] = useState('');
-  const [embassyState, setEmbassyState] = useState({ status: 'idle', results: [] });
+  const [embassyState, setEmbassyState] = useState(
+    /** @type {EmbassyState} */ ({ status: 'idle', results: [] }),
+  );
   const formatter = useMemo(
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
     [locale],
   );
 
+  /** @param {SearchLocation} location */
   async function loadEmbassies(location) {
     embassyRequestRef.current += 1;
     const requestId = embassyRequestRef.current;
@@ -185,6 +236,7 @@ export function ConsularAssistance({ locale = 'en', countries = [] }) {
     );
   }
 
+  /** @param {SubmitEvent|{preventDefault:()=>void}} event */
   async function searchManualLocation(event) {
     event.preventDefault();
     const query = manualQuery.trim();
@@ -211,6 +263,7 @@ export function ConsularAssistance({ locale = 'en', countries = [] }) {
     }
   }
 
+  /** @param {LocationPlace} location */
   function selectManualLocation(location) {
     manualRequestRef.current += 1;
     setManualState({ status: 'idle', results: [] });
@@ -219,7 +272,7 @@ export function ConsularAssistance({ locale = 'en', countries = [] }) {
 
   function focusEmbassyHelp() {
     embassySectionRef.current?.focus();
-    embassySectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    embassySectionRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }
 
   return (
