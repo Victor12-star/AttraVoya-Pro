@@ -96,6 +96,7 @@ function normalizeTripContext(response) {
       if (
         !id ||
         !title ||
+        !status ||
         !['ACTIVE', 'PLANNED'].includes(status) ||
         !startDate ||
         !endDate ||
