@@ -7,6 +7,8 @@ const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
 const DEFAULT_MAX_CONCURRENT = 8;
 const DEFAULT_MAX_QUEUED = 32;
 const DEFAULT_MAX_QUEUE_WAIT_MS = 5000;
+const DEFAULT_CIRCUIT_FAILURE_THRESHOLD = 5;
+const DEFAULT_CIRCUIT_OPEN_MS = 30_000;
 const RETRY_BASE_DELAY_MS = 250;
 const RETRY_MAX_DELAY_MS = 1500;
 
@@ -21,9 +23,11 @@ const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
  * @property {number} [maxConcurrent] Maximum logical requests allowed in flight for this client.
  * @property {number} [maxQueued] Maximum requests allowed to wait for an in-flight slot.
  * @property {number} [maxQueueWaitMs] Maximum time a request may wait for an in-flight slot.
+ * @property {number} [circuitFailureThreshold] Consecutive unavailable requests before suppression.
+ * @property {number} [circuitOpenMs] Suppression duration before one recovery probe is allowed.
  * @property {(milliseconds: number) => Promise<void>} [sleepImpl] Injectable retry delay.
  * @property {() => number} [randomImpl] Injectable random source for retry jitter.
- * @property {() => number} [nowImpl] Injectable wall clock for Retry-After cooldowns.
+ * @property {() => number} [nowImpl] Injectable wall clock for cooldowns and circuit state.
  * @property {{ record: (event: object) => void }} [metrics] Injectable aggregate provider observer.
  */
 
@@ -63,6 +67,11 @@ function providerOutcomeForError(error) {
   }
 
   return 'other';
+}
+
+function isCircuitFailure(error) {
+  if (error?.code !== ERROR_CODES.PROVIDER_UNAVAILABLE) return false;
+  return !['busy', 'circuit_open'].includes(error?.details?.reason);
 }
 
 function recordProviderMetric(metrics, event) {
@@ -194,6 +203,7 @@ async function parseJsonResponse(response, provider) {
  * - Bounds per-client/provider concurrency, queue growth, and queue wait time.
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Honors valid Retry-After cooldowns across new requests in this process.
+ * - Suppresses repeatedly unavailable providers and allows one recovery probe.
  * - Adds bounded retry jitter so concurrent failures do not retry in lockstep.
  * - Records aggregate provider latency/failure/retry telemetry without payload data.
  * - Keeps upstream response text out of application errors/logs by default.
@@ -210,6 +220,8 @@ export function createProviderHttpClient(options) {
     maxConcurrent = DEFAULT_MAX_CONCURRENT,
     maxQueued = DEFAULT_MAX_QUEUED,
     maxQueueWaitMs = DEFAULT_MAX_QUEUE_WAIT_MS,
+    circuitFailureThreshold = DEFAULT_CIRCUIT_FAILURE_THRESHOLD,
+    circuitOpenMs = DEFAULT_CIRCUIT_OPEN_MS,
     sleepImpl = sleep,
     randomImpl = Math.random,
     nowImpl = Date.now,
@@ -233,6 +245,8 @@ export function createProviderHttpClient(options) {
   assertPositiveInteger(maxConcurrent, 'maxConcurrent');
   assertNonNegativeInteger(maxQueued, 'maxQueued');
   assertPositiveInteger(maxQueueWaitMs, 'maxQueueWaitMs');
+  assertPositiveInteger(circuitFailureThreshold, 'circuitFailureThreshold');
+  assertPositiveInteger(circuitOpenMs, 'circuitOpenMs');
 
   const concurrencyGate = createConcurrencyGate({
     provider,
@@ -241,6 +255,9 @@ export function createProviderHttpClient(options) {
     maxQueueWaitMs,
   });
   let rateLimitUntilMs = 0;
+  let consecutiveCircuitFailures = 0;
+  let circuitOpenUntilMs = 0;
+  let halfOpenProbeInFlight = false;
 
   function rememberRateLimit(retryAfter) {
     const nowMs = finiteNow(nowImpl);
@@ -261,6 +278,52 @@ export function createProviderHttpClient(options) {
 
     const retryAfter = String(Math.ceil((rateLimitUntilMs - nowMs) / 1000));
     return mapProviderHttpError({ provider, status: 429, retryAfter });
+  }
+
+  function circuitOpenError(nowMs, includeRetryAfter = true) {
+    const retryAfterMs = Math.max(0, circuitOpenUntilMs - nowMs);
+    return new ProviderUnavailableError(`${provider} is temporarily unavailable.`, {
+      details: {
+        provider,
+        reason: 'circuit_open',
+        ...(includeRetryAfter && retryAfterMs > 0
+          ? { retryAfter: String(Math.ceil(retryAfterMs / 1000)) }
+          : {}),
+      },
+    });
+  }
+
+  function currentCircuitError({ reserveProbe = false } = {}) {
+    if (circuitOpenUntilMs <= 0) return null;
+
+    const nowMs = finiteNow(nowImpl);
+    if (nowMs < circuitOpenUntilMs) return circuitOpenError(nowMs);
+
+    if (halfOpenProbeInFlight) return circuitOpenError(nowMs, false);
+    if (reserveProbe) halfOpenProbeInFlight = true;
+    return null;
+  }
+
+  function closeCircuit() {
+    consecutiveCircuitFailures = 0;
+    circuitOpenUntilMs = 0;
+    halfOpenProbeInFlight = false;
+  }
+
+  function rememberCircuitFailure() {
+    const nowMs = finiteNow(nowImpl);
+
+    if (halfOpenProbeInFlight) {
+      halfOpenProbeInFlight = false;
+      consecutiveCircuitFailures = circuitFailureThreshold;
+      circuitOpenUntilMs = nowMs + circuitOpenMs;
+      return;
+    }
+
+    consecutiveCircuitFailures += 1;
+    if (consecutiveCircuitFailures >= circuitFailureThreshold) {
+      circuitOpenUntilMs = nowMs + circuitOpenMs;
+    }
   }
 
   async function performRequestJson(url, requestOptions = {}, onAttempt = () => {}) {
@@ -357,15 +420,22 @@ export function createProviderHttpClient(options) {
       const rateLimitErrorBeforeQueue = currentRateLimitError();
       if (rateLimitErrorBeforeQueue) throw rateLimitErrorBeforeQueue;
 
+      const circuitErrorBeforeQueue = currentCircuitError();
+      if (circuitErrorBeforeQueue) throw circuitErrorBeforeQueue;
+
       await concurrencyGate.acquire();
       acquired = true;
 
       const rateLimitErrorAfterQueue = currentRateLimitError();
       if (rateLimitErrorAfterQueue) throw rateLimitErrorAfterQueue;
 
+      const circuitErrorAfterQueue = currentCircuitError({ reserveProbe: true });
+      if (circuitErrorAfterQueue) throw circuitErrorAfterQueue;
+
       const payload = await performRequestJson(url, requestOptions, () => {
         attempts += 1;
       });
+      closeCircuit();
       recordProviderMetric(metrics, {
         provider,
         outcome: 'success',
@@ -374,6 +444,16 @@ export function createProviderHttpClient(options) {
       });
       return payload;
     } catch (error) {
+      if (attempts > 0) {
+        if (isCircuitFailure(error)) {
+          rememberCircuitFailure();
+        } else {
+          // A provider response such as 4xx/429/authentication proves the
+          // upstream is reachable, so it breaks a consecutive outage streak.
+          closeCircuit();
+        }
+      }
+
       recordProviderMetric(metrics, {
         provider,
         outcome: providerOutcomeForError(error),
