@@ -102,7 +102,13 @@ jobs:
         run: pnpm test
 
       - name: Install Playwright browsers
-        run: pnpm --filter @attravoya/web exec playwright install --with-deps chromium firefox webkit
+        run: |
+          # GitHub's Ubuntu image includes an unrelated Google Chrome apt source.
+          # Playwright installs its own browser binaries; disabling this runner-only
+          # source avoids external Chrome-repository index races without skipping
+          # Playwright's Ubuntu dependency installation or browser coverage.
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources
+          pnpm --filter @attravoya/web exec playwright install --with-deps chromium firefox webkit
 
       - name: Run web browser smoke and accessibility tests
         env:
