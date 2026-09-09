@@ -1,0 +1,710 @@
+import { normalizeLocale } from '@attravoya/localization';
+
+const COPY = Object.freeze({
+  en: {
+    eyebrow: 'Grounded travel assistant',
+    title: 'Ask using trusted travel data',
+    intro:
+      'Ask about supported local languages, useful phrases, or verified emergency contacts. This release does not use a general AI model and will not guess unsupported facts.',
+    destination: 'Assistant destination',
+    destinationHint: 'Choose the current destination so answers stay scoped to one country.',
+    placeholder: 'Ask a travel question…',
+    ask: 'Ask',
+    clear: 'Clear conversation',
+    empty: 'Your grounded answers will appear here.',
+    sessionOnly: 'Conversation stays in this browser session and is not saved by this feature.',
+    trustedOnly: 'Trusted-data only',
+    source: 'Source',
+    verified: 'Verified',
+    selectDestination: 'Choose a destination before asking this question.',
+    loadingReference: 'Loading destination reference…',
+    referenceUnavailable:
+      'The destination reference could not be loaded, so no answer was invented.',
+    unsupported:
+      'I cannot answer that from the trusted travel data available in this release. Try a language, useful-phrase, emergency, embassy, or passport question.',
+    languagePrompt: 'Which local language should I use?',
+    phrasePrompt: 'Show me useful phrases',
+    emergencyPrompt: 'What emergency contacts are verified?',
+    passportPrompt: 'I lost my passport. Where is embassy help?',
+    languageAnswer: (country, languages) =>
+      `For ${country}, the supported destination language${languages.length === 1 ? ' is' : 's are'}: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Here are useful English phrases available for ${country}:`,
+    emergencyAnswer: (country) =>
+      `These verified country-wide emergency contacts are available for ${country}:`,
+    emergencyUnavailable:
+      'No verified country-wide emergency contact is available in the current reference data. Open Travel Emergency Mode for the safest fallback.',
+    consularAnswer:
+      'Use Travel Emergency Mode below for embassy and lost-passport help. It keeps provider directory data separate from official government verification and does not invent passport requirements.',
+    openEmergency: 'Open Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya phrasebook reference',
+    emergencySource: 'Verified emergency reference',
+    noModel: 'No general AI model is used for these answers.',
+  },
+  sv: {
+    eyebrow: 'Grundad reseassistent',
+    title: 'Fråga med betrodda resedata',
+    intro:
+      'Fråga om lokala språk som stöds, användbara fraser eller verifierade nödnummer. Den här versionen använder ingen allmän AI-modell och gissar inte fakta som saknar stöd.',
+    destination: 'Assistentens destination',
+    destinationHint: 'Välj aktuell destination så att svaren begränsas till ett land.',
+    placeholder: 'Ställ en resefråga…',
+    ask: 'Fråga',
+    clear: 'Rensa konversation',
+    empty: 'Dina grundade svar visas här.',
+    sessionOnly:
+      'Konversationen stannar i den här webbläsarsessionen och sparas inte av funktionen.',
+    trustedOnly: 'Endast betrodda data',
+    source: 'Källa',
+    verified: 'Verifierad',
+    selectDestination: 'Välj en destination innan du ställer frågan.',
+    loadingReference: 'Läser in destinationsreferens…',
+    referenceUnavailable: 'Destinationsreferensen kunde inte läsas in, så inget svar hittades på.',
+    unsupported:
+      'Jag kan inte svara på det från de betrodda resedata som finns i den här versionen. Fråga om språk, användbara fraser, nödläge, ambassad eller pass.',
+    languagePrompt: 'Vilket lokalt språk ska jag använda?',
+    phrasePrompt: 'Visa användbara fraser',
+    emergencyPrompt: 'Vilka nödkontakter är verifierade?',
+    passportPrompt: 'Jag har tappat mitt pass. Var finns ambassadhjälp?',
+    languageAnswer: (country, languages) =>
+      `För ${country} stöds följande destinationsspråk: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Här är användbara engelska fraser som finns för ${country}:`,
+    emergencyAnswer: (country) =>
+      `Dessa verifierade rikstäckande nödkontakter finns för ${country}:`,
+    emergencyUnavailable:
+      'Ingen verifierad rikstäckande nödkontakt finns i aktuell referensdata. Öppna Travel Emergency Mode för säkrast möjliga alternativ.',
+    consularAnswer:
+      'Använd Travel Emergency Mode nedan för ambassad- och passhjälp. Där hålls leverantörens katalogdata åtskilda från officiell myndighetsverifiering och passkrav hittas inte på.',
+    openEmergency: 'Öppna Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya frasreferens',
+    emergencySource: 'Verifierad nödreferens',
+    noModel: 'Ingen allmän AI-modell används för dessa svar.',
+  },
+  es: {
+    eyebrow: 'Asistente de viaje con datos verificados',
+    title: 'Pregunta usando datos de viaje fiables',
+    intro:
+      'Pregunta por idiomas locales compatibles, frases útiles o contactos de emergencia verificados. Esta versión no usa un modelo de IA general ni inventa datos sin respaldo.',
+    destination: 'Destino del asistente',
+    destinationHint: 'Elige el destino actual para limitar las respuestas a un solo país.',
+    placeholder: 'Haz una pregunta de viaje…',
+    ask: 'Preguntar',
+    clear: 'Borrar conversación',
+    empty: 'Tus respuestas verificadas aparecerán aquí.',
+    sessionOnly:
+      'La conversación permanece en esta sesión del navegador y esta función no la guarda.',
+    trustedOnly: 'Solo datos fiables',
+    source: 'Fuente',
+    verified: 'Verificado',
+    selectDestination: 'Elige un destino antes de hacer esta pregunta.',
+    loadingReference: 'Cargando referencia del destino…',
+    referenceUnavailable:
+      'No se pudo cargar la referencia del destino, por lo que no se inventó una respuesta.',
+    unsupported:
+      'No puedo responder con los datos de viaje fiables disponibles en esta versión. Prueba una pregunta sobre idioma, frases útiles, emergencias, embajada o pasaporte.',
+    languagePrompt: '¿Qué idioma local debo usar?',
+    phrasePrompt: 'Muéstrame frases útiles',
+    emergencyPrompt: '¿Qué contactos de emergencia están verificados?',
+    passportPrompt: 'He perdido mi pasaporte. ¿Dónde encuentro ayuda de la embajada?',
+    languageAnswer: (country, languages) =>
+      `Para ${country}, los idiomas de destino compatibles son: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Estas son frases útiles en inglés disponibles para ${country}:`,
+    emergencyAnswer: (country) =>
+      `Estos contactos de emergencia nacionales verificados están disponibles para ${country}:`,
+    emergencyUnavailable:
+      'No hay un contacto de emergencia nacional verificado en los datos actuales. Abre Travel Emergency Mode para la alternativa más segura.',
+    consularAnswer:
+      'Usa Travel Emergency Mode más abajo para ayuda de embajada y pasaporte perdido. Separa los datos de directorio del proveedor de la verificación oficial y no inventa requisitos de pasaporte.',
+    openEmergency: 'Abrir Travel Emergency Mode',
+    phrasebookSource: 'Referencia de frases de AttraVoya',
+    emergencySource: 'Referencia de emergencia verificada',
+    noModel: 'Estas respuestas no usan un modelo de IA general.',
+  },
+  fr: {
+    eyebrow: 'Assistant de voyage fondé sur des données',
+    title: 'Posez une question avec des données fiables',
+    intro:
+      'Demandez les langues locales prises en charge, des phrases utiles ou des contacts d’urgence vérifiés. Cette version n’utilise pas de modèle d’IA général et n’invente pas les faits non pris en charge.',
+    destination: 'Destination de l’assistant',
+    destinationHint:
+      'Choisissez la destination actuelle afin de limiter les réponses à un seul pays.',
+    placeholder: 'Posez une question de voyage…',
+    ask: 'Demander',
+    clear: 'Effacer la conversation',
+    empty: 'Vos réponses fondées sur les données apparaîtront ici.',
+    sessionOnly:
+      'La conversation reste dans cette session du navigateur et n’est pas enregistrée par cette fonction.',
+    trustedOnly: 'Données fiables uniquement',
+    source: 'Source',
+    verified: 'Vérifié',
+    selectDestination: 'Choisissez une destination avant de poser cette question.',
+    loadingReference: 'Chargement de la référence de destination…',
+    referenceUnavailable:
+      'La référence de destination n’a pas pu être chargée ; aucune réponse n’a été inventée.',
+    unsupported:
+      'Je ne peux pas répondre à partir des données de voyage fiables disponibles dans cette version. Essayez une question sur la langue, les phrases utiles, les urgences, l’ambassade ou le passeport.',
+    languagePrompt: 'Quelle langue locale dois-je utiliser ?',
+    phrasePrompt: 'Montrez-moi des phrases utiles',
+    emergencyPrompt: 'Quels contacts d’urgence sont vérifiés ?',
+    passportPrompt: 'J’ai perdu mon passeport. Où trouver de l’aide consulaire ?',
+    languageAnswer: (country, languages) =>
+      `Pour ${country}, les langues de destination prises en charge sont : ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Voici des phrases utiles en anglais disponibles pour ${country} :`,
+    emergencyAnswer: (country) =>
+      `Ces contacts d’urgence nationaux vérifiés sont disponibles pour ${country} :`,
+    emergencyUnavailable:
+      'Aucun contact d’urgence national vérifié n’est disponible dans les données actuelles. Ouvrez Travel Emergency Mode pour l’option la plus sûre.',
+    consularAnswer:
+      'Utilisez Travel Emergency Mode ci-dessous pour l’aide d’ambassade et de passeport perdu. Il sépare les données d’annuaire du fournisseur de la vérification officielle et n’invente pas les exigences de passeport.',
+    openEmergency: 'Ouvrir Travel Emergency Mode',
+    phrasebookSource: 'Référence de phrases AttraVoya',
+    emergencySource: 'Référence d’urgence vérifiée',
+    noModel: 'Aucun modèle d’IA général n’est utilisé pour ces réponses.',
+  },
+  de: {
+    eyebrow: 'Datengestützter Reiseassistent',
+    title: 'Mit vertrauenswürdigen Reisedaten fragen',
+    intro:
+      'Frage nach unterstützten lokalen Sprachen, nützlichen Sätzen oder verifizierten Notfallkontakten. Diese Version nutzt kein allgemeines KI-Modell und erfindet keine unbelegten Fakten.',
+    destination: 'Ziel des Assistenten',
+    destinationHint: 'Wähle das aktuelle Reiseziel, damit Antworten auf ein Land begrenzt bleiben.',
+    placeholder: 'Eine Reisefrage stellen…',
+    ask: 'Fragen',
+    clear: 'Unterhaltung löschen',
+    empty: 'Deine datengestützten Antworten erscheinen hier.',
+    sessionOnly:
+      'Die Unterhaltung bleibt in dieser Browsersitzung und wird von dieser Funktion nicht gespeichert.',
+    trustedOnly: 'Nur vertrauenswürdige Daten',
+    source: 'Quelle',
+    verified: 'Verifiziert',
+    selectDestination: 'Wähle ein Reiseziel, bevor du diese Frage stellst.',
+    loadingReference: 'Zielreferenz wird geladen…',
+    referenceUnavailable:
+      'Die Zielreferenz konnte nicht geladen werden; daher wurde keine Antwort erfunden.',
+    unsupported:
+      'Das kann ich mit den in dieser Version verfügbaren vertrauenswürdigen Reisedaten nicht beantworten. Frage nach Sprache, nützlichen Sätzen, Notfällen, Botschaft oder Reisepass.',
+    languagePrompt: 'Welche lokale Sprache sollte ich verwenden?',
+    phrasePrompt: 'Zeige mir nützliche Sätze',
+    emergencyPrompt: 'Welche Notfallkontakte sind verifiziert?',
+    passportPrompt: 'Ich habe meinen Pass verloren. Wo finde ich Botschaftshilfe?',
+    languageAnswer: (country, languages) =>
+      `Für ${country} werden folgende Zielsprachen unterstützt: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Diese nützlichen englischen Sätze sind für ${country} verfügbar:`,
+    emergencyAnswer: (country) =>
+      `Diese verifizierten landesweiten Notfallkontakte sind für ${country} verfügbar:`,
+    emergencyUnavailable:
+      'In den aktuellen Referenzdaten ist kein verifizierter landesweiter Notfallkontakt verfügbar. Öffne den Travel Emergency Mode für die sicherste Alternative.',
+    consularAnswer:
+      'Nutze unten den Travel Emergency Mode für Botschafts- und Passverlusthilfe. Anbieter-Verzeichnisdaten bleiben von offizieller Behördenverifizierung getrennt und Passanforderungen werden nicht erfunden.',
+    openEmergency: 'Travel Emergency Mode öffnen',
+    phrasebookSource: 'AttraVoya-Phrasenreferenz',
+    emergencySource: 'Verifizierte Notfallreferenz',
+    noModel: 'Für diese Antworten wird kein allgemeines KI-Modell verwendet.',
+  },
+  it: {
+    eyebrow: 'Assistente di viaggio basato su dati',
+    title: 'Chiedi usando dati di viaggio affidabili',
+    intro:
+      'Chiedi informazioni sulle lingue locali supportate, frasi utili o contatti di emergenza verificati. Questa versione non usa un modello IA generale e non inventa fatti non supportati.',
+    destination: 'Destinazione dell’assistente',
+    destinationHint:
+      'Scegli la destinazione attuale per mantenere le risposte limitate a un solo Paese.',
+    placeholder: 'Fai una domanda di viaggio…',
+    ask: 'Chiedi',
+    clear: 'Cancella conversazione',
+    empty: 'Le risposte basate sui dati appariranno qui.',
+    sessionOnly:
+      'La conversazione resta in questa sessione del browser e non viene salvata da questa funzione.',
+    trustedOnly: 'Solo dati affidabili',
+    source: 'Fonte',
+    verified: 'Verificato',
+    selectDestination: 'Scegli una destinazione prima di fare questa domanda.',
+    loadingReference: 'Caricamento del riferimento della destinazione…',
+    referenceUnavailable:
+      'Il riferimento della destinazione non è stato caricato, quindi non è stata inventata una risposta.',
+    unsupported:
+      'Non posso rispondere usando i dati di viaggio affidabili disponibili in questa versione. Prova una domanda su lingua, frasi utili, emergenze, ambasciata o passaporto.',
+    languagePrompt: 'Quale lingua locale dovrei usare?',
+    phrasePrompt: 'Mostrami frasi utili',
+    emergencyPrompt: 'Quali contatti di emergenza sono verificati?',
+    passportPrompt: 'Ho perso il passaporto. Dove trovo aiuto dell’ambasciata?',
+    languageAnswer: (country, languages) =>
+      `Per ${country}, le lingue di destinazione supportate sono: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Ecco frasi utili in inglese disponibili per ${country}:`,
+    emergencyAnswer: (country) =>
+      `Questi contatti di emergenza nazionali verificati sono disponibili per ${country}:`,
+    emergencyUnavailable:
+      'Nei dati attuali non è disponibile un contatto di emergenza nazionale verificato. Apri Travel Emergency Mode per l’alternativa più sicura.',
+    consularAnswer:
+      'Usa Travel Emergency Mode qui sotto per assistenza con ambasciata e passaporto smarrito. Mantiene separati i dati di directory del provider dalla verifica ufficiale e non inventa requisiti del passaporto.',
+    openEmergency: 'Apri Travel Emergency Mode',
+    phrasebookSource: 'Riferimento frasi AttraVoya',
+    emergencySource: 'Riferimento di emergenza verificato',
+    noModel: 'Queste risposte non usano un modello IA generale.',
+  },
+  pt: {
+    eyebrow: 'Assistente de viagem baseado em dados',
+    title: 'Pergunte com dados de viagem fiáveis',
+    intro:
+      'Pergunte sobre idiomas locais suportados, frases úteis ou contactos de emergência verificados. Esta versão não usa um modelo geral de IA e não inventa factos sem suporte.',
+    destination: 'Destino do assistente',
+    destinationHint: 'Escolha o destino atual para manter as respostas limitadas a um país.',
+    placeholder: 'Faça uma pergunta de viagem…',
+    ask: 'Perguntar',
+    clear: 'Limpar conversa',
+    empty: 'As respostas baseadas em dados aparecerão aqui.',
+    sessionOnly:
+      'A conversa permanece nesta sessão do navegador e não é guardada por esta funcionalidade.',
+    trustedOnly: 'Apenas dados fiáveis',
+    source: 'Fonte',
+    verified: 'Verificado',
+    selectDestination: 'Escolha um destino antes de fazer esta pergunta.',
+    loadingReference: 'A carregar referência do destino…',
+    referenceUnavailable:
+      'A referência do destino não pôde ser carregada, por isso nenhuma resposta foi inventada.',
+    unsupported:
+      'Não consigo responder com os dados de viagem fiáveis disponíveis nesta versão. Tente uma pergunta sobre idioma, frases úteis, emergência, embaixada ou passaporte.',
+    languagePrompt: 'Que idioma local devo usar?',
+    phrasePrompt: 'Mostre frases úteis',
+    emergencyPrompt: 'Que contactos de emergência estão verificados?',
+    passportPrompt: 'Perdi o passaporte. Onde encontro ajuda da embaixada?',
+    languageAnswer: (country, languages) =>
+      `Para ${country}, os idiomas de destino suportados são: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Estas frases úteis em inglês estão disponíveis para ${country}:`,
+    emergencyAnswer: (country) =>
+      `Estes contactos de emergência nacionais verificados estão disponíveis para ${country}:`,
+    emergencyUnavailable:
+      'Não existe contacto de emergência nacional verificado nos dados atuais. Abra Travel Emergency Mode para a alternativa mais segura.',
+    consularAnswer:
+      'Use Travel Emergency Mode abaixo para ajuda de embaixada e passaporte perdido. Os dados de diretório do fornecedor ficam separados da verificação oficial e os requisitos de passaporte não são inventados.',
+    openEmergency: 'Abrir Travel Emergency Mode',
+    phrasebookSource: 'Referência de frases AttraVoya',
+    emergencySource: 'Referência de emergência verificada',
+    noModel: 'Estas respostas não usam um modelo geral de IA.',
+  },
+  pl: {
+    eyebrow: 'Asystent podróży oparty na danych',
+    title: 'Pytaj na podstawie zaufanych danych podróżnych',
+    intro:
+      'Pytaj o obsługiwane lokalne języki, przydatne zwroty lub zweryfikowane kontakty alarmowe. Ta wersja nie używa ogólnego modelu AI i nie zgaduje niepotwierdzonych faktów.',
+    destination: 'Cel asystenta',
+    destinationHint: 'Wybierz bieżący cel podróży, aby odpowiedzi dotyczyły jednego kraju.',
+    placeholder: 'Zadaj pytanie podróżne…',
+    ask: 'Zapytaj',
+    clear: 'Wyczyść rozmowę',
+    empty: 'Tutaj pojawią się odpowiedzi oparte na danych.',
+    sessionOnly:
+      'Rozmowa pozostaje w tej sesji przeglądarki i nie jest zapisywana przez tę funkcję.',
+    trustedOnly: 'Tylko zaufane dane',
+    source: 'Źródło',
+    verified: 'Zweryfikowano',
+    selectDestination: 'Wybierz cel podróży przed zadaniem tego pytania.',
+    loadingReference: 'Ładowanie danych celu…',
+    referenceUnavailable:
+      'Nie udało się wczytać danych celu, więc odpowiedź nie została wymyślona.',
+    unsupported:
+      'Nie mogę odpowiedzieć na podstawie zaufanych danych dostępnych w tej wersji. Zapytaj o język, przydatne zwroty, sytuację awaryjną, ambasadę lub paszport.',
+    languagePrompt: 'Jakiego lokalnego języka mam używać?',
+    phrasePrompt: 'Pokaż przydatne zwroty',
+    emergencyPrompt: 'Które kontakty alarmowe są zweryfikowane?',
+    passportPrompt: 'Zgubiłem paszport. Gdzie znajdę pomoc ambasady?',
+    languageAnswer: (country, languages) =>
+      `Dla ${country} obsługiwane języki docelowe to: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Te przydatne angielskie zwroty są dostępne dla ${country}:`,
+    emergencyAnswer: (country) =>
+      `Te zweryfikowane ogólnokrajowe kontakty alarmowe są dostępne dla ${country}:`,
+    emergencyUnavailable:
+      'W bieżących danych nie ma zweryfikowanego ogólnokrajowego kontaktu alarmowego. Otwórz Travel Emergency Mode, aby skorzystać z najbezpieczniejszej alternatywy.',
+    consularAnswer:
+      'Użyj Travel Emergency Mode poniżej, aby uzyskać pomoc ambasady i w razie zgubienia paszportu. Dane katalogowe dostawcy są oddzielone od oficjalnej weryfikacji, a wymagania paszportowe nie są wymyślane.',
+    openEmergency: 'Otwórz Travel Emergency Mode',
+    phrasebookSource: 'Baza zwrotów AttraVoya',
+    emergencySource: 'Zweryfikowana baza alarmowa',
+    noModel: 'Te odpowiedzi nie korzystają z ogólnego modelu AI.',
+  },
+  nl: {
+    eyebrow: 'Datagebaseerde reisassistent',
+    title: 'Vraag met betrouwbare reisgegevens',
+    intro:
+      'Vraag naar ondersteunde lokale talen, nuttige zinnen of geverifieerde noodcontacten. Deze versie gebruikt geen algemeen AI-model en verzint geen onbevestigde feiten.',
+    destination: 'Bestemming van de assistent',
+    destinationHint: 'Kies de huidige bestemming zodat antwoorden tot één land beperkt blijven.',
+    placeholder: 'Stel een reisvraag…',
+    ask: 'Vraag',
+    clear: 'Gesprek wissen',
+    empty: 'Je datagebaseerde antwoorden verschijnen hier.',
+    sessionOnly:
+      'Het gesprek blijft in deze browsersessie en wordt niet door deze functie opgeslagen.',
+    trustedOnly: 'Alleen betrouwbare gegevens',
+    source: 'Bron',
+    verified: 'Geverifieerd',
+    selectDestination: 'Kies een bestemming voordat je deze vraag stelt.',
+    loadingReference: 'Bestemmingsreferentie laden…',
+    referenceUnavailable:
+      'De bestemmingsreferentie kon niet worden geladen, dus er is geen antwoord verzonnen.',
+    unsupported:
+      'Ik kan dat niet beantwoorden met de betrouwbare reisgegevens in deze versie. Vraag naar taal, nuttige zinnen, noodgevallen, ambassade of paspoort.',
+    languagePrompt: 'Welke lokale taal moet ik gebruiken?',
+    phrasePrompt: 'Toon nuttige zinnen',
+    emergencyPrompt: 'Welke noodcontacten zijn geverifieerd?',
+    passportPrompt: 'Ik ben mijn paspoort kwijt. Waar vind ik ambassadehulp?',
+    languageAnswer: (country, languages) =>
+      `Voor ${country} zijn de ondersteunde bestemmingstalen: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Deze nuttige Engelse zinnen zijn beschikbaar voor ${country}:`,
+    emergencyAnswer: (country) =>
+      `Deze geverifieerde landelijke noodcontacten zijn beschikbaar voor ${country}:`,
+    emergencyUnavailable:
+      'Er is geen geverifieerd landelijk noodcontact in de huidige referentiegegevens. Open Travel Emergency Mode voor de veiligste optie.',
+    consularAnswer:
+      'Gebruik Travel Emergency Mode hieronder voor ambassade- en verloren-paspoorthulp. Provider-directorygegevens blijven gescheiden van officiële verificatie en paspoortvereisten worden niet verzonnen.',
+    openEmergency: 'Travel Emergency Mode openen',
+    phrasebookSource: 'AttraVoya-zinnenreferentie',
+    emergencySource: 'Geverifieerde noodreferentie',
+    noModel: 'Voor deze antwoorden wordt geen algemeen AI-model gebruikt.',
+  },
+  no: {
+    eyebrow: 'Databasert reiseassistent',
+    title: 'Spør med pålitelige reisedata',
+    intro:
+      'Spør om støttede lokale språk, nyttige fraser eller verifiserte nødkontakter. Denne versjonen bruker ingen generell KI-modell og gjetter ikke fakta uten støtte.',
+    destination: 'Assistentens reisemål',
+    destinationHint: 'Velg gjeldende reisemål slik at svarene avgrenses til ett land.',
+    placeholder: 'Still et reisespørsmål…',
+    ask: 'Spør',
+    clear: 'Tøm samtalen',
+    empty: 'Databaserte svar vises her.',
+    sessionOnly: 'Samtalen forblir i denne nettleserøkten og lagres ikke av denne funksjonen.',
+    trustedOnly: 'Kun pålitelige data',
+    source: 'Kilde',
+    verified: 'Verifisert',
+    selectDestination: 'Velg et reisemål før du stiller dette spørsmålet.',
+    loadingReference: 'Laster reisemålsreferanse…',
+    referenceUnavailable:
+      'Reisemålsreferansen kunne ikke lastes, så det ble ikke funnet på et svar.',
+    unsupported:
+      'Jeg kan ikke svare på det med de pålitelige reisedataene i denne versjonen. Spør om språk, nyttige fraser, nødsituasjon, ambassade eller pass.',
+    languagePrompt: 'Hvilket lokalt språk bør jeg bruke?',
+    phrasePrompt: 'Vis nyttige fraser',
+    emergencyPrompt: 'Hvilke nødkontakter er verifisert?',
+    passportPrompt: 'Jeg har mistet passet. Hvor finner jeg ambassadehjelp?',
+    languageAnswer: (country, languages) =>
+      `For ${country} er støttede målspråk: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Disse nyttige engelske frasene er tilgjengelige for ${country}:`,
+    emergencyAnswer: (country) =>
+      `Disse verifiserte landsdekkende nødkontaktene er tilgjengelige for ${country}:`,
+    emergencyUnavailable:
+      'Ingen verifisert landsdekkende nødkontakt finnes i gjeldende referansedata. Åpne Travel Emergency Mode for det sikreste alternativet.',
+    consularAnswer:
+      'Bruk Travel Emergency Mode nedenfor for ambassade- og mistet-pass-hjelp. Leverandørens katalogdata holdes atskilt fra offisiell verifisering, og passkrav blir ikke funnet på.',
+    openEmergency: 'Åpne Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya frasereferanse',
+    emergencySource: 'Verifisert nødreferanse',
+    noModel: 'Ingen generell KI-modell brukes for disse svarene.',
+  },
+  da: {
+    eyebrow: 'Databaseret rejseassistent',
+    title: 'Spørg med pålidelige rejsedata',
+    intro:
+      'Spørg om understøttede lokale sprog, nyttige sætninger eller verificerede nødkontakter. Denne version bruger ingen generel AI-model og gætter ikke på fakta uden belæg.',
+    destination: 'Assistentens destination',
+    destinationHint: 'Vælg den aktuelle destination, så svarene afgrænses til ét land.',
+    placeholder: 'Stil et rejsespørgsmål…',
+    ask: 'Spørg',
+    clear: 'Ryd samtale',
+    empty: 'Dine databaserede svar vises her.',
+    sessionOnly: 'Samtalen forbliver i denne browsersession og gemmes ikke af denne funktion.',
+    trustedOnly: 'Kun pålidelige data',
+    source: 'Kilde',
+    verified: 'Verificeret',
+    selectDestination: 'Vælg en destination, før du stiller spørgsmålet.',
+    loadingReference: 'Indlæser destinationsreference…',
+    referenceUnavailable:
+      'Destinationsreferencen kunne ikke indlæses, så der blev ikke opfundet et svar.',
+    unsupported:
+      'Jeg kan ikke besvare det ud fra de pålidelige rejsedata i denne version. Spørg om sprog, nyttige sætninger, nødsituation, ambassade eller pas.',
+    languagePrompt: 'Hvilket lokalt sprog bør jeg bruge?',
+    phrasePrompt: 'Vis nyttige sætninger',
+    emergencyPrompt: 'Hvilke nødkontakter er verificerede?',
+    passportPrompt: 'Jeg har mistet mit pas. Hvor finder jeg ambassadehjælp?',
+    languageAnswer: (country, languages) =>
+      `For ${country} er de understøttede destinationssprog: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `Disse nyttige engelske sætninger er tilgængelige for ${country}:`,
+    emergencyAnswer: (country) =>
+      `Disse verificerede landsdækkende nødkontakter er tilgængelige for ${country}:`,
+    emergencyUnavailable:
+      'Der findes ingen verificeret landsdækkende nødkontakt i de aktuelle referencedata. Åbn Travel Emergency Mode for det sikreste alternativ.',
+    consularAnswer:
+      'Brug Travel Emergency Mode nedenfor til ambassade- og mistet-pas-hjælp. Leverandørens katalogdata holdes adskilt fra officiel verifikation, og paskrav opfindes ikke.',
+    openEmergency: 'Åbn Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya-sætningsreference',
+    emergencySource: 'Verificeret nødreference',
+    noModel: 'Ingen generel AI-model bruges til disse svar.',
+  },
+  fi: {
+    eyebrow: 'Tietoon perustuva matka-avustaja',
+    title: 'Kysy luotettavien matkatietojen avulla',
+    intro:
+      'Kysy tuetuista paikallisista kielistä, hyödyllisistä fraaseista tai vahvistetuista hätäyhteystiedoista. Tämä versio ei käytä yleistä tekoälymallia eikä arvaa tukemattomia faktoja.',
+    destination: 'Avustajan kohde',
+    destinationHint: 'Valitse nykyinen kohde, jotta vastaukset rajataan yhteen maahan.',
+    placeholder: 'Kysy matkakysymys…',
+    ask: 'Kysy',
+    clear: 'Tyhjennä keskustelu',
+    empty: 'Tietoon perustuvat vastauksesi näkyvät täällä.',
+    sessionOnly: 'Keskustelu säilyy tässä selainistunnossa eikä tämä toiminto tallenna sitä.',
+    trustedOnly: 'Vain luotettavat tiedot',
+    source: 'Lähde',
+    verified: 'Vahvistettu',
+    selectDestination: 'Valitse kohde ennen tämän kysymyksen esittämistä.',
+    loadingReference: 'Ladataan kohteen viitetietoja…',
+    referenceUnavailable: 'Kohteen viitetietoja ei voitu ladata, joten vastausta ei keksitty.',
+    unsupported:
+      'En voi vastata siihen tämän version luotettavien matkatietojen perusteella. Kysy kielestä, hyödyllisistä fraaseista, hätätilanteesta, suurlähetystöstä tai passista.',
+    languagePrompt: 'Mitä paikallista kieltä minun pitäisi käyttää?',
+    phrasePrompt: 'Näytä hyödyllisiä fraaseja',
+    emergencyPrompt: 'Mitkä hätäyhteystiedot on vahvistettu?',
+    passportPrompt: 'Kadotin passini. Mistä saan suurlähetystöapua?',
+    languageAnswer: (country, languages) =>
+      `Kohteessa ${country} tuetut kohdekielet ovat: ${languages.join(', ')}.`,
+    phraseAnswer: (country) =>
+      `Nämä hyödylliset englanninkieliset fraasit ovat saatavilla kohteelle ${country}:`,
+    emergencyAnswer: (country) =>
+      `Nämä vahvistetut valtakunnalliset hätäyhteystiedot ovat saatavilla kohteelle ${country}:`,
+    emergencyUnavailable:
+      'Nykyisissä viitetiedoissa ei ole vahvistettua valtakunnallista hätäyhteystietoa. Avaa Travel Emergency Mode turvallisinta vaihtoehtoa varten.',
+    consularAnswer:
+      'Käytä alla olevaa Travel Emergency Mode -osiota suurlähetystö- ja kadonneen passin apuun. Palveluntarjoajan hakemistotiedot pidetään erillään virallisesta vahvistuksesta eikä passivaatimuksia keksitä.',
+    openEmergency: 'Avaa Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya-fraasiviite',
+    emergencySource: 'Vahvistettu hätäviite',
+    noModel: 'Näissä vastauksissa ei käytetä yleistä tekoälymallia.',
+  },
+  tr: {
+    eyebrow: 'Veriye dayalı seyahat asistanı',
+    title: 'Güvenilir seyahat verileriyle sorun',
+    intro:
+      'Desteklenen yerel diller, yararlı ifadeler veya doğrulanmış acil durum irtibatları hakkında sorun. Bu sürüm genel bir yapay zekâ modeli kullanmaz ve desteklenmeyen bilgileri tahmin etmez.',
+    destination: 'Asistan hedefi',
+    destinationHint: 'Yanıtları tek ülkeyle sınırlamak için mevcut hedefi seçin.',
+    placeholder: 'Bir seyahat sorusu sorun…',
+    ask: 'Sor',
+    clear: 'Konuşmayı temizle',
+    empty: 'Veriye dayalı yanıtlarınız burada görünecek.',
+    sessionOnly: 'Konuşma bu tarayıcı oturumunda kalır ve bu özellik tarafından kaydedilmez.',
+    trustedOnly: 'Yalnızca güvenilir veri',
+    source: 'Kaynak',
+    verified: 'Doğrulandı',
+    selectDestination: 'Bu soruyu sormadan önce bir hedef seçin.',
+    loadingReference: 'Hedef referansı yükleniyor…',
+    referenceUnavailable: 'Hedef referansı yüklenemedi; bu nedenle bir yanıt uydurulmadı.',
+    unsupported:
+      'Bu sürümdeki güvenilir seyahat verileriyle bunu yanıtlayamıyorum. Dil, yararlı ifadeler, acil durum, büyükelçilik veya pasaport hakkında sorun.',
+    languagePrompt: 'Hangi yerel dili kullanmalıyım?',
+    phrasePrompt: 'Yararlı ifadeleri göster',
+    emergencyPrompt: 'Hangi acil durum irtibatları doğrulandı?',
+    passportPrompt: 'Pasaportumu kaybettim. Büyükelçilik yardımını nerede bulabilirim?',
+    languageAnswer: (country, languages) =>
+      `${country} için desteklenen hedef diller: ${languages.join(', ')}.`,
+    phraseAnswer: (country) => `${country} için şu yararlı İngilizce ifadeler mevcuttur:`,
+    emergencyAnswer: (country) =>
+      `${country} için şu doğrulanmış ülke çapındaki acil durum irtibatları mevcuttur:`,
+    emergencyUnavailable:
+      'Mevcut referans verilerinde doğrulanmış ülke çapında bir acil durum irtibatı yok. En güvenli alternatif için Travel Emergency Mode’u açın.',
+    consularAnswer:
+      'Büyükelçilik ve kayıp pasaport yardımı için aşağıdaki Travel Emergency Mode’u kullanın. Sağlayıcı dizin verileri resmi doğrulamadan ayrı tutulur ve pasaport gereksinimleri uydurulmaz.',
+    openEmergency: 'Travel Emergency Mode’u aç',
+    phrasebookSource: 'AttraVoya ifade referansı',
+    emergencySource: 'Doğrulanmış acil durum referansı',
+    noModel: 'Bu yanıtlar için genel bir yapay zekâ modeli kullanılmaz.',
+  },
+  ar: {
+    eyebrow: 'مساعد سفر قائم على بيانات موثوقة',
+    title: 'اسأل باستخدام بيانات سفر موثوقة',
+    intro:
+      'اسأل عن اللغات المحلية المدعومة أو العبارات المفيدة أو جهات اتصال الطوارئ الموثقة. لا يستخدم هذا الإصدار نموذج ذكاء اصطناعي عامًا ولا يخمّن معلومات غير مدعومة.',
+    destination: 'وجهة المساعد',
+    destinationHint: 'اختر الوجهة الحالية حتى تظل الإجابات ضمن بلد واحد.',
+    placeholder: 'اطرح سؤالًا عن السفر…',
+    ask: 'اسأل',
+    clear: 'مسح المحادثة',
+    empty: 'ستظهر إجاباتك القائمة على البيانات هنا.',
+    sessionOnly: 'تبقى المحادثة في جلسة المتصفح هذه ولا تحفظها هذه الميزة.',
+    trustedOnly: 'بيانات موثوقة فقط',
+    source: 'المصدر',
+    verified: 'تم التحقق',
+    selectDestination: 'اختر وجهة قبل طرح هذا السؤال.',
+    loadingReference: 'جارٍ تحميل مرجع الوجهة…',
+    referenceUnavailable: 'تعذر تحميل مرجع الوجهة، لذلك لم يتم اختلاق إجابة.',
+    unsupported:
+      'لا يمكنني الإجابة عن ذلك من بيانات السفر الموثوقة المتاحة في هذا الإصدار. جرّب سؤالًا عن اللغة أو العبارات المفيدة أو الطوارئ أو السفارة أو جواز السفر.',
+    languagePrompt: 'ما اللغة المحلية التي ينبغي أن أستخدمها؟',
+    phrasePrompt: 'اعرض عبارات مفيدة',
+    emergencyPrompt: 'ما جهات اتصال الطوارئ التي تم التحقق منها؟',
+    passportPrompt: 'فقدت جواز سفري. أين أجد مساعدة السفارة؟',
+    languageAnswer: (country, languages) =>
+      `اللغات المدعومة للوجهة ${country} هي: ${languages.join('، ')}.`,
+    phraseAnswer: (country) => `هذه عبارات إنجليزية مفيدة متاحة للوجهة ${country}:`,
+    emergencyAnswer: (country) =>
+      `جهات اتصال الطوارئ الوطنية الموثقة التالية متاحة للوجهة ${country}:`,
+    emergencyUnavailable:
+      'لا توجد جهة اتصال طوارئ وطنية موثقة في البيانات المرجعية الحالية. افتح Travel Emergency Mode للحصول على البديل الأكثر أمانًا.',
+    consularAnswer:
+      'استخدم Travel Emergency Mode أدناه لمساعدة السفارة وفقدان جواز السفر. تُفصل بيانات دليل المزود عن التحقق الحكومي الرسمي ولا يتم اختلاق متطلبات جواز السفر.',
+    openEmergency: 'فتح Travel Emergency Mode',
+    phrasebookSource: 'مرجع عبارات AttraVoya',
+    emergencySource: 'مرجع طوارئ موثق',
+    noModel: 'لا يُستخدم نموذج ذكاء اصطناعي عام لهذه الإجابات.',
+  },
+  zh: {
+    eyebrow: '基于可信数据的旅行助手',
+    title: '使用可信旅行数据提问',
+    intro:
+      '可询问支持的当地语言、实用短语或已核实的紧急联系方式。本版本不使用通用 AI 模型，也不会猜测没有依据的信息。',
+    destination: '助手目的地',
+    destinationHint: '选择当前目的地，使回答始终限定在一个国家。',
+    placeholder: '提出旅行问题…',
+    ask: '提问',
+    clear: '清除对话',
+    empty: '基于数据的回答会显示在这里。',
+    sessionOnly: '对话仅保留在当前浏览器会话中，此功能不会保存。',
+    trustedOnly: '仅使用可信数据',
+    source: '来源',
+    verified: '已核实',
+    selectDestination: '请先选择目的地再提问。',
+    loadingReference: '正在加载目的地参考数据…',
+    referenceUnavailable: '无法加载目的地参考数据，因此没有编造回答。',
+    unsupported:
+      '当前版本的可信旅行数据无法回答该问题。请尝试询问语言、实用短语、紧急情况、使馆或护照。',
+    languagePrompt: '我应该使用哪种当地语言？',
+    phrasePrompt: '显示实用短语',
+    emergencyPrompt: '哪些紧急联系方式已核实？',
+    passportPrompt: '我的护照丢了。在哪里找使馆帮助？',
+    languageAnswer: (country, languages) =>
+      `${country} 支持的目的地语言为：${languages.join('、')}。`,
+    phraseAnswer: (country) => `以下是 ${country} 可用的实用英语短语：`,
+    emergencyAnswer: (country) => `${country} 可用的已核实全国紧急联系方式如下：`,
+    emergencyUnavailable:
+      '当前参考数据中没有已核实的全国紧急联系方式。请打开 Travel Emergency Mode 获取最安全的替代方案。',
+    consularAnswer:
+      '请使用下方的 Travel Emergency Mode 获取使馆和护照丢失帮助。它会将服务商目录数据与政府官方核实信息分开，并且不会编造护照要求。',
+    openEmergency: '打开 Travel Emergency Mode',
+    phrasebookSource: 'AttraVoya 短语参考',
+    emergencySource: '已核实紧急参考',
+    noModel: '这些回答不使用通用 AI 模型。',
+  },
+  ja: {
+    eyebrow: '信頼できるデータに基づく旅行アシスタント',
+    title: '信頼できる旅行データで質問',
+    intro:
+      '対応している現地言語、便利なフレーズ、確認済みの緊急連絡先について質問できます。このリリースは汎用 AI モデルを使用せず、裏付けのない情報を推測しません。',
+    destination: 'アシスタントの目的地',
+    destinationHint: '現在の目的地を選び、回答を1か国に限定します。',
+    placeholder: '旅行について質問…',
+    ask: '質問する',
+    clear: '会話を消去',
+    empty: 'データに基づく回答がここに表示されます。',
+    sessionOnly: '会話はこのブラウザーセッション内だけに残り、この機能では保存されません。',
+    trustedOnly: '信頼できるデータのみ',
+    source: '情報源',
+    verified: '確認済み',
+    selectDestination: '質問する前に目的地を選んでください。',
+    loadingReference: '目的地の参照データを読み込み中…',
+    referenceUnavailable: '目的地の参照データを読み込めなかったため、回答は作りませんでした。',
+    unsupported:
+      'このリリースで利用できる信頼済み旅行データからは回答できません。言語、便利なフレーズ、緊急時、大使館、パスポートについて質問してください。',
+    languagePrompt: 'どの現地言語を使えばよいですか？',
+    phrasePrompt: '便利なフレーズを見せて',
+    emergencyPrompt: '確認済みの緊急連絡先は？',
+    passportPrompt: 'パスポートをなくしました。大使館の助けはどこですか？',
+    languageAnswer: (country, languages) =>
+      `${country} で対応している目的地言語は ${languages.join('、')} です。`,
+    phraseAnswer: (country) => `${country} で利用できる便利な英語フレーズです：`,
+    emergencyAnswer: (country) => `${country} で利用できる確認済みの全国緊急連絡先です：`,
+    emergencyUnavailable:
+      '現在の参照データには確認済みの全国緊急連絡先がありません。最も安全な代替手段として Travel Emergency Mode を開いてください。',
+    consularAnswer:
+      '大使館やパスポート紛失の支援には下の Travel Emergency Mode を使ってください。提供者のディレクトリ情報と政府の公式確認情報を分け、パスポート要件を作りません。',
+    openEmergency: 'Travel Emergency Mode を開く',
+    phrasebookSource: 'AttraVoya フレーズ参照',
+    emergencySource: '確認済み緊急参照',
+    noModel: 'これらの回答では汎用 AI モデルを使用しません。',
+  },
+  ko: {
+    eyebrow: '신뢰 데이터 기반 여행 도우미',
+    title: '신뢰할 수 있는 여행 데이터로 질문하세요',
+    intro:
+      '지원되는 현지 언어, 유용한 문구 또는 확인된 긴급 연락처를 물어보세요. 이 버전은 범용 AI 모델을 사용하지 않으며 근거 없는 사실을 추측하지 않습니다.',
+    destination: '도우미 목적지',
+    destinationHint: '현재 목적지를 선택하여 답변을 한 국가로 제한하세요.',
+    placeholder: '여행 질문을 입력하세요…',
+    ask: '질문',
+    clear: '대화 지우기',
+    empty: '데이터에 근거한 답변이 여기에 표시됩니다.',
+    sessionOnly: '대화는 현재 브라우저 세션에만 남으며 이 기능은 저장하지 않습니다.',
+    trustedOnly: '신뢰 데이터만 사용',
+    source: '출처',
+    verified: '확인됨',
+    selectDestination: '질문하기 전에 목적지를 선택하세요.',
+    loadingReference: '목적지 참조 데이터를 불러오는 중…',
+    referenceUnavailable: '목적지 참조 데이터를 불러오지 못해 답변을 만들어내지 않았습니다.',
+    unsupported:
+      '이 버전에서 제공하는 신뢰할 수 있는 여행 데이터로는 답할 수 없습니다. 언어, 유용한 문구, 긴급 상황, 대사관 또는 여권에 대해 질문하세요.',
+    languagePrompt: '어떤 현지 언어를 사용해야 하나요?',
+    phrasePrompt: '유용한 문구 보여줘',
+    emergencyPrompt: '확인된 긴급 연락처는 무엇인가요?',
+    passportPrompt: '여권을 잃어버렸어요. 대사관 도움은 어디서 받나요?',
+    languageAnswer: (country, languages) =>
+      `${country}에서 지원되는 목적지 언어는 ${languages.join(', ')}입니다.`,
+    phraseAnswer: (country) => `${country}에서 사용할 수 있는 유용한 영어 문구입니다:`,
+    emergencyAnswer: (country) => `${country}에서 사용할 수 있는 확인된 전국 긴급 연락처입니다:`,
+    emergencyUnavailable:
+      '현재 참조 데이터에는 확인된 전국 긴급 연락처가 없습니다. 가장 안전한 대안을 위해 Travel Emergency Mode를 여세요.',
+    consularAnswer:
+      '대사관 및 여권 분실 도움은 아래 Travel Emergency Mode를 이용하세요. 제공자 디렉터리 데이터와 정부 공식 확인을 분리하고 여권 요구사항을 만들어내지 않습니다.',
+    openEmergency: 'Travel Emergency Mode 열기',
+    phrasebookSource: 'AttraVoya 문구 참조',
+    emergencySource: '확인된 긴급 참조',
+    noModel: '이 답변에는 범용 AI 모델을 사용하지 않습니다.',
+  },
+  hi: {
+    eyebrow: 'विश्वसनीय डेटा आधारित यात्रा सहायक',
+    title: 'विश्वसनीय यात्रा डेटा से पूछें',
+    intro:
+      'समर्थित स्थानीय भाषाओं, उपयोगी वाक्यों या सत्यापित आपातकालीन संपर्कों के बारे में पूछें। यह संस्करण सामान्य AI मॉडल का उपयोग नहीं करता और बिना आधार के तथ्य नहीं गढ़ता।',
+    destination: 'सहायक का गंतव्य',
+    destinationHint: 'वर्तमान गंतव्य चुनें ताकि उत्तर एक देश तक सीमित रहें।',
+    placeholder: 'यात्रा से जुड़ा सवाल पूछें…',
+    ask: 'पूछें',
+    clear: 'बातचीत साफ़ करें',
+    empty: 'डेटा आधारित उत्तर यहाँ दिखाई देंगे।',
+    sessionOnly: 'बातचीत इसी ब्राउज़र सत्र में रहती है और यह सुविधा इसे सहेजती नहीं है।',
+    trustedOnly: 'केवल विश्वसनीय डेटा',
+    source: 'स्रोत',
+    verified: 'सत्यापित',
+    selectDestination: 'यह सवाल पूछने से पहले गंतव्य चुनें।',
+    loadingReference: 'गंतव्य संदर्भ लोड हो रहा है…',
+    referenceUnavailable: 'गंतव्य संदर्भ लोड नहीं हुआ, इसलिए कोई उत्तर गढ़ा नहीं गया।',
+    unsupported:
+      'इस संस्करण में उपलब्ध विश्वसनीय यात्रा डेटा से मैं इसका उत्तर नहीं दे सकता। भाषा, उपयोगी वाक्य, आपातकाल, दूतावास या पासपोर्ट के बारे में पूछें।',
+    languagePrompt: 'मुझे कौन-सी स्थानीय भाषा इस्तेमाल करनी चाहिए?',
+    phrasePrompt: 'उपयोगी वाक्य दिखाएँ',
+    emergencyPrompt: 'कौन-से आपातकालीन संपर्क सत्यापित हैं?',
+    passportPrompt: 'मेरा पासपोर्ट खो गया है। दूतावास की मदद कहाँ मिलेगी?',
+    languageAnswer: (country, languages) =>
+      `${country} के लिए समर्थित गंतव्य भाषाएँ हैं: ${languages.join(', ')}।`,
+    phraseAnswer: (country) => `${country} के लिए उपलब्ध उपयोगी अंग्रेज़ी वाक्य:`,
+    emergencyAnswer: (country) => `${country} के लिए उपलब्ध सत्यापित देशव्यापी आपातकालीन संपर्क:`,
+    emergencyUnavailable:
+      'मौजूदा संदर्भ डेटा में कोई सत्यापित देशव्यापी आपातकालीन संपर्क उपलब्ध नहीं है। सबसे सुरक्षित विकल्प के लिए Travel Emergency Mode खोलें।',
+    consularAnswer:
+      'दूतावास और खोए हुए पासपोर्ट की मदद के लिए नीचे Travel Emergency Mode का उपयोग करें। इसमें प्रदाता डायरेक्टरी डेटा को सरकारी आधिकारिक सत्यापन से अलग रखा जाता है और पासपोर्ट आवश्यकताएँ गढ़ी नहीं जातीं।',
+    openEmergency: 'Travel Emergency Mode खोलें',
+    phrasebookSource: 'AttraVoya वाक्य संदर्भ',
+    emergencySource: 'सत्यापित आपातकालीन संदर्भ',
+    noModel: 'इन उत्तरों के लिए सामान्य AI मॉडल का उपयोग नहीं किया जाता।',
+  },
+});
+
+export function getGroundedTravelAssistantCopy(locale) {
+  const normalized = normalizeLocale(locale);
+  return COPY[normalized] ?? COPY.en;
+}
