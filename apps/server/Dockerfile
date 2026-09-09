@@ -32,14 +32,10 @@ RUN pnpm --filter @attravoya/database generate \
   && pnpm --filter @attravoya/server build \
   && pnpm --filter @attravoya/server --prod deploy --legacy /opt/attravoya-server
 
-# pnpm deploy installs only production dependencies. Generate once more against
-# that isolated dependency tree so the JavaScript Prisma Client is deployable.
-# Resolve the schema through pnpm's real virtual-store path so Prisma can find
-# the deployed @prisma/client that sits beside the database workspace package.
-RUN schema_path="$(readlink -f /opt/attravoya-server/node_modules/@attravoya/database/prisma/schema.prisma)" \
-  && cd "$(dirname "$schema_path")" \
-  && /workspace/packages/database/node_modules/.bin/prisma generate \
-    --schema="$schema_path"
+# The production deploy intentionally omits Prisma's development CLI. Reuse the
+# client generated above, but copy it into the exact @prisma/client instance
+# resolved by the isolated pnpm deployment so runtime resolution stays correct.
+RUN node --input-type=module -e 'import { cpSync, existsSync, mkdirSync } from "node:fs"; import path from "node:path"; import { createRequire } from "node:module"; const clientDataPath = (requireFromPackage) => path.resolve(path.dirname(requireFromPackage.resolve("@prisma/client")), "../../.prisma/client"); const source = clientDataPath(createRequire("/workspace/packages/database/package.json")); const target = clientDataPath(createRequire("/opt/attravoya-server/node_modules/@attravoya/database/package.json")); if (!existsSync(source)) throw new Error(`Generated Prisma Client not found at ${source}`); mkdirSync(path.dirname(target), { recursive: true }); cpSync(source, target, { recursive: true, force: true }); if (!existsSync(path.join(target, "default.js"))) throw new Error(`Packaged Prisma Client is incomplete at ${target}`);'
 
 FROM operating-system AS runtime
 
