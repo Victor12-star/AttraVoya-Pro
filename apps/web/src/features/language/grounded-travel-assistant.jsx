@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ExternalLink,
   LoaderCircle,
@@ -19,185 +19,33 @@ const MAX_HISTORY_ITEMS = 10;
 
 const INTENT_TERMS = Object.freeze({
   consular: [
-    'embassy',
-    'consulate',
-    'passport',
-    'ambassad',
-    'konsulat',
-    'pasaporte',
-    'embajada',
-    'consulado',
-    'passeport',
-    'ambassade',
-    'consulat',
-    'reisepass',
-    'botschaft',
-    'konsulat',
-    'passaporto',
-    'ambasciata',
-    'consolato',
-    'passaporte',
-    'embaixada',
-    'consulado',
-    'paszport',
-    'ambasada',
-    'konsulat',
-    'paspoort',
-    'ambassade',
-    'consulaat',
-    'passi',
-    'suurlähetyst',
-    'konsulaat',
-    'pasaport',
-    'büyükelçilik',
-    'konsolosluk',
-    'سفارة',
-    'قنصلية',
-    'جواز',
-    '使馆',
-    '领事馆',
-    '护照',
-    '大使館',
-    '領事館',
-    'パスポート',
-    '대사관',
-    '영사관',
-    '여권',
-    'दूतावास',
-    'वाणिज्य दूतावास',
-    'पासपोर्ट',
+    'embassy', 'consulate', 'passport', 'ambassad', 'konsulat', 'pasaporte', 'embajada',
+    'consulado', 'passeport', 'ambassade', 'consulat', 'reisepass', 'botschaft', 'passaporto',
+    'ambasciata', 'consolato', 'passaporte', 'embaixada', 'paszport', 'ambasada', 'paspoort',
+    'consulaat', 'passi', 'suurlähetyst', 'pasaport', 'büyükelçilik', 'konsolosluk', 'سفارة',
+    'قنصلية', 'جواز', '使馆', '领事馆', '护照', '大使館', '領事館', 'パスポート', '대사관',
+    '영사관', '여권', 'दूतावास', 'वाणिज्य दूतावास', 'पासपोर्ट',
   ],
   emergency: [
-    'emergency',
-    'police',
-    'ambulance',
-    'fire service',
-    'nöd',
-    'akut',
-    'polis',
-    'ambulans',
-    'emergencia',
-    'policía',
-    'ambulancia',
-    'urgencia',
-    'police',
-    'ambulance',
-    'urgence',
-    'notfall',
-    'polizei',
-    'krankenwagen',
-    'emergenza',
-    'polizia',
-    'ambulanza',
-    'emergência',
-    'polícia',
-    'ambulância',
-    'nagły',
-    'policja',
-    'pogotowie',
-    'nood',
-    'politie',
-    'ambulance',
-    'nøds',
-    'politi',
-    'ambulanse',
-    'nød',
-    'politi',
-    'ambulance',
-    'hätä',
-    'poliisi',
-    'ambulanssi',
-    'acil',
-    'polis',
-    'ambulans',
-    'طوارئ',
-    'شرطة',
-    'إسعاف',
-    '紧急',
-    '警察',
-    '救护车',
-    '緊急',
-    '警察',
-    '救急車',
-    '응급',
-    '경찰',
-    '구급차',
-    'आपात',
-    'पुलिस',
-    'एम्बुलेंस',
+    'emergency', 'police', 'ambulance', 'fire service', 'nöd', 'akut', 'polis', 'ambulans',
+    'emergencia', 'policía', 'ambulancia', 'urgencia', 'urgence', 'notfall', 'polizei',
+    'krankenwagen', 'emergenza', 'polizia', 'ambulanza', 'emergência', 'polícia', 'ambulância',
+    'nagły', 'policja', 'pogotowie', 'nood', 'politie', 'nøds', 'politi', 'ambulanse', 'nød',
+    'hätä', 'poliisi', 'ambulanssi', 'acil', 'طوارئ', 'شرطة', 'إسعاف', '紧急', '警察',
+    '救护车', '緊急', '救急車', '응급', '경찰', '구급차', 'आपात', 'पुलिस', 'एम्बुलेंस',
   ],
   language: [
-    'language',
-    'speak',
-    'språk',
-    'tala',
-    'idioma',
-    'hablar',
-    'langue',
-    'parler',
-    'sprache',
-    'sprechen',
-    'lingua',
-    'parlare',
-    'falar',
-    'język',
-    'mówić',
-    'taal',
-    'spreken',
-    'snakke',
-    'sprog',
-    'tale',
-    'kieli',
-    'puhua',
-    'dil',
-    'konuş',
-    'لغة',
-    'أتحدث',
-    '语言',
-    '说',
-    '言語',
-    '話',
-    '언어',
-    '말',
-    'भाषा',
-    'बोल',
+    'language', 'speak', 'språk', 'tala', 'idioma', 'hablar', 'langue', 'parler', 'sprache',
+    'sprechen', 'lingua', 'parlare', 'falar', 'język', 'mówić', 'taal', 'spreken', 'snakke',
+    'sprog', 'tale', 'kieli', 'puhua', 'dil', 'konuş', 'لغة', 'أتحدث', '语言', '说', '言語',
+    '話', '언어', '말', 'भाषा', 'बोल',
   ],
   phrases: [
-    'phrase',
-    'how do i say',
-    'hello',
-    'thank you',
-    'fras',
-    'hur säger',
-    'frase',
-    'cómo digo',
-    'dire',
-    'comment dire',
-    'satz',
-    'wie sage',
-    'come si dice',
-    'como digo',
-    'zwrot',
-    'jak powiedzieć',
-    'zin',
-    'hoe zeg',
-    'hvordan sier',
-    'sætning',
-    'hvordan siger',
-    'fraasi',
-    'miten sanon',
-    'ifade',
-    'nasıl söylerim',
-    'عبارة',
-    'كيف أقول',
-    '短语',
-    '怎么说',
-    'フレーズ',
-    'どう言',
-    '문구',
-    '어떻게 말',
-    'वाक्य',
-    'कैसे कह',
+    'phrase', 'how do i say', 'hello', 'thank you', 'fras', 'hur säger', 'frase', 'cómo digo',
+    'dire', 'comment dire', 'satz', 'wie sage', 'come si dice', 'como digo', 'zwrot',
+    'jak powiedzieć', 'zin', 'hoe zeg', 'hvordan sier', 'sætning', 'hvordan siger', 'fraasi',
+    'miten sanon', 'ifade', 'nasıl söylerim', 'عبارة', 'كيف أقول', '短语', '怎么说', 'フレーズ',
+    'どう言', '문구', '어떻게 말', 'वाक्य', 'कैसे कह',
   ],
 });
 
@@ -208,10 +56,7 @@ function safeText(value, maxLength) {
 }
 
 function normalizedSearchText(value) {
-  return String(value ?? '')
-    .normalize('NFKC')
-    .toLocaleLowerCase()
-    .trim();
+  return String(value ?? '').normalize('NFKC').toLocaleLowerCase().trim();
 }
 
 function containsAny(value, terms) {
@@ -321,9 +166,7 @@ export function normalizeAssistantEmergency(response, expectedCountryCode) {
 }
 
 function providerDisplayName(provider) {
-  const normalized = String(provider ?? '')
-    .trim()
-    .toLowerCase();
+  const normalized = String(provider ?? '').trim().toLowerCase();
   if (normalized === 'libretranslate') return 'LibreTranslate';
   return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : null;
 }
@@ -344,7 +187,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   const answerRequestRef = useRef(0);
   const historyIdRef = useRef(0);
   const [countriesState, setCountriesState] = useState(
-    /** @type {{status:string, data:any[]}} */ ({ status: 'idle', data: [] }),
+    /** @type {{status:string, data:any[]}} */ ({ status: 'loading', data: [] }),
   );
   const [countryCode, setCountryCode] = useState('');
   const [phrasebookState, setPhrasebookState] = useState(
@@ -354,19 +197,25 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   const [answerStatus, setAnswerStatus] = useState('idle');
   const [history, setHistory] = useState(/** @type {any[]} */ ([]));
 
-  async function loadCountries() {
-    if (countriesState.status === 'loading' || countriesState.status === 'success') return;
-    setCountriesState({ status: 'loading', data: [] });
-    try {
-      const response = await apiClient.getCountries();
-      const countries = normalizeCountries(response);
-      setCountriesState({ status: countries.length ? 'success' : 'error', data: countries });
-    } catch {
-      setCountriesState({ status: 'error', data: [] });
-    }
-  }
+  useEffect(() => {
+    let active = true;
+    void apiClient
+      .getCountries()
+      .then((response) => {
+        if (!active) return;
+        const countries = normalizeCountries(response);
+        setCountriesState({ status: countries.length ? 'success' : 'error', data: countries });
+      })
+      .catch(() => {
+        if (active) setCountriesState({ status: 'error', data: [] });
+      });
 
-  if (countriesState.status === 'idle') void loadCountries();
+    return () => {
+      active = false;
+      countryRequestRef.current += 1;
+      answerRequestRef.current += 1;
+    };
+  }, []);
 
   async function loadPhrasebook(nextCountryCode) {
     countryRequestRef.current += 1;
@@ -388,9 +237,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   }
 
   function handleCountryChange(event) {
-    const nextCountryCode = String(event.target.value ?? '')
-      .trim()
-      .toUpperCase();
+    const nextCountryCode = String(event.target.value ?? '').trim().toUpperCase();
     if (nextCountryCode && !/^[A-Z]{2}$/.test(nextCountryCode)) return;
 
     countryRequestRef.current += 1;
@@ -456,14 +303,10 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
           `/api/v1/emergency?countryCode=${encodeURIComponent(currentCountryCode)}`,
           { cache: 'no-store' },
         );
-        if (requestId !== answerRequestRef.current || currentCountryCode !== countryCode) return;
+        if (requestId !== answerRequestRef.current) return;
         const emergency = normalizeAssistantEmergency(response, currentCountryCode);
         if (!emergency) {
-          pushAnswer({
-            question: normalizedQuestion,
-            text: copy.referenceUnavailable,
-            grounded: false,
-          });
+          pushAnswer({ question: normalizedQuestion, text: copy.referenceUnavailable, grounded: false });
         } else if (emergency.records.length === 0) {
           pushAnswer({
             question: normalizedQuestion,
@@ -486,16 +329,14 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
           });
         }
       } catch {
-        if (requestId === answerRequestRef.current && currentCountryCode === countryCode) {
-          pushAnswer({
-            question: normalizedQuestion,
-            text: copy.referenceUnavailable,
-            grounded: false,
-          });
+        if (requestId === answerRequestRef.current) {
+          pushAnswer({ question: normalizedQuestion, text: copy.referenceUnavailable, grounded: false });
         }
       } finally {
-        if (requestId === answerRequestRef.current) setAnswerStatus('idle');
-        if (currentCountryCode === countryCode) setQuestion('');
+        if (requestId === answerRequestRef.current) {
+          setAnswerStatus('idle');
+          setQuestion('');
+        }
       }
       return;
     }
