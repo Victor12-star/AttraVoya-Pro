@@ -1,0 +1,180 @@
+.section {
+  display: grid;
+  gap: 1.25rem;
+  margin-block: 1.5rem;
+}
+
+.header,
+.lostHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.header h2,
+.header p,
+.lostHeading h3,
+.lostHeading p,
+.card h4,
+.card p,
+.warning p {
+  margin: 0;
+}
+
+.header p,
+.lostHeading p,
+.card p,
+.warning p {
+  color: var(--text-secondary);
+}
+
+.icon {
+  display: inline-flex;
+  padding: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--surface-raised);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 0.85rem;
+  align-items: end;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 650;
+}
+
+.field select {
+  width: 100%;
+  min-height: 2.9rem;
+  padding-inline: 0.8rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background: var(--surface-raised);
+  color: inherit;
+}
+
+.feedback,
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.85rem;
+  background: var(--surface-raised);
+}
+
+.spin {
+  animation: consular-spin 1s linear infinite;
+}
+
+.results {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.resultsHeading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.resultsHeading h3 {
+  margin: 0;
+}
+
+.resultsHeading span {
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 0.85rem;
+}
+
+.card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--surface-raised);
+}
+
+.card h4 {
+  margin-bottom: 0.3rem;
+}
+
+.hours,
+.contactText,
+.unavailable {
+  font-size: 0.875rem;
+}
+
+.contactText {
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.unavailable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+}
+
+.lostPassport {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--surface-raised);
+}
+
+.lostPassport ol {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-inline-start: 1.4rem;
+}
+
+@keyframes consular-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .controls button {
+    width: 100%;
+  }
+}
