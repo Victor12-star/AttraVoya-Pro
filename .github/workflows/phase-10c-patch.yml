@@ -1,0 +1,324 @@
+name: Phase 10C branch patch
+
+on:
+  push:
+    branches:
+      - feature/phase-10c-provider-total-deadline
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/phase-10c-provider-total-deadline
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply bounded total provider deadline
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('apps/server/src/integrations/http/provider-http-client.js')
+          text = path.read_text()
+
+          def replace_once(old, new):
+              global text
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'Expected one match, found {count}: {old[:80]!r}')
+              text = text.replace(old, new, 1)
+
+          replace_once(
+              "const DEFAULT_MAX_QUEUE_WAIT_MS = 5000;\n",
+              "const DEFAULT_MAX_QUEUE_WAIT_MS = 5000;\nconst DEFAULT_TOTAL_TIMEOUT_MS = 30_000;\n",
+          )
+          replace_once(
+              " * @property {number} [timeoutMs] Default request timeout in milliseconds.\n",
+              " * @property {number} [timeoutMs] Default per-attempt timeout in milliseconds.\n * @property {number} [totalTimeoutMs] Maximum end-to-end logical request duration.\n",
+          )
+          replace_once(
+              " * - Enforces a hard timeout.\n",
+              " * - Enforces a hard per-attempt timeout and an end-to-end logical request deadline.\n",
+          )
+          replace_once(
+              "    timeoutMs = 10_000,\n    retryMax = 2,\n",
+              "    timeoutMs = 10_000,\n    totalTimeoutMs = DEFAULT_TOTAL_TIMEOUT_MS,\n    retryMax = 2,\n",
+          )
+          replace_once(
+              "  assertPositiveInteger(maxConcurrent, 'maxConcurrent');\n",
+              "  assertPositiveInteger(totalTimeoutMs, 'totalTimeoutMs');\n  assertPositiveInteger(maxConcurrent, 'maxConcurrent');\n",
+          )
+
+          gate_start = text.index('function createConcurrencyGate(')
+          gate_end = text.index('\nfunction finiteNow', gate_start)
+          new_gate = r'''function providerRequestTimeoutError(provider, cause) {
+            return new ProviderUnavailableError(`${provider} timed out.`, {
+              ...(cause ? { cause } : {}),
+              details: { provider, reason: 'timeout', scope: 'request' },
+            });
+          }
+
+          function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWaitMs }) {
+            let activeCount = 0;
+            /** @type {{ settled: boolean, resolveSlot: () => boolean }[]} */
+            const waiters = [];
+
+            async function acquire(maxWaitMs = maxQueueWaitMs) {
+              if (activeCount < maxConcurrent) {
+                activeCount += 1;
+                return;
+              }
+
+              if (waiters.length >= maxQueued) {
+                throw new ProviderUnavailableError(`${provider} is temporarily busy.`, {
+                  details: {
+                    provider,
+                    reason: 'busy',
+                    maxConcurrent,
+                    maxQueued,
+                  },
+                });
+              }
+
+              const finiteMaxWaitMs = Number.isFinite(maxWaitMs) ? maxWaitMs : 0;
+              const waitMs = Math.min(maxQueueWaitMs, Math.max(0, Math.floor(finiteMaxWaitMs)));
+              if (waitMs < 1) throw providerRequestTimeoutError(provider);
+              const deadlineLimited = waitMs < maxQueueWaitMs;
+
+              await new Promise((resolve, reject) => {
+                const waiter = {
+                  settled: false,
+                  resolveSlot: () => false,
+                };
+
+                const timeout = setTimeout(() => {
+                  if (waiter.settled) return;
+                  waiter.settled = true;
+
+                  const index = waiters.indexOf(waiter);
+                  if (index !== -1) waiters.splice(index, 1);
+
+                  if (deadlineLimited) {
+                    reject(providerRequestTimeoutError(provider));
+                    return;
+                  }
+
+                  reject(
+                    new ProviderUnavailableError(`${provider} is temporarily busy.`, {
+                      details: {
+                        provider,
+                        reason: 'busy',
+                        maxConcurrent,
+                        maxQueued,
+                        maxQueueWaitMs,
+                      },
+                    }),
+                  );
+                }, waitMs);
+
+                waiter.resolveSlot = () => {
+                  if (waiter.settled) return false;
+                  waiter.settled = true;
+                  clearTimeout(timeout);
+                  resolve(undefined);
+                  return true;
+                };
+
+                waiters.push(waiter);
+              });
+            }
+
+            function release() {
+              while (waiters.length > 0) {
+                const next = waiters.shift();
+                if (next?.resolveSlot()) {
+                  // Hand the existing slot directly to the oldest live waiter so a new
+                  // caller cannot race in between release and queue wake-up and exceed
+                  // the configured in-flight cap.
+                  return;
+                }
+              }
+
+              activeCount -= 1;
+            }
+
+            return { acquire, release };
+          }'''
+          text = text[:gate_start] + new_gate + text[gate_end:]
+
+          perform_start = text.index('  async function performRequestJson(')
+          perform_end = text.index('\n  async function requestJson', perform_start)
+          new_perform = r'''  function remainingRequestMs(deadlineMs) {
+            return deadlineMs - finiteNow(nowImpl);
+          }
+
+          async function waitBeforeRetry(attempt, deadlineMs) {
+            const delayMs = retryDelayWithJitter(attempt, randomImpl);
+            if (remainingRequestMs(deadlineMs) <= delayMs) {
+              throw providerRequestTimeoutError(provider);
+            }
+
+            await sleepImpl(delayMs);
+            if (remainingRequestMs(deadlineMs) <= 0) {
+              throw providerRequestTimeoutError(provider);
+            }
+          }
+
+          async function performRequestJson(
+            url,
+            requestOptions = {},
+            onAttempt = () => {},
+            deadlineMs,
+          ) {
+            const method = String(requestOptions.method ?? 'GET').toUpperCase();
+            const retriesAllowed =
+              requestOptions.retry === false || !['GET', 'HEAD'].includes(method) ? 0 : retryMax;
+            let attempt = 0;
+
+            while (true) {
+              const remainingMs = remainingRequestMs(deadlineMs);
+              if (remainingMs <= 0) throw providerRequestTimeoutError(provider);
+
+              onAttempt();
+              const controller = new AbortController();
+              const attemptTimeoutMs = Math.max(
+                1,
+                Math.min(requestOptions.timeoutMs ?? timeoutMs, Math.ceil(remainingMs)),
+              );
+              const timeout = setTimeout(() => controller.abort(), attemptTimeoutMs);
+
+              try {
+                const headers = new Headers(requestOptions.headers);
+                headers.set('Accept', 'application/json');
+
+                let body = requestOptions.body;
+                if (
+                  body !== undefined &&
+                  body !== null &&
+                  !(body instanceof FormData) &&
+                  typeof body !== 'string'
+                ) {
+                  headers.set('Content-Type', 'application/json');
+                  body = JSON.stringify(body);
+                }
+
+                const response = await fetchImpl(url, {
+                  method,
+                  headers,
+                  body,
+                  signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                  if (RETRYABLE_STATUSES.has(response.status) && attempt < retriesAllowed) {
+                    attempt += 1;
+                    await waitBeforeRetry(attempt, deadlineMs);
+                    continue;
+                  }
+
+                  const retryAfter = response.headers.get('retry-after');
+                  if (response.status === 429) {
+                    rememberRateLimit(retryAfter);
+                  }
+
+                  throw mapProviderHttpError({
+                    provider,
+                    status: response.status,
+                    retryAfter,
+                  });
+                }
+
+                return await parseJsonResponse(response, provider);
+              } catch (error) {
+                if (error?.name === 'AbortError') {
+                  if (remainingRequestMs(deadlineMs) <= 0) {
+                    throw providerRequestTimeoutError(provider, error);
+                  }
+
+                  if (attempt < retriesAllowed) {
+                    attempt += 1;
+                    await waitBeforeRetry(attempt, deadlineMs);
+                    continue;
+                  }
+
+                  throw new ProviderUnavailableError(`${provider} timed out.`, {
+                    cause: error,
+                    details: { provider, reason: 'timeout' },
+                  });
+                }
+
+                if (error?.code?.startsWith?.('PROVIDER_')) throw error;
+
+                if (attempt < retriesAllowed) {
+                  attempt += 1;
+                  await waitBeforeRetry(attempt, deadlineMs);
+                  continue;
+                }
+
+                throw new ProviderUnavailableError(`${provider} could not be reached.`, {
+                  cause: error,
+                  details: { provider, reason: 'network' },
+                });
+              } finally {
+                clearTimeout(timeout);
+              }
+            }
+          }'''
+          text = text[:perform_start] + new_perform + text[perform_end:]
+
+          replace_once(
+              "  async function requestJson(url, requestOptions = {}) {\n    const startedAt = Date.now();\n",
+              "  async function requestJson(url, requestOptions = {}) {\n    const startedAt = Date.now();\n    const requestDeadlineMs = finiteNow(nowImpl) + totalTimeoutMs;\n",
+          )
+          replace_once(
+              "      await concurrencyGate.acquire();\n      acquired = true;\n",
+              "      await concurrencyGate.acquire(requestDeadlineMs - finiteNow(nowImpl));\n      acquired = true;\n\n      if (remainingRequestMs(requestDeadlineMs) <= 0) {\n        throw providerRequestTimeoutError(provider);\n      }\n",
+          )
+          replace_once(
+              "      const payload = await performRequestJson(url, requestOptions, () => {\n        attempts += 1;\n      });\n",
+              "      const payload = await performRequestJson(\n        url,\n        requestOptions,\n        () => {\n          attempts += 1;\n        },\n        requestDeadlineMs,\n      );\n",
+          )
+
+          path.write_text(text)
+          PY
+
+      - name: Format Phase 10C files
+        run: pnpm exec prettier --write apps/server/src/integrations/http/provider-http-client.js apps/server/src/integrations/http/provider-http-client-deadline.test.js
+
+      - name: Run focused provider deadline tests
+        run: pnpm --filter @attravoya/server test -- provider-http-client-deadline.test.js
+
+      - name: Commit exact Phase 10C patch
+        run: |
+          if git diff --quiet -- apps/server/src/integrations/http/provider-http-client.js apps/server/src/integrations/http/provider-http-client-deadline.test.js; then
+            echo "Phase 10C patch made no changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/server/src/integrations/http/provider-http-client.js apps/server/src/integrations/http/provider-http-client-deadline.test.js
+          git commit -m "Phase 10C: bound total provider request duration"
+          git push origin HEAD:feature/phase-10c-provider-total-deadline
