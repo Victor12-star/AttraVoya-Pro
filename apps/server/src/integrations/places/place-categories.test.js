@@ -8,4 +8,9 @@ describe('Geoapify place category groups', () => {
     expect(GROUPS.BEACHES).toBe('beaches');
     expect(PLACE_CATEGORY_GROUPS[GROUPS.BEACHES]).toEqual(['beach']);
   });
+
+  it('maps the provider-neutral embassy group to Geoapify diplomatic facilities', () => {
+    expect(GROUPS.EMBASSIES).toBe('embassies');
+    expect(PLACE_CATEGORY_GROUPS[GROUPS.EMBASSIES]).toEqual(['office.government.embassy']);
+  });
 });

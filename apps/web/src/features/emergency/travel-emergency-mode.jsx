@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Clock3, ExternalLink, LoaderCircle, Phone, ShieldAlert } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { ConsularAssistance } from './consular-assistance.jsx';
 import { getTravelEmergencyCopy } from './travel-emergency-copy.js';
 import styles from './travel-emergency-mode.module.css';
 
@@ -292,6 +293,8 @@ export function TravelEmergencyMode({ locale = 'en', messages }) {
           </div>
         </section>
       ) : null}
+
+      <ConsularAssistance locale={locale} countries={countriesState.data} />
 
       <aside className={styles.disclaimer}>
         <ShieldAlert size={21} aria-hidden="true" />
