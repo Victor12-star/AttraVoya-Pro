@@ -5,57 +5,63 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 ## First action in a new chat
 
 1. Fetch `develop` and record its exact SHA.
-2. Inspect the exact CI run attached to that SHA and verify the five canonical jobs individually.
-3. Inspect the current Phase 9V PR/branch state before making any change.
-4. If Phase 9V is still open, continue only from its exact final head and fix any failing CI checks.
-5. If Phase 9V is already merged, verify the independent push CI on the resulting exact `develop` SHA before starting the next slice.
+2. Inspect the exact push-triggered CI run attached to that SHA.
+3. Verify all five canonical jobs individually rather than relying on workflow-level success.
+4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
+5. Inspect open pull requests/issues and the live roadmap before choosing any new feature slice.
+6. Do not restart Phase 9V or Phase 9W; both are already fully released and post-merge verified.
 
-## Last fully verified release before Phase 9V
+## Current fully verified release
 
-Phase 9U is complete.
+Phase 9W — itinerary-aware Travel Companion destination/language selection — is complete.
 
-- PR `#80`
-- final PR head: `2d48f66f5d9422271d90451ba133a768def9e419`
-- final PR CI: `34354904041`, all five jobs green
-- exact resulting `develop`: `d79f13c6c71239c8811b0e93b2fff85fa77fb25a`
-- post-merge push CI: `34358073350`, all five jobs green
+- PR: `#82`
+- Final PR head: `68ffb64437dfab095d92a0becb998ef567e20857`
+- Final PR CI run: `34381531508`
+- All five canonical jobs passed
+- Exact squash-merged `develop`: `05da4337dfb0ec8790f40cfe31de4a36ce11506e`
+- Post-merge push CI run: `34381990044`
+- All five canonical jobs passed
 
-Obsolete Phase 9U PR `#79` was closed as superseded and must not be merged.
+The Phase 9W read contract is authenticated and owner-scoped, bounded to relevant active/planned trips, `private, no-store`, and data-minimized. It supports safe automatic current-destination/language selection while preserving manual override. Do not expand it casually to expose trip notes, budgets, expenses, accommodation details, provider IDs, passport data, or itinerary item contents.
 
-## Current slice
+## Previous verified release
 
-Phase 9V — grounded Travel Companion assistant.
+Phase 9V — grounded Travel Companion assistant — is complete.
 
-Branch:
+- PR: `#81`
+- Final PR head: `4196edcfe229d4fbb86c4c756bbfe4d44dd48868`
+- Final PR CI run: `34371785290`
+- All five canonical jobs passed
+- Exact squash-merged `develop`: `a06f3f54446084a55851ac0f6506d0f6b91246fb`
+- Post-merge push CI run: `34372221954`
+- All five canonical jobs passed
 
-`feature/phase-9v-grounded-travel-assistant`
+## Critical Travel Companion boundaries
 
-Baseline:
+- The server AI integration remains only a reserved provider boundary; do not fake an LLM/model call or branding.
+- Ground answers in approved AttraVoya contracts and explicitly decline unsupported questions rather than hallucinating.
+- Keep Travel Companion conversation history session-only unless a later privacy-reviewed design explicitly changes that rule.
+- Embassy discovery uses the provider-neutral places boundary and Geoapify's documented `office.government.embassy` category; do not invent a separate consulate provider category.
+- Do not present provider phone/site/opening-hours/passport-procedure fields as officially verified government information.
+- Preserve verified emergency provenance and safe HTTP/HTTPS source-link normalization.
+- Do not invent emergency contacts, consular contacts, travel prices, hotel/flight availability, weather, visa/passport rules, or other unsupported live facts.
+- Preserve all 18 maintained UI locales, accessibility, mobile behavior, RTL, reduced-motion, and theme behavior.
 
-`d79f13c6c71239c8811b0e93b2fff85fa77fb25a`
-
-### Intended behavior
-
-- integrate into the existing `/language` Travel Companion page;
-- choose a current destination;
-- answer supported-language questions from the existing phrasebook contract;
-- answer useful-phrase questions from the existing phrasebook contract;
-- answer emergency questions only from verified country-wide emergency records, including source and verification metadata;
-- route embassy/lost-passport questions to the dedicated Travel Emergency Mode;
-- explicitly decline unsupported questions rather than hallucinating;
-- keep conversation history session-only and do not persist user prompts;
-- preserve mobile, accessibility, RTL, reduced-motion, and theme behavior;
-- provide UI copy for all 18 maintained locales.
-
-### Critical AI boundary
-
-The server AI integration files are currently zero-byte placeholders. There is no configured general AI provider. Do not fake an LLM call, hard-code a provider claim, or imply a general AI model generated Phase 9V answers.
-
-A future real conversational model may be added behind the reserved AI provider boundary, but it must preserve grounding, provenance, privacy, rate limiting, safety, and no-invented-live-data rules.
+Obsolete Phase 9U PR `#79` was closed as superseded and must never be merged.
 
 ## Release rule
 
-The exact final Phase 9V PR head must pass all five canonical jobs:
+Every new slice must use the normal gate:
+
+1. start from the latest exact `develop` SHA whose push CI has all five jobs green;
+2. create a dedicated branch;
+3. open a PR into `develop`;
+4. exact final PR head must pass all five canonical jobs;
+5. squash-merge using expected-head protection;
+6. exact resulting `develop` SHA must independently pass all five canonical jobs on a push-triggered run before any later slice starts.
+
+The canonical jobs are:
 
 1. Code quality and unit tests
 2. Dependency and secret checks
@@ -63,10 +69,15 @@ The exact final Phase 9V PR head must pass all five canonical jobs:
 4. Production builds
 5. PostgreSQL and Prisma verification
 
-Only then squash-merge with the exact expected head SHA. After merge, the exact resulting `develop` SHA must independently pass all five jobs on a push-triggered CI run before proceeding.
+Never weaken CI, security, privacy, provider-honesty, accessibility, or data-integrity controls to get green status.
 
-Never treat workflow-level success alone as 5/5; inspect each job.
+## Next-work status
 
-## Likely next slice after Phase 9V
+There is no explicitly designated post-Phase-9W feature slice in the repository at this checkpoint. Do not invent a Phase 9X label merely to keep numbering moving.
 
-Itinerary-aware destination/language selection remains an explicitly deferred Travel Companion gap. Start it only after Phase 9V is fully released and post-merge verified. Re-inspect the live repository first in case a newer verified plan supersedes this handoff.
+Standing open production programs include:
+
+- Issue `#40`: scalability, reliability, performance, resilience, observability, privacy, and user-experience readiness. This is a broad incremental program and should be split into coherent reviewable slices based on the live architecture and measured need.
+- Issue `#36`: privacy-conscious analytics and admin monitoring. Its specification explicitly says to implement it after the necessary authoritative product/subscription actions exist and before final release hardening. The analytics dashboard is owner/admin-only and must never be exposed in the normal traveller application.
+
+When continuing, re-inspect the latest verified repository state and choose the next coherent slice only when it is supported by the live roadmap/product gaps or an explicit owner instruction. Repository state always wins over this handoff if newer verified work has landed.
