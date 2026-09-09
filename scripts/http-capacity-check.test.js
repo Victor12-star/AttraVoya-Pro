@@ -43,31 +43,34 @@ test('capacity evaluation accepts healthy steady load and bounded 429 backpressu
   assert.deepEqual(failures, []);
 });
 
-test('capacity evaluation rejects latency, transport, server, and missing-backpressure failures', () => {
-  const failures = evaluateApiCapacityCheck({
-    steady: summary({
-      successful: 49,
-      failed: 1,
-      errorRate: 0.02,
-      p95: 501,
-      statusCounts: { 200: 49, 500: 1 },
-    }),
-    burst: summary({
-      successful: 99,
-      failed: 1,
-      errorRate: 0.01,
-      p95: 150,
-      statusCounts: { 200: 99, 503: 1 },
-      transportErrors: { AbortError: 1 },
-    }),
-  });
+test(
+  'capacity evaluation rejects latency, transport, server, and missing-backpressure failures',
+  () => {
+    const failures = evaluateApiCapacityCheck({
+      steady: summary({
+        successful: 49,
+        failed: 1,
+        errorRate: 0.02,
+        p95: 501,
+        statusCounts: { 200: 49, 500: 1 },
+      }),
+      burst: summary({
+        successful: 99,
+        failed: 1,
+        errorRate: 0.01,
+        p95: 150,
+        statusCounts: { 200: 99, 503: 1 },
+        transportErrors: { AbortError: 1 },
+      }),
+    });
 
-  assert.ok(failures.some((failure) => failure.includes('Steady-load error rate')));
-  assert.ok(failures.some((failure) => failure.includes('p95 latency')));
-  assert.ok(failures.some((failure) => failure.includes('transport error')));
-  assert.ok(failures.some((failure) => failure.includes('server error response')));
-  assert.ok(failures.some((failure) => failure.includes('HTTP 429 backpressure boundary')));
-});
+    assert.ok(failures.some((failure) => failure.includes('Steady-load error rate')));
+    assert.ok(failures.some((failure) => failure.includes('p95 latency')));
+    assert.ok(failures.some((failure) => failure.includes('transport error')));
+    assert.ok(failures.some((failure) => failure.includes('server error response')));
+    assert.ok(failures.some((failure) => failure.includes('HTTP 429 backpressure boundary')));
+  },
+);
 
 test('capacity check refuses remote targets', async () => {
   await assert.rejects(
