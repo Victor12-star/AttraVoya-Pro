@@ -7,6 +7,7 @@ const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
 const DEFAULT_MAX_CONCURRENT = 8;
 const DEFAULT_MAX_QUEUED = 32;
 const DEFAULT_MAX_QUEUE_WAIT_MS = 5000;
+const DEFAULT_TOTAL_TIMEOUT_MS = 30_000;
 const DEFAULT_CIRCUIT_FAILURE_THRESHOLD = 5;
 const DEFAULT_CIRCUIT_OPEN_MS = 30_000;
 const RETRY_BASE_DELAY_MS = 250;
@@ -18,7 +19,8 @@ const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, mil
  * @typedef {object} ProviderHttpClientOptions
  * @property {string} provider Human-readable provider name used in safe errors.
  * @property {typeof globalThis.fetch} [fetchImpl] Injectable fetch for deterministic tests.
- * @property {number} [timeoutMs] Default request timeout in milliseconds.
+ * @property {number} [timeoutMs] Default per-attempt timeout in milliseconds.
+ * @property {number} [totalTimeoutMs] Maximum end-to-end logical request duration.
  * @property {number} [retryMax] Maximum transient retries for safe idempotent requests.
  * @property {number} [maxConcurrent] Maximum logical requests allowed in flight for this client.
  * @property {number} [maxQueued] Maximum requests allowed to wait for an in-flight slot.
@@ -82,12 +84,19 @@ function recordProviderMetric(metrics, event) {
   }
 }
 
+function providerRequestTimeoutError(provider, cause) {
+  return new ProviderUnavailableError(`${provider} timed out.`, {
+    ...(cause ? { cause } : {}),
+    details: { provider, reason: 'timeout', scope: 'request' },
+  });
+}
+
 function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWaitMs }) {
   let activeCount = 0;
   /** @type {{ settled: boolean, resolveSlot: () => boolean }[]} */
   const waiters = [];
 
-  async function acquire() {
+  async function acquire(maxWaitMs = maxQueueWaitMs) {
     if (activeCount < maxConcurrent) {
       activeCount += 1;
       return;
@@ -104,6 +113,11 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
       });
     }
 
+    const finiteMaxWaitMs = Number.isFinite(maxWaitMs) ? maxWaitMs : 0;
+    const waitMs = Math.min(maxQueueWaitMs, Math.max(0, Math.floor(finiteMaxWaitMs)));
+    if (waitMs < 1) throw providerRequestTimeoutError(provider);
+    const deadlineLimited = waitMs < maxQueueWaitMs;
+
     await new Promise((resolve, reject) => {
       const waiter = {
         settled: false,
@@ -117,6 +131,11 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
         const index = waiters.indexOf(waiter);
         if (index !== -1) waiters.splice(index, 1);
 
+        if (deadlineLimited) {
+          reject(providerRequestTimeoutError(provider));
+          return;
+        }
+
         reject(
           new ProviderUnavailableError(`${provider} is temporarily busy.`, {
             details: {
@@ -128,7 +147,7 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
             },
           }),
         );
-      }, maxQueueWaitMs);
+      }, waitMs);
 
       waiter.resolveSlot = () => {
         if (waiter.settled) return false;
@@ -146,9 +165,6 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
     while (waiters.length > 0) {
       const next = waiters.shift();
       if (next?.resolveSlot()) {
-        // Hand the existing slot directly to the oldest live waiter so a new
-        // caller cannot race in between release and queue wake-up and exceed
-        // the configured in-flight cap.
         return;
       }
     }
@@ -158,7 +174,6 @@ function createConcurrencyGate({ provider, maxConcurrent, maxQueued, maxQueueWai
 
   return { acquire, release };
 }
-
 function finiteNow(nowImpl) {
   const value = Number(nowImpl());
   if (!Number.isFinite(value)) {
@@ -199,7 +214,7 @@ async function parseJsonResponse(response, provider) {
 /**
  * Resilient JSON transport shared by external provider adapters.
  *
- * - Enforces a hard timeout.
+ * - Enforces a hard per-attempt timeout and an end-to-end logical request deadline.
  * - Bounds per-client/provider concurrency, queue growth, and queue wait time.
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Honors valid Retry-After cooldowns across new requests in this process.
@@ -216,6 +231,7 @@ export function createProviderHttpClient(options) {
     provider,
     fetchImpl = globalThis.fetch,
     timeoutMs = 10_000,
+    totalTimeoutMs = DEFAULT_TOTAL_TIMEOUT_MS,
     retryMax = 2,
     maxConcurrent = DEFAULT_MAX_CONCURRENT,
     maxQueued = DEFAULT_MAX_QUEUED,
@@ -242,6 +258,7 @@ export function createProviderHttpClient(options) {
   if (!metrics || typeof metrics.record !== 'function') {
     throw new TypeError('Provider HTTP client requires a metrics observer.');
   }
+  assertPositiveInteger(totalTimeoutMs, 'totalTimeoutMs');
   assertPositiveInteger(maxConcurrent, 'maxConcurrent');
   assertNonNegativeInteger(maxQueued, 'maxQueued');
   assertPositiveInteger(maxQueueWaitMs, 'maxQueueWaitMs');
@@ -326,16 +343,39 @@ export function createProviderHttpClient(options) {
     }
   }
 
-  async function performRequestJson(url, requestOptions = {}, onAttempt = () => {}) {
+  function remainingRequestMs(deadlineMs) {
+    return deadlineMs - finiteNow(nowImpl);
+  }
+
+  async function waitBeforeRetry(attempt, deadlineMs) {
+    const delayMs = retryDelayWithJitter(attempt, randomImpl);
+    if (remainingRequestMs(deadlineMs) <= delayMs) {
+      throw providerRequestTimeoutError(provider);
+    }
+
+    await sleepImpl(delayMs);
+    if (remainingRequestMs(deadlineMs) <= 0) {
+      throw providerRequestTimeoutError(provider);
+    }
+  }
+
+  async function performRequestJson(url, requestOptions = {}, onAttempt = () => {}, deadlineMs) {
     const method = String(requestOptions.method ?? 'GET').toUpperCase();
     const retriesAllowed =
       requestOptions.retry === false || !['GET', 'HEAD'].includes(method) ? 0 : retryMax;
     let attempt = 0;
 
     while (true) {
+      const remainingMs = remainingRequestMs(deadlineMs);
+      if (remainingMs <= 0) throw providerRequestTimeoutError(provider);
+
       onAttempt();
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), requestOptions.timeoutMs ?? timeoutMs);
+      const attemptTimeoutMs = Math.max(
+        1,
+        Math.min(requestOptions.timeoutMs ?? timeoutMs, Math.ceil(remainingMs)),
+      );
+      const timeout = setTimeout(() => controller.abort(), attemptTimeoutMs);
 
       try {
         const headers = new Headers(requestOptions.headers);
@@ -362,7 +402,7 @@ export function createProviderHttpClient(options) {
         if (!response.ok) {
           if (RETRYABLE_STATUSES.has(response.status) && attempt < retriesAllowed) {
             attempt += 1;
-            await sleepImpl(retryDelayWithJitter(attempt, randomImpl));
+            await waitBeforeRetry(attempt, deadlineMs);
             continue;
           }
 
@@ -381,9 +421,13 @@ export function createProviderHttpClient(options) {
         return await parseJsonResponse(response, provider);
       } catch (error) {
         if (error?.name === 'AbortError') {
+          if (remainingRequestMs(deadlineMs) <= 0) {
+            throw providerRequestTimeoutError(provider, error);
+          }
+
           if (attempt < retriesAllowed) {
             attempt += 1;
-            await sleepImpl(retryDelayWithJitter(attempt, randomImpl));
+            await waitBeforeRetry(attempt, deadlineMs);
             continue;
           }
 
@@ -397,7 +441,7 @@ export function createProviderHttpClient(options) {
 
         if (attempt < retriesAllowed) {
           attempt += 1;
-          await sleepImpl(retryDelayWithJitter(attempt, randomImpl));
+          await waitBeforeRetry(attempt, deadlineMs);
           continue;
         }
 
@@ -410,9 +454,9 @@ export function createProviderHttpClient(options) {
       }
     }
   }
-
   async function requestJson(url, requestOptions = {}) {
     const startedAt = Date.now();
+    const requestDeadlineMs = finiteNow(nowImpl) + totalTimeoutMs;
     let attempts = 0;
     let acquired = false;
 
@@ -423,8 +467,12 @@ export function createProviderHttpClient(options) {
       const circuitErrorBeforeQueue = currentCircuitError();
       if (circuitErrorBeforeQueue) throw circuitErrorBeforeQueue;
 
-      await concurrencyGate.acquire();
+      await concurrencyGate.acquire(requestDeadlineMs - finiteNow(nowImpl));
       acquired = true;
+
+      if (remainingRequestMs(requestDeadlineMs) <= 0) {
+        throw providerRequestTimeoutError(provider);
+      }
 
       const rateLimitErrorAfterQueue = currentRateLimitError();
       if (rateLimitErrorAfterQueue) throw rateLimitErrorAfterQueue;
@@ -432,9 +480,14 @@ export function createProviderHttpClient(options) {
       const circuitErrorAfterQueue = currentCircuitError({ reserveProbe: true });
       if (circuitErrorAfterQueue) throw circuitErrorAfterQueue;
 
-      const payload = await performRequestJson(url, requestOptions, () => {
-        attempts += 1;
-      });
+      const payload = await performRequestJson(
+        url,
+        requestOptions,
+        () => {
+          attempts += 1;
+        },
+        requestDeadlineMs,
+      );
       closeCircuit();
       recordProviderMetric(metrics, {
         provider,

@@ -49,18 +49,19 @@ describe('provider HTTP client total deadline', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-09-09T00:00:00.000Z'));
 
-    const fetchImpl = vi.fn((_url, options) =>
-      new Promise((_resolve, reject) => {
-        options.signal.addEventListener(
-          'abort',
-          () => {
-            const error = new Error('aborted');
-            error.name = 'AbortError';
-            reject(error);
-          },
-          { once: true },
-        );
-      }),
+    const fetchImpl = vi.fn(
+      (_url, options) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener(
+            'abort',
+            () => {
+              const error = new Error('aborted');
+              error.name = 'AbortError';
+              reject(error);
+            },
+            { once: true },
+          );
+        }),
     );
     const client = createProviderHttpClient({
       provider: 'test',
