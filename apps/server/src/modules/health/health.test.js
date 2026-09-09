@@ -143,8 +143,11 @@ describe('health endpoints', () => {
     });
     apps.push(app);
 
-    let overloadedResponse;
-    for (let requestNumber = 0; requestNumber < 121; requestNumber += 1) {
+    let overloadedResponse = await app.inject({
+      method: 'GET',
+      url: '/api/v1/countries',
+    });
+    for (let requestNumber = 1; requestNumber < 121; requestNumber += 1) {
       overloadedResponse = await app.inject({
         method: 'GET',
         url: '/api/v1/countries',
