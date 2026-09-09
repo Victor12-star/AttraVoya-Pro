@@ -77,7 +77,7 @@ export function buildCompanionTripContext(records, today) {
 
   const trips = (Array.isArray(records) ? records : [])
     .map(mapCompanionTrip)
-    .filter(Boolean)
+    .filter((trip) => trip !== null)
     .sort((left, right) => {
       const priorityDifference = tripPriority(left, todayString) - tripPriority(right, todayString);
       if (priorityDifference !== 0) return priorityDifference;
