@@ -29,7 +29,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `For ${country}, the supported destination language${languages.length === 1 ? ' is' : 's are'}: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Here are useful English phrases available for ${country}:`,
-    emergencyAnswer: (country) => `These verified country-wide emergency contacts are available for ${country}:`,
+    emergencyAnswer: (country) =>
+      `These verified country-wide emergency contacts are available for ${country}:`,
     emergencyUnavailable:
       'No verified country-wide emergency contact is available in the current reference data. Open Travel Emergency Mode for the safest fallback.',
     consularAnswer:
@@ -50,7 +51,8 @@ const COPY = Object.freeze({
     ask: 'Fråga',
     clear: 'Rensa konversation',
     empty: 'Dina grundade svar visas här.',
-    sessionOnly: 'Konversationen stannar i den här webbläsarsessionen och sparas inte av funktionen.',
+    sessionOnly:
+      'Konversationen stannar i den här webbläsarsessionen och sparas inte av funktionen.',
     trustedOnly: 'Endast betrodda data',
     source: 'Källa',
     verified: 'Verifierad',
@@ -66,7 +68,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `För ${country} stöds följande destinationsspråk: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Här är användbara engelska fraser som finns för ${country}:`,
-    emergencyAnswer: (country) => `Dessa verifierade rikstäckande nödkontakter finns för ${country}:`,
+    emergencyAnswer: (country) =>
+      `Dessa verifierade rikstäckande nödkontakter finns för ${country}:`,
     emergencyUnavailable:
       'Ingen verifierad rikstäckande nödkontakt finns i aktuell referensdata. Öppna Travel Emergency Mode för säkrast möjliga alternativ.',
     consularAnswer:
@@ -87,13 +90,15 @@ const COPY = Object.freeze({
     ask: 'Preguntar',
     clear: 'Borrar conversación',
     empty: 'Tus respuestas verificadas aparecerán aquí.',
-    sessionOnly: 'La conversación permanece en esta sesión del navegador y esta función no la guarda.',
+    sessionOnly:
+      'La conversación permanece en esta sesión del navegador y esta función no la guarda.',
     trustedOnly: 'Solo datos fiables',
     source: 'Fuente',
     verified: 'Verificado',
     selectDestination: 'Elige un destino antes de hacer esta pregunta.',
     loadingReference: 'Cargando referencia del destino…',
-    referenceUnavailable: 'No se pudo cargar la referencia del destino, por lo que no se inventó una respuesta.',
+    referenceUnavailable:
+      'No se pudo cargar la referencia del destino, por lo que no se inventó una respuesta.',
     unsupported:
       'No puedo responder con los datos de viaje fiables disponibles en esta versión. Prueba una pregunta sobre idioma, frases útiles, emergencias, embajada o pasaporte.',
     languagePrompt: '¿Qué idioma local debo usar?',
@@ -103,7 +108,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Para ${country}, los idiomas de destino compatibles son: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Estas son frases útiles en inglés disponibles para ${country}:`,
-    emergencyAnswer: (country) => `Estos contactos de emergencia nacionales verificados están disponibles para ${country}:`,
+    emergencyAnswer: (country) =>
+      `Estos contactos de emergencia nacionales verificados están disponibles para ${country}:`,
     emergencyUnavailable:
       'No hay un contacto de emergencia nacional verificado en los datos actuales. Abre Travel Emergency Mode para la alternativa más segura.',
     consularAnswer:
@@ -119,18 +125,21 @@ const COPY = Object.freeze({
     intro:
       'Demandez les langues locales prises en charge, des phrases utiles ou des contacts d’urgence vérifiés. Cette version n’utilise pas de modèle d’IA général et n’invente pas les faits non pris en charge.',
     destination: 'Destination de l’assistant',
-    destinationHint: 'Choisissez la destination actuelle afin de limiter les réponses à un seul pays.',
+    destinationHint:
+      'Choisissez la destination actuelle afin de limiter les réponses à un seul pays.',
     placeholder: 'Posez une question de voyage…',
     ask: 'Demander',
     clear: 'Effacer la conversation',
     empty: 'Vos réponses fondées sur les données apparaîtront ici.',
-    sessionOnly: 'La conversation reste dans cette session du navigateur et n’est pas enregistrée par cette fonction.',
+    sessionOnly:
+      'La conversation reste dans cette session du navigateur et n’est pas enregistrée par cette fonction.',
     trustedOnly: 'Données fiables uniquement',
     source: 'Source',
     verified: 'Vérifié',
     selectDestination: 'Choisissez une destination avant de poser cette question.',
     loadingReference: 'Chargement de la référence de destination…',
-    referenceUnavailable: 'La référence de destination n’a pas pu être chargée ; aucune réponse n’a été inventée.',
+    referenceUnavailable:
+      'La référence de destination n’a pas pu être chargée ; aucune réponse n’a été inventée.',
     unsupported:
       'Je ne peux pas répondre à partir des données de voyage fiables disponibles dans cette version. Essayez une question sur la langue, les phrases utiles, les urgences, l’ambassade ou le passeport.',
     languagePrompt: 'Quelle langue locale dois-je utiliser ?',
@@ -140,7 +149,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Pour ${country}, les langues de destination prises en charge sont : ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Voici des phrases utiles en anglais disponibles pour ${country} :`,
-    emergencyAnswer: (country) => `Ces contacts d’urgence nationaux vérifiés sont disponibles pour ${country} :`,
+    emergencyAnswer: (country) =>
+      `Ces contacts d’urgence nationaux vérifiés sont disponibles pour ${country} :`,
     emergencyUnavailable:
       'Aucun contact d’urgence national vérifié n’est disponible dans les données actuelles. Ouvrez Travel Emergency Mode pour l’option la plus sûre.',
     consularAnswer:
@@ -161,13 +171,15 @@ const COPY = Object.freeze({
     ask: 'Fragen',
     clear: 'Unterhaltung löschen',
     empty: 'Deine datengestützten Antworten erscheinen hier.',
-    sessionOnly: 'Die Unterhaltung bleibt in dieser Browsersitzung und wird von dieser Funktion nicht gespeichert.',
+    sessionOnly:
+      'Die Unterhaltung bleibt in dieser Browsersitzung und wird von dieser Funktion nicht gespeichert.',
     trustedOnly: 'Nur vertrauenswürdige Daten',
     source: 'Quelle',
     verified: 'Verifiziert',
     selectDestination: 'Wähle ein Reiseziel, bevor du diese Frage stellst.',
     loadingReference: 'Zielreferenz wird geladen…',
-    referenceUnavailable: 'Die Zielreferenz konnte nicht geladen werden; daher wurde keine Antwort erfunden.',
+    referenceUnavailable:
+      'Die Zielreferenz konnte nicht geladen werden; daher wurde keine Antwort erfunden.',
     unsupported:
       'Das kann ich mit den in dieser Version verfügbaren vertrauenswürdigen Reisedaten nicht beantworten. Frage nach Sprache, nützlichen Sätzen, Notfällen, Botschaft oder Reisepass.',
     languagePrompt: 'Welche lokale Sprache sollte ich verwenden?',
@@ -177,7 +189,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Für ${country} werden folgende Zielsprachen unterstützt: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Diese nützlichen englischen Sätze sind für ${country} verfügbar:`,
-    emergencyAnswer: (country) => `Diese verifizierten landesweiten Notfallkontakte sind für ${country} verfügbar:`,
+    emergencyAnswer: (country) =>
+      `Diese verifizierten landesweiten Notfallkontakte sind für ${country} verfügbar:`,
     emergencyUnavailable:
       'In den aktuellen Referenzdaten ist kein verifizierter landesweiter Notfallkontakt verfügbar. Öffne den Travel Emergency Mode für die sicherste Alternative.',
     consularAnswer:
@@ -193,18 +206,21 @@ const COPY = Object.freeze({
     intro:
       'Chiedi informazioni sulle lingue locali supportate, frasi utili o contatti di emergenza verificati. Questa versione non usa un modello IA generale e non inventa fatti non supportati.',
     destination: 'Destinazione dell’assistente',
-    destinationHint: 'Scegli la destinazione attuale per mantenere le risposte limitate a un solo Paese.',
+    destinationHint:
+      'Scegli la destinazione attuale per mantenere le risposte limitate a un solo Paese.',
     placeholder: 'Fai una domanda di viaggio…',
     ask: 'Chiedi',
     clear: 'Cancella conversazione',
     empty: 'Le risposte basate sui dati appariranno qui.',
-    sessionOnly: 'La conversazione resta in questa sessione del browser e non viene salvata da questa funzione.',
+    sessionOnly:
+      'La conversazione resta in questa sessione del browser e non viene salvata da questa funzione.',
     trustedOnly: 'Solo dati affidabili',
     source: 'Fonte',
     verified: 'Verificato',
     selectDestination: 'Scegli una destinazione prima di fare questa domanda.',
     loadingReference: 'Caricamento del riferimento della destinazione…',
-    referenceUnavailable: 'Il riferimento della destinazione non è stato caricato, quindi non è stata inventata una risposta.',
+    referenceUnavailable:
+      'Il riferimento della destinazione non è stato caricato, quindi non è stata inventata una risposta.',
     unsupported:
       'Non posso rispondere usando i dati di viaggio affidabili disponibili in questa versione. Prova una domanda su lingua, frasi utili, emergenze, ambasciata o passaporto.',
     languagePrompt: 'Quale lingua locale dovrei usare?',
@@ -214,7 +230,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Per ${country}, le lingue di destinazione supportate sono: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Ecco frasi utili in inglese disponibili per ${country}:`,
-    emergencyAnswer: (country) => `Questi contatti di emergenza nazionali verificati sono disponibili per ${country}:`,
+    emergencyAnswer: (country) =>
+      `Questi contatti di emergenza nazionali verificati sono disponibili per ${country}:`,
     emergencyUnavailable:
       'Nei dati attuali non è disponibile un contatto di emergenza nazionale verificato. Apri Travel Emergency Mode per l’alternativa più sicura.',
     consularAnswer:
@@ -235,13 +252,15 @@ const COPY = Object.freeze({
     ask: 'Perguntar',
     clear: 'Limpar conversa',
     empty: 'As respostas baseadas em dados aparecerão aqui.',
-    sessionOnly: 'A conversa permanece nesta sessão do navegador e não é guardada por esta funcionalidade.',
+    sessionOnly:
+      'A conversa permanece nesta sessão do navegador e não é guardada por esta funcionalidade.',
     trustedOnly: 'Apenas dados fiáveis',
     source: 'Fonte',
     verified: 'Verificado',
     selectDestination: 'Escolha um destino antes de fazer esta pergunta.',
     loadingReference: 'A carregar referência do destino…',
-    referenceUnavailable: 'A referência do destino não pôde ser carregada, por isso nenhuma resposta foi inventada.',
+    referenceUnavailable:
+      'A referência do destino não pôde ser carregada, por isso nenhuma resposta foi inventada.',
     unsupported:
       'Não consigo responder com os dados de viagem fiáveis disponíveis nesta versão. Tente uma pergunta sobre idioma, frases úteis, emergência, embaixada ou passaporte.',
     languagePrompt: 'Que idioma local devo usar?',
@@ -251,7 +270,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Para ${country}, os idiomas de destino suportados são: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Estas frases úteis em inglês estão disponíveis para ${country}:`,
-    emergencyAnswer: (country) => `Estes contactos de emergência nacionais verificados estão disponíveis para ${country}:`,
+    emergencyAnswer: (country) =>
+      `Estes contactos de emergência nacionais verificados estão disponíveis para ${country}:`,
     emergencyUnavailable:
       'Não existe contacto de emergência nacional verificado nos dados atuais. Abra Travel Emergency Mode para a alternativa mais segura.',
     consularAnswer:
@@ -272,13 +292,15 @@ const COPY = Object.freeze({
     ask: 'Zapytaj',
     clear: 'Wyczyść rozmowę',
     empty: 'Tutaj pojawią się odpowiedzi oparte na danych.',
-    sessionOnly: 'Rozmowa pozostaje w tej sesji przeglądarki i nie jest zapisywana przez tę funkcję.',
+    sessionOnly:
+      'Rozmowa pozostaje w tej sesji przeglądarki i nie jest zapisywana przez tę funkcję.',
     trustedOnly: 'Tylko zaufane dane',
     source: 'Źródło',
     verified: 'Zweryfikowano',
     selectDestination: 'Wybierz cel podróży przed zadaniem tego pytania.',
     loadingReference: 'Ładowanie danych celu…',
-    referenceUnavailable: 'Nie udało się wczytać danych celu, więc odpowiedź nie została wymyślona.',
+    referenceUnavailable:
+      'Nie udało się wczytać danych celu, więc odpowiedź nie została wymyślona.',
     unsupported:
       'Nie mogę odpowiedzieć na podstawie zaufanych danych dostępnych w tej wersji. Zapytaj o język, przydatne zwroty, sytuację awaryjną, ambasadę lub paszport.',
     languagePrompt: 'Jakiego lokalnego języka mam używać?',
@@ -288,7 +310,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Dla ${country} obsługiwane języki docelowe to: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Te przydatne angielskie zwroty są dostępne dla ${country}:`,
-    emergencyAnswer: (country) => `Te zweryfikowane ogólnokrajowe kontakty alarmowe są dostępne dla ${country}:`,
+    emergencyAnswer: (country) =>
+      `Te zweryfikowane ogólnokrajowe kontakty alarmowe są dostępne dla ${country}:`,
     emergencyUnavailable:
       'W bieżących danych nie ma zweryfikowanego ogólnokrajowego kontaktu alarmowego. Otwórz Travel Emergency Mode, aby skorzystać z najbezpieczniejszej alternatywy.',
     consularAnswer:
@@ -309,13 +332,15 @@ const COPY = Object.freeze({
     ask: 'Vraag',
     clear: 'Gesprek wissen',
     empty: 'Je datagebaseerde antwoorden verschijnen hier.',
-    sessionOnly: 'Het gesprek blijft in deze browsersessie en wordt niet door deze functie opgeslagen.',
+    sessionOnly:
+      'Het gesprek blijft in deze browsersessie en wordt niet door deze functie opgeslagen.',
     trustedOnly: 'Alleen betrouwbare gegevens',
     source: 'Bron',
     verified: 'Geverifieerd',
     selectDestination: 'Kies een bestemming voordat je deze vraag stelt.',
     loadingReference: 'Bestemmingsreferentie laden…',
-    referenceUnavailable: 'De bestemmingsreferentie kon niet worden geladen, dus er is geen antwoord verzonnen.',
+    referenceUnavailable:
+      'De bestemmingsreferentie kon niet worden geladen, dus er is geen antwoord verzonnen.',
     unsupported:
       'Ik kan dat niet beantwoorden met de betrouwbare reisgegevens in deze versie. Vraag naar taal, nuttige zinnen, noodgevallen, ambassade of paspoort.',
     languagePrompt: 'Welke lokale taal moet ik gebruiken?',
@@ -325,7 +350,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `Voor ${country} zijn de ondersteunde bestemmingstalen: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Deze nuttige Engelse zinnen zijn beschikbaar voor ${country}:`,
-    emergencyAnswer: (country) => `Deze geverifieerde landelijke noodcontacten zijn beschikbaar voor ${country}:`,
+    emergencyAnswer: (country) =>
+      `Deze geverifieerde landelijke noodcontacten zijn beschikbaar voor ${country}:`,
     emergencyUnavailable:
       'Er is geen geverifieerd landelijk noodcontact in de huidige referentiegegevens. Open Travel Emergency Mode voor de veiligste optie.',
     consularAnswer:
@@ -352,7 +378,8 @@ const COPY = Object.freeze({
     verified: 'Verifisert',
     selectDestination: 'Velg et reisemål før du stiller dette spørsmålet.',
     loadingReference: 'Laster reisemålsreferanse…',
-    referenceUnavailable: 'Reisemålsreferansen kunne ikke lastes, så det ble ikke funnet på et svar.',
+    referenceUnavailable:
+      'Reisemålsreferansen kunne ikke lastes, så det ble ikke funnet på et svar.',
     unsupported:
       'Jeg kan ikke svare på det med de pålitelige reisedataene i denne versjonen. Spør om språk, nyttige fraser, nødsituasjon, ambassade eller pass.',
     languagePrompt: 'Hvilket lokalt språk bør jeg bruke?',
@@ -362,7 +389,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `For ${country} er støttede målspråk: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Disse nyttige engelske frasene er tilgjengelige for ${country}:`,
-    emergencyAnswer: (country) => `Disse verifiserte landsdekkende nødkontaktene er tilgjengelige for ${country}:`,
+    emergencyAnswer: (country) =>
+      `Disse verifiserte landsdekkende nødkontaktene er tilgjengelige for ${country}:`,
     emergencyUnavailable:
       'Ingen verifisert landsdekkende nødkontakt finnes i gjeldende referansedata. Åpne Travel Emergency Mode for det sikreste alternativet.',
     consularAnswer:
@@ -389,7 +417,8 @@ const COPY = Object.freeze({
     verified: 'Verificeret',
     selectDestination: 'Vælg en destination, før du stiller spørgsmålet.',
     loadingReference: 'Indlæser destinationsreference…',
-    referenceUnavailable: 'Destinationsreferencen kunne ikke indlæses, så der blev ikke opfundet et svar.',
+    referenceUnavailable:
+      'Destinationsreferencen kunne ikke indlæses, så der blev ikke opfundet et svar.',
     unsupported:
       'Jeg kan ikke besvare det ud fra de pålidelige rejsedata i denne version. Spørg om sprog, nyttige sætninger, nødsituation, ambassade eller pas.',
     languagePrompt: 'Hvilket lokalt sprog bør jeg bruge?',
@@ -399,7 +428,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `For ${country} er de understøttede destinationssprog: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `Disse nyttige engelske sætninger er tilgængelige for ${country}:`,
-    emergencyAnswer: (country) => `Disse verificerede landsdækkende nødkontakter er tilgængelige for ${country}:`,
+    emergencyAnswer: (country) =>
+      `Disse verificerede landsdækkende nødkontakter er tilgængelige for ${country}:`,
     emergencyUnavailable:
       'Der findes ingen verificeret landsdækkende nødkontakt i de aktuelle referencedata. Åbn Travel Emergency Mode for det sikreste alternativ.',
     consularAnswer:
@@ -435,8 +465,10 @@ const COPY = Object.freeze({
     passportPrompt: 'Kadotin passini. Mistä saan suurlähetystöapua?',
     languageAnswer: (country, languages) =>
       `Kohteessa ${country} tuetut kohdekielet ovat: ${languages.join(', ')}.`,
-    phraseAnswer: (country) => `Nämä hyödylliset englanninkieliset fraasit ovat saatavilla kohteelle ${country}:`,
-    emergencyAnswer: (country) => `Nämä vahvistetut valtakunnalliset hätäyhteystiedot ovat saatavilla kohteelle ${country}:`,
+    phraseAnswer: (country) =>
+      `Nämä hyödylliset englanninkieliset fraasit ovat saatavilla kohteelle ${country}:`,
+    emergencyAnswer: (country) =>
+      `Nämä vahvistetut valtakunnalliset hätäyhteystiedot ovat saatavilla kohteelle ${country}:`,
     emergencyUnavailable:
       'Nykyisissä viitetiedoissa ei ole vahvistettua valtakunnallista hätäyhteystietoa. Avaa Travel Emergency Mode turvallisinta vaihtoehtoa varten.',
     consularAnswer:
@@ -473,7 +505,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `${country} için desteklenen hedef diller: ${languages.join(', ')}.`,
     phraseAnswer: (country) => `${country} için şu yararlı İngilizce ifadeler mevcuttur:`,
-    emergencyAnswer: (country) => `${country} için şu doğrulanmış ülke çapındaki acil durum irtibatları mevcuttur:`,
+    emergencyAnswer: (country) =>
+      `${country} için şu doğrulanmış ülke çapındaki acil durum irtibatları mevcuttur:`,
     emergencyUnavailable:
       'Mevcut referans verilerinde doğrulanmış ülke çapında bir acil durum irtibatı yok. En güvenli alternatif için Travel Emergency Mode’u açın.',
     consularAnswer:
@@ -510,7 +543,8 @@ const COPY = Object.freeze({
     languageAnswer: (country, languages) =>
       `اللغات المدعومة للوجهة ${country} هي: ${languages.join('، ')}.`,
     phraseAnswer: (country) => `هذه عبارات إنجليزية مفيدة متاحة للوجهة ${country}:`,
-    emergencyAnswer: (country) => `جهات اتصال الطوارئ الوطنية الموثقة التالية متاحة للوجهة ${country}:`,
+    emergencyAnswer: (country) =>
+      `جهات اتصال الطوارئ الوطنية الموثقة التالية متاحة للوجهة ${country}:`,
     emergencyUnavailable:
       'لا توجد جهة اتصال طوارئ وطنية موثقة في البيانات المرجعية الحالية. افتح Travel Emergency Mode للحصول على البديل الأكثر أمانًا.',
     consularAnswer:

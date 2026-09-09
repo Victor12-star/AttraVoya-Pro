@@ -19,33 +19,172 @@ const MAX_HISTORY_ITEMS = 10;
 
 const INTENT_TERMS = Object.freeze({
   consular: [
-    'embassy', 'consulate', 'passport', 'ambassad', 'konsulat', 'pasaporte', 'embajada',
-    'consulado', 'passeport', 'ambassade', 'consulat', 'reisepass', 'botschaft', 'passaporto',
-    'ambasciata', 'consolato', 'passaporte', 'embaixada', 'paszport', 'ambasada', 'paspoort',
-    'consulaat', 'passi', 'suurlähetyst', 'pasaport', 'büyükelçilik', 'konsolosluk', 'سفارة',
-    'قنصلية', 'جواز', '使馆', '领事馆', '护照', '大使館', '領事館', 'パスポート', '대사관',
-    '영사관', '여권', 'दूतावास', 'वाणिज्य दूतावास', 'पासपोर्ट',
+    'embassy',
+    'consulate',
+    'passport',
+    'ambassad',
+    'konsulat',
+    'pasaporte',
+    'embajada',
+    'consulado',
+    'passeport',
+    'ambassade',
+    'consulat',
+    'reisepass',
+    'botschaft',
+    'passaporto',
+    'ambasciata',
+    'consolato',
+    'passaporte',
+    'embaixada',
+    'paszport',
+    'ambasada',
+    'paspoort',
+    'consulaat',
+    'passi',
+    'suurlähetyst',
+    'pasaport',
+    'büyükelçilik',
+    'konsolosluk',
+    'سفارة',
+    'قنصلية',
+    'جواز',
+    '使馆',
+    '领事馆',
+    '护照',
+    '大使館',
+    '領事館',
+    'パスポート',
+    '대사관',
+    '영사관',
+    '여권',
+    'दूतावास',
+    'वाणिज्य दूतावास',
+    'पासपोर्ट',
   ],
   emergency: [
-    'emergency', 'police', 'ambulance', 'fire service', 'nöd', 'akut', 'polis', 'ambulans',
-    'emergencia', 'policía', 'ambulancia', 'urgencia', 'urgence', 'notfall', 'polizei',
-    'krankenwagen', 'emergenza', 'polizia', 'ambulanza', 'emergência', 'polícia', 'ambulância',
-    'nagły', 'policja', 'pogotowie', 'nood', 'politie', 'nøds', 'politi', 'ambulanse', 'nød',
-    'hätä', 'poliisi', 'ambulanssi', 'acil', 'طوارئ', 'شرطة', 'إسعاف', '紧急', '警察',
-    '救护车', '緊急', '救急車', '응급', '경찰', '구급차', 'आपात', 'पुलिस', 'एम्बुलेंस',
+    'emergency',
+    'police',
+    'ambulance',
+    'fire service',
+    'nöd',
+    'akut',
+    'polis',
+    'ambulans',
+    'emergencia',
+    'policía',
+    'ambulancia',
+    'urgencia',
+    'urgence',
+    'notfall',
+    'polizei',
+    'krankenwagen',
+    'emergenza',
+    'polizia',
+    'ambulanza',
+    'emergência',
+    'polícia',
+    'ambulância',
+    'nagły',
+    'policja',
+    'pogotowie',
+    'nood',
+    'politie',
+    'nøds',
+    'politi',
+    'ambulanse',
+    'nød',
+    'hätä',
+    'poliisi',
+    'ambulanssi',
+    'acil',
+    'طوارئ',
+    'شرطة',
+    'إسعاف',
+    '紧急',
+    '警察',
+    '救护车',
+    '緊急',
+    '救急車',
+    '응급',
+    '경찰',
+    '구급차',
+    'आपात',
+    'पुलिस',
+    'एम्बुलेंस',
   ],
   language: [
-    'language', 'speak', 'språk', 'tala', 'idioma', 'hablar', 'langue', 'parler', 'sprache',
-    'sprechen', 'lingua', 'parlare', 'falar', 'język', 'mówić', 'taal', 'spreken', 'snakke',
-    'sprog', 'tale', 'kieli', 'puhua', 'dil', 'konuş', 'لغة', 'أتحدث', '语言', '说', '言語',
-    '話', '언어', '말', 'भाषा', 'बोल',
+    'language',
+    'speak',
+    'språk',
+    'tala',
+    'idioma',
+    'hablar',
+    'langue',
+    'parler',
+    'sprache',
+    'sprechen',
+    'lingua',
+    'parlare',
+    'falar',
+    'język',
+    'mówić',
+    'taal',
+    'spreken',
+    'snakke',
+    'sprog',
+    'tale',
+    'kieli',
+    'puhua',
+    'dil',
+    'konuş',
+    'لغة',
+    'أتحدث',
+    '语言',
+    '说',
+    '言語',
+    '話',
+    '언어',
+    '말',
+    'भाषा',
+    'बोल',
   ],
   phrases: [
-    'phrase', 'how do i say', 'hello', 'thank you', 'fras', 'hur säger', 'frase', 'cómo digo',
-    'dire', 'comment dire', 'satz', 'wie sage', 'come si dice', 'como digo', 'zwrot',
-    'jak powiedzieć', 'zin', 'hoe zeg', 'hvordan sier', 'sætning', 'hvordan siger', 'fraasi',
-    'miten sanon', 'ifade', 'nasıl söylerim', 'عبارة', 'كيف أقول', '短语', '怎么说', 'フレーズ',
-    'どう言', '문구', '어떻게 말', 'वाक्य', 'कैसे कह',
+    'phrase',
+    'how do i say',
+    'hello',
+    'thank you',
+    'fras',
+    'hur säger',
+    'frase',
+    'cómo digo',
+    'dire',
+    'comment dire',
+    'satz',
+    'wie sage',
+    'come si dice',
+    'como digo',
+    'zwrot',
+    'jak powiedzieć',
+    'zin',
+    'hoe zeg',
+    'hvordan sier',
+    'sætning',
+    'hvordan siger',
+    'fraasi',
+    'miten sanon',
+    'ifade',
+    'nasıl söylerim',
+    'عبارة',
+    'كيف أقول',
+    '短语',
+    '怎么说',
+    'フレーズ',
+    'どう言',
+    '문구',
+    '어떻게 말',
+    'वाक्य',
+    'कैसे कह',
   ],
 });
 
@@ -56,7 +195,10 @@ function safeText(value, maxLength) {
 }
 
 function normalizedSearchText(value) {
-  return String(value ?? '').normalize('NFKC').toLocaleLowerCase().trim();
+  return String(value ?? '')
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .trim();
 }
 
 function containsAny(value, terms) {
@@ -97,9 +239,8 @@ export function normalizeAssistantPhrasebook(response, expectedCountryCode) {
   const countryName = safeText(phrasebook?.destination?.countryName, 160);
   if (countryCode !== expectedCountryCode || !countryName) return null;
 
-  const languages = (Array.isArray(phrasebook?.destination?.languages)
-    ? phrasebook.destination.languages
-    : []
+  const languages = (
+    Array.isArray(phrasebook?.destination?.languages) ? phrasebook.destination.languages : []
   )
     .map((language) => {
       const code = safeLanguageCode(language?.code);
@@ -166,7 +307,9 @@ export function normalizeAssistantEmergency(response, expectedCountryCode) {
 }
 
 function providerDisplayName(provider) {
-  const normalized = String(provider ?? '').trim().toLowerCase();
+  const normalized = String(provider ?? '')
+    .trim()
+    .toLowerCase();
   if (normalized === 'libretranslate') return 'LibreTranslate';
   return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : null;
 }
@@ -237,7 +380,9 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   }
 
   function handleCountryChange(event) {
-    const nextCountryCode = String(event.target.value ?? '').trim().toUpperCase();
+    const nextCountryCode = String(event.target.value ?? '')
+      .trim()
+      .toUpperCase();
     if (nextCountryCode && !/^[A-Z]{2}$/.test(nextCountryCode)) return;
 
     countryRequestRef.current += 1;
@@ -306,7 +451,11 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
         if (requestId !== answerRequestRef.current) return;
         const emergency = normalizeAssistantEmergency(response, currentCountryCode);
         if (!emergency) {
-          pushAnswer({ question: normalizedQuestion, text: copy.referenceUnavailable, grounded: false });
+          pushAnswer({
+            question: normalizedQuestion,
+            text: copy.referenceUnavailable,
+            grounded: false,
+          });
         } else if (emergency.records.length === 0) {
           pushAnswer({
             question: normalizedQuestion,
@@ -330,7 +479,11 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
         }
       } catch {
         if (requestId === answerRequestRef.current) {
-          pushAnswer({ question: normalizedQuestion, text: copy.referenceUnavailable, grounded: false });
+          pushAnswer({
+            question: normalizedQuestion,
+            text: copy.referenceUnavailable,
+            grounded: false,
+          });
         }
       } finally {
         if (requestId === answerRequestRef.current) {
@@ -360,7 +513,11 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
       !phrasebook ||
       phrasebook.countryCode !== currentCountryCode
     ) {
-      pushAnswer({ question: normalizedQuestion, text: copy.referenceUnavailable, grounded: false });
+      pushAnswer({
+        question: normalizedQuestion,
+        text: copy.referenceUnavailable,
+        grounded: false,
+      });
       setAnswerStatus('idle');
       setQuestion('');
       return;
@@ -385,7 +542,9 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
       const phrases = phrasebook.phrases.slice(0, 4);
       pushAnswer({
         question: normalizedQuestion,
-        text: phrases.length ? copy.phraseAnswer(phrasebook.countryName) : copy.referenceUnavailable,
+        text: phrases.length
+          ? copy.phraseAnswer(phrasebook.countryName)
+          : copy.referenceUnavailable,
         grounded: phrases.length > 0,
         phrases,
         sources: phrases.length ? [source] : [],

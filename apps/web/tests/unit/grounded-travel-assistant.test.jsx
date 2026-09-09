@@ -13,11 +13,8 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const {
-  GroundedTravelAssistant,
-  classifyGroundedTravelQuestion,
-  normalizeAssistantEmergency,
-} = await import('../../src/features/language/grounded-travel-assistant.jsx');
+const { GroundedTravelAssistant, classifyGroundedTravelQuestion, normalizeAssistantEmergency } =
+  await import('../../src/features/language/grounded-travel-assistant.jsx');
 
 const messages = {
   common: {
@@ -113,7 +110,9 @@ describe('GroundedTravelAssistant', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Which local language should I use?' }));
 
     expect(
-      await screen.findByText('For Sweden, the supported destination language is: Swedish (Svenska).'),
+      await screen.findByText(
+        'For Sweden, the supported destination language is: Swedish (Svenska).',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText('AttraVoya phrasebook reference')).toBeInTheDocument();
     expect(screen.getByText('LibreTranslate')).toBeInTheDocument();
@@ -123,9 +122,7 @@ describe('GroundedTravelAssistant', () => {
     render(<GroundedTravelAssistant locale="en" messages={messages} />);
     await chooseSweden();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'What emergency contacts are verified?' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'What emergency contacts are verified?' }));
 
     expect(await screen.findByText('General emergency')).toBeInTheDocument();
     expect(screen.getByText('112')).toBeInTheDocument();
