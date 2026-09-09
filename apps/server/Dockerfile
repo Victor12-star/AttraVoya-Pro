@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-ARG NODE_VERSION=24.19.0
+ARG NODE_VERSION=24.20.0
 ARG PNPM_VERSION=11.22.0
 
 FROM node:${NODE_VERSION}-bookworm-slim AS operating-system
@@ -30,19 +30,20 @@ RUN --mount=type=cache,id=attravoya-pnpm-store,target=/pnpm/store \
 
 RUN pnpm --filter @attravoya/database generate \
   && pnpm --filter @attravoya/server build \
-  && pnpm --filter @attravoya/server --prod deploy --legacy /opt/attravoya-server
+  && pnpm --config.inject-workspace-packages=true --filter @attravoya/server --prod deploy /opt/attravoya-server
 
-# pnpm deploy installs only production dependencies. Generate once more against
-# that isolated dependency tree so the JavaScript Prisma Client is deployable.
-RUN cd /opt/attravoya-server \
-  && /workspace/node_modules/.bin/prisma generate \
-    --schema=/opt/attravoya-server/node_modules/@attravoya/database/prisma/schema.prisma
+# The production deploy intentionally omits Prisma's development CLI. Reuse the
+# client generated above, but copy it into the exact @prisma/client instance
+# resolved by the isolated pnpm deployment so runtime resolution stays correct.
+# The injected workspace package is a symlink; resolve its real pnpm-store path
+# first, matching Node's normal runtime module-resolution behavior.
+RUN node --input-type=module -e 'import { cpSync, existsSync, mkdirSync, realpathSync } from "node:fs"; import path from "node:path"; import { createRequire } from "node:module"; const clientDataPath = (requireFromPackage) => path.resolve(path.dirname(requireFromPackage.resolve("@prisma/client")), "../../.prisma/client"); const source = clientDataPath(createRequire("/workspace/packages/database/package.json")); const deployedDatabasePackage = realpathSync("/opt/attravoya-server/node_modules/@attravoya/database/package.json"); const target = clientDataPath(createRequire(deployedDatabasePackage)); if (!existsSync(source)) throw new Error(`Generated Prisma Client not found at ${source}`); mkdirSync(path.dirname(target), { recursive: true }); cpSync(source, target, { recursive: true, force: true }); if (!existsSync(path.join(target, "default.js"))) throw new Error(`Packaged Prisma Client is incomplete at ${target}`);'
 
 FROM operating-system AS runtime
 
-ENV HOST=0.0.0.0
+ENV API_HOST=0.0.0.0
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV API_PORT=5000
 
 LABEL org.opencontainers.image.title="AttraVoya Pro API" \
   org.opencontainers.image.description="AttraVoya Pro Fastify REST API"
@@ -53,7 +54,9 @@ USER node
 
 EXPOSE 5000
 
+# Liveness proves only that this API process can answer. Deployment platforms
+# should use /api/v1/health/ready separately before routing application traffic.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e 'fetch("http://127.0.0.1:" + process.env.PORT + "/health/live", { signal: AbortSignal.timeout(4000) }).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));'
+  CMD node -e 'fetch("http://127.0.0.1:" + process.env.API_PORT + "/api/v1/health/live", { signal: AbortSignal.timeout(4000) }).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));'
 
 CMD ["node", "src/server.js"]
