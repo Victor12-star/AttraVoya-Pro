@@ -26,75 +26,51 @@ The five canonical jobs are:
 
 Never infer 5/5 from workflow-level status alone; inspect the individual jobs. Do not bypass checks, weaken workflows, or push feature work directly to `develop`.
 
-## Last fully released slice
+## Current fully verified release
 
-Phase 9U — Geoapify-backed embassy discovery and lost-passport assistance — is complete.
+Phase 9W — itinerary-aware Travel Companion destination/language selection — is complete.
 
-- PR: `#80`
-- Final PR head: `2d48f66f5d9422271d90451ba133a768def9e419`
-- Final PR CI run: `34354904041`
+- PR: `#82`
+- Final PR head: `68ffb64437dfab095d92a0becb998ef567e20857`
+- Final PR CI run: `34381531508`
 - Result: all five canonical jobs passed
-- Squash-merged `develop` SHA: `d79f13c6c71239c8811b0e93b2fff85fa77fb25a`
-- Independent post-merge push CI run: `34358073350`
+- Squash-merged `develop` SHA: `05da4337dfb0ec8790f40cfe31de4a36ce11506e`
+- Independent post-merge push CI run: `34381990044`
 - Result: all five canonical jobs passed
 
-Phase 9U rules that must remain true:
+Phase 9W adds an authenticated, owner-scoped Trip read path for Travel Companion, keeps the response bounded and `private, no-store`, prefers the current `ACTIVE` trip and otherwise the nearest `PLANNED` trip, can safely select the saved trip destination/language, allows manual override at any time, and does not expose trip notes, budgets, expenses, accommodation details, provider IDs, passport data, or itinerary item contents.
+
+## Previous verified Travel Companion release
+
+Phase 9V — grounded Travel Companion assistant — is complete.
+
+- PR: `#81`
+- Final PR head: `4196edcfe229d4fbb86c4c756bbfe4d44dd48868`
+- Final PR CI run: `34371785290`
+- Result: all five canonical jobs passed
+- Squash-merged `develop` SHA: `a06f3f54446084a55851ac0f6506d0f6b91246fb`
+- Independent post-merge push CI run: `34372221954`
+- Result: all five canonical jobs passed
+
+Phase 9V remains deliberately grounded rather than pretending a general AI provider exists. `apps/server/src/integrations/ai/` is still only a reserved provider boundary. The Travel Companion assistant answers only from approved AttraVoya contracts, routes embassy/lost-passport questions to Travel Emergency Mode, declines unsupported questions, and keeps conversation history session-only rather than persisting user prompts.
+
+## Travel Companion safety boundaries that remain mandatory
+
+Preserve the completed Phase 9U/9V/9W rules:
 
 - embassy discovery uses the provider-neutral places boundary and Geoapify's documented `office.government.embassy` category;
 - do not invent a separate consulate provider category;
-- precise location is optional and runtime-only for this feature;
+- optional precise location used by embassy discovery stays runtime-only;
 - provider phone, website, opening hours, or passport procedures are not presented as officially verified government information;
 - lost/stolen-passport guidance remains generic and directs users to the responsible authority for exact requirements;
-- all supported UI locales, accessibility, RTL, and reduced-motion behavior remain supported.
-
-Obsolete PR `#79` was closed as superseded and must never be merged.
-
-## Current active slice
-
-Phase 9V — grounded Travel Companion assistant.
-
-Working branch:
-
-`feature/phase-9v-grounded-travel-assistant`
-
-Exact baseline:
-
-`d79f13c6c71239c8811b0e93b2fff85fa77fb25a`
-
-### Why this implementation is grounded rather than a fake AI chatbot
-
-`apps/server/src/integrations/ai/` currently contains placeholder files only. No real general AI provider is configured. Phase 9V must therefore not claim that an AI model produced answers and must not fabricate a model integration.
-
-The current foundation answers only from trusted AttraVoya contracts:
-
-- destination language and useful-phrase answers: `/api/v1/phrasebook?countryCode=...`
-- verified country-wide emergency contacts: `/api/v1/emergency?countryCode=...`
-- embassy and lost-passport questions: route users to the dedicated Travel Emergency Mode from Phase 9U
-- unsupported questions: explicitly decline rather than guess
-
-### Phase 9V product and safety requirements
-
-- destination-scoped questions;
-- multilingual deterministic intent recognition for the maintained UI languages;
-- strict normalization of provider/reference payloads before rendering;
-- emergency source URLs must be HTTP/HTTPS only;
-- verified emergency source name and verification date must remain visible;
+- no fake LLM/model claim until a real provider is implemented behind the reserved AI boundary;
 - no invented emergency number, consular contact, hotel availability, price, weather, flight, visa, passport rule, or other unsupported fact;
-- no general AI/model branding until a real provider is implemented behind the reserved AI boundary;
-- conversation history is session-only React state and is not persisted by this feature;
-- stale async responses must not overwrite a newer destination or answer;
-- accessible keyboard/focus behavior, mobile layout, dark/light theme compatibility, RTL-friendly layout, and reduced-motion support;
-- localized UI copy across all 18 maintained locales.
+- emergency source URLs remain restricted to safe HTTP/HTTPS normalization and verified source/verification metadata remains visible;
+- owner-scoped trip context remains authenticated, bounded, data-minimized, and `private, no-store`;
+- manual destination choice must not be overwritten unexpectedly by later trip-context loading;
+- all 18 maintained UI locales, accessibility, mobile behavior, RTL, reduced-motion, and theme compatibility remain supported.
 
-### Current Phase 9V files
-
-- `apps/web/src/features/language/grounded-travel-assistant.jsx`
-- `apps/web/src/features/language/grounded-travel-assistant-copy.js`
-- `apps/web/src/features/language/grounded-travel-assistant.module.css`
-- `apps/web/tests/unit/grounded-travel-assistant.test.jsx`
-- `apps/web/src/app/(main)/language/page.jsx`
-
-The assistant is composed into the existing Travel Companion page between the interpreter and Travel Emergency Mode. Do not create a parallel Travel Companion route.
+Obsolete Phase 9U PR `#79` was closed as superseded and must never be merged.
 
 ## Recent completed Travel Companion sequence
 
@@ -104,10 +80,16 @@ The assistant is composed into the existing Travel Companion page between the in
 - Phase 9R — Taxi/Driver Card
 - Phase 9T — Travel Emergency Mode
 - Phase 9U — embassy discovery and lost-passport assistance
-- Phase 9V — grounded conversational assistant foundation — current slice
+- Phase 9V — grounded conversational assistant foundation
+- Phase 9W — itinerary-aware destination/language selection
 
-## Planned next gap after Phase 9V
+## Current next-work status
 
-The remaining Travel Companion gap explicitly deferred by the earlier interpreter work is itinerary-aware destination/language selection. Treat that as the likely next slice only after Phase 9V has been squash-merged and the resulting exact `develop` SHA independently passes all five canonical jobs.
+No post-Phase-9W feature slice is explicitly designated in the live repository at this checkpoint. Do not invent a Phase 9X name or restart a completed Travel Companion slice.
 
-Before beginning any later slice, inspect the live repository and current handoff again. Repository state always wins over this file if a newer verified release has already landed.
+Two standing production programs remain open but are not, by themselves, an instruction to start an arbitrary implementation slice:
+
+- GitHub Issue `#40` / `docs/SCALABILITY-RELIABILITY-UX-REQUIREMENTS.md` — broad incremental production scalability, reliability, performance, resilience, observability, privacy, and UX requirements.
+- GitHub Issue `#36` / `docs/PRIVACY-ANALYTICS-ADMIN-MONITORING.md` — privacy-conscious analytics/admin monitoring. Its sequencing explicitly defers implementation until the necessary authoritative product/subscription actions exist and before final release hardening. The analytics dashboard is admin-only and must never appear in the normal traveller application.
+
+Before starting the next product slice, inspect the live repository, open issues/PRs, roadmap, and current product gaps from the latest verified `develop`. Repository state wins over this document if newer verified work has landed.
