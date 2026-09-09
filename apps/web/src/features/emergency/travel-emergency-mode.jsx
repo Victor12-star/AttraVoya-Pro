@@ -1,13 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  Clock3,
-  ExternalLink,
-  LoaderCircle,
-  Phone,
-  ShieldAlert,
-} from 'lucide-react';
+import { Clock3, ExternalLink, LoaderCircle, Phone, ShieldAlert } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getTravelEmergencyCopy } from './travel-emergency-copy.js';
@@ -52,9 +46,7 @@ export function normalizeEmergencyCountries(response) {
       return iso2 && /^[A-Z]{2}$/.test(iso2) && name ? { iso2, name } : null;
     })
     .filter(Boolean)
-    .sort((left, right) =>
-      left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }),
-    );
+    .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
 }
 
 /** @param {any} response @param {string} expectedCountryCode */
@@ -229,7 +221,9 @@ export function TravelEmergencyMode({ locale = 'en', messages }) {
       {countriesState.status === 'loading' || emergencyState.status === 'loading' ? (
         <div className={styles.feedback} role="status" aria-live="polite">
           <LoaderCircle className={styles.spin} size={22} aria-hidden="true" />
-          <span>{emergencyState.status === 'loading' ? copy.loading : messages.common.loading}</span>
+          <span>
+            {emergencyState.status === 'loading' ? copy.loading : messages.common.loading}
+          </span>
         </div>
       ) : null}
 

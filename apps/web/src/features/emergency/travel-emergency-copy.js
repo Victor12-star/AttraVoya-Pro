@@ -12,11 +12,14 @@ const COPY = Object.freeze({
     source: 'Official source',
     lastVerified: 'Last verified',
     loading: 'Loading emergency contacts…',
-    empty: 'No verified emergency contacts are available for this country yet. Do not guess a number.',
+    empty:
+      'No verified emergency contacts are available for this country yet. Do not guess a number.',
     error: 'Emergency contacts could not be loaded right now. No emergency number was invented.',
     disclaimerTitle: 'Check locally when possible',
-    disclaimer: 'Emergency numbers and services can change. Verify locally when possible, especially before relying on this information in a crisis.',
-    immediateDanger: 'If someone is in immediate danger and no verified number is shown, ask a trusted local person, hotel, transport operator, police officer, or medical professional for the correct local emergency service.',
+    disclaimer:
+      'Emergency numbers and services can change. Verify locally when possible, especially before relying on this information in a crisis.',
+    immediateDanger:
+      'If someone is in immediate danger and no verified number is shown, ask a trusted local person, hotel, transport operator, police officer, or medical professional for the correct local emergency service.',
   },
   sv: {
     eyebrow: 'Resesäkerhet',
@@ -32,59 +35,73 @@ const COPY = Object.freeze({
     empty: 'Det finns ännu inga verifierade nödkontakter för detta land. Gissa inte ett nummer.',
     error: 'Nödkontakter kunde inte läsas in just nu. Inget nödnummer har hittats på.',
     disclaimerTitle: 'Kontrollera lokalt när det är möjligt',
-    disclaimer: 'Nödnummer och tjänster kan ändras. Kontrollera lokalt när det är möjligt, särskilt innan du förlitar dig på informationen i en kris.',
-    immediateDanger: 'Om någon är i omedelbar fara och inget verifierat nummer visas, be en betrodd lokal person, hotellpersonal, transportör, polis eller vårdpersonal om rätt lokal räddningstjänst.',
+    disclaimer:
+      'Nödnummer och tjänster kan ändras. Kontrollera lokalt när det är möjligt, särskilt innan du förlitar dig på informationen i en kris.',
+    immediateDanger:
+      'Om någon är i omedelbar fara och inget verifierat nummer visas, be en betrodd lokal person, hotellpersonal, transportör, polis eller vårdpersonal om rätt lokal räddningstjänst.',
   },
   es: {
     eyebrow: 'Seguridad de viaje',
     title: 'Modo de emergencia',
     intro: 'Mantén a mano contactos de emergencia locales verificados durante el viaje.',
-    chooseCountryHint: 'Elige el país en el que te encuentras para cargar sus contactos verificados.',
+    chooseCountryHint:
+      'Elige el país en el que te encuentras para cargar sus contactos verificados.',
     contacts: 'Contactos de emergencia verificados',
     call: 'Llamar',
     callUnavailable: 'Enlace de llamada no disponible',
     source: 'Fuente oficial',
     lastVerified: 'Última verificación',
     loading: 'Cargando contactos de emergencia…',
-    empty: 'Todavía no hay contactos de emergencia verificados para este país. No adivines un número.',
+    empty:
+      'Todavía no hay contactos de emergencia verificados para este país. No adivines un número.',
     error: 'No se pudieron cargar los contactos de emergencia. No se inventó ningún número.',
     disclaimerTitle: 'Comprueba localmente cuando sea posible',
-    disclaimer: 'Los números y servicios de emergencia pueden cambiar. Compruébalos localmente cuando sea posible, especialmente antes de depender de esta información en una crisis.',
-    immediateDanger: 'Si alguien está en peligro inmediato y no aparece un número verificado, pregunta a una persona local de confianza, al hotel, a un operador de transporte, a la policía o a un profesional sanitario por el servicio de emergencia local correcto.',
+    disclaimer:
+      'Los números y servicios de emergencia pueden cambiar. Compruébalos localmente cuando sea posible, especialmente antes de depender de esta información en una crisis.',
+    immediateDanger:
+      'Si alguien está en peligro inmediato y no aparece un número verificado, pregunta a una persona local de confianza, al hotel, a un operador de transporte, a la policía o a un profesional sanitario por el servicio de emergencia local correcto.',
   },
   fr: {
     eyebrow: 'Sécurité en voyage',
     title: 'Mode urgence',
     intro: 'Gardez des contacts d’urgence locaux vérifiés à portée de main pendant votre voyage.',
-    chooseCountryHint: 'Choisissez le pays où vous vous trouvez pour charger ses contacts vérifiés.',
+    chooseCountryHint:
+      'Choisissez le pays où vous vous trouvez pour charger ses contacts vérifiés.',
     contacts: 'Contacts d’urgence vérifiés',
     call: 'Appeler',
     callUnavailable: 'Lien d’appel indisponible',
     source: 'Source officielle',
     lastVerified: 'Dernière vérification',
     loading: 'Chargement des contacts d’urgence…',
-    empty: 'Aucun contact d’urgence vérifié n’est encore disponible pour ce pays. Ne devinez pas un numéro.',
+    empty:
+      'Aucun contact d’urgence vérifié n’est encore disponible pour ce pays. Ne devinez pas un numéro.',
     error: 'Les contacts d’urgence n’ont pas pu être chargés. Aucun numéro n’a été inventé.',
     disclaimerTitle: 'Vérifiez localement si possible',
-    disclaimer: 'Les numéros et services d’urgence peuvent changer. Vérifiez localement si possible, surtout avant de vous fier à ces informations en situation de crise.',
-    immediateDanger: 'Si une personne est en danger immédiat et qu’aucun numéro vérifié n’est affiché, demandez le bon service d’urgence local à une personne de confiance, à l’hôtel, à un opérateur de transport, à la police ou à un professionnel de santé.',
+    disclaimer:
+      'Les numéros et services d’urgence peuvent changer. Vérifiez localement si possible, surtout avant de vous fier à ces informations en situation de crise.',
+    immediateDanger:
+      'Si une personne est en danger immédiat et qu’aucun numéro vérifié n’est affiché, demandez le bon service d’urgence local à une personne de confiance, à l’hôtel, à un opérateur de transport, à la police ou à un professionnel de santé.',
   },
   de: {
     eyebrow: 'Reisesicherheit',
     title: 'Notfallmodus',
     intro: 'Halten Sie verifizierte lokale Notfallkontakte auf Reisen griffbereit.',
-    chooseCountryHint: 'Wählen Sie das Land, in dem Sie sich befinden, um verifizierte Kontakte zu laden.',
+    chooseCountryHint:
+      'Wählen Sie das Land, in dem Sie sich befinden, um verifizierte Kontakte zu laden.',
     contacts: 'Verifizierte Notfallkontakte',
     call: 'Anrufen',
     callUnavailable: 'Anruflink nicht verfügbar',
     source: 'Offizielle Quelle',
     lastVerified: 'Zuletzt verifiziert',
     loading: 'Notfallkontakte werden geladen…',
-    empty: 'Für dieses Land sind noch keine verifizierten Notfallkontakte verfügbar. Raten Sie keine Nummer.',
+    empty:
+      'Für dieses Land sind noch keine verifizierten Notfallkontakte verfügbar. Raten Sie keine Nummer.',
     error: 'Notfallkontakte konnten nicht geladen werden. Es wurde keine Notrufnummer erfunden.',
     disclaimerTitle: 'Wenn möglich vor Ort prüfen',
-    disclaimer: 'Notrufnummern und Dienste können sich ändern. Prüfen Sie sie wenn möglich vor Ort, besonders bevor Sie sich in einer Krise darauf verlassen.',
-    immediateDanger: 'Wenn jemand unmittelbar in Gefahr ist und keine verifizierte Nummer angezeigt wird, fragen Sie eine vertrauenswürdige Person vor Ort, das Hotel, einen Verkehrsbetreiber, die Polizei oder medizinisches Fachpersonal nach dem richtigen lokalen Notdienst.',
+    disclaimer:
+      'Notrufnummern und Dienste können sich ändern. Prüfen Sie sie wenn möglich vor Ort, besonders bevor Sie sich in einer Krise darauf verlassen.',
+    immediateDanger:
+      'Wenn jemand unmittelbar in Gefahr ist und keine verifizierte Nummer angezeigt wird, fragen Sie eine vertrauenswürdige Person vor Ort, das Hotel, einen Verkehrsbetreiber, die Polizei oder medizinisches Fachpersonal nach dem richtigen lokalen Notdienst.',
   },
   it: {
     eyebrow: 'Sicurezza in viaggio',
@@ -97,11 +114,14 @@ const COPY = Object.freeze({
     source: 'Fonte ufficiale',
     lastVerified: 'Ultima verifica',
     loading: 'Caricamento contatti di emergenza…',
-    empty: 'Non sono ancora disponibili contatti di emergenza verificati per questo Paese. Non indovinare un numero.',
+    empty:
+      'Non sono ancora disponibili contatti di emergenza verificati per questo Paese. Non indovinare un numero.',
     error: 'Impossibile caricare i contatti di emergenza. Non è stato inventato alcun numero.',
     disclaimerTitle: 'Verifica localmente quando possibile',
-    disclaimer: 'Numeri e servizi di emergenza possono cambiare. Verifica localmente quando possibile, soprattutto prima di fare affidamento su queste informazioni in una crisi.',
-    immediateDanger: 'Se qualcuno è in pericolo immediato e non compare un numero verificato, chiedi il servizio di emergenza locale corretto a una persona fidata del posto, all’hotel, a un operatore di trasporto, alla polizia o a un professionista sanitario.',
+    disclaimer:
+      'Numeri e servizi di emergenza possono cambiare. Verifica localmente quando possibile, soprattutto prima di fare affidamento su queste informazioni in una crisi.',
+    immediateDanger:
+      'Se qualcuno è in pericolo immediato e non compare un numero verificato, chiedi il servizio di emergenza locale corretto a una persona fidata del posto, all’hotel, a un operatore di trasporto, alla polizia o a un professionista sanitario.',
   },
   pt: {
     eyebrow: 'Segurança em viagem',
@@ -114,11 +134,14 @@ const COPY = Object.freeze({
     source: 'Fonte oficial',
     lastVerified: 'Última verificação',
     loading: 'A carregar contactos de emergência…',
-    empty: 'Ainda não existem contactos de emergência verificados para este país. Não adivinhe um número.',
+    empty:
+      'Ainda não existem contactos de emergência verificados para este país. Não adivinhe um número.',
     error: 'Não foi possível carregar os contactos de emergência. Nenhum número foi inventado.',
     disclaimerTitle: 'Confirme localmente quando possível',
-    disclaimer: 'Os números e serviços de emergência podem mudar. Confirme localmente quando possível, sobretudo antes de depender desta informação numa crise.',
-    immediateDanger: 'Se alguém estiver em perigo imediato e não aparecer um número verificado, pergunte pelo serviço de emergência local correto a uma pessoa local de confiança, ao hotel, a um operador de transporte, à polícia ou a um profissional de saúde.',
+    disclaimer:
+      'Os números e serviços de emergência podem mudar. Confirme localmente quando possível, sobretudo antes de depender desta informação numa crise.',
+    immediateDanger:
+      'Se alguém estiver em perigo imediato e não aparecer um número verificado, pergunte pelo serviço de emergência local correto a uma pessoa local de confiança, ao hotel, a um operador de transporte, à polícia ou a um profissional de saúde.',
   },
   pl: {
     eyebrow: 'Bezpieczeństwo w podróży',
@@ -134,8 +157,10 @@ const COPY = Object.freeze({
     empty: 'Brak jeszcze zweryfikowanych kontaktów alarmowych dla tego kraju. Nie zgaduj numeru.',
     error: 'Nie udało się wczytać kontaktów alarmowych. Żaden numer nie został wymyślony.',
     disclaimerTitle: 'Sprawdź lokalnie, jeśli to możliwe',
-    disclaimer: 'Numery i służby alarmowe mogą się zmieniać. Sprawdź je lokalnie, jeśli to możliwe, szczególnie przed poleganiem na tych informacjach w sytuacji kryzysowej.',
-    immediateDanger: 'Jeśli ktoś jest w bezpośrednim niebezpieczeństwie i nie ma zweryfikowanego numeru, poproś zaufaną osobę na miejscu, hotel, przewoźnika, policjanta lub pracownika medycznego o właściwy lokalny numer alarmowy.',
+    disclaimer:
+      'Numery i służby alarmowe mogą się zmieniać. Sprawdź je lokalnie, jeśli to możliwe, szczególnie przed poleganiem na tych informacjach w sytuacji kryzysowej.',
+    immediateDanger:
+      'Jeśli ktoś jest w bezpośrednim niebezpieczeństwie i nie ma zweryfikowanego numeru, poproś zaufaną osobę na miejscu, hotel, przewoźnika, policjanta lub pracownika medycznego o właściwy lokalny numer alarmowy.',
   },
   nl: {
     eyebrow: 'Reisveiligheid',
@@ -151,8 +176,10 @@ const COPY = Object.freeze({
     empty: 'Er zijn nog geen geverifieerde noodcontacten voor dit land. Raad geen nummer.',
     error: 'Noodcontacten konden niet worden geladen. Er is geen noodnummer verzonnen.',
     disclaimerTitle: 'Controleer lokaal indien mogelijk',
-    disclaimer: 'Noodnummers en diensten kunnen veranderen. Controleer lokaal indien mogelijk, vooral voordat je in een crisis op deze informatie vertrouwt.',
-    immediateDanger: 'Als iemand direct gevaar loopt en er geen geverifieerd nummer staat, vraag dan een vertrouwd lokaal persoon, het hotel, een vervoerder, de politie of een zorgprofessional naar de juiste lokale hulpdienst.',
+    disclaimer:
+      'Noodnummers en diensten kunnen veranderen. Controleer lokaal indien mogelijk, vooral voordat je in een crisis op deze informatie vertrouwt.',
+    immediateDanger:
+      'Als iemand direct gevaar loopt en er geen geverifieerd nummer staat, vraag dan een vertrouwd lokaal persoon, het hotel, een vervoerder, de politie of een zorgprofessional naar de juiste lokale hulpdienst.',
   },
   no: {
     eyebrow: 'Reisesikkerhet',
@@ -168,8 +195,10 @@ const COPY = Object.freeze({
     empty: 'Det finnes ennå ingen verifiserte nødkontakter for dette landet. Ikke gjett et nummer.',
     error: 'Nødkontakter kunne ikke lastes. Ingen nødnumre ble funnet på.',
     disclaimerTitle: 'Kontroller lokalt når det er mulig',
-    disclaimer: 'Nødnumre og tjenester kan endres. Kontroller lokalt når det er mulig, særlig før du stoler på informasjonen i en krise.',
-    immediateDanger: 'Hvis noen er i umiddelbar fare og ingen verifisert nummer vises, spør en betrodd lokal person, hotellet, en transportør, politiet eller helsepersonell om riktig lokal nødtjeneste.',
+    disclaimer:
+      'Nødnumre og tjenester kan endres. Kontroller lokalt når det er mulig, særlig før du stoler på informasjonen i en krise.',
+    immediateDanger:
+      'Hvis noen er i umiddelbar fare og ingen verifisert nummer vises, spør en betrodd lokal person, hotellet, en transportør, politiet eller helsepersonell om riktig lokal nødtjeneste.',
   },
   da: {
     eyebrow: 'Rejsesikkerhed',
@@ -185,8 +214,10 @@ const COPY = Object.freeze({
     empty: 'Der er endnu ingen verificerede nødkontakter for dette land. Gæt ikke et nummer.',
     error: 'Nødkontakter kunne ikke indlæses. Intet nødnummer blev opfundet.',
     disclaimerTitle: 'Kontrollér lokalt når det er muligt',
-    disclaimer: 'Nødnumre og tjenester kan ændre sig. Kontrollér lokalt når det er muligt, især før du stoler på oplysningerne i en krise.',
-    immediateDanger: 'Hvis nogen er i umiddelbar fare, og der ikke vises et verificeret nummer, så spørg en betroet lokal person, hotellet, en transportoperatør, politiet eller sundhedspersonale om den korrekte lokale nødtjeneste.',
+    disclaimer:
+      'Nødnumre og tjenester kan ændre sig. Kontrollér lokalt når det er muligt, især før du stoler på oplysningerne i en krise.',
+    immediateDanger:
+      'Hvis nogen er i umiddelbar fare, og der ikke vises et verificeret nummer, så spørg en betroet lokal person, hotellet, en transportoperatør, politiet eller sundhedspersonale om den korrekte lokale nødtjeneste.',
   },
   fi: {
     eyebrow: 'Matkaturvallisuus',
@@ -202,8 +233,10 @@ const COPY = Object.freeze({
     empty: 'Tälle maalle ei ole vielä vahvistettuja hätäyhteystietoja. Älä arvaa numeroa.',
     error: 'Hätäyhteystietoja ei voitu ladata. Mitään hätänumeroa ei keksitty.',
     disclaimerTitle: 'Tarkista paikallisesti mahdollisuuksien mukaan',
-    disclaimer: 'Hätänumerot ja palvelut voivat muuttua. Tarkista ne paikallisesti mahdollisuuksien mukaan, erityisesti ennen kuin luotat tietoihin kriisissä.',
-    immediateDanger: 'Jos joku on välittömässä vaarassa eikä vahvistettua numeroa näy, kysy oikeaa paikallista hätäpalvelua luotettavalta paikalliselta henkilöltä, hotellilta, liikennöitsijältä, poliisilta tai terveydenhuollon ammattilaiselta.',
+    disclaimer:
+      'Hätänumerot ja palvelut voivat muuttua. Tarkista ne paikallisesti mahdollisuuksien mukaan, erityisesti ennen kuin luotat tietoihin kriisissä.',
+    immediateDanger:
+      'Jos joku on välittömässä vaarassa eikä vahvistettua numeroa näy, kysy oikeaa paikallista hätäpalvelua luotettavalta paikalliselta henkilöltä, hotellilta, liikennöitsijältä, poliisilta tai terveydenhuollon ammattilaiselta.',
   },
   tr: {
     eyebrow: 'Seyahat güvenliği',
@@ -219,8 +252,10 @@ const COPY = Object.freeze({
     empty: 'Bu ülke için henüz doğrulanmış acil durum kişisi yok. Numara tahmin etmeyin.',
     error: 'Acil durum kişileri yüklenemedi. Hiçbir acil numara uydurulmadı.',
     disclaimerTitle: 'Mümkün olduğunda yerel olarak kontrol edin',
-    disclaimer: 'Acil numaralar ve hizmetler değişebilir. Özellikle kriz anında bu bilgilere güvenmeden önce mümkün olduğunda yerel olarak doğrulayın.',
-    immediateDanger: 'Birisi acil tehlikedeyse ve doğrulanmış bir numara görünmüyorsa, doğru yerel acil servisi güvenilir bir yerel kişiye, otele, ulaşım işletmesine, polise veya sağlık çalışanına sorun.',
+    disclaimer:
+      'Acil numaralar ve hizmetler değişebilir. Özellikle kriz anında bu bilgilere güvenmeden önce mümkün olduğunda yerel olarak doğrulayın.',
+    immediateDanger:
+      'Birisi acil tehlikedeyse ve doğrulanmış bir numara görünmüyorsa, doğru yerel acil servisi güvenilir bir yerel kişiye, otele, ulaşım işletmesine, polise veya sağlık çalışanına sorun.',
   },
   ar: {
     eyebrow: 'سلامة السفر',
@@ -236,8 +271,10 @@ const COPY = Object.freeze({
     empty: 'لا توجد بعد جهات اتصال طوارئ موثقة لهذا البلد. لا تخمّن رقمًا.',
     error: 'تعذر تحميل جهات اتصال الطوارئ. لم يتم اختلاق أي رقم طوارئ.',
     disclaimerTitle: 'تحقق محليًا متى أمكن',
-    disclaimer: 'قد تتغير أرقام وخدمات الطوارئ. تحقق منها محليًا متى أمكن، خصوصًا قبل الاعتماد على هذه المعلومات في أزمة.',
-    immediateDanger: 'إذا كان شخص ما في خطر فوري ولم يظهر رقم موثق، فاسأل شخصًا محليًا موثوقًا أو الفندق أو مشغل النقل أو الشرطة أو مختصًا صحيًا عن خدمة الطوارئ المحلية الصحيحة.',
+    disclaimer:
+      'قد تتغير أرقام وخدمات الطوارئ. تحقق منها محليًا متى أمكن، خصوصًا قبل الاعتماد على هذه المعلومات في أزمة.',
+    immediateDanger:
+      'إذا كان شخص ما في خطر فوري ولم يظهر رقم موثق، فاسأل شخصًا محليًا موثوقًا أو الفندق أو مشغل النقل أو الشرطة أو مختصًا صحيًا عن خدمة الطوارئ المحلية الصحيحة.',
   },
   zh: {
     eyebrow: '旅行安全',
@@ -254,7 +291,8 @@ const COPY = Object.freeze({
     error: '暂时无法加载紧急联系方式。系统没有编造任何紧急号码。',
     disclaimerTitle: '尽可能在当地核实',
     disclaimer: '紧急号码和服务可能会变化。尽可能在当地核实，尤其是在危机中依赖这些信息之前。',
-    immediateDanger: '如果有人处于直接危险中且没有显示经过验证的号码，请向可信赖的当地人、酒店、交通运营方、警察或医疗专业人员询问正确的当地紧急服务。',
+    immediateDanger:
+      '如果有人处于直接危险中且没有显示经过验证的号码，请向可信赖的当地人、酒店、交通运营方、警察或医疗专业人员询问正确的当地紧急服务。',
   },
   ja: {
     eyebrow: '旅行の安全',
@@ -270,8 +308,10 @@ const COPY = Object.freeze({
     empty: 'この国では確認済みの緊急連絡先がまだありません。番号を推測しないでください。',
     error: '緊急連絡先を読み込めませんでした。緊急番号を作り出すことはしていません。',
     disclaimerTitle: '可能であれば現地で確認',
-    disclaimer: '緊急番号やサービスは変更される場合があります。特に危機時にこの情報を利用する前に、可能であれば現地で確認してください。',
-    immediateDanger: '誰かが差し迫った危険にあり、確認済み番号が表示されない場合は、信頼できる現地の人、ホテル、交通事業者、警察官、医療専門家に正しい現地の緊急サービスを尋ねてください。',
+    disclaimer:
+      '緊急番号やサービスは変更される場合があります。特に危機時にこの情報を利用する前に、可能であれば現地で確認してください。',
+    immediateDanger:
+      '誰かが差し迫った危険にあり、確認済み番号が表示されない場合は、信頼できる現地の人、ホテル、交通事業者、警察官、医療専門家に正しい現地の緊急サービスを尋ねてください。',
   },
   ko: {
     eyebrow: '여행 안전',
@@ -287,8 +327,10 @@ const COPY = Object.freeze({
     empty: '이 국가에는 아직 확인된 긴급 연락처가 없습니다. 번호를 추측하지 마세요.',
     error: '긴급 연락처를 불러올 수 없습니다. 어떤 긴급 번호도 만들어내지 않았습니다.',
     disclaimerTitle: '가능하면 현지에서 확인하세요',
-    disclaimer: '긴급 번호와 서비스는 변경될 수 있습니다. 특히 위기 상황에서 이 정보에 의존하기 전에 가능하면 현지에서 확인하세요.',
-    immediateDanger: '누군가 즉각적인 위험에 처했고 확인된 번호가 표시되지 않으면 신뢰할 수 있는 현지인, 호텔, 교통 운영자, 경찰 또는 의료 전문가에게 올바른 현지 긴급 서비스를 문의하세요.',
+    disclaimer:
+      '긴급 번호와 서비스는 변경될 수 있습니다. 특히 위기 상황에서 이 정보에 의존하기 전에 가능하면 현지에서 확인하세요.',
+    immediateDanger:
+      '누군가 즉각적인 위험에 처했고 확인된 번호가 표시되지 않으면 신뢰할 수 있는 현지인, 호텔, 교통 운영자, 경찰 또는 의료 전문가에게 올바른 현지 긴급 서비스를 문의하세요.',
   },
   hi: {
     eyebrow: 'यात्रा सुरक्षा',
@@ -301,11 +343,14 @@ const COPY = Object.freeze({
     source: 'आधिकारिक स्रोत',
     lastVerified: 'अंतिम सत्यापन',
     loading: 'आपातकालीन संपर्क लोड हो रहे हैं…',
-    empty: 'इस देश के लिए अभी कोई सत्यापित आपातकालीन संपर्क उपलब्ध नहीं है। किसी नंबर का अनुमान न लगाएँ।',
+    empty:
+      'इस देश के लिए अभी कोई सत्यापित आपातकालीन संपर्क उपलब्ध नहीं है। किसी नंबर का अनुमान न लगाएँ।',
     error: 'आपातकालीन संपर्क लोड नहीं हो सके। कोई आपातकालीन नंबर बनाया नहीं गया।',
     disclaimerTitle: 'जहाँ संभव हो स्थानीय रूप से जाँचें',
-    disclaimer: 'आपातकालीन नंबर और सेवाएँ बदल सकती हैं। जहाँ संभव हो स्थानीय रूप से जाँचें, खासकर संकट में इस जानकारी पर निर्भर होने से पहले।',
-    immediateDanger: 'यदि कोई व्यक्ति तुरंत खतरे में है और कोई सत्यापित नंबर नहीं दिख रहा, तो किसी विश्वसनीय स्थानीय व्यक्ति, होटल, परिवहन संचालक, पुलिस अधिकारी या चिकित्सा पेशेवर से सही स्थानीय आपात सेवा पूछें।',
+    disclaimer:
+      'आपातकालीन नंबर और सेवाएँ बदल सकती हैं। जहाँ संभव हो स्थानीय रूप से जाँचें, खासकर संकट में इस जानकारी पर निर्भर होने से पहले।',
+    immediateDanger:
+      'यदि कोई व्यक्ति तुरंत खतरे में है और कोई सत्यापित नंबर नहीं दिख रहा, तो किसी विश्वसनीय स्थानीय व्यक्ति, होटल, परिवहन संचालक, पुलिस अधिकारी या चिकित्सा पेशेवर से सही स्थानीय आपात सेवा पूछें।',
   },
 });
 
