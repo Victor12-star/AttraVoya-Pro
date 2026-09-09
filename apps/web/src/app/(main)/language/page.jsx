@@ -1,3 +1,4 @@
+import { ConsularAssistance } from '../../../features/emergency/consular-assistance.jsx';
 import { TravelEmergencyMode } from '../../../features/emergency/travel-emergency-mode.jsx';
 import { TaxiDriverCardLauncher } from '../../../features/language/taxi-driver-card-launcher.jsx';
 import { TravelCompanionPage } from '../../../features/language/travel-companion-page.jsx';
@@ -14,6 +15,7 @@ export default async function Page() {
     <>
       <TravelCompanionPage locale={locale} messages={messages} />
       <TravelEmergencyMode locale={locale} messages={messages} />
+      <ConsularAssistance locale={locale} />
       <TaxiDriverCardLauncher
         locale={locale}
         messages={messages}
