@@ -28,9 +28,10 @@ export function evaluateApiCapacityCheck({ steady, burst }) {
     failures.push(`Steady-load error rate must be 0, received ${steady.errorRate}.`);
   }
 
-  if (steady.latencyMs?.p95 === null || steady.latencyMs?.p95 > STEADY_MAX_P95_MS) {
+  const steadyP95 = steady.latencyMs?.p95;
+  if (steadyP95 == null || steadyP95 > STEADY_MAX_P95_MS) {
     failures.push(
-      `Steady-load p95 latency ${steady.latencyMs?.p95 ?? 'unavailable'} ms exceeded ${STEADY_MAX_P95_MS} ms.`,
+      `Steady-load p95 latency ${steadyP95 ?? 'unavailable'} ms exceeded ${STEADY_MAX_P95_MS} ms.`,
     );
   }
 
