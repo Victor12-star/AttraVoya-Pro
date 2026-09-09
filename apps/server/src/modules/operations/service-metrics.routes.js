@@ -45,10 +45,7 @@ export async function serviceMetricsRoutes(app, options = {}) {
   );
 
   const adminOnly = {
-    onRequest: [
-      protectedApp.authenticate,
-      protectedApp.authorize({ minimumRole: ROLES.ADMIN }),
-    ],
+    onRequest: [protectedApp.authenticate, protectedApp.authorize({ minimumRole: ROLES.ADMIN })],
   };
 
   app.get('/', adminOnly, async (_request, reply) => {
