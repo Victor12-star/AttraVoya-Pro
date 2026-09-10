@@ -1,14 +1,16 @@
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { resolve } from 'node:path';
 
 import { expect, test } from 'vitest';
 
-const requireFromRoot = createRequire(new URL('../../../../package.json', import.meta.url));
+const rootPackagePath = resolve(process.cwd(), '../../package.json');
+const requireFromRoot = createRequire(rootPackagePath);
 const prettier = requireFromRoot('prettier');
 
 test('prints the formatter output for the Phase 10K target file', async () => {
-  const targetUrl = new URL('../e2e/public-home.spec.js', import.meta.url);
-  const source = await readFile(targetUrl, 'utf8');
+  const targetPath = resolve(process.cwd(), 'tests/e2e/public-home.spec.js');
+  const source = await readFile(targetPath, 'utf8');
   const formatted = await prettier.format(source, { parser: 'babel' });
 
   console.warn(`PRETTIER_PHASE_10K_START\n${formatted}PRETTIER_PHASE_10K_END`);
