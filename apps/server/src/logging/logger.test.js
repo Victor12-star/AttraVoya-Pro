@@ -15,7 +15,7 @@ process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 const { createLoggerOptions, requestRouteForLog } = await import('./logger.js');
 
 describe('privacy-safe request logging', () => {
-  it('uses the matched route template instead of private query and path values', () => {
+  it('uses the matched route template without private query, path, or client IP values', () => {
     const request = {
       id: 'request-1',
       method: 'GET',
@@ -31,13 +31,13 @@ describe('privacy-safe request logging', () => {
       id: 'request-1',
       method: 'GET',
       url: '/api/v1/planner/requests/:requestId',
-      remoteAddress: '203.0.113.7',
     });
     expect(JSON.stringify(serialized)).not.toContain('private-request-id');
     expect(JSON.stringify(serialized)).not.toContain('private-place');
+    expect(JSON.stringify(serialized)).not.toContain('203.0.113.7');
   });
 
-  it('uses a fixed label when no application route matched', () => {
+  it('uses a fixed label and omits the client IP when no application route matched', () => {
     const request = {
       id: 'request-2',
       method: 'GET',
@@ -51,5 +51,6 @@ describe('privacy-safe request logging', () => {
     expect(serialized.url).toBe('<unmatched>');
     expect(JSON.stringify(serialized)).not.toContain('private-value');
     expect(JSON.stringify(serialized)).not.toContain('should-not-log');
+    expect(JSON.stringify(serialized)).not.toContain('203.0.113.8');
   });
 });
