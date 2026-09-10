@@ -140,6 +140,7 @@ export async function buildApp(options = {}) {
     requestMetrics,
     providerMetrics: options.serviceMetricsProviderMetrics,
     providerCacheMetrics: options.serviceMetricsProviderCacheMetrics,
+    runtimeMetrics: options.serviceMetricsRuntimeMetrics,
     getDatabasePoolMetrics: options.serviceMetricsDatabasePoolMetrics,
   });
 
