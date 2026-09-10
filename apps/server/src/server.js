@@ -8,7 +8,11 @@ const readinessState = createReadinessState();
 const app = await buildApp({ readinessState });
 registerDatabaseLifecycle(app);
 
-const shutdown = createShutdownHandler({ app, readinessState });
+const shutdown = createShutdownHandler({
+  app,
+  readinessState,
+  gracePeriodMs: env.SHUTDOWN_GRACE_MS,
+});
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.once(signal, () => {
