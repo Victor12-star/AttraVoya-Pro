@@ -11,7 +11,11 @@ const prettier = requireFromRoot('prettier');
 test('prints the formatter output for the Phase 10K target file', async () => {
   const targetPath = resolve(process.cwd(), 'tests/e2e/public-home.spec.js');
   const source = await readFile(targetPath, 'utf8');
-  const formatted = await prettier.format(source, { parser: 'babel' });
+  const config = await prettier.resolveConfig(targetPath);
+  const formatted = await prettier.format(source, {
+    ...config,
+    filepath: targetPath,
+  });
 
   console.warn(`PRETTIER_PHASE_10K_START\n${formatted}PRETTIER_PHASE_10K_END`);
   expect(formatted.length).toBeGreaterThan(0);
