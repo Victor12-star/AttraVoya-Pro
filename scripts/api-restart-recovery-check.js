@@ -8,6 +8,14 @@ const START_TIMEOUT_MS = 20_000;
 const STOP_TIMEOUT_MS = 30_000;
 const POLL_INTERVAL_MS = 250;
 
+/**
+ * @typedef {object} HealthProbe
+ * @property {string} [status]
+ * @property {string} [service]
+ * @property {string} [database]
+ */
+
+/** @returns {never} */
 function fail(message) {
   throw new Error(message);
 }
@@ -64,13 +72,14 @@ function startApi({ host, port }) {
   });
 }
 
+/** @returns {Promise<HealthProbe | null>} */
 async function readProbe(url) {
   try {
     const response = await fetch(url, {
       signal: AbortSignal.timeout(1_000),
     });
     if (!response.ok) return null;
-    return await response.json();
+    return /** @type {HealthProbe} */ (await response.json());
   } catch {
     return null;
   }
@@ -118,7 +127,10 @@ async function stopApi(child, label) {
       exitPromise,
       new Promise((_, reject) => {
         timeout = setTimeout(
-          () => reject(new Error(`${label} API process exceeded the shutdown deadline.`)),
+          () =>
+            reject(
+              new Error(`${label} API process exceeded the shutdown deadline.`),
+            ),
           STOP_TIMEOUT_MS,
         );
       }),
@@ -155,7 +167,11 @@ async function main() {
     activeProcess = null;
     console.log('API restart and recovery contract passed.');
   } finally {
-    if (activeProcess && activeProcess.exitCode === null && activeProcess.signalCode === null) {
+    if (
+      activeProcess &&
+      activeProcess.exitCode === null &&
+      activeProcess.signalCode === null
+    ) {
       activeProcess.kill('SIGKILL');
     }
   }
