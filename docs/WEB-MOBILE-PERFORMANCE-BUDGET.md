@@ -61,9 +61,20 @@ Performance is not a reason to weaken security checks, privacy controls, provide
 
 ## Transfer and JavaScript budgets
 
-A fixed JavaScript or transfer-byte ceiling is deliberately not invented in this slice because the current production-build route inventory has not yet been baselined with a reproducible measurement harness. The next enforcement slice should capture compressed JavaScript, CSS, image and total transfer sizes for representative routes and then set thresholds that are both strict enough to catch regressions and compatible with the verified current application.
+Phase 10K established a reproducible public-home mobile production baseline on the Pixel 7 Chromium project against the optimized `next start` build. Two independent exact-commit CI runs produced effectively identical transfer results: JavaScript 172,730 bytes, CSS 5,787 bytes and images 0 bytes, while total same-origin transfer measured 195,508 bytes and 195,511 bytes. The three-byte total difference came from the document response; JavaScript and CSS were unchanged.
 
-Until that measured baseline exists:
+The initial hard release ceilings use the larger observed baseline plus 10% headroom, rounded upward to the next whole byte:
+
+- total same-origin transfer: 215,063 bytes;
+- JavaScript transfer: 190,003 bytes;
+- CSS transfer: 6,366 bytes;
+- image transfer on the public home route: 0 bytes.
+
+The 10% allowance is intentionally bounded. It permits small build or response-header variation and modest reviewed growth while requiring a deliberate performance review before a material bundle regression can ship. The zero image ceiling does not prohibit images elsewhere in AttraVoya. It reflects the measured public-home baseline. Adding an image to this route requires a new measured baseline and an explicit reviewed budget revision rather than an invented allowance.
+
+The Playwright release gate measures same-origin navigation and resource entries and logs aggregate counts and byte totals only. It must not emit raw resource URLs, query strings, user identifiers, provider payloads or other request-level information. A representative route that legitimately uses image assets must receive its own measured image ceiling rather than inheriting the public-home zero value.
+
+The following rules remain in force:
 
 - new heavy dependencies require a demonstrated product need;
 - route-specific code should not be pulled into the global shell without reason;
@@ -82,7 +93,7 @@ Any external real-user monitoring provider requires privacy/security review, pro
 
 ## Release and regression policy
 
-Once an enforceable performance harness is added, a regression beyond an approved hard budget must block release unless the budget itself is deliberately revised with measured evidence and review. Thresholds must not be silently raised simply to make CI green.
+The public-home mobile resource budgets above are enforced by the production-build Playwright release gate. A regression beyond an approved hard budget must block release unless the budget itself is deliberately revised with measured evidence and review. Thresholds must not be silently raised simply to make CI green.
 
 Field regressions should be handled as operational reliability work. If a key route exceeds the Core Web Vitals budget at the 75th percentile, investigate the route, device segment, backend/provider contribution and recent deployment before claiming the experience meets the target.
 
@@ -104,4 +115,4 @@ Production performance maturity requires evidence from both controlled pre-relea
 - identified regressions and corrective action;
 - confirmation that performance telemetry itself respected the privacy boundary.
 
-Current cross-browser Playwright, slow-network and accessibility tests remain valuable release checks, but they are not a substitute for measured Core Web Vitals.
+Current cross-browser Playwright, slow-network, accessibility and resource-budget tests remain valuable release checks, but they are not a substitute for measured Core Web Vitals.
