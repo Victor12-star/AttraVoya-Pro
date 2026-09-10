@@ -3,6 +3,12 @@ import { expect, test } from '@playwright/test';
 
 const BLOCKING_ACCESSIBILITY_IMPACTS = new Set(['critical', 'serious']);
 const SLOW_NETWORK_DELAY_MS = 250;
+const PRODUCTION_MOBILE_RESOURCE_BUDGET_BYTES = Object.freeze({
+  totalTransferBytes: 215_063,
+  scriptTransferBytes: 190_003,
+  styleTransferBytes: 6_366,
+  imageTransferBytes: 0,
+});
 
 function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -76,14 +82,14 @@ test.describe('public home page', () => {
     await expect(page.locator('a[href="/plan-by-budget"]').first()).toBeVisible();
   });
 
-  test('measures the production mobile resource baseline', async ({
+  test('enforces the production mobile resource budget', async ({
     browserName,
     isMobile,
     page,
   }) => {
     test.skip(
       browserName !== 'chromium' || !isMobile,
-      'Resource baseline is measured once on the Pixel 7 Chromium project.',
+      'Production resource budget is enforced once on the Pixel 7 Chromium project.',
     );
 
     await page.addInitScript(() => performance.setResourceTimingBufferSize(1000));
@@ -98,10 +104,22 @@ test.describe('public home page', () => {
     expect(baseline.byType.script.count).toBeGreaterThan(0);
     expect(baseline.totals.encodedBodyBytes).toBeGreaterThan(0);
     expect(baseline.totals.decodedBodyBytes).toBeGreaterThan(0);
+    expect(baseline.totals.transferBytes).toBeLessThanOrEqual(
+      PRODUCTION_MOBILE_RESOURCE_BUDGET_BYTES.totalTransferBytes,
+    );
+    expect(baseline.byType.script.transferBytes).toBeLessThanOrEqual(
+      PRODUCTION_MOBILE_RESOURCE_BUDGET_BYTES.scriptTransferBytes,
+    );
+    expect(baseline.byType.style.transferBytes).toBeLessThanOrEqual(
+      PRODUCTION_MOBILE_RESOURCE_BUDGET_BYTES.styleTransferBytes,
+    );
+    expect(baseline.byType.image.transferBytes).toBeLessThanOrEqual(
+      PRODUCTION_MOBILE_RESOURCE_BUDGET_BYTES.imageTransferBytes,
+    );
 
     // Keep CI evidence aggregate-only. Do not print resource URLs, query strings,
     // user identifiers, provider payloads or other request-level information.
-    console.warn(`Production mobile resource baseline: ${JSON.stringify(baseline)}`);
+    console.warn(`Production mobile resource budget evidence: ${JSON.stringify(baseline)}`);
   });
 
   test('renders over a deliberately delayed network', async ({ page }) => {
