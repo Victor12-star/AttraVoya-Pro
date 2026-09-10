@@ -127,10 +127,7 @@ async function stopApi(child, label) {
       exitPromise,
       new Promise((_, reject) => {
         timeout = setTimeout(
-          () =>
-            reject(
-              new Error(`${label} API process exceeded the shutdown deadline.`),
-            ),
+          () => reject(new Error(`${label} API process exceeded the shutdown deadline.`)),
           STOP_TIMEOUT_MS,
         );
       }),
