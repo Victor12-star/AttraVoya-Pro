@@ -4,6 +4,7 @@ const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_HOST: z.string().trim().min(1).default('0.0.0.0'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(5000),
+  SHUTDOWN_GRACE_MS: z.coerce.number().int().min(1000).max(120000).default(25000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   WEB_URL: z.string().url(),
   ADMIN_URL: z.string().url(),
