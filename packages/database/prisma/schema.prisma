@@ -361,6 +361,7 @@ model AuthSession {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([userId, revokedAt])
   @@index([expiresAt])
 }
 
@@ -375,6 +376,7 @@ model EmailVerificationToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([userId, usedAt])
   @@index([expiresAt])
 }
 
@@ -389,6 +391,7 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+  @@index([userId, usedAt])
   @@index([expiresAt])
 }
 
