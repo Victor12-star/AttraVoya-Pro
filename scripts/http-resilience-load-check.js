@@ -174,8 +174,9 @@ async function main() {
   console.log(JSON.stringify(result, null, 2));
 
   if (result.failures.length > 0) {
-    for (const failure of result.failures)
+    for (const failure of result.failures) {
       console.error(`RESILIENCE LOAD CHECK FAILED: ${failure}`);
+    }
     process.exitCode = 1;
   }
 }
