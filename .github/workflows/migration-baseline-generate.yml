@@ -25,28 +25,26 @@ jobs:
 
           path = Path('.github/workflows/ci.yml')
           content = path.read_text()
-          old = '''      - name: Apply schema to disposable CI database
-                run: pnpm --filter @attravoya/database db:push
-
-              - name: Seed reference data
-          '''
-          new = '''      - name: Apply migrations to disposable CI database
-                run: pnpm db:deploy
-
-              - name: Verify migration status
-                run: pnpm --filter @attravoya/database migrate:status
-
-              - name: Verify deployed schema matches Prisma schema
-                run: |
-                  pnpm --filter @attravoya/database exec prisma migrate diff \\
-                    --from-config-datasource \\
-                    --to-schema prisma/schema.prisma \\
-                    --exit-code
-
-              - name: Seed reference data
-          '''
-          if old not in content:
-              raise SystemExit('Expected CI database schema-push block was not found.')
+          old = (
+              "      - name: Apply schema to disposable CI database\n"
+              "        run: pnpm --filter @attravoya/database db:push\n"
+          )
+          new = (
+              "      - name: Apply migrations to disposable CI database\n"
+              "        run: pnpm db:deploy\n"
+              "\n"
+              "      - name: Verify migration status\n"
+              "        run: pnpm --filter @attravoya/database migrate:status\n"
+              "\n"
+              "      - name: Verify deployed schema matches Prisma schema\n"
+              "        run: |\n"
+              "          pnpm --filter @attravoya/database exec prisma migrate diff \\\n"
+              "            --from-config-datasource \\\n"
+              "            --to-schema prisma/schema.prisma \\\n"
+              "            --exit-code\n"
+          )
+          if content.count(old) != 1:
+              raise SystemExit('Expected exactly one CI database schema-push block.')
           path.write_text(content.replace(old, new, 1))
           PY
 
