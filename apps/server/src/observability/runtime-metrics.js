@@ -32,12 +32,10 @@ function boundedRatio(numerator, denominator) {
  */
 export function createRuntimeMetrics(options = {}) {
   const now = options.now ?? (() => performance.now());
-  const readCpuUsage =
-    options.readCpuUsage ?? ((previous) => process.cpuUsage(previous));
+  const readCpuUsage = options.readCpuUsage ?? ((previous) => process.cpuUsage(previous));
   const readMemoryUsage = options.readMemoryUsage ?? (() => process.memoryUsage());
   const readEventLoopUtilization =
-    options.readEventLoopUtilization ??
-    ((previous) => performance.eventLoopUtilization(previous));
+    options.readEventLoopUtilization ?? ((previous) => performance.eventLoopUtilization(previous));
   const parallelism = options.parallelism ?? availableParallelism();
 
   if (typeof now !== 'function') throw new TypeError('now must be a function.');
@@ -63,9 +61,7 @@ export function createRuntimeMetrics(options = {}) {
       const elapsedMs = nonNegative(now() - startedAtMs);
       const cpuUsage = readCpuUsage(startedCpuUsage);
       const memoryUsage = readMemoryUsage();
-      const eventLoopUsage = readEventLoopUtilization(
-        startedEventLoopUtilization,
-      );
+      const eventLoopUsage = readEventLoopUtilization(startedEventLoopUtilization);
 
       const userTimeMs = nonNegative(cpuUsage.user) / 1_000;
       const systemTimeMs = nonNegative(cpuUsage.system) / 1_000;
@@ -97,10 +93,7 @@ export function createRuntimeMetrics(options = {}) {
           arrayBuffersBytes,
         },
         eventLoop: {
-          utilizationRatio: boundedRatio(
-            nonNegative(eventLoopUsage.utilization),
-            1,
-          ),
+          utilizationRatio: boundedRatio(nonNegative(eventLoopUsage.utilization), 1),
           activeMs: nonNegative(eventLoopUsage.active),
           idleMs: nonNegative(eventLoopUsage.idle),
         },
