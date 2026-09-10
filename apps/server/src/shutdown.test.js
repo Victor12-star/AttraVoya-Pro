@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createShutdownHandler } from './shutdown.js';
 
@@ -15,6 +15,10 @@ function deferredVoid() {
 
   return { promise, resolve };
 }
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe('shutdown handler', () => {
   it('coalesces repeated shutdown signals into one close operation', async () => {
@@ -87,5 +91,51 @@ describe('shutdown handler', () => {
 
     expect(app.log.error).toHaveBeenCalledWith({ err: closeError }, 'Graceful shutdown failed');
     expect(exitImpl).toHaveBeenCalledWith(1);
+  });
+
+  it('fails closed when graceful draining exceeds its configured deadline', async () => {
+    vi.useFakeTimers();
+    const gate = deferredVoid();
+    const app = {
+      close: vi.fn().mockImplementation(async () => gate.promise),
+      log: {
+        info: vi.fn(),
+        error: vi.fn(),
+      },
+    };
+    const exitImpl = vi.fn();
+    const shutdown = createShutdownHandler({ app, gracePeriodMs: 1000, exitImpl });
+
+    const result = shutdown('SIGTERM');
+    await vi.advanceTimersByTimeAsync(1000);
+    await result;
+
+    expect(exitImpl).toHaveBeenCalledTimes(1);
+    expect(exitImpl).toHaveBeenCalledWith(1);
+    expect(app.log.error).toHaveBeenCalledWith(
+      {
+        err: expect.objectContaining({
+          code: 'SHUTDOWN_TIMEOUT',
+          message: 'Graceful shutdown exceeded 1000ms.',
+        }),
+      },
+      'Graceful shutdown failed',
+    );
+
+    gate.resolve(undefined);
+  });
+
+  it('rejects an invalid shutdown grace period at startup', () => {
+    const app = {
+      close: vi.fn(),
+      log: {
+        info: vi.fn(),
+        error: vi.fn(),
+      },
+    };
+
+    expect(() => createShutdownHandler({ app, gracePeriodMs: 0 })).toThrow(
+      'Shutdown grace period must be a positive integer.',
+    );
   });
 });
