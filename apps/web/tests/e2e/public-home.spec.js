@@ -53,7 +53,9 @@ async function collectProductionResourceBaseline(page) {
       const encodedBodyBytes = Number.isFinite(entry.encodedBodySize)
         ? entry.encodedBodySize
         : 0;
-      const transferBytes = Number.isFinite(entry.transferSize) ? entry.transferSize : 0;
+      const transferBytes = Number.isFinite(entry.transferSize)
+        ? entry.transferSize
+        : 0;
 
       summary.count += 1;
       summary.decodedBodyBytes += decodedBodyBytes;
@@ -88,7 +90,9 @@ test.describe('public home page', () => {
         'Resource baseline is measured once on the Pixel 7 Chromium project.',
       );
 
-      await page.addInitScript(() => performance.setResourceTimingBufferSize(1000));
+      await page.addInitScript(() =>
+        performance.setResourceTimingBufferSize(1000),
+      );
       const response = await page.goto('/');
 
       expect(response?.ok()).toBe(true);
@@ -103,7 +107,9 @@ test.describe('public home page', () => {
 
       // Keep CI evidence aggregate-only. Do not print resource URLs, query strings,
       // user identifiers, provider payloads or other request-level information.
-      console.warn(`Production mobile resource baseline: ${JSON.stringify(baseline)}`);
+      console.warn(
+        `Production mobile resource baseline: ${JSON.stringify(baseline)}`,
+      );
     },
   );
 
