@@ -82,6 +82,7 @@ test.describe('public home page', () => {
       'Resource baseline is measured once on the Pixel 7 Chromium project.',
     );
 
+    await page.addInitScript(() => performance.setResourceTimingBufferSize(1000));
     const response = await page.goto('/');
 
     expect(response?.ok()).toBe(true);
