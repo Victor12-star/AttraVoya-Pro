@@ -177,6 +177,11 @@ jobs:
       - name: Run database tests
         run: pnpm --filter @attravoya/database test
 
+      - name: Verify API graceful restart and database recovery
+        env:
+          API_RESTART_RECOVERY_TEST: '1'
+        run: pnpm api:restart:check
+
       - name: Verify API early-load capacity and overload backpressure
         run: |
           set -euo pipefail
