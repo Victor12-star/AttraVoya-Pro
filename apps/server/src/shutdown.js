@@ -5,9 +5,9 @@
  */
 
 function createShutdownTimeoutError(gracePeriodMs) {
-  const error = new Error(`Graceful shutdown exceeded ${gracePeriodMs}ms.`);
-  error.code = 'SHUTDOWN_TIMEOUT';
-  return error;
+  return Object.assign(new Error(`Graceful shutdown exceeded ${gracePeriodMs}ms.`), {
+    code: 'SHUTDOWN_TIMEOUT',
+  });
 }
 
 /**
