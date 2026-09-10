@@ -43,6 +43,11 @@ const authorizationSelect = {
   },
 };
 
+const claimedTokenSelect = {
+  userId: true,
+  user: { select: { deletedAt: true } },
+};
+
 /**
  * Authentication persistence is kept behind this repository so services do not
  * depend on Prisma query shapes. It also gives security tests a clean place to
@@ -114,19 +119,17 @@ export const authRepository = Object.freeze({
 
   async verifyEmailByTokenHash(tokenHash, now = new Date()) {
     return prisma.$transaction(async (tx) => {
-      const token = await tx.emailVerificationToken.findUnique({
-        where: { tokenHash },
-        include: { user: true },
-      });
-
-      if (!token || token.usedAt || token.expiresAt <= now || token.user.deletedAt) {
-        return null;
-      }
-
-      await tx.emailVerificationToken.update({
-        where: { id: token.id },
+      const claimed = await tx.emailVerificationToken.updateMany({
+        where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
         data: { usedAt: now },
       });
+      if (claimed.count !== 1) return null;
+
+      const token = await tx.emailVerificationToken.findUnique({
+        where: { tokenHash },
+        select: claimedTokenSelect,
+      });
+      if (!token || token.user.deletedAt) return null;
 
       return tx.user.update({
         where: { id: token.userId },
@@ -208,16 +211,18 @@ export const authRepository = Object.freeze({
 
   async resetPasswordByTokenHash({ tokenHash, passwordHash, now = new Date() }) {
     return prisma.$transaction(async (tx) => {
+      const claimed = await tx.passwordResetToken.updateMany({
+        where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+        data: { usedAt: now },
+      });
+      if (claimed.count !== 1) return null;
+
       const token = await tx.passwordResetToken.findUnique({
         where: { tokenHash },
-        include: { user: true },
+        select: claimedTokenSelect,
       });
+      if (!token || token.user.deletedAt) return null;
 
-      if (!token || token.usedAt || token.expiresAt <= now || token.user.deletedAt) {
-        return null;
-      }
-
-      await tx.passwordResetToken.update({ where: { id: token.id }, data: { usedAt: now } });
       await tx.authSession.updateMany({
         where: { userId: token.userId, revokedAt: null },
         data: { revokedAt: now },
