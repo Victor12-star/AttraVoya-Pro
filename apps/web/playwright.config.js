@@ -43,7 +43,11 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm dev',
+    // CI exercises the optimized production build users will receive. Local
+    // development keeps the faster dev-server workflow and reuse behavior.
+    command: isContinuousIntegration
+      ? 'NODE_ENV=production pnpm build && NODE_ENV=production pnpm start'
+      : 'pnpm dev',
     reuseExistingServer: !isContinuousIntegration,
     stderr: 'pipe',
     stdout: 'pipe',
