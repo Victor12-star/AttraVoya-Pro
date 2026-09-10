@@ -8,6 +8,64 @@ function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+async function collectProductionResourceBaseline(page) {
+  return page.evaluate(() => {
+    const totals = {
+      count: 0,
+      decodedBodyBytes: 0,
+      encodedBodyBytes: 0,
+      transferBytes: 0,
+    };
+    const byType = Object.fromEntries(
+      ['document', 'script', 'style', 'image', 'font', 'other'].map((type) => [
+        type,
+        {
+          count: 0,
+          decodedBodyBytes: 0,
+          encodedBodyBytes: 0,
+          transferBytes: 0,
+        },
+      ]),
+    );
+
+    function classify(pathname, fallbackType) {
+      if (/\.js$/i.test(pathname)) return 'script';
+      if (/\.css$/i.test(pathname)) return 'style';
+      if (/\.(?:avif|gif|jpe?g|png|svg|webp)$/i.test(pathname)) return 'image';
+      if (/\.(?:otf|ttf|woff2?)$/i.test(pathname)) return 'font';
+      return fallbackType === 'navigation' ? 'document' : 'other';
+    }
+
+    const entries = [
+      ...performance.getEntriesByType('navigation'),
+      ...performance.getEntriesByType('resource'),
+    ];
+
+    for (const entry of entries) {
+      const resourceUrl = new URL(entry.name, location.href);
+      if (resourceUrl.origin !== location.origin) continue;
+
+      const type = classify(resourceUrl.pathname, entry.entryType);
+      const summary = byType[type];
+      const decodedBodyBytes = Number.isFinite(entry.decodedBodySize) ? entry.decodedBodySize : 0;
+      const encodedBodyBytes = Number.isFinite(entry.encodedBodySize) ? entry.encodedBodySize : 0;
+      const transferBytes = Number.isFinite(entry.transferSize) ? entry.transferSize : 0;
+
+      summary.count += 1;
+      summary.decodedBodyBytes += decodedBodyBytes;
+      summary.encodedBodyBytes += encodedBodyBytes;
+      summary.transferBytes += transferBytes;
+
+      totals.count += 1;
+      totals.decodedBodyBytes += decodedBodyBytes;
+      totals.encodedBodyBytes += encodedBodyBytes;
+      totals.transferBytes += transferBytes;
+    }
+
+    return { byType, totals };
+  });
+}
+
 test.describe('public home page', () => {
   test('renders the core public experience', async ({ page }) => {
     const response = await page.goto('/');
@@ -16,6 +74,34 @@ test.describe('public home page', () => {
     await expect(page.getByRole('main')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.locator('a[href="/plan-by-budget"]').first()).toBeVisible();
+  });
+
+  test('measures the production mobile resource baseline', async ({
+    browserName,
+    isMobile,
+    page,
+  }) => {
+    test.skip(
+      browserName !== 'chromium' || !isMobile,
+      'Resource baseline is measured once on the Pixel 7 Chromium project.',
+    );
+
+    await page.addInitScript(() => performance.setResourceTimingBufferSize(1000));
+    const response = await page.goto('/');
+
+    expect(response?.ok()).toBe(true);
+    await expect(page.getByRole('main')).toBeVisible();
+
+    const baseline = await collectProductionResourceBaseline(page);
+
+    expect(baseline.byType.document.count).toBeGreaterThan(0);
+    expect(baseline.byType.script.count).toBeGreaterThan(0);
+    expect(baseline.totals.encodedBodyBytes).toBeGreaterThan(0);
+    expect(baseline.totals.decodedBodyBytes).toBeGreaterThan(0);
+
+    // Keep CI evidence aggregate-only. Do not print resource URLs, query strings,
+    // user identifiers, provider payloads or other request-level information.
+    console.warn(`Production mobile resource baseline: ${JSON.stringify(baseline)}`);
   });
 
   test('renders over a deliberately delayed network', async ({ page }) => {
