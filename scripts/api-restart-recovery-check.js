@@ -164,11 +164,7 @@ async function main() {
     activeProcess = null;
     console.log('API restart and recovery contract passed.');
   } finally {
-    if (
-      activeProcess &&
-      activeProcess.exitCode === null &&
-      activeProcess.signalCode === null
-    ) {
+    if (activeProcess && activeProcess.exitCode === null && activeProcess.signalCode === null) {
       activeProcess.kill('SIGKILL');
     }
   }
