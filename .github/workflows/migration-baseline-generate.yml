@@ -1,0 +1,43 @@
+name: Migration baseline generator
+
+on:
+  push:
+    branches:
+      - phase-10t-migration-baseline
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    name: Generate Prisma baseline SQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate baseline SQL
+        run: |
+          echo 'PRISMA_BASELINE_SQL_BEGIN'
+          pnpm --filter @attravoya/database exec prisma migrate diff \
+            --from-empty \
+            --to-schema prisma/schema.prisma \
+            --script
+          echo 'PRISMA_BASELINE_SQL_END'
