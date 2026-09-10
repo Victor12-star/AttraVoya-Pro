@@ -110,50 +110,47 @@ test('resilience evaluation rejects soak, spike, and post-sequence health failur
   assert.ok(failures.some((failure) => failure.includes('Readiness probe')));
 });
 
-test(
-  'resilience runner executes four soak waves, one spike, two probes, and bounded pauses',
-  async () => {
-    const calls = [];
-    const pauses = [];
-    const responses = [
-      healthySoakWave(),
-      healthySoakWave(),
-      healthySoakWave(),
-      healthySoakWave(),
-      healthySpike(),
-      healthyProbe(),
-      healthyProbe(),
-    ];
+test('resilience runner executes bounded soak, spike, probes, and pauses', async () => {
+  const calls = [];
+  const pauses = [];
+  const responses = [
+    healthySoakWave(),
+    healthySoakWave(),
+    healthySoakWave(),
+    healthySoakWave(),
+    healthySpike(),
+    healthyProbe(),
+    healthyProbe(),
+  ];
 
-    const result = await runApiResilienceLoadCheck(
-      {},
-      {
-        runHttpLoadTest: async (config) => {
-          calls.push(config);
-          return responses[calls.length - 1];
-        },
-        sleep: async (milliseconds) => {
-          pauses.push(milliseconds);
-        },
+  const result = await runApiResilienceLoadCheck(
+    {},
+    {
+      runHttpLoadTest: async (config) => {
+        calls.push(config);
+        return responses[calls.length - 1];
       },
-    );
+      sleep: async (milliseconds) => {
+        pauses.push(milliseconds);
+      },
+    },
+  );
 
-    assert.equal(calls.length, 7);
-    assert.equal(pauses.length, 3);
-    assert.deepEqual(pauses, [250, 250, 250]);
-    assert.deepEqual(
-      calls.slice(0, 4).map((call) => [call.requests, call.concurrency]),
-      [
-        [12, 4],
-        [12, 4],
-        [12, 4],
-        [12, 4],
-      ],
-    );
-    assert.deepEqual([calls[4].requests, calls[4].concurrency], [60, 60]);
-    assert.deepEqual(result.failures, []);
-  },
-);
+  assert.equal(calls.length, 7);
+  assert.equal(pauses.length, 3);
+  assert.deepEqual(pauses, [250, 250, 250]);
+  assert.deepEqual(
+    calls.slice(0, 4).map((call) => [call.requests, call.concurrency]),
+    [
+      [12, 4],
+      [12, 4],
+      [12, 4],
+      [12, 4],
+    ],
+  );
+  assert.deepEqual([calls[4].requests, calls[4].concurrency], [60, 60]);
+  assert.deepEqual(result.failures, []);
+});
 
 test('resilience check refuses remote targets', async () => {
   await assert.rejects(
