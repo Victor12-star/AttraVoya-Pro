@@ -30,7 +30,6 @@ export function createLoggerOptions() {
           // Keep the existing `url` log field for downstream compatibility,
           // but its value is now a bounded route template rather than raw input.
           url: requestRouteForLog(request),
-          remoteAddress: request.ip,
         };
       },
     },
