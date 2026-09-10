@@ -47,7 +47,10 @@ export function createShutdownHandler({
 
         const closePromise = app.close();
         const timeoutPromise = new Promise((_, reject) => {
-          timeout = setTimeout(() => reject(createShutdownTimeoutError(gracePeriodMs)), gracePeriodMs);
+          timeout = setTimeout(
+            () => reject(createShutdownTimeoutError(gracePeriodMs)),
+            gracePeriodMs,
+          );
         });
 
         await Promise.race([closePromise, timeoutPromise]);
