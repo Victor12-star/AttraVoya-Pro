@@ -97,7 +97,9 @@ export async function runApiResilienceLoadCheck(options = {}, dependencies = {})
   const livenessUrl = assertHttpLoadTargetAllowed(new URL(LIVENESS_PATH, baseUrl), false);
   const readinessUrl = assertHttpLoadTargetAllowed(new URL(READINESS_PATH, baseUrl), false);
   const runLoad = dependencies.runHttpLoadTest ?? runHttpLoadTest;
-  const sleep = dependencies.sleep ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  const sleep =
+    dependencies.sleep ??
+    ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
 
   const soak = [];
   for (let wave = 0; wave < SOAK_WAVES; wave += 1) {
@@ -172,7 +174,8 @@ async function main() {
   console.log(JSON.stringify(result, null, 2));
 
   if (result.failures.length > 0) {
-    for (const failure of result.failures) console.error(`RESILIENCE LOAD CHECK FAILED: ${failure}`);
+    for (const failure of result.failures)
+      console.error(`RESILIENCE LOAD CHECK FAILED: ${failure}`);
     process.exitCode = 1;
   }
 }
