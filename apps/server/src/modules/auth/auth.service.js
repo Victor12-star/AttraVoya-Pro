@@ -179,11 +179,19 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
       // Rotate refresh credentials after every use. A copied old token becomes
       // useless immediately after the legitimate client refreshes its session.
       const nextRefreshToken = createOpaqueToken();
-      await repository.rotateSession({
+      const rotated = await repository.rotateSession({
         sessionId: session.id,
-        refreshTokenHash: hashToken(nextRefreshToken),
+        currentRefreshTokenHash: currentHash,
+        nextRefreshTokenHash: hashToken(nextRefreshToken),
         lastUsedAt: new Date(),
       });
+
+      // A concurrent request may have read the same session before the first
+      // rotation committed. Treat a failed compare-and-swap as a stale token
+      // instead of returning credentials that another request already replaced.
+      if (!rotated) {
+        throw new AuthenticationError('Your session has expired. Please sign in again.');
+      }
 
       return {
         accessToken: issueAccessToken(session.auth),
