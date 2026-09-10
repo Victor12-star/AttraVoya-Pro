@@ -97,7 +97,7 @@ test.describe('public home page', () => {
 
     // Keep CI evidence aggregate-only. Do not print resource URLs, query strings,
     // user identifiers, provider payloads or other request-level information.
-    console.log(`Production mobile resource baseline: ${JSON.stringify(baseline)}`);
+    console.warn(`Production mobile resource baseline: ${JSON.stringify(baseline)}`);
   });
 
   test('renders over a deliberately delayed network', async ({ page }) => {
