@@ -233,6 +233,62 @@ jobs:
 
           echo "API capacity/backpressure contract passed."
 
+      - name: Verify bounded soak and spike resilience
+        run: |
+          set -euo pipefail
+
+          log_file="/tmp/attravoya-resilience-api.log"
+          node apps/server/src/server.js >"$log_file" 2>&1 &
+          api_pid=$!
+
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              cat "$log_file" || true
+            fi
+            if kill -0 "$api_pid" 2>/dev/null; then
+              kill -TERM "$api_pid" 2>/dev/null || true
+              for attempt in {1..20}; do
+                if ! kill -0 "$api_pid" 2>/dev/null; then
+                  break
+                fi
+                sleep 0.25
+              done
+              kill -KILL "$api_pid" 2>/dev/null || true
+            fi
+            wait "$api_pid" 2>/dev/null || true
+            exit "$status"
+          }
+          trap cleanup EXIT
+
+          ready=0
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5000/api/v1/health/ready >/dev/null; then
+              ready=1
+              break
+            fi
+            if ! kill -0 "$api_pid" 2>/dev/null; then
+              echo "API exited before becoming ready for resilience testing."
+              exit 1
+            fi
+            echo "Waiting for API resilience-test readiness ($attempt/30)..."
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            echo "API did not become ready for resilience testing within 30 seconds."
+            exit 1
+          fi
+
+          pnpm resilience:check
+
+          if ! kill -0 "$api_pid" 2>/dev/null; then
+            echo "API exited during the bounded soak/spike check."
+            exit 1
+          fi
+
+          echo "API bounded soak/spike resilience contract passed."
+
       - name: Verify database pool exhaustion behavior
         env:
           DATABASE_POOL_EXHAUSTION_TEST: '1'
