@@ -170,12 +170,25 @@ export const authRepository = Object.freeze({
       });
   },
 
-  async rotateSession({ sessionId, refreshTokenHash, lastUsedAt }) {
-    return prisma.authSession.update({
-      where: { id: sessionId },
-      data: { refreshTokenHash, lastUsedAt },
-      select: { id: true, userId: true, expiresAt: true },
+  async rotateSession({
+    sessionId,
+    currentRefreshTokenHash,
+    nextRefreshTokenHash,
+    lastUsedAt,
+  }) {
+    // Compare-and-swap the refresh credential. The old hash is part of the
+    // write predicate so two requests that read the same session cannot both
+    // rotate it successfully; only the first database update can match.
+    const updated = await prisma.authSession.updateMany({
+      where: {
+        id: sessionId,
+        refreshTokenHash: currentRefreshTokenHash,
+        revokedAt: null,
+      },
+      data: { refreshTokenHash: nextRefreshTokenHash, lastUsedAt },
     });
+
+    return updated.count === 1;
   },
 
   async revokeSessionByRefreshHash(refreshTokenHash, revokedAt = new Date()) {
