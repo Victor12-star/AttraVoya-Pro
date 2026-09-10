@@ -102,6 +102,32 @@ async function createApp() {
       other: 0,
     })),
   };
+  const runtimeMetrics = {
+    snapshot: vi.fn(() => ({
+      windowSeconds: 60,
+      cpu: {
+        userTimeMs: 1200,
+        systemTimeMs: 300,
+        totalTimeMs: 1500,
+        coreUtilization: 0.025,
+        capacityUtilizationRatio: 0.00625,
+        availableParallelism: 4,
+      },
+      memory: {
+        rssBytes: 120_000_000,
+        heapTotalBytes: 80_000_000,
+        heapUsedBytes: 40_000_000,
+        heapUtilizationRatio: 0.5,
+        externalBytes: 2_000_000,
+        arrayBuffersBytes: 250_000,
+      },
+      eventLoop: {
+        utilizationRatio: 0.12,
+        activeMs: 7200,
+        idleMs: 52_800,
+      },
+    })),
+  };
   const databasePoolMetrics = vi.fn(() => ({
     maxConnections: 5,
     totalConnections: 2,
@@ -119,6 +145,7 @@ async function createApp() {
     requestMetrics,
     serviceMetricsProviderMetrics: providerMetrics,
     serviceMetricsProviderCacheMetrics: providerCacheMetrics,
+    serviceMetricsRuntimeMetrics: runtimeMetrics,
     serviceMetricsDatabasePoolMetrics: databasePoolMetrics,
   });
   apps.push(app);
@@ -128,6 +155,7 @@ async function createApp() {
     requestMetrics,
     providerMetrics,
     providerCacheMetrics,
+    runtimeMetrics,
     databasePoolMetrics,
   };
 }
@@ -150,6 +178,7 @@ describe('admin service metrics', () => {
     expect(metrics.requestMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerCacheMetrics.snapshot).not.toHaveBeenCalled();
+    expect(metrics.runtimeMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.databasePoolMetrics).not.toHaveBeenCalled();
   });
 
@@ -167,6 +196,7 @@ describe('admin service metrics', () => {
     expect(metrics.requestMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerCacheMetrics.snapshot).not.toHaveBeenCalled();
+    expect(metrics.runtimeMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.databasePoolMetrics).not.toHaveBeenCalled();
   });
 
@@ -194,6 +224,19 @@ describe('admin service metrics', () => {
         providers: [{ provider: 'geoapify', requests: 3, failures: 1 }],
       },
       providerCache: { accesses: 10, hits: 7, hitRate: 0.7 },
+      runtime: {
+        cpu: {
+          coreUtilization: 0.025,
+          capacityUtilizationRatio: 0.00625,
+          availableParallelism: 4,
+        },
+        memory: {
+          rssBytes: 120_000_000,
+          heapUsedBytes: 40_000_000,
+          heapUtilizationRatio: 0.5,
+        },
+        eventLoop: { utilizationRatio: 0.12 },
+      },
       databasePool: {
         maxConnections: 5,
         activeConnections: 1,
@@ -211,6 +254,7 @@ describe('admin service metrics', () => {
     expect(metrics.requestMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.providerMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.providerCacheMetrics.snapshot).toHaveBeenCalledTimes(1);
+    expect(metrics.runtimeMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.databasePoolMetrics).toHaveBeenCalledTimes(1);
   });
 });

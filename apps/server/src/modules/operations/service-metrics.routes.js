@@ -3,6 +3,7 @@ import { getDatabasePoolMetrics } from '@attravoya/database';
 
 import { providerCacheMetrics } from '../../observability/provider-cache-metrics.js';
 import { providerMetrics } from '../../observability/provider-metrics.js';
+import { runtimeMetrics } from '../../observability/runtime-metrics.js';
 
 function requireSnapshotSource(source, name) {
   if (!source || typeof source.snapshot !== 'function') {
@@ -40,6 +41,10 @@ export async function serviceMetricsRoutes(app, options = {}) {
     options.providerCacheMetrics ?? providerCacheMetrics,
     'Provider cache metrics',
   );
+  const configuredRuntimeMetrics = requireSnapshotSource(
+    options.runtimeMetrics ?? runtimeMetrics,
+    'Runtime metrics',
+  );
   const readDatabasePoolMetrics = requireDatabasePoolReader(
     options.getDatabasePoolMetrics ?? getDatabasePoolMetrics,
   );
@@ -59,6 +64,7 @@ export async function serviceMetricsRoutes(app, options = {}) {
       http: requestMetrics.snapshot(),
       providers: configuredProviderMetrics.snapshot(),
       providerCache: configuredProviderCacheMetrics.snapshot(),
+      runtime: configuredRuntimeMetrics.snapshot(),
       databasePool: readDatabasePoolMetrics(),
     };
   });
