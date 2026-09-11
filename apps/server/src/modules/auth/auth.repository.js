@@ -48,6 +48,14 @@ const claimedTokenSelect = {
   user: { select: { deletedAt: true } },
 };
 
+const publicSessionSelect = {
+  id: true,
+  userAgent: true,
+  lastUsedAt: true,
+  expiresAt: true,
+  createdAt: true,
+};
+
 /**
  * Authentication persistence is kept behind this repository so services do not
  * depend on Prisma query shapes. It also gives security tests a clean place to
@@ -149,6 +157,30 @@ export const authRepository = Object.freeze({
         expiresAt,
       },
       select: { id: true, userId: true, expiresAt: true },
+    });
+  },
+
+  async listActiveSessionsForUser(userId, now = new Date(), limit = 50) {
+    return prisma.authSession.findMany({
+      where: { userId, revokedAt: null, expiresAt: { gt: now } },
+      orderBy: [{ lastUsedAt: 'desc' }, { id: 'desc' }],
+      take: limit,
+      select: publicSessionSelect,
+    });
+  },
+
+  async revokeOwnedSession({ userId, sessionId, revokedAt = new Date() }) {
+    const result = await prisma.authSession.updateMany({
+      where: { id: sessionId, userId, revokedAt: null, expiresAt: { gt: revokedAt } },
+      data: { revokedAt },
+    });
+    return result.count === 1;
+  },
+
+  async revokeAllActiveSessionsForUser(userId, revokedAt = new Date()) {
+    return prisma.authSession.updateMany({
+      where: { userId, revokedAt: null, expiresAt: { gt: revokedAt } },
+      data: { revokedAt },
     });
   },
 
