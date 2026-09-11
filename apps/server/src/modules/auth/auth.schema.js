@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -5,6 +7,8 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
 } from '@attravoya/validation';
+
+const sessionIdParamsSchema = z.object({ sessionId: z.string().trim().min(1).max(128) }).strict();
 
 export const authSchemas = Object.freeze({
   register: {
@@ -21,5 +25,8 @@ export const authSchemas = Object.freeze({
   },
   verifyEmail: {
     body: verifyEmailSchema,
+  },
+  revokeSession: {
+    params: sessionIdParamsSchema,
   },
 });

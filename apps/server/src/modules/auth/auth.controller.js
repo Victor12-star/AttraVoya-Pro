@@ -40,6 +40,15 @@ function clearSessionCookies(reply, env) {
   reply.clearCookie(AUTH_COOKIES.REFRESH, options);
 }
 
+function authenticatedUserId(request) {
+  return /** @type {any} */ (request).auth.id;
+}
+
+function sendPrivate(reply, payload, statusCode = 200) {
+  reply.header('Cache-Control', 'private, no-store');
+  return reply.code(statusCode).send(payload);
+}
+
 export function createAuthController({
   service,
   env,
@@ -118,6 +127,25 @@ export function createAuthController({
       });
       setSessionCookies(reply, session, env);
       return reply.send({ accessToken: session.accessToken, user: session.user });
+    },
+
+    async listSessions(request, reply) {
+      const sessions = await service.listSessions(authenticatedUserId(request));
+      return sendPrivate(reply, { sessions });
+    },
+
+    async revokeSession(request, reply) {
+      await service.revokeSession({
+        userId: authenticatedUserId(request),
+        sessionId: request.params.sessionId,
+      });
+      return reply.status(204).send();
+    },
+
+    async revokeAllSessions(request, reply) {
+      await service.revokeAllSessions(authenticatedUserId(request));
+      clearSessionCookies(reply, env);
+      return reply.status(204).send();
     },
 
     async refresh(request, reply) {

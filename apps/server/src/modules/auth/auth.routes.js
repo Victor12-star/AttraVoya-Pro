@@ -8,6 +8,7 @@ import { createAuthController } from './auth.controller.js';
 const STRICT_AUTH_RATE_LIMIT = Object.freeze({ max: 10, timeWindow: '1 minute' });
 const PASSWORD_RESET_RATE_LIMIT = Object.freeze({ max: 5, timeWindow: '15 minutes' });
 const VERIFICATION_RESEND_RATE_LIMIT = Object.freeze({ max: 5, timeWindow: '15 minutes' });
+const SESSION_MANAGEMENT_RATE_LIMIT = Object.freeze({ max: 30, timeWindow: '1 minute' });
 
 function resolveConfiguredEmailProvider(options) {
   if (options.emailProvider) return options.emailProvider;
@@ -53,6 +54,8 @@ export async function authRoutes(app, options = {}) {
     onVerificationRequested,
     onPasswordResetRequested,
   });
+  const protectedApp = /** @type {any} */ (app);
+  const authenticated = { onRequest: [protectedApp.authenticate] };
 
   app.post('/register', {
     schema: authSchemas.register,
@@ -76,6 +79,25 @@ export async function authRoutes(app, options = {}) {
     schema: authSchemas.login,
     config: { rateLimit: STRICT_AUTH_RATE_LIMIT },
     handler: controller.login,
+  });
+
+  app.get('/sessions', {
+    ...authenticated,
+    config: { rateLimit: SESSION_MANAGEMENT_RATE_LIMIT },
+    handler: controller.listSessions,
+  });
+
+  app.delete('/sessions', {
+    ...authenticated,
+    config: { rateLimit: SESSION_MANAGEMENT_RATE_LIMIT },
+    handler: controller.revokeAllSessions,
+  });
+
+  app.delete('/sessions/:sessionId', {
+    ...authenticated,
+    schema: authSchemas.revokeSession,
+    config: { rateLimit: SESSION_MANAGEMENT_RATE_LIMIT },
+    handler: controller.revokeSession,
   });
 
   app.post('/refresh', {
