@@ -82,9 +82,10 @@ describe('provider request budget environment', () => {
   });
 
   it('requires an explicit budget for production Resend email', () => {
-    const source = productionEnvironment();
-    delete source.RESEND_REQUEST_BUDGET_MAX;
-    delete source.RESEND_REQUEST_BUDGET_WINDOW_SECONDS;
+    const source = productionEnvironment({
+      RESEND_REQUEST_BUDGET_MAX: '',
+      RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '',
+    });
 
     expect(() => loadEnvironment(source)).toThrow(
       /RESEND_REQUEST_BUDGET_MAX and RESEND_REQUEST_BUDGET_WINDOW_SECONDS/,
