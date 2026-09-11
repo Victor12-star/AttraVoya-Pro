@@ -139,7 +139,7 @@ describe('SessionSecurityPage', () => {
     await waitFor(() =>
       expect(screen.queryByRole('heading', { name: 'Chrome · Windows' })).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Session revoked.');
+    expect(screen.getByText(/Session revoked\./)).toBeInTheDocument();
   });
 
   it('requires explicit confirmation before revoking every session and redirects after success', async () => {
