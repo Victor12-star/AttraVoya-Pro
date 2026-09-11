@@ -23,7 +23,33 @@ test.describe('profile session security', () => {
   test('renders a private session-management experience without serious accessibility issues', async ({
     page,
   }) => {
+    const sessionRequests = [];
+    const failedRequests = [];
+    const pageErrors = [];
+    const consoleErrors = [];
+    let routeHits = 0;
+
+    page.on('request', (request) => {
+      if (request.url().includes('/api/v1/auth/sessions')) {
+        sessionRequests.push({ method: request.method(), url: request.url() });
+      }
+    });
+    page.on('requestfailed', (request) => {
+      if (request.url().includes('/api/v1/auth/sessions')) {
+        failedRequests.push({
+          method: request.method(),
+          url: request.url(),
+          failure: request.failure()?.errorText ?? null,
+        });
+      }
+    });
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+
     await page.route('**/api/v1/auth/sessions*', async (route) => {
+      routeHits += 1;
       const request = route.request();
       const url = new URL(request.url());
       expect(request.method()).toBe('GET');
@@ -46,7 +72,21 @@ test.describe('profile session security', () => {
 
     expect(response?.ok()).toBe(true);
     await expect(page.getByRole('heading', { name: 'Sessions & devices', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Chrome · Windows' })).toBeVisible();
+    try {
+      await expect(page.getByRole('heading', { name: 'Chrome · Windows' })).toBeVisible();
+    } catch (error) {
+      throw new Error(
+        `Session card did not render. diagnostics=${JSON.stringify({
+          routeHits,
+          sessionRequests,
+          failedRequests,
+          pageErrors,
+          consoleErrors,
+          currentUrl: page.url(),
+        })}`,
+        { cause: error },
+      );
+    }
     await expect(page.getByText('must-not-render')).toHaveCount(0);
     await expect(page.getByText(/Mozilla\/5\.0/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Revoke session: Chrome · Windows' })).toBeVisible();
