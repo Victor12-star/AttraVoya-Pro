@@ -22,7 +22,11 @@ test.describe('profile session security', () => {
   test('renders a private session-management experience without serious accessibility issues', async ({
     page,
   }) => {
-    await page.route('http://localhost:5000/api/v1/auth/sessions', async (route) => {
+    await page.route('**/api/v1/auth/sessions*', async (route) => {
+      const request = route.request();
+      const url = new URL(request.url());
+      expect(request.method()).toBe('GET');
+      expect(url.pathname).toBe('/api/v1/auth/sessions');
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
