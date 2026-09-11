@@ -17,10 +17,10 @@ function assertPositiveSafeInteger(value, name) {
   }
 }
 
-function finiteNow(nowMs) {
-  const value = Number(nowMs);
+function finiteNow(nowImpl) {
+  const value = Number(nowImpl());
   if (!Number.isFinite(value)) {
-    throw new TypeError('Provider request budget clock must be a finite number.');
+    throw new TypeError('Provider request budget clock must return a finite number.');
   }
   return value;
 }
@@ -48,14 +48,17 @@ export function configureProviderRequestBudgets(nextPolicies = {}) {
 /**
  * Consume allowance immediately before one real upstream HTTP attempt.
  * Providers without a configured policy keep the transport's existing
- * behavior, which is useful outside production and for isolated tests.
+ * behavior, including its clock-call sequence in deterministic tests.
  */
-export function consumeProviderRequestBudget({ provider, nowMs = Date.now() }) {
+export function consumeProviderRequestBudget({ provider, nowImpl = Date.now }) {
   const normalizedProvider = normalizeProvider(provider);
   const policy = policies.get(normalizedProvider);
   if (!policy) return;
+  if (typeof nowImpl !== 'function') {
+    throw new TypeError('Provider request budget requires a clock function.');
+  }
 
-  const now = finiteNow(nowMs);
+  const now = finiteNow(nowImpl);
   let state = states.get(normalizedProvider);
   const windowEnded = state ? state.windowStartedAt + policy.windowMs : 0;
 
