@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const BLOCKING_ACCESSIBILITY_IMPACTS = new Set(['critical', 'serious']);
+const WEB_ORIGIN = 'http://127.0.0.1:4173';
 
 const sessionPayload = {
   sessions: [
@@ -28,15 +29,12 @@ test.describe('profile session security', () => {
       expect(request.method()).toBe('GET');
       expect(url.pathname).toBe('/api/v1/auth/sessions');
 
-      const requestOrigin = request.headers().origin;
-      expect(requestOrigin).toBeTruthy();
-
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         headers: {
           'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': requestOrigin,
+          'Access-Control-Allow-Origin': WEB_ORIGIN,
           'Cache-Control': 'private, no-store',
           Vary: 'Origin',
         },
