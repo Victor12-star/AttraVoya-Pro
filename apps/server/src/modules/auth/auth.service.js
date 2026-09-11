@@ -13,6 +13,7 @@ import { AUTH_TOKEN_BYTES, TOKEN_HASH_ALGORITHM } from './auth.contracts.js';
 
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+const ACTIVE_SESSION_LIST_LIMIT = 50;
 
 // Use a real Argon2id hash when an email does not exist so failed logins take
 // roughly comparable work and reveal less information through timing.
@@ -40,6 +41,16 @@ function publicUser(auth) {
     email: auth.email,
     roles: auth.roles ?? [],
     emailVerified: Boolean(auth.emailVerifiedAt),
+  };
+}
+
+function publicSession(session) {
+  return {
+    id: session.id,
+    userAgent: session.userAgent ?? null,
+    createdAt: session.createdAt.toISOString(),
+    lastUsedAt: session.lastUsedAt.toISOString(),
+    expiresAt: session.expiresAt.toISOString(),
   };
 }
 
@@ -165,6 +176,26 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
         refreshExpiresAt: session.expiresAt,
         user: publicUser(auth),
       };
+    },
+
+    async listSessions(userId) {
+      const sessions = await repository.listActiveSessionsForUser(
+        userId,
+        new Date(),
+        ACTIVE_SESSION_LIST_LIMIT,
+      );
+      return sessions.map(publicSession);
+    },
+
+    async revokeSession({ userId, sessionId }) {
+      // The repository predicate includes the authenticated owner. Ignore a
+      // non-match so this endpoint cannot be used to probe another user's
+      // session identifiers and repeated revocation remains idempotent.
+      await repository.revokeOwnedSession({ userId, sessionId });
+    },
+
+    async revokeAllSessions(userId) {
+      await repository.revokeAllActiveSessionsForUser(userId);
     },
 
     async refresh(refreshToken) {
