@@ -2,6 +2,7 @@ import { ProviderResponseError, ProviderUnavailableError } from '../../errors/ap
 import { ERROR_CODES } from '../../errors/error-codes.js';
 import { providerMetrics as defaultProviderMetrics } from '../../observability/provider-metrics.js';
 import { mapProviderHttpError } from './provider-error-mapper.js';
+import { consumeProviderRequestBudget } from './provider-request-budget.js';
 
 const RETRYABLE_STATUSES = new Set([408, 425, 500, 502, 503, 504]);
 const DEFAULT_MAX_CONCURRENT = 8;
@@ -216,6 +217,7 @@ async function parseJsonResponse(response, provider) {
  *
  * - Enforces a hard per-attempt timeout and an end-to-end logical request deadline.
  * - Bounds per-client/provider concurrency, queue growth, and queue wait time.
+ * - Enforces configured provider request budgets before each real upstream attempt.
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Honors valid Retry-After cooldowns across new requests in this process.
  * - Suppresses repeatedly unavailable providers and allows one recovery probe.
@@ -369,6 +371,7 @@ export function createProviderHttpClient(options) {
       const remainingMs = remainingRequestMs(deadlineMs);
       if (remainingMs <= 0) throw providerRequestTimeoutError(provider);
 
+      consumeProviderRequestBudget({ provider, nowImpl });
       onAttempt();
       const controller = new AbortController();
       const attemptTimeoutMs = Math.max(
