@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const BLOCKING_ACCESSIBILITY_IMPACTS = new Set(['critical', 'serious']);
-const WEB_ORIGIN = 'http://127.0.0.1:4173';
+const WEB_ORIGIN = new URL(process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000').origin;
 
 const sessionPayload = {
   sessions: [
