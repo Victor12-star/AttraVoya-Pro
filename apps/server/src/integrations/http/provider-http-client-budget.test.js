@@ -90,8 +90,12 @@ describe('provider HTTP request budgets', () => {
       nowImpl: () => 30_000,
     });
 
-    await expect(pexels.requestJson('https://provider.example/image')).resolves.toEqual({ ok: true });
-    await expect(newsdata.requestJson('https://provider.example/news')).resolves.toEqual({ ok: true });
+    await expect(pexels.requestJson('https://provider.example/image')).resolves.toEqual({
+      ok: true,
+    });
+    await expect(newsdata.requestJson('https://provider.example/news')).resolves.toEqual({
+      ok: true,
+    });
     await expect(pexels.requestJson('https://provider.example/image/2')).rejects.toMatchObject({
       code: 'PROVIDER_RATE_LIMITED',
     });

@@ -39,17 +39,15 @@ function productionEnvironment(overrides = {}) {
 
 describe('provider request budget environment', () => {
   it('allows non-production credential configuration without a request budget', () => {
-    const environment = loadEnvironment(
-      baseEnvironment({ GEOAPIFY_API_KEY: 'geoapify-test-key' }),
-    );
+    const environment = loadEnvironment(baseEnvironment({ GEOAPIFY_API_KEY: 'geoapify-test-key' }));
 
     expect(environment.GEOAPIFY_REQUEST_BUDGET_MAX).toBeUndefined();
   });
 
   it('requires both halves of a configured budget in every environment', () => {
-    expect(() =>
-      loadEnvironment(baseEnvironment({ PEXELS_REQUEST_BUDGET_MAX: '50' })),
-    ).toThrow(/PEXELS_REQUEST_BUDGET_MAX and PEXELS_REQUEST_BUDGET_WINDOW_SECONDS/);
+    expect(() => loadEnvironment(baseEnvironment({ PEXELS_REQUEST_BUDGET_MAX: '50' }))).toThrow(
+      /PEXELS_REQUEST_BUDGET_MAX and PEXELS_REQUEST_BUDGET_WINDOW_SECONDS/,
+    );
   });
 
   it('fails closed when a credentialed production provider lacks an explicit budget', () => {
