@@ -33,7 +33,7 @@ describe('session API client', () => {
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
     await expect(client.revokeAuthSession(' session/one ')).resolves.toBeNull();
-    await expect(client.revokeAuthSession('   ')).rejects.toBeInstanceOf(TypeError);
+    expect(() => client.revokeAuthSession('   ')).toThrow(TypeError);
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
