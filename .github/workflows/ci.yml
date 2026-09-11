@@ -163,8 +163,18 @@ jobs:
       - name: Validate Prisma schema
         run: pnpm --filter @attravoya/database validate:schema
 
-      - name: Apply schema to disposable CI database
-        run: pnpm --filter @attravoya/database db:push
+      - name: Apply migrations to disposable CI database
+        run: pnpm db:deploy
+
+      - name: Verify migration status
+        run: pnpm --filter @attravoya/database migrate:status
+
+      - name: Verify deployed schema matches Prisma schema
+        run: |
+          pnpm --filter @attravoya/database exec prisma migrate diff \
+            --from-config-datasource \
+            --to-schema prisma/schema.prisma \
+            --exit-code
 
       - name: Seed reference data
         run: pnpm db:seed

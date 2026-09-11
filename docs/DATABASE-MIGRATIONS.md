@@ -1,0 +1,67 @@
+# Database migration deployment
+
+This document defines the Prisma/PostgreSQL migration contract for AttraVoya Pro. It complements the deployment reliability and PostgreSQL disaster-recovery runbooks.
+
+## Source of truth
+
+`packages/database/prisma/schema.prisma` is the current Prisma schema. Versioned production schema changes must also be represented by ordered migration files under `packages/database/prisma/migrations/`.
+
+The initial `0_init` migration was generated from the current schema with the repository's pinned Prisma version. It is the baseline for migration-managed databases; it is not an instruction to recreate tables in an already populated database.
+
+## Empty or new environments
+
+For an empty PostgreSQL database:
+
+1. configure the intended `DATABASE_URL` through the deployment platform's secret management;
+2. run `pnpm db:deploy` before admitting the new application version to traffic;
+3. run `pnpm --filter @attravoya/database migrate:status` and require no pending or failed migration;
+4. verify schema drift is empty with `prisma migrate diff` before considering the database ready;
+5. seed only the repository's idempotent reference data where that environment requires it.
+
+CI follows the same deployment path against a disposable PostgreSQL database. It no longer uses `prisma db push` as release evidence.
+
+## Existing databases created before migration history
+
+Do **not** run `0_init` against an existing database that already contains the AttraVoya Pro tables. The baseline contains table, enum, index, and foreign-key creation statements and would conflict with those objects.
+
+Before adopting migration history for an existing database:
+
+1. create and verify a recoverable backup or provider restore point;
+2. run a schema-only comparison from the configured datasource to `prisma/schema.prisma` and require no unexpected drift;
+3. investigate and reconcile any drift before changing migration history;
+4. only when the existing schema is confirmed equivalent, mark the baseline as already applied with `pnpm --filter @attravoya/database exec prisma migrate resolve --applied 0_init`;
+5. run `pnpm --filter @attravoya/database migrate:status` and the schema-drift check again;
+6. preserve the command output and database/release revision as private operational evidence without copying credentials or user data into logs or documentation.
+
+Baselining an existing database is an explicit operator action. Application startup must not silently mark migrations applied, mutate migration history, or fall back to `db push`.
+
+## Rolling-deployment compatibility
+
+Future migrations must be reviewed for compatibility while old and new application versions can overlap. Prefer additive changes first: add nullable columns, new tables, new indexes, or otherwise backward-compatible objects before application code depends on them.
+
+When a change eventually removes or tightens an existing contract, use an expand/migrate/contract sequence:
+
+1. **Expand:** deploy a backward-compatible schema that both application versions can use.
+2. **Migrate:** deploy application code and backfill data with bounded, observable work where required.
+3. **Contract:** remove old columns, constraints, enum values, or compatibility paths only after no supported application version depends on them.
+
+Do not combine a destructive schema change with the first application release that stops using the old shape. Renames should normally be treated as add/copy/switch/remove rather than an immediate destructive rename when rolling compatibility matters.
+
+## Rollback and failure handling
+
+`prisma migrate deploy` applies committed migrations forward; it is not a general automatic rollback mechanism. If a migration fails, stop the rollout, preserve database evidence, and follow the migration-specific recovery plan.
+
+Before redeploying an older application version after a schema change, confirm that the current database remains backward-compatible with that version. For destructive or data-transforming migrations, define the backup/restore or forward-fix procedure before release rather than improvising after failure.
+
+Never place database credentials, connection strings containing secrets, authentication tokens, request payloads, traveller data, or raw user records in migration logs or release notes.
+
+## Pull-request requirements for future schema changes
+
+A pull request that changes the Prisma schema must include the corresponding migration and must pass the exact-head PostgreSQL/Prisma CI job. Reviewers should verify that:
+
+- migration SQL matches the intended schema change;
+- deployment ordering is safe for overlapping application versions;
+- long-running locks, backfills, uniqueness changes, and non-null constraints have an explicit bounded plan;
+- destructive changes have an explicit recovery path;
+- `migrate:status` is clean after deploy;
+- the deployed database has no unexpected schema drift from the committed Prisma schema.
