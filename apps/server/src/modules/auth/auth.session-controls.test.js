@@ -124,9 +124,7 @@ describe('authenticated session controls', () => {
     });
 
     expect(response.statusCode).toBe(204);
-    expect(revoked).toEqual([
-      { userId: 'user-1', sessionId: 'session-from-another-account' },
-    ]);
+    expect(revoked).toEqual([{ userId: 'user-1', sessionId: 'session-from-another-account' }]);
   });
 
   it('revokes all active sessions for the authenticated account and clears auth cookies', async () => {
