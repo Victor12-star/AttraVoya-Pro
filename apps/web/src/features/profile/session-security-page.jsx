@@ -135,8 +135,12 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
   }, [copy]);
 
   useEffect(() => {
-    void loadSessions();
+    const timer = setTimeout(() => {
+      void loadSessions();
+    }, 0);
+
     return () => {
+      clearTimeout(timer);
       requestSequenceRef.current += 1;
     };
   }, [loadSessions]);
