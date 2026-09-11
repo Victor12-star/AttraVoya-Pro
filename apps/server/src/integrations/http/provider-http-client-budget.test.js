@@ -20,7 +20,7 @@ afterEach(() => {
 describe('provider HTTP request budgets', () => {
   it('shares one allowance across separate clients for the same provider', async () => {
     configureProviderRequestBudgets({ geoapify: { maxRequests: 2, windowMs: 60_000 } });
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
+    const fetchImpl = vi.fn().mockImplementation(async () => jsonResponse(200, { ok: true }));
     const common = {
       provider: 'geoapify',
       fetchImpl,
@@ -76,7 +76,7 @@ describe('provider HTTP request budgets', () => {
       pexels: { maxRequests: 1, windowMs: 60_000 },
       newsdata: { maxRequests: 1, windowMs: 60_000 },
     });
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
+    const fetchImpl = vi.fn().mockImplementation(async () => jsonResponse(200, { ok: true }));
     const pexels = createProviderHttpClient({
       provider: 'pexels',
       fetchImpl,
