@@ -9,11 +9,12 @@ import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
 import { API_PREFIX, DEFAULT_BODY_LIMIT_BYTES, DEFAULT_RATE_LIMIT } from './config/constants.js';
-import { env } from './config/env.js';
+import { env, providerRequestBudgetPoliciesFromEnvironment } from './config/env.js';
 import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
 import { createAuthorizeHook } from './hooks/authorize.js';
+import { configureProviderRequestBudgets } from './integrations/http/provider-request-budget.js';
 import { createReadinessState } from './lifecycle/readiness-state.js';
 import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
 import { authRepository } from './modules/auth/auth.repository.js';
@@ -42,6 +43,10 @@ import {
 } from './observability/http-request-metrics.js';
 
 export async function buildApp(options = {}) {
+  configureProviderRequestBudgets(
+    options.providerRequestBudgetPolicies ?? providerRequestBudgetPoliciesFromEnvironment(env),
+  );
+
   const readinessState = options.readinessState ?? createReadinessState();
   const app = Fastify({
     logger: options.logger ?? createLoggerOptions(),
