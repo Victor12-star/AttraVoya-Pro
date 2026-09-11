@@ -27,9 +27,19 @@ test.describe('profile session security', () => {
       const url = new URL(request.url());
       expect(request.method()).toBe('GET');
       expect(url.pathname).toBe('/api/v1/auth/sessions');
+
+      const requestOrigin = request.headers().origin;
+      expect(requestOrigin).toBeTruthy();
+
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
+        headers: {
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Origin': requestOrigin,
+          'Cache-Control': 'private, no-store',
+          Vary: 'Origin',
+        },
         body: JSON.stringify(sessionPayload),
       });
     });
