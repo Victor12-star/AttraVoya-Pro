@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -207,6 +207,51 @@ describe('AccommodationPage', () => {
 
     screen.getByRole('button', { name: 'Close photos' }).click();
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('falls back across failed provider photos instead of leaving broken hotel media', async () => {
+    mocks.getNearbyAccommodation.mockResolvedValue(accommodationPhotoResponse());
+
+    render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
+
+    await screen.findByRole('heading', { name: 'Example Hotel', level: 2 });
+    fireEvent.error(screen.getByRole('img', { name: 'Example Hotel exterior' }));
+    expect(
+      await screen.findByRole('img', { name: 'Example Hotel room interior' }),
+    ).toBeInTheDocument();
+
+    fireEvent.error(screen.getByRole('img', { name: 'Example Hotel room interior' }));
+    expect(await screen.findByRole('img', { name: 'Example Hotel bed' })).toBeInTheDocument();
+
+    fireEvent.error(screen.getByRole('img', { name: 'Example Hotel bed' }));
+    expect(
+      await screen.findByText('Property photos are not available from this provider.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'View photos' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'View photos: Example Hotel' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('restores keyboard focus to the control that opened the hotel photo gallery', async () => {
+    mocks.getNearbyAccommodation.mockResolvedValue(accommodationPhotoResponse());
+
+    render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
+
+    await screen.findByRole('heading', { name: 'Example Hotel', level: 2 });
+    const trigger = screen.getByRole('button', { name: 'View photos' });
+    trigger.focus();
+    trigger.click();
+
+    const closeButton = await screen.findByRole('button', { name: 'Close photos' });
+    await waitFor(() => expect(closeButton).toHaveFocus());
+    closeButton.click();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(trigger).toHaveFocus();
+    });
   });
 
   it('refetches through the dedicated accommodation API when a supported type is selected', async () => {
