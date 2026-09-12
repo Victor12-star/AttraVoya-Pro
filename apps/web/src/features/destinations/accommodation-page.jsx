@@ -265,7 +265,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     ? `${destination.provider ?? ''}:${destination.externalId ?? ''}:${destination.slug}`
     : '';
   const failedPhotoUrls = photoFailures.scope === photoScope ? photoFailures.urls : null;
-  const galleryPhotos = galleryStay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
+  const galleryPhotos =
+    galleryStay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
   const activePhoto = galleryPhotos[activePhotoIndex] ?? null;
 
   useEffect(() => {
@@ -518,7 +519,9 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
             {stays.map((stay) => {
               const distance = formatDistance(numberFormatter, stay.distanceMeters);
               const typeLabel = stay.accommodationType ? copy.types[stay.accommodationType] : null;
-              const availablePhotos = stay.photos.filter((photo) => !failedPhotoUrls?.has(photo.url));
+              const availablePhotos = stay.photos.filter((photo) =>
+                !failedPhotoUrls?.has(photo.url),
+              );
               const coverPhoto = availablePhotos[0] ?? null;
               const coverAlt = coverPhoto
                 ? (coverPhoto.alt ??
@@ -687,7 +690,9 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                       type="button"
                       key={photo.key}
                       onClick={() => setActivePhotoIndex(index)}
-                      aria-label={`${photoCopy.categories[photo.category] ?? photoCopy.categories.OTHER}: ${index + 1}`}
+                      aria-label={`${
+                        photoCopy.categories[photo.category] ?? photoCopy.categories.OTHER
+                      }: ${index + 1}`}
                       aria-pressed={index === activePhotoIndex}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
