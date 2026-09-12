@@ -1,0 +1,45 @@
+name: Phase 10AE Prettier diagnostic
+
+on:
+  push:
+    branches:
+      - phase-10ae/replica-safe-rate-limits
+
+jobs:
+  prettier-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Show exact Phase 10AE Prettier diff
+        run: |
+          pnpm exec prettier \
+            apps/server/src/app.js \
+            apps/server/src/config/replica-rate-limit.js \
+            apps/server/src/config/replica-rate-limit.test.js \
+            apps/server/src/config/replica-topology.js \
+            apps/server/src/config/replica-topology.test.js \
+            apps/server/src/modules/health/health.test.js \
+            docs/DEPLOYMENT-RELIABILITY-RUNBOOK.md \
+            --write
+          git diff -- \
+            apps/server/src/app.js \
+            apps/server/src/config/replica-rate-limit.js \
+            apps/server/src/config/replica-rate-limit.test.js \
+            apps/server/src/config/replica-topology.js \
+            apps/server/src/config/replica-topology.test.js \
+            apps/server/src/modules/health/health.test.js \
+            docs/DEPLOYMENT-RELIABILITY-RUNBOOK.md
