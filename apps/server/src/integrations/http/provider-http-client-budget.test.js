@@ -38,7 +38,7 @@ describe('provider HTTP request budgets', () => {
     });
     await expect(mapsClient.requestJson('https://provider.example/more')).rejects.toMatchObject({
       code: 'PROVIDER_RATE_LIMITED',
-      details: { reason: 'budget_exhausted', retryAfter: '60' },
+      details: { reason: 'budget_exhausted', retryAfter: '50' },
     });
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
