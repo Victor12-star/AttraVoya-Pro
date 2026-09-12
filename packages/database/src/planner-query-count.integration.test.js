@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { createPlannerRepository } from '../../../apps/server/src/modules/planner/planner.repository.js';
 
 const describePlannerQueryCount =
-  process.env.PLANNER_QUERY_COUNT_TEST === '1' ? describe : describe.skip;
+  process.env.DATABASE_POOL_EXHAUSTION_TEST === '1' ? describe : describe.skip;
 
 const TEST_COUNTRY_ISO2 = 'XZ';
 const TEST_COUNTRY_ISO3 = 'XZZ';
