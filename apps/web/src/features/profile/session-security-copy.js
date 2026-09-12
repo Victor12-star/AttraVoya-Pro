@@ -358,8 +358,7 @@ const COPY = Object.freeze({
     revokeFailed: 'Bu oturum iptal edilemedi. Tekrar deneyin.',
     revokeHint: 'Bir oturumu iptal etmek diğer oturumlarınızdan çıkış yapmaz.',
     signOutAll: 'Her yerden çıkış yap',
-    signOutAllHint:
-      'Bu tarayıcı dahil tüm aktif oturumları iptal edin ve giriş sayfasına dönün.',
+    signOutAllHint: 'Bu tarayıcı dahil tüm aktif oturumları iptal edin ve giriş sayfasına dönün.',
     confirmAll: 'Emin misiniz? Her cihazda yeniden oturum açmanız gerekecek.',
     confirmAllAction: 'Her yerden çıkışı onayla',
     signingOut: 'Çıkış yapılıyor…',
@@ -467,8 +466,7 @@ const COPY = Object.freeze({
     revokeFailed: '이 세션을 해제할 수 없습니다. 다시 시도하세요.',
     revokeHint: '한 세션을 해제해도 다른 세션에서는 로그아웃되지 않습니다.',
     signOutAll: '모든 곳에서 로그아웃',
-    signOutAllHint:
-      '이 브라우저를 포함한 모든 활성 세션을 해제하고 로그인 페이지로 돌아갑니다.',
+    signOutAllHint: '이 브라우저를 포함한 모든 활성 세션을 해제하고 로그인 페이지로 돌아갑니다.',
     confirmAll: '확실한가요? 모든 기기에서 다시 로그인해야 합니다.',
     confirmAllAction: '모든 곳에서 로그아웃 확인',
     signingOut: '로그아웃 중…',
@@ -495,8 +493,7 @@ const COPY = Object.freeze({
     revokeFailed: 'यह सत्र रद्द नहीं किया जा सका। फिर प्रयास करें।',
     revokeHint: 'एक सत्र रद्द करने से आपके अन्य सत्र साइन आउट नहीं होते।',
     signOutAll: 'हर जगह से साइन आउट',
-    signOutAllHint:
-      'इस ब्राउज़र सहित सभी सक्रिय सत्र रद्द करें और साइन-इन पेज पर वापस जाएँ।',
+    signOutAllHint: 'इस ब्राउज़र सहित सभी सक्रिय सत्र रद्द करें और साइन-इन पेज पर वापस जाएँ।',
     confirmAll: 'क्या आप सुनिश्चित हैं? आपको हर डिवाइस पर फिर से साइन इन करना होगा।',
     confirmAllAction: 'हर जगह से साइन आउट की पुष्टि करें',
     signingOut: 'साइन आउट हो रहा है…',

@@ -3,7 +3,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Clock3, LoaderCircle, LogOut, MonitorSmartphone, RefreshCw, ShieldCheck } from 'lucide-react';
+import {
+  Clock3,
+  LoaderCircle,
+  LogOut,
+  MonitorSmartphone,
+  RefreshCw,
+  ShieldCheck,
+} from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 import styles from './session-security-page.module.css';
@@ -107,9 +114,7 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
   const [action, setAction] = useState(
     /** @type {{kind:string, sessionId:string|null}} */ ({ kind: 'idle', sessionId: null }),
   );
-  const [feedback, setFeedback] = useState(
-    /** @type {{kind:string, text:string}|null} */ (null),
-  );
+  const [feedback, setFeedback] = useState(/** @type {{kind:string, text:string}|null} */ (null));
   const [confirmAll, setConfirmAll] = useState(false);
 
   const loadSessions = useCallback(async () => {
@@ -233,7 +238,11 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
       {state.status === 'error' ? (
         <div className={styles.feedback} role="alert">
           <span>{copy.loadError}</span>
-          <button className="button button--secondary" type="button" onClick={() => void loadSessions()}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => void loadSessions()}
+          >
             <RefreshCw size={17} aria-hidden="true" />
             {common.retry}
           </button>

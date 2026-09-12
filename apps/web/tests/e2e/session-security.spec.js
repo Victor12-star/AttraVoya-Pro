@@ -89,7 +89,9 @@ test.describe('profile session security', () => {
     }
     await expect(page.getByText('must-not-render')).toHaveCount(0);
     await expect(page.getByText(/Mozilla\/5\.0/)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Revoke session: Chrome · Windows' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Revoke session: Chrome · Windows' }),
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Sign out everywhere' })).toBeVisible();
 
     const accessibility = await new AxeBuilder({ page }).analyze();

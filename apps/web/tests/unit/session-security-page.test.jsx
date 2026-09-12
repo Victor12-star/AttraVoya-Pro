@@ -21,12 +21,10 @@ vi.mock('../../src/lib/api-client.js', () => ({
   },
 }));
 
-const { SessionSecurityPage } = await import(
-  '../../src/features/profile/session-security-page.jsx'
-);
-const { getSessionSecurityCopy } = await import(
-  '../../src/features/profile/session-security-copy.js'
-);
+const { SessionSecurityPage } =
+  await import('../../src/features/profile/session-security-page.jsx');
+const { getSessionSecurityCopy } =
+  await import('../../src/features/profile/session-security-copy.js');
 
 const copy = getSessionSecurityCopy('en');
 const common = { loading: 'Loading…', retry: 'Retry', cancel: 'Cancel' };
@@ -47,12 +45,7 @@ function session(overrides = {}) {
 
 function renderPage() {
   return render(
-    <SessionSecurityPage
-      locale="en"
-      copy={copy}
-      common={common}
-      signInLabel="Sign in"
-    />,
+    <SessionSecurityPage locale="en" copy={copy} common={common} signInLabel="Sign in" />,
   );
 }
 
