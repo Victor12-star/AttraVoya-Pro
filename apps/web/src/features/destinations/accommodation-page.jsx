@@ -29,8 +29,7 @@ const SEARCH_RADIUS_METERS = 10_000;
 const SEARCH_LIMIT = 24;
 const MAX_PROPERTY_PHOTOS = 24;
 const PHOTO_CATEGORIES = new Set(['EXTERIOR', 'ROOM', 'BED', 'BATHROOM', 'INTERIOR', 'OTHER']);
-const MODAL_FOCUSABLE_SELECTOR =
-  'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+const MODAL_FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 const FILTER_TYPES = Object.freeze([
   null,
   ACCOMMODATION_TYPES.HOTEL,
