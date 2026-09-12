@@ -1,0 +1,236 @@
+.page {
+  display: grid;
+  gap: 1rem;
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: clamp(1.15rem, 3vw, 1.6rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.header h1,
+.sessionCard h2,
+.signOutAll h2 {
+  margin: 0;
+}
+
+.header p,
+.privacyNote p,
+.signOutAll p,
+.confirmation p {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.headerIcon,
+.deviceIcon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-subtle);
+}
+
+.headerIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-lg);
+}
+
+.privacyNote,
+.revokeHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.privacyNote svg,
+.revokeHint svg {
+  flex: 0 0 auto;
+  margin-top: 0.12rem;
+}
+
+.feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+  padding: 1rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.feedbackError {
+  border-style: solid;
+}
+
+.sessionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+}
+
+.sessionCard {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.sessionHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.sessionHeading h2 {
+  min-width: 0;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.deviceIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+}
+
+.metadata {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.metadata > div {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.metadata dt {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.metadata dd {
+  margin: 0;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+.sessionCard button,
+.signOutAll button,
+.feedback button,
+.feedback a {
+  min-height: 2.85rem;
+}
+
+.sessionCard button:focus-visible,
+.signOutAll button:focus-visible,
+.feedback button:focus-visible,
+.feedback a:focus-visible {
+  outline: 3px solid var(--color-focus, currentColor);
+  outline-offset: 3px;
+}
+
+.revokeHint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.signOutAll {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+}
+
+.signOutAll > div:first-child {
+  min-width: 0;
+}
+
+.confirmation {
+  display: grid;
+  gap: 0.75rem;
+  min-width: min(100%, 22rem);
+}
+
+.confirmation p {
+  font-weight: 700;
+}
+
+.confirmationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+@media (max-width: 42rem) {
+  .header,
+  .signOutAll {
+    align-items: stretch;
+  }
+
+  .header {
+    gap: 0.75rem;
+  }
+
+  .signOutAll {
+    display: grid;
+  }
+
+  .signOutAll > button,
+  .confirmationActions,
+  .confirmationActions button,
+  .sessionCard button {
+    width: 100%;
+  }
+
+  .confirmationActions {
+    display: grid;
+  }
+}

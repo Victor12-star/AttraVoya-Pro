@@ -3,6 +3,9 @@
   --text-muted: #62706f;
   --brand-accent: #bd5037;
   --brand-accent-hover: #a9432f;
+  /* Wordmarks sit on both light shell and dark inverse surfaces, so keep dedicated AA-safe tones. */
+  --brand-wordmark-accent: #a9432f;
+  --brand-wordmark-accent-inverse: #dd684c;
 }
 
 [data-theme='dark'] {
@@ -10,6 +13,16 @@
   --text-muted: #9ba9a7;
   --brand-accent: #f28b72;
   --brand-accent-hover: #f4a18d;
+  --brand-wordmark-accent: #f28b72;
+  --brand-wordmark-accent-inverse: #f28b72;
+}
+
+.brand__wordmark strong {
+  color: var(--brand-wordmark-accent);
+}
+
+.brand--inverse .brand__wordmark strong {
+  color: var(--brand-wordmark-accent-inverse);
 }
 
 [data-theme='dark'] .button--accent {

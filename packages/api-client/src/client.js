@@ -28,6 +28,15 @@ function normalizeIdempotencyKey(value) {
   return normalized;
 }
 
+function normalizeOpaqueId(value, label) {
+  if (typeof value !== 'string') throw new TypeError(`${label} must be a string.`);
+  const normalized = value.trim();
+  if (!normalized || normalized.length > 128) {
+    throw new TypeError(`${label} must contain 1 to 128 characters.`);
+  }
+  return normalized;
+}
+
 async function readResponseBody(response) {
   if (response.status === 204) return null;
   const contentType = response.headers.get('content-type') ?? '';
@@ -130,6 +139,14 @@ export function createApiClient(options) {
     login: (body) => request('/api/v1/auth/login', { method: 'POST', body }),
     refresh: () => request('/api/v1/auth/refresh', { method: 'POST' }),
     logout: () => request('/api/v1/auth/logout', { method: 'POST' }),
+    listAuthSessions: () => request('/api/v1/auth/sessions', { cache: 'no-store' }),
+    revokeAuthSession: (sessionId) =>
+      request(
+        `/api/v1/auth/sessions/${encodeURIComponent(normalizeOpaqueId(sessionId, 'Session ID'))}`,
+        { method: 'DELETE', cache: 'no-store' },
+      ),
+    revokeAllAuthSessions: () =>
+      request('/api/v1/auth/sessions', { method: 'DELETE', cache: 'no-store' }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
     resendVerification: (email) =>
