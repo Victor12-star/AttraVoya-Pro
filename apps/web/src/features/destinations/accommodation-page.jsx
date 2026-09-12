@@ -329,8 +329,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
 
   /** @param {any} stay @param {HTMLButtonElement} trigger */
   function openGallery(stay, trigger) {
-    const availablePhotos =
-      stay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
+    const availablePhotos = stay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
     if (availablePhotos.length === 0) return;
 
     galleryTriggerRef.current = trigger;
@@ -390,9 +389,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   function previousPhoto() {
     if (galleryPhotos.length === 0) return;
     setActivePhotoIndex((current) =>
-      current === 0
-        ? galleryPhotos.length - 1
-        : Math.min(current - 1, galleryPhotos.length - 1),
+      current === 0 ? galleryPhotos.length - 1 : Math.min(current - 1, galleryPhotos.length - 1),
     );
   }
 
