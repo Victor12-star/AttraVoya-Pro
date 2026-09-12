@@ -31,8 +31,7 @@
     "lint": "eslint . --max-warnings=0",
     "check:js": "node ../../scripts/check-javascript.js .",
     "test": "vitest run --passWithNoTests",
-    "test:planner-query-count": "vitest run src/planner-query-count.integration.test.js",
-    "test:pool-exhaustion": "vitest run src/pool-exhaustion.integration.test.js src/auth-token-concurrency.integration.test.js src/query-index.integration.test.js",
+    "test:pool-exhaustion": "vitest run src/pool-exhaustion.integration.test.js src/auth-token-concurrency.integration.test.js src/query-index.integration.test.js src/planner-query-count.integration.test.js",
     "test:watch": "vitest",
     "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
   },
