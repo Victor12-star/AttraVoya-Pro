@@ -29,6 +29,8 @@ const SEARCH_RADIUS_METERS = 10_000;
 const SEARCH_LIMIT = 24;
 const MAX_PROPERTY_PHOTOS = 24;
 const PHOTO_CATEGORIES = new Set(['EXTERIOR', 'ROOM', 'BED', 'BATHROOM', 'INTERIOR', 'OTHER']);
+const MODAL_FOCUSABLE_SELECTOR =
+  'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 const FILTER_TYPES = Object.freeze([
   null,
   ACCOMMODATION_TYPES.HOTEL,
@@ -248,6 +250,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const [photoFailures, setPhotoFailures] = useState(
     /** @type {{scope: string, urls: Set<string>}} */ ({ scope: '', urls: new Set() }),
   );
+  const galleryDialogRef = useRef(/** @type {HTMLElement|null} */ (null));
   const galleryCloseButtonRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
   const galleryTriggerRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
   const galleryWasOpenRef = useRef(false);
@@ -303,6 +306,32 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
       if (event.key === 'Escape') {
         setGalleryStay(null);
         setActivePhotoIndex(0);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const dialog = galleryDialogRef.current;
+      if (!dialog) return;
+      const focusableElements = /** @type {HTMLElement[]} */ (
+        Array.from(dialog.querySelectorAll(MODAL_FOCUSABLE_SELECTOR))
+      );
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+      if (!firstFocusable || !lastFocusable) return;
+
+      // Keep keyboard navigation inside the modal so Tab cannot reach controls
+      // hidden behind the gallery backdrop while the traveller is inspecting photos.
+      if (!dialog.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? lastFocusable : firstFocusable).focus();
+        return;
+      }
+      if (event.shiftKey && document.activeElement === firstFocusable) {
+        event.preventDefault();
+        lastFocusable.focus();
+      } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
       }
     }
 
@@ -619,6 +648,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
       {galleryStay && activePhoto ? (
         <div className={styles.galleryBackdrop} role="presentation">
           <section
+            ref={galleryDialogRef}
             className={styles.galleryDialog}
             role="dialog"
             aria-modal="true"
