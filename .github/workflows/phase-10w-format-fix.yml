@@ -1,0 +1,63 @@
+name: Phase 10W formatter
+
+on:
+  push:
+    branches:
+      - phase-10w-web-session-controls
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: phase-10w-web-session-controls
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Phase 10W files
+        run: >-
+          pnpm exec prettier --write
+          apps/web/src/features/profile/session-security-copy.js
+          apps/web/src/features/profile/session-security-page.jsx
+          apps/web/tests/e2e/session-security.spec.js
+          apps/web/tests/unit/session-security-page.test.jsx
+
+      - name: Commit formatting
+        shell: bash
+        run: |
+          if git diff --quiet -- \
+            apps/web/src/features/profile/session-security-copy.js \
+            apps/web/src/features/profile/session-security-page.jsx \
+            apps/web/tests/e2e/session-security.spec.js \
+            apps/web/tests/unit/session-security-page.test.jsx; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            apps/web/src/features/profile/session-security-copy.js \
+            apps/web/src/features/profile/session-security-page.jsx \
+            apps/web/tests/e2e/session-security.spec.js \
+            apps/web/tests/unit/session-security-page.test.jsx
+          git commit -m 'style: format phase 10w session security files'
+          git push origin HEAD:phase-10w-web-session-controls
