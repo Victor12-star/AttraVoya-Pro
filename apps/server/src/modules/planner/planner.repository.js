@@ -68,15 +68,29 @@ function isUniqueConstraintError(error) {
   return /** @type {{ code?: string }} */ (error).code === 'P2002';
 }
 
-export function createPlannerRepository() {
+/**
+ * Build the planner repository around either the normal shared Prisma singleton
+ * or an explicitly supplied client. Production callers omit the argument; the
+ * injection point exists so PostgreSQL integration tests can measure the exact
+ * repository query path without replacing production data-access behavior.
+ *
+ * @param {typeof import('@attravoya/database').prisma} [prismaClient]
+ */
+export function createPlannerRepository(prismaClient) {
+  async function getPrisma() {
+    if (prismaClient) return prismaClient;
+    const { prisma } = await import('@attravoya/database');
+    return prisma;
+  }
+
   return {
     async findCurrencyByCode(code) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.currency.findUnique({ where: { code }, select: { id: true, code: true } });
     },
 
     async findDestinationById(destinationId) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.destination.findUnique({
         where: { id: destinationId },
         select: { id: true, status: true },
@@ -84,12 +98,12 @@ export function createPlannerRepository() {
     },
 
     async findOriginCityById(cityId) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.city.findUnique({ where: { id: cityId }, select: { id: true } });
     },
 
     async findOriginAirportById(airportId) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.airport.findUnique({
         where: { id: airportId },
         select: { id: true, cityId: true },
@@ -97,7 +111,7 @@ export function createPlannerRepository() {
     },
 
     async createOwnedRequest({ userId, currencyId, input }) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       const { accommodation, ...requestInput } = input;
 
       return prisma.travelPlanRequest.create({
@@ -112,7 +126,7 @@ export function createPlannerRepository() {
     },
 
     async createOwnedRequestIdempotently({ requestId, userId, currencyId, input }) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       const { accommodation, ...requestInput } = input;
 
       try {
@@ -143,7 +157,7 @@ export function createPlannerRepository() {
     },
 
     async listOwnedRequests(userId, limit = 20, cursor) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.travelPlanRequest.findMany({
         where: {
           userId,
@@ -163,7 +177,7 @@ export function createPlannerRepository() {
     },
 
     async findOwnedRequestById({ userId, requestId }) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.travelPlanRequest.findFirst({
         where: { id: requestId, userId },
         select: plannerRequestSelect,
@@ -171,17 +185,16 @@ export function createPlannerRepository() {
     },
 
     async findPublishedDestinationCandidateById(destinationId) {
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.destination.findFirst({
         where: { id: destinationId, status: 'PUBLISHED' },
         select: destinationCandidateSelect,
       });
     },
 
-    /** @param {{excludeCityId?: string, limit?: number}} [options] */
     async listPublishedDestinationCandidates(options = {}) {
       const { excludeCityId, limit = 20 } = options;
-      const { prisma } = await import('@attravoya/database');
+      const prisma = await getPrisma();
       return prisma.destination.findMany({
         where: {
           status: 'PUBLISHED',
