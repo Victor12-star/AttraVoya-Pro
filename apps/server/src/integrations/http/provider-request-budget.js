@@ -25,13 +25,37 @@ function finiteNow(nowImpl) {
   return value;
 }
 
+function localReplicaAllowance(maxRequests, replicaCount, provider) {
+  if (maxRequests < replicaCount) {
+    throw new TypeError(
+      `Provider request budget ${provider} maxRequests must be at least the declared replica count (${replicaCount}).`,
+    );
+  }
+
+  // Every replica receives the same conservative integer share. Any remainder
+  // is deliberately left unused because spending it safely would require a
+  // shared cross-replica counter or stable replica identity.
+  return Math.floor(maxRequests / replicaCount);
+}
+
+function alignedWindowStart(now, windowMs) {
+  // Using the same wall-clock boundary on every replica prevents independently
+  // started processes from resetting their local shares at different times.
+  return Math.floor(now / windowMs) * windowMs;
+}
+
 /**
  * Replace all in-process provider request-budget policies.
+ *
+ * Configured maxRequests values are deployment-wide budgets. Each process gets
+ * a conservative share based on the declared active replica count so identical
+ * replicas cannot multiply provider quota consumption merely by scaling out.
  *
  * Each policy is intentionally supplied by deployment configuration rather
  * than hardcoded vendor limits because provider plans and quotas can change.
  */
-export function configureProviderRequestBudgets(nextPolicies = {}) {
+export function configureProviderRequestBudgets(nextPolicies = {}, { replicaCount = 1 } = {}) {
+  assertPositiveSafeInteger(replicaCount, 'replicaCount');
   policies.clear();
   states.clear();
 
@@ -41,7 +65,10 @@ export function configureProviderRequestBudgets(nextPolicies = {}) {
     const windowMs = Number(policy?.windowMs);
     assertPositiveSafeInteger(maxRequests, 'maxRequests');
     assertPositiveSafeInteger(windowMs, 'windowMs');
-    policies.set(normalizedProvider, { maxRequests, windowMs });
+    policies.set(normalizedProvider, {
+      maxRequests: localReplicaAllowance(maxRequests, replicaCount, normalizedProvider),
+      windowMs,
+    });
   }
 }
 
@@ -59,11 +86,11 @@ export function consumeProviderRequestBudget({ provider, nowImpl = Date.now }) {
   }
 
   const now = finiteNow(nowImpl);
+  const windowStartedAt = alignedWindowStart(now, policy.windowMs);
   let state = states.get(normalizedProvider);
-  const windowEnded = state ? state.windowStartedAt + policy.windowMs : 0;
 
-  if (!state || now < state.windowStartedAt || now >= windowEnded) {
-    state = { windowStartedAt: now, used: 0 };
+  if (!state || state.windowStartedAt !== windowStartedAt) {
+    state = { windowStartedAt, used: 0 };
     states.set(normalizedProvider, state);
   }
 
