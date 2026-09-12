@@ -28,9 +28,11 @@ function parseReplicaCount(value) {
  * Fail closed when production is declared as multi-replica before the controls
  * that remain intentionally process-local have a reviewed shared-state strategy.
  *
- * Provider request budgets are already partitioned conservatively by the
- * declared topology; the remaining controls below still block production
- * horizontal scaling.
+ * Provider request budgets are partitioned conservatively by the declared
+ * topology. Provider response caches are also intentionally process-local, but
+ * their contract allows only non-authoritative snapshots whose misses can be
+ * refetched safely, so cache locality does not require replica coordination.
+ * The remaining controls below still block production horizontal scaling.
  *
  * This is a deployment-safety contract, not a claim that one process is the
  * long-term scaling architecture. Remove or evolve the guard only together with
@@ -42,7 +44,7 @@ export function assertSupportedReplicaTopology({ nodeEnv, replicaCount }) {
 
   if (nodeEnv === 'production' && declaredReplicaCount > 1) {
     throw new Error(
-      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Process-local rate limits, circuit state, cache coordination, and aggregate metrics are not yet a shared multi-replica contract.',
+      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Process-local rate limits, circuit state, and aggregate metrics are not yet a shared multi-replica contract.',
     );
   }
 
