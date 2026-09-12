@@ -264,8 +264,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const photoScope = destination
     ? `${destination.provider ?? ''}:${destination.externalId ?? ''}:${destination.slug}`
     : '';
-  const failedPhotoUrls =
-    photoFailures.scope === photoScope ? photoFailures.urls : null;
+  const failedPhotoUrls = photoFailures.scope === photoScope ? photoFailures.urls : null;
   const galleryPhotos =
     galleryStay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
   const activePhoto = galleryPhotos[activePhotoIndex] ?? null;
@@ -352,8 +351,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
    */
   function markPhotoUnavailable(photoUrl) {
     setPhotoFailures((current) => {
-      const urls =
-        current.scope === photoScope ? new Set(current.urls) : new Set();
+      const urls = current.scope === photoScope ? new Set(current.urls) : new Set();
       if (urls.has(photoUrl) && current.scope === photoScope) return current;
       urls.add(photoUrl);
       return { scope: photoScope, urls };
@@ -381,10 +379,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
    */
   function handleThumbnailError(event, photo) {
     const image = event.currentTarget;
-    if (
-      photo.thumbnailUrl !== photo.url &&
-      image.dataset.fullSizeFallback !== 'true'
-    ) {
+    if (photo.thumbnailUrl !== photo.url && image.dataset.fullSizeFallback !== 'true') {
       image.dataset.fullSizeFallback = 'true';
       image.src = photo.url;
       return;
