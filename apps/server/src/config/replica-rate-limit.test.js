@@ -26,9 +26,10 @@ describe('replica-safe rate limits', () => {
     expect(partitionDeploymentRateLimitMax(120, 2)).toBe(60);
     expect(partitionDeploymentRateLimitMax(30, 4)).toBe(7);
     expect(partitionDeploymentRateLimitMax(10, 2)).toBe(5);
-    expect(partitionDeploymentRateLimitConfig({ max: 300, timeWindow: '1 minute' }, 2)).toEqual(
-      { max: 150, timeWindow: '1 minute' },
-    );
+    expect(partitionDeploymentRateLimitConfig({ max: 300, timeWindow: '1 minute' }, 2)).toEqual({
+      max: 150,
+      timeWindow: '1 minute',
+    });
   });
 
   it('fails closed when a configured ceiling cannot reserve one request per replica', () => {
