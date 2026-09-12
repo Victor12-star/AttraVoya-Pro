@@ -108,6 +108,39 @@ describe('provider cache', () => {
     await expect(Promise.all([first, second])).resolves.toEqual(['first-value', 'second-value']);
   });
 
+  it('keeps separate replica caches independent while misses remain safe to refetch', async () => {
+    const firstReplica = createProviderCache();
+    const secondReplica = createProviderCache();
+    let secondReplicaLoads = 0;
+
+    await firstReplica.getOrLoad(
+      'provider-snapshot',
+      async () => ({ provider: 'example', fetchedAt: 'replica-one' }),
+      60,
+    );
+
+    expect(secondReplica.get('provider-snapshot')).toBeUndefined();
+
+    const secondSnapshot = await secondReplica.getOrLoad(
+      'provider-snapshot',
+      async () => {
+        secondReplicaLoads += 1;
+        return { provider: 'example', fetchedAt: 'replica-two' };
+      },
+      60,
+    );
+
+    expect(secondReplicaLoads).toBe(1);
+    expect(secondSnapshot).toEqual({ provider: 'example', fetchedAt: 'replica-two' });
+
+    firstReplica.clear();
+    expect(firstReplica.get('provider-snapshot')).toBeUndefined();
+    expect(secondReplica.get('provider-snapshot')).toEqual({
+      provider: 'example',
+      fetchedAt: 'replica-two',
+    });
+  });
+
   it('keeps cache and in-flight limits fail-fast and explicit', () => {
     expect(() => createProviderCache({ maxEntries: 0 })).toThrow(
       'Provider cache maxEntries must be a positive integer.',

@@ -17,7 +17,7 @@ describe('API replica topology contract', () => {
 
   it('fails closed when production declares more than one active API replica', () => {
     expect(() => declareReplicaCount('production', '2')).toThrow(
-      /production currently supports exactly 1 active API replica/,
+      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Process-local rate limits, circuit state, and aggregate metrics are not yet a shared multi-replica contract.',
     );
   });
 

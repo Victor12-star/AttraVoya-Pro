@@ -21,9 +21,11 @@ Every production API deployment must preserve all of the following:
 
 ## Current replica-topology safety contract
 
-AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. Several controls remain intentionally process-local today, including rate-limit counters, provider circuit state, provider cache coordination, and aggregate process metrics. Running multiple active production replicas without a reviewed shared-state strategy could therefore make those controls inconsistent across replicas even though database-backed user/session state remains shared.
+AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining correctness-sensitive process-local blockers are rate-limit counters, provider circuit state, and aggregate process metrics. Running multiple active production replicas before those controls have a reviewed multi-replica strategy could make their behavior inconsistent across replicas even though database-backed user/session state remains shared.
 
-Credentialed-provider request budgets are no longer in that unresolved set. Their configured maxima are deployment-wide values that are conservatively partitioned by the validated `API_REPLICA_COUNT`, and their counters use wall-clock-aligned windows so separate replicas roll over at the same boundary. This removes quota multiplication as a provider-budget scaling blocker without adding speculative distributed infrastructure. It does **not** remove the overall production replica guard while the controls above remain unresolved.
+Provider response caches are intentionally process-local and are no longer an unresolved correctness blocker. They may contain only bounded, non-authoritative provider snapshots whose misses can be safely refetched; no session, authorization, payment, entitlement, booking confirmation, inventory lock, idempotency, or other coordination state may depend on them. Separate replicas may therefore have different cache contents, hit rates, and bounded snapshot freshness without requiring cross-replica invalidation for correctness. Duplicate provider reads caused by local misses remain constrained separately by the deployment-wide provider request-budget contract. Add Redis or another shared cache later only if measured provider cost, latency, or hit-rate evidence justifies that optimization.
+
+Credentialed-provider request budgets are also no longer in the unresolved set. Their configured maxima are deployment-wide values that are conservatively partitioned by the validated `API_REPLICA_COUNT`, and their counters use wall-clock-aligned windows so separate replicas roll over at the same boundary. This removes quota multiplication as a provider-budget scaling blocker without adding speculative distributed infrastructure. It does **not** remove the overall production replica guard while the controls above remain unresolved.
 
 The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
 
@@ -157,4 +159,5 @@ Review this document whenever any of the following changes:
 - database migration strategy;
 - `API_REPLICA_COUNT`, API replica topology, or database connection budget;
 - provider request-budget partitioning or window semantics;
+- provider cache authority, freshness, or sharing semantics;
 - release/rollback automation.
