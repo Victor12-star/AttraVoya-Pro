@@ -45,6 +45,7 @@ import {
 export async function buildApp(options = {}) {
   configureProviderRequestBudgets(
     options.providerRequestBudgetPolicies ?? providerRequestBudgetPoliciesFromEnvironment(env),
+    { replicaCount: options.replicaCount ?? 1 },
   );
 
   const readinessState = options.readinessState ?? createReadinessState();
