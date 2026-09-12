@@ -245,7 +245,12 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const [selectedType, setSelectedType] = useState(/** @type {string|null} */ (null));
   const [galleryStay, setGalleryStay] = useState(/** @type {any|null} */ (null));
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [photoFailures, setPhotoFailures] = useState(
+    /** @type {{scope: string, urls: Set<string>}} */ ({ scope: '', urls: new Set() }),
+  );
   const galleryCloseButtonRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
+  const galleryTriggerRef = useRef(/** @type {HTMLButtonElement|null} */ (null));
+  const galleryWasOpenRef = useRef(false);
   const [accommodationState, setAccommodationState] = useState(
     /** @type {AccommodationState} */ ({
       status: destination ? 'loading' : 'idle',
@@ -256,6 +261,13 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
     [locale],
   );
+  const photoScope = destination
+    ? `${destination.provider ?? ''}:${destination.externalId ?? ''}:${destination.slug}`
+    : '';
+  const failedPhotoUrls = photoFailures.scope === photoScope ? photoFailures.urls : null;
+  const galleryPhotos =
+    galleryStay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
+  const activePhoto = galleryPhotos[activePhotoIndex] ?? null;
 
   useEffect(() => {
     if (!destination) return;
@@ -271,8 +283,20 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   }, [destination, locale, selectedType]);
 
   useEffect(() => {
-    if (!galleryStay) return undefined;
+    if (!galleryStay) {
+      if (galleryWasOpenRef.current) {
+        galleryWasOpenRef.current = false;
+        const trigger = galleryTriggerRef.current;
+        galleryTriggerRef.current = null;
 
+        // Return keyboard focus to the control that launched the gallery so a
+        // traveller does not lose their place after closing a modal photo view.
+        if (trigger?.isConnected) trigger.focus();
+      }
+      return undefined;
+    }
+
+    galleryWasOpenRef.current = true;
     galleryCloseButtonRef.current?.focus();
 
     function handleKeyDown(event) {
@@ -303,9 +327,12 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     void requestAccommodation(destination, locale, selectedType).then(setAccommodationState);
   }
 
-  /** @param {any} stay */
-  function openGallery(stay) {
-    if (!stay?.photos?.length) return;
+  /** @param {any} stay @param {HTMLButtonElement} trigger */
+  function openGallery(stay, trigger) {
+    const availablePhotos = stay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
+    if (availablePhotos.length === 0) return;
+
+    galleryTriggerRef.current = trigger;
     setGalleryStay(stay);
     setActivePhotoIndex(0);
   }
@@ -315,14 +342,60 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
     setActivePhotoIndex(0);
   }
 
+  /**
+   * A syntactically safe provider URL can still expire, return 404, or fail after
+   * render. Remove failed media from this destination's usable set so the UI can
+   * fall through to another real provider photo instead of showing a broken image.
+   * @param {string} photoUrl
+   */
+  function markPhotoUnavailable(photoUrl) {
+    setPhotoFailures((current) => {
+      const urls = current.scope === photoScope ? new Set(current.urls) : new Set();
+      if (urls.has(photoUrl) && current.scope === photoScope) return current;
+      urls.add(photoUrl);
+      return { scope: photoScope, urls };
+    });
+
+    if (!galleryStay) return;
+
+    const remainingPhotos = galleryStay.photos.filter(
+      (photo) => photo.url !== photoUrl && !failedPhotoUrls?.has(photo.url),
+    );
+    if (remainingPhotos.length === 0) {
+      closeGallery();
+      return;
+    }
+    if (activePhotoIndex >= remainingPhotos.length) {
+      setActivePhotoIndex(remainingPhotos.length - 1);
+    }
+  }
+
+  /**
+   * Prefer the provider's lightweight thumbnail, but retry the same real photo at
+   * full size before discarding it. A thumbnail outage must not hide a valid room.
+   * @param {{currentTarget: HTMLImageElement}} event
+   * @param {any} photo
+   */
+  function handleThumbnailError(event, photo) {
+    const image = event.currentTarget;
+    if (photo.thumbnailUrl !== photo.url && image.dataset.fullSizeFallback !== 'true') {
+      image.dataset.fullSizeFallback = 'true';
+      image.src = photo.url;
+      return;
+    }
+    markPhotoUnavailable(photo.url);
+  }
+
   function previousPhoto() {
-    if (!galleryStay?.photos?.length) return;
-    setActivePhotoIndex((current) => (current === 0 ? galleryStay.photos.length - 1 : current - 1));
+    if (galleryPhotos.length === 0) return;
+    setActivePhotoIndex((current) =>
+      current === 0 ? galleryPhotos.length - 1 : Math.min(current - 1, galleryPhotos.length - 1),
+    );
   }
 
   function nextPhoto() {
-    if (!galleryStay?.photos?.length) return;
-    setActivePhotoIndex((current) => (current + 1) % galleryStay.photos.length);
+    if (galleryPhotos.length === 0) return;
+    setActivePhotoIndex((current) => (current + 1) % galleryPhotos.length);
   }
 
   if (!destination) {
@@ -345,7 +418,6 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const providerName = providerDisplayName(accommodationState.data?.provider);
   const backHref = buildDestinationHref(destination);
   const inventoryDataAvailable = accommodationState.data?.inventoryDataAvailable === true;
-  const activePhoto = galleryStay?.photos?.[activePhotoIndex] ?? null;
 
   return (
     <section className={styles.page} aria-labelledby="accommodation-title">
@@ -447,7 +519,10 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
             {stays.map((stay) => {
               const distance = formatDistance(numberFormatter, stay.distanceMeters);
               const typeLabel = stay.accommodationType ? copy.types[stay.accommodationType] : null;
-              const coverPhoto = stay.photos[0] ?? null;
+              const availablePhotos = stay.photos.filter(
+                (photo) => !failedPhotoUrls?.has(photo.url),
+              );
+              const coverPhoto = availablePhotos[0] ?? null;
               const coverAlt = coverPhoto
                 ? (coverPhoto.alt ??
                   `${stay.name} — ${photoCopy.categories[coverPhoto.category] ?? photoCopy.categories.OTHER}`)
@@ -459,15 +534,21 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                     <button
                       className={styles.photoPreview}
                       type="button"
-                      onClick={() => openGallery(stay)}
+                      onClick={(event) => openGallery(stay, event.currentTarget)}
                       aria-label={`${photoCopy.viewPhotos}: ${stay.name}`}
                     >
                       {/* Remote property-media domains are provider-controlled and cannot be statically allowlisted. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={coverPhoto.url} alt={coverAlt} loading="lazy" decoding="async" />
+                      <img
+                        src={coverPhoto.url}
+                        alt={coverAlt}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => markPhotoUnavailable(coverPhoto.url)}
+                      />
                       <span className={styles.photoCount}>
                         <Images size={15} aria-hidden="true" />
-                        {stay.photos.length}
+                        {availablePhotos.length}
                       </span>
                     </button>
                   ) : (
@@ -493,11 +574,11 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                     </p>
                   ) : null}
 
-                  {stay.photos.length > 0 ? (
+                  {availablePhotos.length > 0 ? (
                     <button
                       className={styles.galleryButton}
                       type="button"
-                      onClick={() => openGallery(stay)}
+                      onClick={(event) => openGallery(stay, event.currentTarget)}
                     >
                       <Images size={16} aria-hidden="true" />
                       {photoCopy.viewPhotos}
@@ -570,6 +651,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                   `${galleryStay.name} — ${photoCopy.categories[activePhoto.category] ?? photoCopy.categories.OTHER}`
                 }
                 decoding="async"
+                onError={() => markPhotoUnavailable(activePhoto.url)}
               />
               <div className={styles.galleryMeta}>
                 <span className={styles.typeBadge}>
@@ -578,7 +660,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                 <span>
                   {interpolate(photoCopy.count, {
                     current: activePhotoIndex + 1,
-                    total: galleryStay.photos.length,
+                    total: galleryPhotos.length,
                   })}
                 </span>
                 {activePhoto.provider || activePhoto.attribution ? (
@@ -589,7 +671,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
               </div>
             </div>
 
-            {galleryStay.photos.length > 1 ? (
+            {galleryPhotos.length > 1 ? (
               <div className={styles.galleryNavigation}>
                 <button
                   className={styles.iconButton}
@@ -600,7 +682,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                   <ChevronLeft size={20} aria-hidden="true" />
                 </button>
                 <div className={styles.thumbnailList}>
-                  {galleryStay.photos.map((photo, index) => (
+                  {galleryPhotos.map((photo, index) => (
                     <button
                       className={`${styles.thumbnailButton} ${
                         index === activePhotoIndex ? styles.thumbnailButtonActive : ''
@@ -612,7 +694,13 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                       aria-pressed={index === activePhotoIndex}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={photo.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+                      <img
+                        src={photo.thumbnailUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        onError={(event) => handleThumbnailError(event, photo)}
+                      />
                     </button>
                   ))}
                 </div>
