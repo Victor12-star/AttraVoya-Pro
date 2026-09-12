@@ -9,21 +9,21 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10R.
+6. Do not restart completed production-readiness work through Phase 10W.
 
 ## Current fully verified release
 
-Phase 10R — provider failure isolation — is complete.
+Phase 10W — web session security controls — is complete.
 
-- PR: `#106`
-- Final PR head: `4e72ac4103b5c77ebdb773b0b6229d68788d3801`
-- Final PR CI run: `34520682649`
+- PR: `#112`
+- Final PR head: `6971786b138fe9f762c983b216962ceee4919cc9`
+- Final PR CI run: `34699789733`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `5960fec326e1a730701e7c116eaed6676ccdaaf8`
-- Post-merge push CI run: `34521122460`
+- Exact squash-merged `develop`: `d68d723deca5870ccb02129edfaa0b009853a71f`
+- Post-merge push CI run: `34699998083`
 - All five canonical jobs passed
 
-Phase 10R proves at application level that a weather-provider outage returns HTTP 503 with the existing `PROVIDER_UNAVAILABLE` contract while an unrelated currency route, liveness, and readiness remain HTTP 200. One provider failure must not unnecessarily take down unrelated API functionality.
+Phase 10W exposes the existing Phase 10U owner-scoped session APIs through the web `/profile` security experience. It uses deliberately coarse browser/platform labels, never renders raw refresh hashes/IP hashes/tokens, provides safe loading/error/authentication/empty states, supports targeted revoke and explicit sign-out-everywhere confirmation, prevents duplicate destructive actions, preserves 18 locales and theme/reduced-motion/RTL behavior, and is covered by browser smoke plus blocking Axe accessibility checks.
 
 ## Completed production-readiness sequence
 
@@ -51,8 +51,22 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10P — authentication query/index review — PR `#104`
 - Phase 10Q — concurrent refresh-session overwrite prevention — PR `#105`
 - Phase 10R — provider failure isolation — PR `#106`
+- Maintenance handoff synchronization through Phase 10R — merged before Phase 10S
+- Phase 10S — API restart and database recovery verification — PR `#108`
+- Phase 10T — Prisma migration baseline and deploy gate — PR `#109`
+- Phase 10U — owner-scoped session controls — PR `#110`
+- Phase 10V — paid-provider request budgets — PR `#111`
+- Phase 10W — web session security controls — PR `#112`
 
 PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
+
+## What the newest slices prove
+
+- Phase 10S verifies real API process replacement against disposable PostgreSQL: readiness, bounded SIGTERM shutdown, restart on the same host/port/database, and readiness again.
+- Phase 10T adds the Prisma `0_init` migration baseline, production-style `migrate deploy`, migration-status/schema-drift CI checks and safe rolling-compatible migration guidance.
+- Phase 10U exposes bounded, authenticated, owner-scoped active-session visibility plus idempotent targeted revocation and revoke-all behavior with minimized metadata.
+- Phase 10V adds explicit operator-configured request budgets for credentialed external providers and consumes budget immediately before each real upstream attempt, including retries, without guessing vendor limits.
+- Phase 10W provides the traveller-facing web session-security experience on top of Phase 10U with privacy minimization, authoritative destructive actions, accessibility and browser evidence.
 
 ## Existing protections that should not be reimplemented
 
@@ -60,7 +74,7 @@ Before choosing another Issue #40 slice, remember that the live repository alrea
 
 - 256 KiB request-body limiting;
 - global and route/risk-aware rate limits for authentication/planner/provider-heavy traffic plus separate bounded health-probe limits;
-- provider timeouts, bounded retries with jitter, `Retry-After`, concurrency bulkheads, queue bounds, total request deadlines and circuit breaking;
+- provider timeouts, bounded retries with jitter, `Retry-After`, concurrency bulkheads, queue bounds, total request deadlines, circuit breaking and first-stage paid-provider request budgets;
 - in-process provider cache with single-flight miss coalescing;
 - owner-scoped planner access, bounded pagination and planner-create idempotency;
 - privacy-safe structured logging and bounded HTTP/provider/cache/database/runtime metrics;
@@ -70,8 +84,11 @@ Before choosing another Issue #40 slice, remember that the live repository alrea
 - measured early-capacity evidence and PostgreSQL connection-budget methodology;
 - bounded stress, soak and spike regression testing;
 - production API container verification, deployment draining/shutdown runbook and overload-safe readiness/liveness;
+- deterministic process-level API restart/recovery evidence;
+- Prisma migration baseline plus production-style deploy/status/drift verification and rolling-compatible migration guidance;
 - atomic authentication token claims and compare-and-swap refresh-token rotation;
 - authentication query/index review with PostgreSQL catalog and `EXPLAIN` evidence;
+- owner-scoped session listing/revocation APIs and the web session-security experience;
 - deterministic provider-failure isolation;
 - browser/mobile/cross-browser E2E, accessibility, slow-network and reconnect coverage;
 - a production-build web test path plus measured and enforced public-home mobile resource budgets.
@@ -93,7 +110,7 @@ The zero-image ceiling is route-specific. Never silently raise a resource thresh
 
 Never log or expose authentication tokens, cookies, refresh tokens, private request bodies, traveller private data, unnecessary trip/budget details, children's sensitive information, raw provider payloads, secrets, credentials, or unnecessary client/IP information.
 
-Never invent prices, flights, hotel availability, weather, emergency numbers, embassy/consulate information, visa requirements, passport procedures, provider availability, live travel results, or AI/LLM responses. The AI provider boundary remains reserved until a real model integration genuinely exists.
+Never invent prices, flights, hotel availability, weather, emergency numbers, embassy/consulate information, visa requirements, passport procedures, provider availability, live travel results, provider quota values or AI/LLM responses. The AI provider boundary remains reserved until a real model integration genuinely exists.
 
 ## Critical Travel Companion boundaries
 
@@ -133,7 +150,9 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 Issue `#40` remains the active broad production-readiness program, but the next functional slice is not automatically predetermined. Inspect the live code first.
 
-Candidate genuine gaps to investigate include restart/recovery-path evidence, dependency timeout/recovery behavior beyond the existing provider-isolation test, unproven multi-instance deployment assumptions, shared-state decisions only where the architecture actually requires them, database N+1/hot-path evidence, rolling-deployment/backward-compatible migration evidence, route-specific loading/error/degraded-mode UX gaps, additional session/device/revocation production-risk controls, and measurable provider quota/cost protections.
+Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, basic owner-scoped session/device revocation controls, the web session-security experience, and first-stage credentialed-provider request budgets.
+
+Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond the existing provider-isolation test, unproven multi-instance deployment assumptions, shared-state decisions only where the architecture actually requires them, database N+1/hot-path evidence, deployment-platform edge/load-balancer/WAF requirements once a concrete public production target exists, route-specific partial/degraded-mode UX gaps, and whether provider-budget coordination must become shared only after a measured multi-replica need is demonstrated.
 
 These are candidates only. Do not add Redis, queues, read replicas, distributed tracing, monitoring vendors, or other shared infrastructure simply because Issue `#40` mentions them.
 
