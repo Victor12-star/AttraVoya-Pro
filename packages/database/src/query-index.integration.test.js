@@ -100,3 +100,67 @@ describeQueryIndexes('authentication query/index contract', () => {
     });
   });
 });
+
+describeQueryIndexes('planner list query/index contract', () => {
+  it('materializes the composite index used to list a traveller’s planner requests', async () => {
+    const rows = /** @type {Array<{tablename: string, indexname: string, indexdef: string}>} */ (
+      await prisma.$queryRaw`
+        SELECT tablename, indexname, indexdef
+        FROM pg_indexes
+        WHERE schemaname = current_schema()
+          AND indexname = 'TravelPlanRequest_userId_createdAt_idx'
+      `
+    );
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      tablename: 'TravelPlanRequest',
+      indexname: 'TravelPlanRequest_userId_createdAt_idx',
+    });
+    expect(rows[0]?.indexdef).toContain('"userId", "createdAt"');
+  });
+
+  it('keeps first-page and cursor-page planner list predicates index-backed in PostgreSQL', async () => {
+    const cursorCreatedAt = new Date('2026-09-12T12:00:00.000Z');
+
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SET LOCAL enable_seqscan = off`;
+
+      const firstPageRows = /** @type {Array<Record<string, unknown>>} */ (
+        await tx.$queryRaw`
+          EXPLAIN (COSTS OFF)
+          SELECT "id", "createdAt"
+          FROM "TravelPlanRequest"
+          WHERE "userId" = ${'query-index-probe'}
+          ORDER BY "createdAt" DESC, "id" DESC
+          LIMIT 21
+        `
+      );
+      const cursorPageRows = /** @type {Array<Record<string, unknown>>} */ (
+        await tx.$queryRaw`
+          EXPLAIN (COSTS OFF)
+          SELECT "id", "createdAt"
+          FROM "TravelPlanRequest"
+          WHERE "userId" = ${'query-index-probe'}
+            AND (
+              "createdAt" < ${cursorCreatedAt}
+              OR (
+                "createdAt" = ${cursorCreatedAt}
+                AND "id" < ${'query-index-probe-id'}
+              )
+            )
+          ORDER BY "createdAt" DESC, "id" DESC
+          LIMIT 21
+        `
+      );
+
+      const firstPagePlan = renderExplainPlan(firstPageRows);
+      const cursorPagePlan = renderExplainPlan(cursorPageRows);
+
+      expectIndexBackedPlan(firstPagePlan);
+      expectIndexBackedPlan(cursorPagePlan);
+      expect(firstPagePlan).toContain('TravelPlanRequest_userId_createdAt_idx');
+      expect(cursorPagePlan).toContain('TravelPlanRequest_userId_createdAt_idx');
+    });
+  });
+});
