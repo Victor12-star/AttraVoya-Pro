@@ -28,19 +28,17 @@ Never infer 5/5 from workflow-level status alone; inspect the individual jobs. D
 
 ## Current fully verified release
 
-Phase 10R — provider failure isolation — is complete.
+Phase 10W — web session security controls — is complete.
 
-- PR: `#106`
-- Final PR head: `4e72ac4103b5c77ebdb773b0b6229d68788d3801`
-- Final PR CI run: `34520682649`
+- PR: `#112`
+- Final PR head: `6971786b138fe9f762c983b216962ceee4919cc9`
+- Final PR CI run: `34699789733`
 - Result: all five canonical jobs passed
-- Squash-merged `develop` SHA: `5960fec326e1a730701e7c116eaed6676ccdaaf8`
-- Independent post-merge push CI run: `34521122460`
+- Squash-merged `develop` SHA: `d68d723deca5870ccb02129edfaa0b009853a71f`
+- Independent post-merge push CI run: `34699998083`
 - Result: all five canonical jobs passed
 
-Phase 10R adds deterministic application-level integration evidence that one external-provider outage does not unnecessarily take down unrelated API functionality. The test makes the weather provider unavailable and verifies that the weather route returns HTTP 503 with the existing `PROVIDER_UNAVAILABLE` contract while an unrelated currency route, liveness, and readiness remain HTTP 200.
-
-No fake provider data, distributed infrastructure, privacy weakening, or flaky live dependency was introduced.
+Phase 10W exposes the existing owner-scoped session APIs through the web `/profile` security experience. It provides minimized browser/platform labels, safe loading/empty/error/authentication-required states, targeted session revocation, explicit sign-out-everywhere confirmation, duplicate-action protection, 18-locale copy, responsive theming, browser smoke coverage and blocking Axe accessibility coverage. Raw refresh hashes, IP hashes, tokens and other private session metadata remain unexposed.
 
 The public-home Pixel 7 Chromium production-build resource budget established by Phases 10K and 10L remains enforced. Current hard ceilings are 215,063 bytes total same-origin transfer, 190,003 bytes JavaScript transfer, 6,366 bytes CSS transfer, and 0 bytes image transfer for that specific route. The zero-image ceiling is route-specific and must not be generalized to unrelated routes.
 
@@ -72,10 +70,16 @@ The following Issue #40 slices are complete and must not be restarted:
 - Phase 10P — authentication query/index review — PR `#104`
 - Phase 10Q — concurrent refresh-session overwrite prevention — PR `#105`
 - Phase 10R — provider failure isolation — PR `#106`
+- Maintenance handoff synchronization through Phase 10R — merged before Phase 10S
+- Phase 10S — API restart and database recovery verification — PR `#108`
+- Phase 10T — Prisma migration baseline and deploy gate — PR `#109`
+- Phase 10U — owner-scoped session controls — PR `#110`
+- Phase 10V — paid-provider request budgets — PR `#111`
+- Phase 10W — web session security controls — PR `#112`
 
 PR `#91` is obsolete and was superseded by the corrected Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` is also superseded and must never be merged.
 
-## What Phases 10M through 10R added
+## What Phases 10M through 10W added
 
 Phase 10M defined early, growth, and high-scale capacity-planning contracts, added measured early-capacity evidence, PostgreSQL connection-budget methodology, provider-call/cost evidence requirements, and promotion rules before higher-scale capacity can be claimed.
 
@@ -89,13 +93,23 @@ Phase 10Q added compare-and-swap refresh-token rotation so two simultaneous refr
 
 Phase 10R added deterministic evidence that one provider outage does not unnecessarily degrade unrelated provider routes or health endpoints.
 
+Phase 10S added a guarded process-level restart/recovery harness that starts the real API against disposable PostgreSQL, verifies database-backed readiness, performs bounded SIGTERM shutdown, starts a replacement process on the same host/port/database and verifies readiness again in CI.
+
+Phase 10T added the Prisma-generated `0_init` migration baseline, production-style `migrate deploy` CI evidence, migration-status and schema-drift verification, and explicit safe-baseline/expand-migrate-contract guidance for rolling-compatible database changes.
+
+Phase 10U added authenticated owner-scoped session visibility with a hard result bound, privacy-minimized session metadata, idempotent targeted revocation and revoke-all-active-sessions support while preserving short-lived access-token lifetime semantics.
+
+Phase 10V added explicit operator-configured in-process request budgets for credentialed external providers. Allowance is consumed immediately before each real upstream attempt, including retries; production fails startup when an enabled credentialed provider lacks its required budget configuration; no vendor quota values are guessed.
+
+Phase 10W added the web account-security UI for those owner-scoped session controls, with privacy-minimized device labels, authoritative destructive-action handling, all maintained locales, responsive/accessibility behavior and blocking browser/Axe coverage.
+
 ## Existing Issue #40 foundations that must be preserved
 
 The repository already contains production-readiness work that later slices must build on rather than duplicate:
 
 - bounded global and route/risk-aware API rate limits, including stricter planner and provider-backed route limits;
 - a 256 KiB Fastify request-body ceiling;
-- provider hard timeouts, bounded retries with jitter, `Retry-After` handling, per-provider concurrency limits, queue bounds, a total logical-request deadline, and a process-local circuit breaker;
+- provider hard timeouts, bounded retries with jitter, `Retry-After` handling, per-provider concurrency limits, queue bounds, a total logical-request deadline, a process-local circuit breaker and explicit paid-provider request budgets;
 - bounded in-process provider caching with single-flight cache-miss coalescing;
 - owner-scoped private planner data, keyset pagination, and planner-create idempotency;
 - privacy-safe request logging and bounded process-local HTTP/provider/cache/database/runtime metrics;
@@ -106,8 +120,11 @@ The repository already contains production-readiness work that later slices must
 - bounded soak, stress, and spike regression evidence;
 - overload-safe health probes;
 - a verified non-root API production container and bounded deployment/graceful-shutdown runbook;
-- atomic authentication token claiming and refresh-session concurrency protection;
+- process-level API restart/recovery verification;
+- a Prisma migration baseline plus production-style migration deploy/status/drift gates and rolling-compatible migration guidance;
+- atomic authentication token claiming and compare-and-swap refresh-session concurrency protection;
 - authentication query/index review with PostgreSQL catalog and `EXPLAIN` evidence;
+- owner-scoped session visibility/revocation APIs plus a privacy-minimized web session-security experience;
 - provider-failure isolation;
 - browser E2E, accessibility, slow-network, offline/reconnection, production-build, mobile and cross-browser coverage;
 - web/mobile Core Web Vitals targets and the public-home production resource-budget gate.
@@ -141,7 +158,9 @@ Preserve the completed Travel Companion rules:
 
 Issue `#40` — production scalability, reliability, performance and user-experience readiness — remains open. Continue it only through coherent, reviewable gaps supported by the live architecture. Before naming or implementing another phase, inspect the current repository and prior PRs so already completed protections are not duplicated.
 
-Candidate remaining gaps that still require live verification include restart/recovery-path evidence, dependency timeout-and-recovery behavior beyond the existing provider-isolation test, multi-instance deployment assumptions that are not yet proven, shared-state decisions only where the current architecture actually requires them, database N+1/hot-path evidence, rolling-deployment/backward-compatible migration evidence, route-specific loading/error/degraded-mode UX gaps, additional session/device/revocation production-risk controls, and measurable provider quota/cost protections.
+Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, basic owner-scoped session/device revocation controls, the web session-security experience, and first-stage credentialed-provider request budgets.
+
+Candidate remaining gaps that still require live verification include dependency timeout-and-recovery behavior beyond the existing provider-isolation test, unproven multi-instance deployment assumptions, shared-state decisions only where the current architecture actually requires them, database N+1/hot-path evidence, deployment-platform edge/load-balancer/WAF requirements when a real public production target is selected, route-specific partial/degraded-mode UX gaps, and whether provider-budget semantics need a shared coordinator only after a measured multi-replica deployment requirement exists.
 
 Treat those as candidate gaps, not automatic implementation instructions. Inspect first and choose the smallest genuine missing production-readiness slice.
 
