@@ -264,7 +264,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   const photoScope = destination
     ? `${destination.provider ?? ''}:${destination.externalId ?? ''}:${destination.slug}`
     : '';
-  const failedPhotoUrls = photoFailures.scope === photoScope ? photoFailures.urls : null;
+  const failedPhotoUrls =
+    photoFailures.scope === photoScope ? photoFailures.urls : null;
   const galleryPhotos =
     galleryStay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
   const activePhoto = galleryPhotos[activePhotoIndex] ?? null;
@@ -329,7 +330,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
 
   /** @param {any} stay @param {HTMLButtonElement} trigger */
   function openGallery(stay, trigger) {
-    const availablePhotos = stay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
+    const availablePhotos =
+      stay?.photos?.filter((photo) => !failedPhotoUrls?.has(photo.url)) ?? [];
     if (availablePhotos.length === 0) return;
 
     galleryTriggerRef.current = trigger;
@@ -350,7 +352,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
    */
   function markPhotoUnavailable(photoUrl) {
     setPhotoFailures((current) => {
-      const urls = current.scope === photoScope ? new Set(current.urls) : new Set();
+      const urls =
+        current.scope === photoScope ? new Set(current.urls) : new Set();
       if (urls.has(photoUrl) && current.scope === photoScope) return current;
       urls.add(photoUrl);
       return { scope: photoScope, urls };
@@ -378,7 +381,10 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
    */
   function handleThumbnailError(event, photo) {
     const image = event.currentTarget;
-    if (photo.thumbnailUrl !== photo.url && image.dataset.fullSizeFallback !== 'true') {
+    if (
+      photo.thumbnailUrl !== photo.url &&
+      image.dataset.fullSizeFallback !== 'true'
+    ) {
       image.dataset.fullSizeFallback = 'true';
       image.src = photo.url;
       return;
@@ -389,7 +395,9 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
   function previousPhoto() {
     if (galleryPhotos.length === 0) return;
     setActivePhotoIndex((current) =>
-      current === 0 ? galleryPhotos.length - 1 : Math.min(current - 1, galleryPhotos.length - 1),
+      current === 0
+        ? galleryPhotos.length - 1
+        : Math.min(current - 1, galleryPhotos.length - 1),
     );
   }
 
@@ -519,8 +527,8 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
             {stays.map((stay) => {
               const distance = formatDistance(numberFormatter, stay.distanceMeters);
               const typeLabel = stay.accommodationType ? copy.types[stay.accommodationType] : null;
-              const availablePhotos = stay.photos.filter((photo) =>
-                !failedPhotoUrls?.has(photo.url),
+              const availablePhotos = stay.photos.filter(
+                (photo) => !failedPhotoUrls?.has(photo.url),
               );
               const coverPhoto = availablePhotos[0] ?? null;
               const coverAlt = coverPhoto
@@ -690,9 +698,7 @@ export function AccommodationPage({ destination, locale = 'en', messages }) {
                       type="button"
                       key={photo.key}
                       onClick={() => setActivePhotoIndex(index)}
-                      aria-label={`${
-                        photoCopy.categories[photo.category] ?? photoCopy.categories.OTHER
-                      }: ${index + 1}`}
+                      aria-label={`${photoCopy.categories[photo.category] ?? photoCopy.categories.OTHER}: ${index + 1}`}
                       aria-pressed={index === activePhotoIndex}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
