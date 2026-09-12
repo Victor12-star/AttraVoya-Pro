@@ -17,12 +17,19 @@ function recordCacheMetric(metrics, outcome) {
 }
 
 /**
- * Small in-process TTL cache for low-cost provider responses.
+ * Small, intentionally process-local TTL cache for non-authoritative provider snapshots.
  *
- * This is intentionally provider-agnostic and bounded. It reduces repeated
- * external API calls during local development without pretending to be a
- * distributed cache. A production deployment can later replace this behind
- * the same provider/service boundary with Redis or another shared cache.
+ * Cache misses must always be safe to refetch, and correctness must never depend
+ * on cross-replica invalidation. Do not store sessions, authorization decisions,
+ * payment or entitlement state, booking confirmations, inventory locks,
+ * idempotency state, or any other mutable state that coordinates correctness.
+ * Independent replicas may therefore differ only in cache hit ratio, duplicate
+ * provider reads, and bounded snapshot freshness. Deployment-wide provider
+ * request budgets bound those duplicate reads separately.
+ *
+ * Keep the cache bounded and local until measured provider cost, latency, or hit
+ * rate demonstrates a reason for shared caching. Redis or another coordinator is
+ * an optimization option later, not a prerequisite for correctness today.
  *
  * @param {{
  *   maxEntries?: number,
