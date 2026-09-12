@@ -46,6 +46,34 @@ describe('health endpoints', () => {
     expect(response.headers['x-request-id']).toBeTruthy();
   });
 
+  it('partitions global and route-specific limits across declared replicas', async () => {
+    const app = await buildApp({
+      logger: false,
+      replicaCount: 2,
+      healthRepository: {
+        checkDatabase: async () => true,
+      },
+      countriesRepository: {
+        list: async () => [],
+      },
+    });
+    apps.push(app);
+
+    const ordinaryResponse = await app.inject({
+      method: 'GET',
+      url: '/api/v1/countries',
+    });
+    const livenessResponse = await app.inject({
+      method: 'GET',
+      url: '/api/v1/health/live',
+    });
+
+    expect(ordinaryResponse.statusCode).toBe(200);
+    expect(ordinaryResponse.headers['x-ratelimit-limit']).toBe('60');
+    expect(livenessResponse.statusCode).toBe(200);
+    expect(livenessResponse.headers['x-ratelimit-limit']).toBe('150');
+  });
+
   it('returns readiness when the database check succeeds', async () => {
     const app = await buildApp({
       logger: false,
