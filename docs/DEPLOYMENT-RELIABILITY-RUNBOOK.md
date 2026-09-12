@@ -21,7 +21,9 @@ Every production API deployment must preserve all of the following:
 
 ## Current replica-topology safety contract
 
-AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. Several controls are intentionally process-local today, including rate-limit counters, credentialed-provider request budgets, provider circuit state, provider cache coordination, and aggregate process metrics. Running multiple active production replicas without a reviewed shared-state strategy could therefore make those controls inconsistent across replicas even though database-backed user/session state remains shared.
+AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. Several controls remain intentionally process-local today, including rate-limit counters, provider circuit state, provider cache coordination, and aggregate process metrics. Running multiple active production replicas without a reviewed shared-state strategy could therefore make those controls inconsistent across replicas even though database-backed user/session state remains shared.
+
+Credentialed-provider request budgets are no longer in that unresolved set. Their configured maxima are deployment-wide values that are conservatively partitioned by the validated `API_REPLICA_COUNT`, and their counters use wall-clock-aligned windows so separate replicas roll over at the same boundary. This removes quota multiplication as a provider-budget scaling blocker without adding speculative distributed infrastructure. It does **not** remove the overall production replica guard while the controls above remain unresolved.
 
 The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
 
@@ -35,7 +37,7 @@ Operators must set `API_REPLICA_COUNT` to the real active topology. Do not leave
 
 This guard is intentionally temporary. Remove or evolve it only after measured traffic/capacity evidence justifies multi-replica operation and every correctness-sensitive process-local control has an explicit decision: move to shared coordination, replace with a multi-replica-safe design, or document why locality is harmless. Do not add Redis, distributed rate limiting, or another coordinator merely to remove the guard before that need exists.
 
-A rolling replacement may still momentarily overlap old and new processes when the platform provides replacement semantics, but that overlap must not be treated as steady-state horizontal scaling. Provider-budget and database-connection implications must still be reviewed before choosing such a rollout strategy.
+A rolling replacement may still momentarily overlap old and new processes when the platform provides replacement semantics, but that overlap must not be treated as steady-state horizontal scaling. Database-connection capacity must still be reviewed before choosing such a rollout strategy. If both processes can issue provider traffic during an overlap, the provider-budget topology calculation must include that simultaneously active capacity rather than pretending only one process can spend allowance.
 
 ## Timing contract
 
@@ -76,6 +78,7 @@ Before deploying a commit to production, verify all of the following against the
 - `SHUTDOWN_GRACE_MS` is valid and the infrastructure termination grace remains longer;
 - database migrations, when present, have an explicit compatibility/rollback plan and have passed the PostgreSQL/Prisma CI job;
 - provider credentials and optional integrations are configured only where intended; missing optional providers must degrade honestly rather than be replaced with fake data;
+- configured provider request-budget maxima are legitimate deployment-wide allowances and remain large enough to reserve a non-zero conservative share for every declared replica;
 - no deployment step exposes secrets, request bodies, traveller data, tokens, or provider payloads in logs.
 
 ## Rollout verification
@@ -125,7 +128,7 @@ Do not plan a rollout that intentionally removes all healthy API capacity before
 
 For the current architecture, steady-state production remains exactly one active API replica. If the platform briefly overlaps old and new processes during replacement, review that overlap explicitly rather than treating it as proof of production-safe horizontal scaling.
 
-The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment.
+The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment. Provider request budgets only preserve their deployment-wide ceiling when the declared replica count covers every process that can spend allowance during the aligned window.
 
 ## Failure drills before production launch
 
@@ -153,4 +156,5 @@ Review this document whenever any of the following changes:
 - load-balancer health-check behavior;
 - database migration strategy;
 - `API_REPLICA_COUNT`, API replica topology, or database connection budget;
+- provider request-budget partitioning or window semantics;
 - release/rollback automation.
