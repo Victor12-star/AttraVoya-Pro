@@ -13,6 +13,13 @@ const TEST_COUNTRY_ISO3 = 'XZZ';
 const TEST_CURRENCY_CODE = 'XQC';
 const MAX_EXPECTED_PLANNER_READ_QUERIES = 8;
 
+/**
+ * Count only SQL reads that can grow with planner relation loading. Connection,
+ * transaction and fixture-management statements are intentionally excluded so
+ * the regression contract measures the production repository query shape.
+ *
+ * @param {string[]} queries
+ */
 function countPlannerReadQueries(queries) {
   return queries.filter((query) =>
     /"(TravelPlanRequest|TravelStayPreference|Currency|Destination|City|Country)"/.test(query),
@@ -44,7 +51,10 @@ describePlannerQueryCount('planner list PostgreSQL query-count contract', () => 
     const destinationId = `query-count-destination-${suffix}`;
     const currencyId = `query-count-currency-${suffix}`;
     const userId = `query-count-user-${suffix}`;
-    const requestIds = Array.from({ length: 41 }, (_, index) => `query-count-request-${suffix}-${index}`);
+    const requestIds = Array.from(
+      { length: 41 },
+      (_, index) => `query-count-request-${suffix}-${index}`,
+    );
     const baseCreatedAt = Date.now();
 
     try {
@@ -159,14 +169,27 @@ describePlannerQueryCount('planner list PostgreSQL query-count contract', () => 
       expect(continuationPage.queryCount).toBe(tinyPage.queryCount);
       expect(fullPage.queryCount).toBeLessThanOrEqual(MAX_EXPECTED_PLANNER_READ_QUERIES);
     } finally {
-      await prisma.travelPlanRequest.deleteMany({ where: { id: { in: requestIds } } }).catch(() => {});
-      await prisma.user.deleteMany({ where: { id: userId } }).catch(() => {});
-      await prisma.destination.deleteMany({ where: { id: destinationId } }).catch(() => {});
-      await prisma.city.deleteMany({ where: { id: cityId } }).catch(() => {});
-      await prisma.country.deleteMany({ where: { id: countryId } }).catch(() => {});
-      await prisma.currency.deleteMany({ where: { id: currencyId } }).catch(() => {});
-      await prisma.$disconnect();
-      await pool.end();
+      // Cleanup is part of the regression contract. Silently swallowing a failed
+      // delete can leak fixtures into later database checks and hide the real
+      // source of nondeterministic CI failures.
+      try {
+        await prisma.$transaction([
+          prisma.travelPlanRequest.deleteMany({ where: { id: { in: requestIds } } }),
+          prisma.user.deleteMany({ where: { id: userId } }),
+          prisma.destination.deleteMany({ where: { id: destinationId } }),
+          prisma.city.deleteMany({ where: { id: cityId } }),
+          prisma.country.deleteMany({ where: { id: countryId } }),
+          prisma.currency.deleteMany({ where: { id: currencyId } }),
+        ]);
+      } finally {
+        // Database handles must always be released, even when fixture cleanup
+        // fails, otherwise the CI process can hang and obscure the useful error.
+        try {
+          await prisma.$disconnect();
+        } finally {
+          await pool.end();
+        }
+      }
     }
   });
 });
