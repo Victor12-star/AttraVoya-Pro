@@ -17,6 +17,25 @@ Every production API deployment must preserve all of the following:
 5. A replacement instance must become ready before the old healthy capacity is removed when the platform supports rolling replacement.
 6. A rollout must stop or roll back when the new version cannot become ready, repeatedly exits, or causes material health/error regression.
 7. Deployment automation must not bypass the repository's five canonical CI jobs or treat a successful build alone as release evidence.
+8. `API_REPLICA_COUNT` must match the actual number of simultaneously active API replicas. Production currently supports exactly `1` active replica.
+
+## Current replica-topology safety contract
+
+AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. Several controls are intentionally process-local today, including rate-limit counters, credentialed-provider request budgets, provider circuit state, provider cache coordination, and aggregate process metrics. Running multiple active production replicas without a reviewed shared-state strategy could therefore make those controls inconsistent across replicas even though database-backed user/session state remains shared.
+
+The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
+
+- missing or blank values resolve to `1` for backward-compatible single-instance operation;
+- production accepts exactly `1` active API replica;
+- production startup fails closed when `API_REPLICA_COUNT` is greater than `1`;
+- non-production environments may declare more than one process for controlled multi-process exercises without turning that into a production-readiness claim;
+- invalid values are rejected rather than silently coerced.
+
+Operators must set `API_REPLICA_COUNT` to the real active topology. Do not leave it at `1` while independently scaling the platform above one active production API instance.
+
+This guard is intentionally temporary. Remove or evolve it only after measured traffic/capacity evidence justifies multi-replica operation and every correctness-sensitive process-local control has an explicit decision: move to shared coordination, replace with a multi-replica-safe design, or document why locality is harmless. Do not add Redis, distributed rate limiting, or another coordinator merely to remove the guard before that need exists.
+
+A rolling replacement may still momentarily overlap old and new processes when the platform provides replacement semantics, but that overlap must not be treated as steady-state horizontal scaling. Provider-budget and database-connection implications must still be reviewed before choosing such a rollout strategy.
 
 ## Timing contract
 
@@ -53,6 +72,7 @@ Before deploying a commit to production, verify all of the following against the
 
 - all five canonical GitHub Actions jobs passed on that exact release commit;
 - required production environment variables pass the server environment contract;
+- `API_REPLICA_COUNT` matches the actual active topology and is `1` for the current production architecture;
 - `SHUTDOWN_GRACE_MS` is valid and the infrastructure termination grace remains longer;
 - database migrations, when present, have an explicit compatibility/rollback plan and have passed the PostgreSQL/Prisma CI job;
 - provider credentials and optional integrations are configured only where intended; missing optional providers must degrade honestly rather than be replaced with fake data;
@@ -101,9 +121,11 @@ For an application-only rollback with a backward-compatible database state:
 
 ## Capacity during rolling replacement
 
-Do not plan a rollout that intentionally removes all healthy API capacity before replacement capacity is ready. The required surge/spare capacity depends on the production platform and measured workload, so this repository does not invent a fixed replica count.
+Do not plan a rollout that intentionally removes all healthy API capacity before replacement capacity is ready. The required surge/spare capacity depends on the production platform and measured workload, so this repository does not invent a fixed long-term replica count.
 
-The release owner should confirm that database connection budgets and external-provider concurrency limits remain safe while old and new instances overlap during a rolling deployment.
+For the current architecture, steady-state production remains exactly one active API replica. If the platform briefly overlaps old and new processes during replacement, review that overlap explicitly rather than treating it as proof of production-safe horizontal scaling.
+
+The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment.
 
 ## Failure drills before production launch
 
@@ -114,7 +136,7 @@ The production-readiness program should exercise these scenarios in a staging or
 - deliberately hold shutdown past the configured application grace and confirm a visible unsuccessful exit;
 - start a replacement that never becomes ready and confirm healthy old capacity is not prematurely discarded where platform semantics allow that control;
 - simulate a bad application release and execute the rollback procedure;
-- validate database connection budget while old and new replicas overlap;
+- validate database connection budget while replacement processes overlap;
 - verify overload/backpressure still protects the service during rollout traffic shifts.
 
 ## Release evidence
@@ -130,5 +152,5 @@ Review this document whenever any of the following changes:
 - hosting/orchestration platform;
 - load-balancer health-check behavior;
 - database migration strategy;
-- API replica topology or database connection budget;
+- `API_REPLICA_COUNT`, API replica topology, or database connection budget;
 - release/rollback automation.

@@ -1,8 +1,14 @@
 import { env } from './config/env.js';
+import { assertSupportedReplicaTopology } from './config/replica-topology.js';
 import { buildApp } from './app.js';
 import { createReadinessState } from './lifecycle/readiness-state.js';
 import { registerDatabaseLifecycle } from './plugins/database.js';
 import { createShutdownHandler } from './shutdown.js';
+
+assertSupportedReplicaTopology({
+  nodeEnv: env.NODE_ENV,
+  replicaCount: process.env.API_REPLICA_COUNT,
+});
 
 const readinessState = createReadinessState();
 const app = await buildApp({ readinessState });
