@@ -254,6 +254,25 @@ describe('AccommodationPage', () => {
     });
   });
 
+  it('keeps Tab and Shift+Tab focus inside the hotel photo gallery', async () => {
+    mocks.getNearbyAccommodation.mockResolvedValue(accommodationPhotoResponse());
+
+    render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
+
+    await screen.findByRole('heading', { name: 'Example Hotel', level: 2 });
+    screen.getByRole('button', { name: 'View photos' }).click();
+
+    const closeButton = await screen.findByRole('button', { name: 'Close photos' });
+    const nextButton = screen.getByRole('button', { name: 'Next photo' });
+    await waitFor(() => expect(closeButton).toHaveFocus());
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(nextButton).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(closeButton).toHaveFocus();
+  });
+
   it('refetches through the dedicated accommodation API when a supported type is selected', async () => {
     render(<AccommodationPage destination={destination} locale="en" messages={messages} />);
 
