@@ -10,6 +10,11 @@ import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod
 
 import { API_PREFIX, DEFAULT_BODY_LIMIT_BYTES, DEFAULT_RATE_LIMIT } from './config/constants.js';
 import { env, providerRequestBudgetPoliciesFromEnvironment } from './config/env.js';
+import {
+  AlignedLocalRateLimitStore,
+  createReplicaRateLimitRouteNormalizer,
+  partitionDeploymentRateLimitConfig,
+} from './config/replica-rate-limit.js';
 import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
@@ -43,9 +48,10 @@ import {
 } from './observability/http-request-metrics.js';
 
 export async function buildApp(options = {}) {
+  const replicaCount = options.replicaCount ?? 1;
   configureProviderRequestBudgets(
     options.providerRequestBudgetPolicies ?? providerRequestBudgetPoliciesFromEnvironment(env),
-    { replicaCount: options.replicaCount ?? 1 },
+    { replicaCount },
   );
 
   const readinessState = options.readinessState ?? createReadinessState();
@@ -112,9 +118,17 @@ export async function buildApp(options = {}) {
   app.decorate('authenticate', createAuthenticateHook({ repository: authenticationRepository }));
   app.decorate('authorize', createAuthorizeHook);
 
+  const deploymentRateLimit = partitionDeploymentRateLimitConfig(DEFAULT_RATE_LIMIT, replicaCount);
+
+  // Route-level limits are deployment-wide policies too. Normalize them before
+  // @fastify/rate-limit registers its own onRoute hook so every current and
+  // future numeric override receives the same conservative replica partition.
+  app.addHook('onRoute', createReplicaRateLimitRouteNormalizer(replicaCount));
+
   await app.register(rateLimit, {
     global: true,
-    ...DEFAULT_RATE_LIMIT,
+    ...deploymentRateLimit,
+    store: AlignedLocalRateLimitStore,
     errorResponseBuilder(request) {
       return {
         statusCode: 429,
