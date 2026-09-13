@@ -221,6 +221,10 @@ async function parseJsonResponse(response, provider) {
  * - Retries only transient failures and never tight-loops on HTTP 429.
  * - Honors valid Retry-After cooldowns across new requests in this process.
  * - Suppresses repeatedly unavailable providers and allows one recovery probe.
+ * - Keeps circuit state process-local as defensive per-replica failure isolation.
+ *   Replica disagreement may change only which instance attempts or suppresses
+ *   a provider call; deployment-wide request budgets bound aggregate attempts,
+ *   and no authoritative application state depends on the circuit.
  * - Adds bounded retry jitter so concurrent failures do not retry in lockstep.
  * - Records aggregate provider latency/failure/retry telemetry without payload data.
  * - Keeps upstream response text out of application errors/logs by default.
