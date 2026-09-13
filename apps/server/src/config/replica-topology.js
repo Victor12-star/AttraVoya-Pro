@@ -31,8 +31,11 @@ function parseReplicaCount(value) {
  * Provider request budgets and API rate limits are partitioned conservatively
  * by the declared topology with aligned fixed windows. Provider response caches
  * are intentionally local but may hold only non-authoritative snapshots whose
- * misses can be refetched safely. The remaining controls below still block
- * production horizontal scaling.
+ * misses can be refetched safely. Provider circuit state is also intentionally
+ * local defensive failure isolation: disagreement changes which replica attempts
+ * a provider call, while deployment-wide request budgets bound aggregate attempts
+ * and no authoritative application state depends on the circuit. The remaining
+ * control below still blocks production horizontal scaling.
  *
  * This is a deployment-safety contract, not a claim that one process is the
  * long-term scaling architecture. Remove or evolve the guard only together with
@@ -44,7 +47,7 @@ export function assertSupportedReplicaTopology({ nodeEnv, replicaCount }) {
 
   if (nodeEnv === 'production' && declaredReplicaCount > 1) {
     throw new Error(
-      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Process-local provider circuit state and aggregate metrics are not yet a shared multi-replica contract.',
+      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Aggregate metrics do not yet provide a complete multi-replica operational view.',
     );
   }
 

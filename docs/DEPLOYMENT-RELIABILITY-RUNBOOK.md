@@ -21,7 +21,7 @@ Every production API deployment must preserve all of the following:
 
 ## Current replica-topology safety contract
 
-AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining process-local blockers are provider circuit state and aggregate process metrics. Running multiple active production replicas before those controls have a reviewed multi-replica strategy could make provider failure isolation or operational visibility inconsistent across replicas even though database-backed user/session state remains shared.
+AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining process-local blocker is aggregate process metrics. Running multiple active production replicas before metrics provide a reviewed aggregate operational view could hide deployment-wide saturation or failure patterns even though database-backed user/session state remains shared.
 
 Provider response caches are intentionally process-local and are no longer an unresolved correctness blocker. They may contain only bounded, non-authoritative provider snapshots whose misses can be safely refetched; no session, authorization, payment, entitlement, booking confirmation, inventory lock, idempotency, or other coordination state may depend on them. Separate replicas may therefore have different cache contents, hit rates, and bounded snapshot freshness without requiring cross-replica invalidation for correctness. Duplicate provider reads caused by local misses remain constrained separately by the deployment-wide provider request-budget contract. Add Redis or another shared cache later only if measured provider cost, latency, or hit-rate evidence justifies that optimization.
 
@@ -31,7 +31,9 @@ API rate limits now use the same deployment-wide principle. The configured globa
 
 Multi-replica rate-limit safety fails closed for dynamic `max` or `timeWindow` functions and for sliding/backoff modes that would break the aligned fixed-window proof. Every positive deployment-wide maximum must also be at least the declared replica count so every active process can reserve a non-zero share. The current smallest explicit route ceiling is the planner's 10 requests per minute, so the present local-partition design cannot declare more than 10 active replicas without deliberately revising that policy or adopting a reviewed shared limiter. Normal platform clock synchronization is required because the fixed-window contract relies on wall-clock-aligned boundaries.
 
-These completed provider-budget, provider-cache, and rate-limit contracts do **not** remove the overall production replica guard while provider circuit state and aggregate metrics remain unresolved.
+Provider circuit state is also no longer an unresolved multi-replica blocker. Each circuit is deliberately defensive per-replica failure isolation, not globally authoritative state. Replicas may temporarily disagree about provider health, so one replica may suppress a call while another still attempts one. That difference affects availability and efficiency only: it cannot authorize a user, confirm a booking, reserve inventory, mutate an entitlement, or establish any other application truth. Retries and concurrency remain bounded per client, and every real upstream attempt consumes the conservatively partitioned deployment-wide provider request budget before network access. Shared circuit coordination would therefore be an operational optimization only if measured outage traffic later justifies it.
+
+These completed provider-budget, provider-cache, rate-limit, and provider-circuit contracts do **not** remove the overall production replica guard while aggregate metrics remain unresolved.
 
 The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
 
