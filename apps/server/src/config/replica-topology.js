@@ -76,8 +76,8 @@ function parseMetricsInstanceId(value) {
 export function resolveSupportedReplicaTopology({
   nodeEnv,
   replicaCount,
-  metricsAggregationMode,
-  metricsInstanceId,
+  metricsAggregationMode = undefined,
+  metricsInstanceId = undefined,
 }) {
   const declaredReplicaCount = parseReplicaCount(replicaCount);
   const aggregationMode = parseMetricsAggregationMode(metricsAggregationMode);
