@@ -97,9 +97,10 @@ describe('API client', () => {
     });
 
     const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' });
     await vi.advanceTimersByTimeAsync(25);
 
-    await expect(request).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' });
+    await expectation;
     vi.useRealTimers();
   });
 
@@ -118,8 +119,9 @@ describe('API client', () => {
     });
 
     const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
     callerController.abort();
 
-    await expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    await expectation;
   });
 });
