@@ -72,12 +72,19 @@ function parseMetricsInstanceId(value) {
  * Resolve replica and observability topology once during startup.
  * Metrics remain bounded and process-local so recording adds no database or
  * network work to user requests. External monitoring aggregates replicas.
+ *
+ * @param {{
+ *   nodeEnv: string,
+ *   replicaCount?: string | number | null,
+ *   metricsAggregationMode?: string | null,
+ *   metricsInstanceId?: string | null,
+ * }} options
  */
 export function resolveSupportedReplicaTopology({
   nodeEnv,
   replicaCount,
-  metricsAggregationMode = undefined,
-  metricsInstanceId = undefined,
+  metricsAggregationMode,
+  metricsInstanceId,
 }) {
   const declaredReplicaCount = parseReplicaCount(replicaCount);
   const aggregationMode = parseMetricsAggregationMode(metricsAggregationMode);
