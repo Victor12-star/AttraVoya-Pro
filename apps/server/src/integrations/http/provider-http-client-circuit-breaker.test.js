@@ -85,7 +85,9 @@ describe('provider HTTP client circuit breaker', () => {
     await expect(replicaA.requestJson('https://provider.example/a')).rejects.toMatchObject({
       code: 'PROVIDER_UNAVAILABLE',
     });
-    await expect(replicaA.requestJson('https://provider.example/a-suppressed')).rejects.toMatchObject({
+    await expect(
+      replicaA.requestJson('https://provider.example/a-suppressed'),
+    ).rejects.toMatchObject({
       code: 'PROVIDER_UNAVAILABLE',
       details: { reason: 'circuit_open' },
     });
