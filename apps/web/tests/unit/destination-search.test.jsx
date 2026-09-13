@@ -69,11 +69,14 @@ describe('DestinationSearch', () => {
 
     expect(screen.getByText('Loading…')).toBeInTheDocument();
     const result = await screen.findByRole('button', { name: /Stockholm/i });
-    expect(mocks.searchDestinations).toHaveBeenCalledWith({
-      query: 'Stockholm',
-      language: 'en',
-      limit: 8,
-    });
+    expect(mocks.searchDestinations).toHaveBeenCalledWith(
+      {
+        query: 'Stockholm',
+        language: 'en',
+        limit: 8,
+      },
+      { signal: expect.any(AbortSignal) },
+    );
 
     fireEvent.click(result);
     expect(result).toHaveAttribute('aria-pressed', 'true');
@@ -120,6 +123,25 @@ describe('DestinationSearch', () => {
       await screen.findByText('Search cities, countries and destinations', { selector: 'strong' }),
     ).toBeInTheDocument();
     expect(screen.getByText('zz')).toBeInTheDocument();
+  });
+
+  it('cancels provider work when the search screen unmounts', () => {
+    let signal;
+    mocks.searchDestinations.mockImplementation((_query, options) => {
+      signal = options.signal;
+      return new Promise(() => {});
+    });
+
+    const { unmount } = render(
+      <DestinationSearch initialQuery="Stockholm" locale="en" messages={messages} />,
+    );
+
+    expect(signal).toBeInstanceOf(AbortSignal);
+    expect(signal.aborted).toBe(false);
+
+    unmount();
+
+    expect(signal.aborted).toBe(true);
   });
 
   it('validates short queries before calling the backend', () => {

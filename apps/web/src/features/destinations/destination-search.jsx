@@ -60,30 +60,41 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
   const [formError, setFormError] = useState(false);
   const [selectedId, setSelectedId] = useState(/** @type {string|null} */ (null));
   const requestSequence = useRef(0);
+  const activeRequest = useRef(/** @type {AbortController|null} */ (null));
   const initialSearchStarted = useRef(false);
 
   const runSearch = useCallback(
     async (rawQuery) => {
       const cleanQuery = String(rawQuery ?? '').trim();
+
+      // Stop obsolete provider work before starting or rejecting a newer query.
+      activeRequest.current?.abort();
+      const requestId = ++requestSequence.current;
+
       if (cleanQuery.length < MIN_QUERY_LENGTH) {
+        activeRequest.current = null;
         setFormError(true);
         setStatus('idle');
         setResults([]);
         return;
       }
 
-      const requestId = ++requestSequence.current;
+      const controller = new AbortController();
+      activeRequest.current = controller;
       setFormError(false);
       setSubmittedQuery(cleanQuery);
       setSelectedId(null);
       setStatus('loading');
 
       try {
-        const response = await apiClient.searchDestinations({
-          query: cleanQuery,
-          language: locale,
-          limit: RESULT_LIMIT,
-        });
+        const response = await apiClient.searchDestinations(
+          {
+            query: cleanQuery,
+            language: locale,
+            limit: RESULT_LIMIT,
+          },
+          { signal: controller.signal },
+        );
 
         // Ignore an older response when a newer search has already started.
         if (requestId !== requestSequence.current) return;
@@ -97,9 +108,20 @@ export function DestinationSearch({ initialQuery = '', locale = 'en', messages }
         if (requestId !== requestSequence.current) return;
         setResults([]);
         setStatus('error');
+      } finally {
+        if (activeRequest.current === controller) activeRequest.current = null;
       }
     },
     [locale],
+  );
+
+  useEffect(
+    () => () => {
+      requestSequence.current += 1;
+      activeRequest.current?.abort();
+      activeRequest.current = null;
+    },
+    [],
   );
 
   useEffect(() => {
