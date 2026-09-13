@@ -21,11 +21,17 @@ Every production API deployment must preserve all of the following:
 
 ## Current replica-topology safety contract
 
-AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining correctness-sensitive process-local blockers are rate-limit counters, provider circuit state, and aggregate process metrics. Running multiple active production replicas before those controls have a reviewed multi-replica strategy could make their behavior inconsistent across replicas even though database-backed user/session state remains shared.
+AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining process-local blockers are provider circuit state and aggregate process metrics. Running multiple active production replicas before those controls have a reviewed multi-replica strategy could make provider failure isolation or operational visibility inconsistent across replicas even though database-backed user/session state remains shared.
 
 Provider response caches are intentionally process-local and are no longer an unresolved correctness blocker. They may contain only bounded, non-authoritative provider snapshots whose misses can be safely refetched; no session, authorization, payment, entitlement, booking confirmation, inventory lock, idempotency, or other coordination state may depend on them. Separate replicas may therefore have different cache contents, hit rates, and bounded snapshot freshness without requiring cross-replica invalidation for correctness. Duplicate provider reads caused by local misses remain constrained separately by the deployment-wide provider request-budget contract. Add Redis or another shared cache later only if measured provider cost, latency, or hit-rate evidence justifies that optimization.
 
-Credentialed-provider request budgets are also no longer in the unresolved set. Their configured maxima are deployment-wide values that are conservatively partitioned by the validated `API_REPLICA_COUNT`, and their counters use wall-clock-aligned windows so separate replicas roll over at the same boundary. This removes quota multiplication as a provider-budget scaling blocker without adding speculative distributed infrastructure. It does **not** remove the overall production replica guard while the controls above remain unresolved.
+Credentialed-provider request budgets are also no longer in the unresolved set. Their configured maxima are deployment-wide values that are conservatively partitioned by the validated `API_REPLICA_COUNT`, and their counters use wall-clock-aligned windows so separate replicas roll over at the same boundary. This removes quota multiplication as a provider-budget scaling blocker without adding speculative distributed infrastructure.
+
+API rate limits now use the same deployment-wide principle. The configured global and route-specific numeric maxima are divided conservatively by the validated `API_REPLICA_COUNT`, and each process uses a bounded local store whose fixed windows align to wall-clock boundaries. The central route-registration contract partitions every numeric override before `@fastify/rate-limit` observes it, so provider routes, planner routes, health probes, and future numeric overrides cannot silently multiply their allowance across replicas. A hot replica may return HTTP 429 before another replica has spent its unused share; that is an intentional conservative tradeoff. Add a shared limiter only if measured traffic distribution or fairness requirements justify its operational cost.
+
+Multi-replica rate-limit safety fails closed for dynamic `max` or `timeWindow` functions and for sliding/backoff modes that would break the aligned fixed-window proof. Every positive deployment-wide maximum must also be at least the declared replica count so every active process can reserve a non-zero share. The current smallest explicit route ceiling is the planner's 10 requests per minute, so the present local-partition design cannot declare more than 10 active replicas without deliberately revising that policy or adopting a reviewed shared limiter. Normal platform clock synchronization is required because the fixed-window contract relies on wall-clock-aligned boundaries.
+
+These completed provider-budget, provider-cache, and rate-limit contracts do **not** remove the overall production replica guard while provider circuit state and aggregate metrics remain unresolved.
 
 The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
 
@@ -39,7 +45,7 @@ Operators must set `API_REPLICA_COUNT` to the real active topology. Do not leave
 
 This guard is intentionally temporary. Remove or evolve it only after measured traffic/capacity evidence justifies multi-replica operation and every correctness-sensitive process-local control has an explicit decision: move to shared coordination, replace with a multi-replica-safe design, or document why locality is harmless. Do not add Redis, distributed rate limiting, or another coordinator merely to remove the guard before that need exists.
 
-A rolling replacement may still momentarily overlap old and new processes when the platform provides replacement semantics, but that overlap must not be treated as steady-state horizontal scaling. Database-connection capacity must still be reviewed before choosing such a rollout strategy. If both processes can issue provider traffic during an overlap, the provider-budget topology calculation must include that simultaneously active capacity rather than pretending only one process can spend allowance.
+A rolling replacement may still momentarily overlap old and new processes when the platform provides replacement semantics, but that overlap must not be treated as steady-state horizontal scaling. Database-connection capacity must still be reviewed before choosing such a rollout strategy. If overlapping processes can accept API or provider traffic, `API_REPLICA_COUNT` must cover that simultaneously active capacity so both the rate-limit and provider-budget partition calculations remain conservative.
 
 ## Timing contract
 
@@ -81,6 +87,8 @@ Before deploying a commit to production, verify all of the following against the
 - database migrations, when present, have an explicit compatibility/rollback plan and have passed the PostgreSQL/Prisma CI job;
 - provider credentials and optional integrations are configured only where intended; missing optional providers must degrade honestly rather than be replaced with fake data;
 - configured provider request-budget maxima are legitimate deployment-wide allowances and remain large enough to reserve a non-zero conservative share for every declared replica;
+- every positive API rate-limit maximum is large enough to reserve a non-zero conservative share for every declared replica, and no multi-replica route introduces an unreviewed dynamic/sliding-window override;
+- production hosts maintain normal clock synchronization so wall-clock-aligned provider-budget and rate-limit windows do not drift materially;
 - no deployment step exposes secrets, request bodies, traveller data, tokens, or provider payloads in logs.
 
 ## Rollout verification
@@ -130,7 +138,7 @@ Do not plan a rollout that intentionally removes all healthy API capacity before
 
 For the current architecture, steady-state production remains exactly one active API replica. If the platform briefly overlaps old and new processes during replacement, review that overlap explicitly rather than treating it as proof of production-safe horizontal scaling.
 
-The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment. Provider request budgets only preserve their deployment-wide ceiling when the declared replica count covers every process that can spend allowance during the aligned window.
+The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment. Provider request budgets and API rate limits preserve their deployment-wide ceilings only when the declared replica count covers every process that can spend allowance or accept limited traffic during the aligned window.
 
 ## Failure drills before production launch
 
@@ -160,4 +168,5 @@ Review this document whenever any of the following changes:
 - `API_REPLICA_COUNT`, API replica topology, or database connection budget;
 - provider request-budget partitioning or window semantics;
 - provider cache authority, freshness, or sharing semantics;
+- API rate-limit maxima, window semantics, or store strategy;
 - release/rollback automation.
