@@ -40,7 +40,7 @@ describe('BudgetQuickForm', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Origin' }), {
       target: { value: 'Stockholm' },
     });
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Total budget' }), {
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Total budget SEK' }), {
       target: { value: '10000' },
     });
 
