@@ -277,6 +277,21 @@ img {
 .button:hover {
   transform: translateY(-1px);
 }
+.button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+.button__spinner {
+  animation: button-spin 800ms linear infinite;
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .button--compact {
   min-height: 40px;
   padding: 8px 16px;
