@@ -213,6 +213,11 @@ describe('admin service metrics', () => {
     expect(response.headers['cache-control']).toBe('private, no-store');
     expect(response.json()).toMatchObject({
       scope: 'PROCESS_LOCAL',
+      topology: {
+        instanceId: 'single',
+        declaredReplicas: 1,
+        aggregationMode: 'PROCESS_LOCAL',
+      },
       http: {
         overall: {
           requests: 12,

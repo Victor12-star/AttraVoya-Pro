@@ -21,6 +21,24 @@ function requireDatabasePoolReader(reader) {
   return reader;
 }
 
+function requireMetricsTopology(topology) {
+  const replicaCount = topology?.replicaCount;
+  const aggregationMode = topology?.metrics?.aggregationMode;
+  const instanceId = topology?.metrics?.instanceId;
+
+  if (!Number.isInteger(replicaCount) || replicaCount < 1) {
+    throw new TypeError('Metrics topology replicaCount must be a positive integer.');
+  }
+  if (!['process_local', 'external'].includes(aggregationMode)) {
+    throw new TypeError('Metrics topology aggregationMode is invalid.');
+  }
+  if (typeof instanceId !== 'string' || instanceId.length < 1) {
+    throw new TypeError('Metrics topology instanceId is required.');
+  }
+
+  return { replicaCount, aggregationMode, instanceId };
+}
+
 /**
  * Expose bounded, process-local operational telemetry to current administrators.
  * The underlying metric registries deliberately contain aggregate service data
@@ -48,6 +66,12 @@ export async function serviceMetricsRoutes(app, options = {}) {
   const readDatabasePoolMetrics = requireDatabasePoolReader(
     options.getDatabasePoolMetrics ?? getDatabasePoolMetrics,
   );
+  const topology = requireMetricsTopology(
+    options.topology ?? {
+      replicaCount: 1,
+      metrics: { aggregationMode: 'process_local', instanceId: 'single' },
+    },
+  );
 
   const adminOnly = {
     onRequest: [protectedApp.authenticate, protectedApp.authorize({ minimumRole: ROLES.ADMIN })],
@@ -55,12 +79,17 @@ export async function serviceMetricsRoutes(app, options = {}) {
 
   app.get('/', adminOnly, async (_request, reply) => {
     // Operational snapshots are never shared or browser-cached. They describe
-    // only this API process; a future production metrics backend must aggregate
-    // replicas explicitly instead of treating this endpoint as cluster-wide.
+    // only this API process. In external mode the collector must scrape every
+    // instance and aggregate snapshots instead of treating one response as cluster-wide.
     reply.header('Cache-Control', 'private, no-store');
 
     return {
       scope: 'PROCESS_LOCAL',
+      topology: {
+        instanceId: topology.instanceId,
+        declaredReplicas: topology.replicaCount,
+        aggregationMode: topology.aggregationMode.toUpperCase(),
+      },
       http: requestMetrics.snapshot(),
       providers: configuredProviderMetrics.snapshot(),
       providerCache: configuredProviderCacheMetrics.snapshot(),
