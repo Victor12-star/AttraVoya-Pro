@@ -21,7 +21,7 @@ Every production API deployment must preserve all of the following:
 
 ## Current replica-topology safety contract
 
-AttraVoya Pro is **not yet claiming production-safe horizontal API scaling**. The remaining process-local blocker is aggregate process metrics. Running multiple active production replicas before metrics provide a reviewed aggregate operational view could hide deployment-wide saturation or failure patterns even though database-backed user/session state remains shared.
+AttraVoya Pro supports a conservative multi-replica API topology when every deployment-wide control below is configured truthfully. Metrics remain process-local on hot request paths, while production with multiple replicas must explicitly select external aggregation, assign each active replica a unique stable instance identity, and scrape every instance directly. A load-balanced sample from one replica is never a deployment-wide view.
 
 Provider response caches are intentionally process-local and are no longer an unresolved correctness blocker. They may contain only bounded, non-authoritative provider snapshots whose misses can be safely refetched; no session, authorization, payment, entitlement, booking confirmation, inventory lock, idempotency, or other coordination state may depend on them. Separate replicas may therefore have different cache contents, hit rates, and bounded snapshot freshness without requiring cross-replica invalidation for correctness. Duplicate provider reads caused by local misses remain constrained separately by the deployment-wide provider request-budget contract. Add Redis or another shared cache later only if measured provider cost, latency, or hit-rate evidence justifies that optimization.
 
@@ -33,13 +33,13 @@ Multi-replica rate-limit safety fails closed for dynamic `max` or `timeWindow` f
 
 Provider circuit state is also no longer an unresolved multi-replica blocker. Each circuit is deliberately defensive per-replica failure isolation, not globally authoritative state. Replicas may temporarily disagree about provider health, so one replica may suppress a call while another still attempts one. That difference affects availability and efficiency only: it cannot authorize a user, confirm a booking, reserve inventory, mutate an entitlement, or establish any other application truth. Retries and concurrency remain bounded per client, and every real upstream attempt consumes the conservatively partitioned deployment-wide provider request budget before network access. Shared circuit coordination would therefore be an operational optimization only if measured outage traffic later justifies it.
 
-These completed provider-budget, provider-cache, rate-limit, and provider-circuit contracts do **not** remove the overall production replica guard while aggregate metrics remain unresolved.
+Aggregate metrics use an explicit exporter topology rather than adding shared database or network writes to user request paths. Each private service-metrics response includes its validated instance identity, declared replica count, and aggregation mode. Production with multiple replicas fails closed unless `METRICS_AGGREGATION_MODE=external` and `METRICS_INSTANCE_ID` is configured. The platform must give every simultaneously active replica a unique stable identity, route the authenticated collector directly to each instance, aggregate all instance snapshots, and alert when observed identities do not match `API_REPLICA_COUNT`. This preserves low request latency while preventing one replica's metrics from being mistaken for the whole deployment.
 
 The API startup path enforces this truthfulness boundary through `API_REPLICA_COUNT`:
 
 - missing or blank values resolve to `1` for backward-compatible single-instance operation;
-- production accepts exactly `1` active API replica;
-- production startup fails closed when `API_REPLICA_COUNT` is greater than `1`;
+- production accepts one replica with process-local metrics;
+- production accepts multiple replicas only with external aggregation and a validated instance identity;
 - non-production environments may declare more than one process for controlled multi-process exercises without turning that into a production-readiness claim;
 - invalid values are rejected rather than silently coerced.
 
@@ -138,7 +138,7 @@ For an application-only rollback with a backward-compatible database state:
 
 Do not plan a rollout that intentionally removes all healthy API capacity before replacement capacity is ready. The required surge/spare capacity depends on the production platform and measured workload, so this repository does not invent a fixed long-term replica count.
 
-For the current architecture, steady-state production remains exactly one active API replica. If the platform briefly overlaps old and new processes during replacement, review that overlap explicitly rather than treating it as proof of production-safe horizontal scaling.
+For multi-replica production, the metrics collector and direct per-instance scrape routes must be operational before traffic is enabled. If the platform briefly overlaps old and new processes during replacement, review that overlap explicitly rather than treating it as proof of production-safe horizontal scaling.
 
 The release owner should confirm that database connection budgets and external-provider concurrency/request-budget controls remain safe while old and new processes overlap during a rolling deployment. Provider request budgets and API rate limits preserve their deployment-wide ceilings only when the declared replica count covers every process that can spend allowance or accept limited traffic during the aligned window.
 

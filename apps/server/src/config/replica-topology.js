@@ -42,14 +42,68 @@ function parseReplicaCount(value) {
  * measured multi-replica evidence and shared coordination where correctness or
  * operational visibility requires it.
  */
-export function assertSupportedReplicaTopology({ nodeEnv, replicaCount }) {
-  const declaredReplicaCount = parseReplicaCount(replicaCount);
+function parseMetricsAggregationMode(value) {
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return 'process_local';
+  }
 
-  if (nodeEnv === 'production' && declaredReplicaCount > 1) {
+  const mode = String(value).trim().toLowerCase();
+  if (!['process_local', 'external'].includes(mode)) {
     throw new Error(
-      'Invalid AttraVoya Pro server environment:\nAPI_REPLICA_COUNT: production currently supports exactly 1 active API replica. Aggregate metrics do not yet provide a complete multi-replica operational view.',
+      "Invalid AttraVoya Pro server environment:\nMETRICS_AGGREGATION_MODE: use 'process_local' or 'external'.",
+    );
+  }
+  return mode;
+}
+
+function parseMetricsInstanceId(value) {
+  if (value === undefined || value === null || String(value).trim() === '') return null;
+
+  const instanceId = String(value).trim();
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(instanceId)) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nMETRICS_INSTANCE_ID: use 1 to 64 letters, numbers, dots, underscores, or dashes, starting with a letter or number.',
+    );
+  }
+  return instanceId;
+}
+
+/**
+ * Resolve replica and observability topology once during startup.
+ * Metrics remain bounded and process-local so recording adds no database or
+ * network work to user requests. External monitoring aggregates replicas.
+ */
+export function resolveSupportedReplicaTopology({
+  nodeEnv,
+  replicaCount,
+  metricsAggregationMode,
+  metricsInstanceId,
+}) {
+  const declaredReplicaCount = parseReplicaCount(replicaCount);
+  const aggregationMode = parseMetricsAggregationMode(metricsAggregationMode);
+  const configuredInstanceId = parseMetricsInstanceId(metricsInstanceId);
+
+  if (aggregationMode === 'external' && !configuredInstanceId) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nMETRICS_INSTANCE_ID: required when METRICS_AGGREGATION_MODE is external.',
     );
   }
 
-  return declaredReplicaCount;
+  if (nodeEnv === 'production' && declaredReplicaCount > 1 && aggregationMode !== 'external') {
+    throw new Error(
+      "Invalid AttraVoya Pro server environment:\nMETRICS_AGGREGATION_MODE: production with multiple API replicas requires 'external'.",
+    );
+  }
+
+  return Object.freeze({
+    replicaCount: declaredReplicaCount,
+    metrics: Object.freeze({
+      aggregationMode,
+      instanceId: configuredInstanceId ?? 'single',
+    }),
+  });
+}
+
+export function assertSupportedReplicaTopology(options) {
+  return resolveSupportedReplicaTopology(options).replicaCount;
 }

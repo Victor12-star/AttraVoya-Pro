@@ -162,6 +162,15 @@ export async function buildApp(options = {}) {
     providerCacheMetrics: options.serviceMetricsProviderCacheMetrics,
     runtimeMetrics: options.serviceMetricsRuntimeMetrics,
     getDatabasePoolMetrics: options.serviceMetricsDatabasePoolMetrics,
+    topology:
+      options.replicaTopology ??
+      Object.freeze({
+        replicaCount,
+        metrics: Object.freeze({
+          aggregationMode: 'process_local',
+          instanceId: 'single',
+        }),
+      }),
   });
 
   await app.register(countriesRoutes, {
