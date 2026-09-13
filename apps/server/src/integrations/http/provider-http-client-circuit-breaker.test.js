@@ -65,12 +65,8 @@ describe('provider HTTP client circuit breaker', () => {
 
 
   it('treats independent replica circuits as local failure isolation', async () => {
-    const replicaAFetch = vi
-      .fn()
-      .mockResolvedValue(jsonResponse(503, { error: 'down' }));
-    const replicaBFetch = vi
-      .fn()
-      .mockResolvedValue(jsonResponse(200, { ok: true }));
+    const replicaAFetch = vi.fn().mockResolvedValue(jsonResponse(503, { error: 'down' }));
+    const replicaBFetch = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
     const replicaA = createProviderHttpClient({
       provider: 'test',
       fetchImpl: replicaAFetch,
@@ -86,24 +82,20 @@ describe('provider HTTP client circuit breaker', () => {
       circuitOpenMs: 30_000,
     });
 
-    await expect(
-      replicaA.requestJson('https://provider.example/a'),
-    ).rejects.toMatchObject({
+    await expect(replicaA.requestJson('https://provider.example/a')).rejects.toMatchObject({
       code: 'PROVIDER_UNAVAILABLE',
     });
-    await expect(
-      replicaA.requestJson('https://provider.example/a-suppressed'),
-    ).rejects.toMatchObject({
-      code: 'PROVIDER_UNAVAILABLE',
-      details: { reason: 'circuit_open' },
-    });
+    await expect(replicaA.requestJson('https://provider.example/a-suppressed')).rejects.toMatchObject(
+      {
+        code: 'PROVIDER_UNAVAILABLE',
+        details: { reason: 'circuit_open' },
+      },
+    );
 
     // Another replica may still probe the provider. This is safe because circuit
     // state is defensive only and aggregate attempts are constrained separately
     // by the deployment-wide provider request-budget contract.
-    await expect(
-      replicaB.requestJson('https://provider.example/b'),
-    ).resolves.toEqual({ ok: true });
+    await expect(replicaB.requestJson('https://provider.example/b')).resolves.toEqual({ ok: true });
     expect(replicaAFetch).toHaveBeenCalledTimes(1);
     expect(replicaBFetch).toHaveBeenCalledTimes(1);
   });
