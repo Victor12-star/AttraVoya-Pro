@@ -37,6 +37,23 @@ function normalizeOpaqueId(value, label) {
   return normalized;
 }
 
+/**
+ * Forward caller cancellation into the request-owned controller so the hard
+ * client deadline remains active even when a screen supplies its own signal.
+ */
+function forwardAbort(controller, signal) {
+  if (!signal) return () => {};
+
+  const abort = () => controller.abort(signal.reason);
+  if (signal.aborted) {
+    abort();
+    return () => {};
+  }
+
+  signal.addEventListener('abort', abort, { once: true });
+  return () => signal.removeEventListener('abort', abort);
+}
+
 async function readResponseBody(response) {
   if (response.status === 204) return null;
   const contentType = response.headers.get('content-type') ?? '';
@@ -75,7 +92,12 @@ export function createApiClient(options) {
 
   async function request(path, requestOptions = {}) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), requestOptions.timeoutMs ?? timeoutMs);
+    let timedOut = false;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, requestOptions.timeoutMs ?? timeoutMs);
+    const stopForwardingAbort = forwardAbort(controller, requestOptions.signal);
 
     try {
       const headers = new Headers(requestOptions.headers);
@@ -95,7 +117,7 @@ export function createApiClient(options) {
         headers,
         body,
         credentials,
-        signal: requestOptions.signal ?? controller.signal,
+        signal: controller.signal,
         cache: requestOptions.cache,
       });
 
@@ -114,10 +136,13 @@ export function createApiClient(options) {
     } catch (error) {
       if (error instanceof ApiClientError) throw error;
       if (error?.name === 'AbortError') {
-        throw new ApiClientError('The request timed out. Please try again.', {
-          code: 'REQUEST_TIMEOUT',
-          cause: error,
-        });
+        throw new ApiClientError(
+          timedOut ? 'The request timed out. Please try again.' : 'The request was cancelled.',
+          {
+            code: timedOut ? 'REQUEST_TIMEOUT' : 'REQUEST_ABORTED',
+            cause: error,
+          },
+        );
       }
       throw new ApiClientError(
         'Unable to reach AttraVoya Pro. Check your connection and try again.',
@@ -128,6 +153,7 @@ export function createApiClient(options) {
       );
     } finally {
       clearTimeout(timeout);
+      stopForwardingAbort();
     }
   }
 

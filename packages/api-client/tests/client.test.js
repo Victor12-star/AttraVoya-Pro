@@ -80,4 +80,48 @@ describe('API client', () => {
       code: 'NETWORK_ERROR',
     });
   });
+  it('keeps the hard timeout active when the caller also supplies a signal', async () => {
+    vi.useFakeTimers();
+    const callerController = new AbortController();
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      timeoutMs: 25,
+      fetchImpl: async (_url, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => reject(new DOMException('aborted', 'AbortError')),
+            { once: true },
+          );
+        }),
+    });
+
+    const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' });
+    await vi.advanceTimersByTimeAsync(25);
+
+    await expectation;
+    vi.useRealTimers();
+  });
+
+  it('reports caller cancellation separately from a timeout', async () => {
+    const callerController = new AbortController();
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: async (_url, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => reject(new DOMException('aborted', 'AbortError')),
+            { once: true },
+          );
+        }),
+    });
+
+    const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    callerController.abort();
+
+    await expectation;
+  });
 });
