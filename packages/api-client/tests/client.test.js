@@ -124,4 +124,28 @@ describe('API client', () => {
 
     await expectation;
   });
+  it('preserves caller cancellation when a custom reason and slow rejection cross the deadline', async () => {
+    vi.useFakeTimers();
+    const callerController = new AbortController();
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      timeoutMs: 25,
+      fetchImpl: async (_url, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => setTimeout(() => reject(new Error('custom abort internals')), 30),
+            { once: true },
+          );
+        }),
+    });
+
+    const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    callerController.abort(new Error('screen disposed'));
+    await vi.advanceTimersByTimeAsync(50);
+
+    await expectation;
+    vi.useRealTimers();
+  });
 });

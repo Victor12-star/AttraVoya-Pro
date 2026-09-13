@@ -41,10 +41,13 @@ function normalizeOpaqueId(value, label) {
  * Forward caller cancellation into the request-owned controller so the hard
  * client deadline remains active even when a screen supplies its own signal.
  */
-function forwardAbort(controller, signal) {
+function forwardAbort(controller, signal, markCallerAbort) {
   if (!signal) return () => {};
 
-  const abort = () => controller.abort(signal.reason);
+  const abort = () => {
+    markCallerAbort();
+    controller.abort();
+  };
   if (signal.aborted) {
     abort();
     return () => {};
@@ -92,12 +95,15 @@ export function createApiClient(options) {
 
   async function request(path, requestOptions = {}) {
     const controller = new AbortController();
-    let timedOut = false;
+    let abortSource = null;
     const timeout = setTimeout(() => {
-      timedOut = true;
+      if (controller.signal.aborted) return;
+      abortSource = 'timeout';
       controller.abort();
     }, requestOptions.timeoutMs ?? timeoutMs);
-    const stopForwardingAbort = forwardAbort(controller, requestOptions.signal);
+    const stopForwardingAbort = forwardAbort(controller, requestOptions.signal, () => {
+      abortSource = 'caller';
+    });
 
     try {
       const headers = new Headers(requestOptions.headers);
@@ -135,7 +141,8 @@ export function createApiClient(options) {
       return payload;
     } catch (error) {
       if (error instanceof ApiClientError) throw error;
-      if (error?.name === 'AbortError') {
+      if (controller.signal.aborted) {
+        const timedOut = abortSource === 'timeout';
         throw new ApiClientError(
           timedOut ? 'The request timed out. Please try again.' : 'The request was cancelled.',
           {
