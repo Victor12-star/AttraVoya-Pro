@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ArrowRight, MapPin, Users, WalletCards } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ArrowRight, LoaderCircle, MapPin, Users, WalletCards } from 'lucide-react';
 
 import { rememberRecentSearch } from '../../lib/recent-searches.js';
 
@@ -12,13 +12,20 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
   const [budget, setBudget] = useState('');
   const [adults, setAdults] = useState('2');
   const [children, setChildren] = useState('0');
+  const [navigating, setNavigating] = useState(false);
+  const navigationStartedRef = useRef(false);
 
   function submit(event) {
     event.preventDefault();
+    if (navigationStartedRef.current) return;
+
     const cleanOrigin = origin.trim();
     const amount = Number(budget);
 
     if (!cleanOrigin || !Number.isFinite(amount) || amount <= 0) return;
+
+    navigationStartedRef.current = true;
+    setNavigating(true);
 
     rememberRecentSearch({
       type: 'BUDGET_TRIP',
@@ -43,18 +50,23 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
   }
 
   return (
-    <form className="budget-quick-form" onSubmit={submit}>
+    <form className="budget-quick-form" onSubmit={submit} aria-busy={navigating}>
       <label>
         <span>{messages.budget.origin}</span>
         <div className="input-with-icon">
-          <MapPin size={18} />
-          <input required value={origin} onChange={(event) => setOrigin(event.target.value)} />
+          <MapPin size={18} aria-hidden="true" />
+          <input
+            required
+            value={origin}
+            onChange={(event) => setOrigin(event.target.value)}
+            disabled={navigating}
+          />
         </div>
       </label>
       <label>
         <span>{messages.budget.totalBudget}</span>
         <div className="input-with-icon">
-          <WalletCards size={18} />
+          <WalletCards size={18} aria-hidden="true" />
           <input
             required
             min="1"
@@ -62,6 +74,7 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
             type="number"
             value={budget}
             onChange={(event) => setBudget(event.target.value)}
+            disabled={navigating}
           />
           <strong>{currency}</strong>
         </div>
@@ -70,7 +83,7 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
         <span>{messages.search.travellers}</span>
         <div className="traveller-fields">
           <span>
-            <Users size={17} />
+            <Users size={17} aria-hidden="true" />
             <input
               aria-label={messages.budget.adults}
               min="1"
@@ -78,6 +91,7 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
               type="number"
               value={adults}
               onChange={(event) => setAdults(event.target.value)}
+              disabled={navigating}
             />
           </span>
           <span>
@@ -88,13 +102,22 @@ export function BudgetQuickForm({ messages, currency = 'EUR' }) {
               type="number"
               value={children}
               onChange={(event) => setChildren(event.target.value)}
+              disabled={navigating}
             />
           </span>
         </div>
       </label>
-      <button className="button button--dark budget-quick-form__button" type="submit">
-        {messages.budget.submit}
-        <ArrowRight size={18} />
+      <button
+        className="button button--dark budget-quick-form__button"
+        type="submit"
+        disabled={navigating}
+      >
+        {navigating ? (
+          <LoaderCircle className="button__spinner" size={18} aria-hidden="true" />
+        ) : (
+          <ArrowRight size={18} aria-hidden="true" />
+        )}
+        {navigating ? messages.common.loading : messages.budget.submit}
       </button>
     </form>
   );
