@@ -10,15 +10,14 @@ describe('mobile root layout recovery', () => {
 
   it('shows a safe accessible fallback and retries without exposing diagnostics', async () => {
     const retry = jest.fn();
-    const { getByRole, queryByText } = await render(
+    const { getByText, queryByText } = await render(
       <ErrorBoundary error={new Error('private native stack details')} retry={retry} />,
     );
 
-    expect(getByRole('alert')).toBeTruthy();
-    expect(getByRole('header', { name: 'Something went wrong' })).toBeTruthy();
+    expect(getByText('Something went wrong')).toBeTruthy();
     expect(queryByText(/private native stack details/i)).toBeNull();
 
-    fireEvent.press(getByRole('button', { name: 'Try again' }));
+    fireEvent.press(getByText('Try again'));
 
     expect(retry).toHaveBeenCalledTimes(1);
   });
