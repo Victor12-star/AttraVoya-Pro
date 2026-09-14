@@ -251,4 +251,31 @@ describe('API client', () => {
 
     await expect(client.request('/api/v1/example')).resolves.toBeNull();
   });
+
+  it.each([
+    ['null', null],
+    ['an array', []],
+    ['a string', 'unexpected'],
+    ['a number', 42],
+    ['a boolean', true],
+  ])('rejects a successful JSON response whose top level is %s', async (_label, payload) => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: async () =>
+        new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: {
+            'content-type': 'application/json',
+            'x-request-id': 'request-invalid-envelope',
+          },
+        }),
+    });
+
+    await expect(client.request('/api/v1/example')).rejects.toMatchObject({
+      name: 'ApiClientError',
+      status: 200,
+      code: 'INVALID_API_RESPONSE',
+      requestId: 'request-invalid-envelope',
+    });
+  });
 });

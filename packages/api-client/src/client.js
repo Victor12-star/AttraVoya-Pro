@@ -205,6 +205,11 @@ export function createApiClient(options) {
         });
       }
 
+      const isEnvelope = payload !== null && typeof payload === 'object' && !Array.isArray(payload);
+      if (response.status !== 204 && !isEnvelope) {
+        throw invalidResponse(response, 'The server returned an unexpected response structure.');
+      }
+
       return payload;
     } catch (error) {
       if (error instanceof ApiClientError) throw error;
