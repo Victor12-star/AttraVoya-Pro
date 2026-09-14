@@ -171,17 +171,23 @@ describe('DestinationPage', () => {
       expect.stringContaining('/destinations/stockholm-se/transport?'),
     );
 
-    expect(mocks.getWeather).toHaveBeenCalledWith({
-      latitude: 59.3293,
-      longitude: 18.0686,
-      forecastDays: 4,
-      timezone: 'Europe/Stockholm',
-    });
-    expect(mocks.searchImages).toHaveBeenCalledWith({
-      query: 'Stockholm Sweden',
-      orientation: 'landscape',
-      perPage: 1,
-    });
+    expect(mocks.getWeather).toHaveBeenCalledWith(
+      {
+        latitude: 59.3293,
+        longitude: 18.0686,
+        forecastDays: 4,
+        timezone: 'Europe/Stockholm',
+      },
+      { signal: expect.any(AbortSignal) },
+    );
+    expect(mocks.searchImages).toHaveBeenCalledWith(
+      {
+        query: 'Stockholm Sweden',
+        orientation: 'landscape',
+        perPage: 1,
+      },
+      { signal: expect.any(AbortSignal) },
+    );
   });
 
   it('keeps missing imagery honest and exposes a working retry control', async () => {
@@ -213,6 +219,30 @@ describe('DestinationPage', () => {
     within(weatherRegion).getByRole('button', { name: 'Retry' }).click();
     expect(await within(weatherRegion).findByText('14 °C')).toBeInTheDocument();
     expect(mocks.getWeather).toHaveBeenCalledTimes(2);
+  });
+
+  it('cancels independent provider work when navigation leaves the page', () => {
+    const signals = {};
+    mocks.getWeather.mockImplementation((_query, options) => {
+      signals.weather = options.signal;
+      return new Promise(() => {});
+    });
+    mocks.searchImages.mockImplementation((_query, options) => {
+      signals.image = options.signal;
+      return new Promise(() => {});
+    });
+
+    const { unmount } = render(
+      <DestinationPage destination={destination} locale="en" messages={messages} />,
+    );
+
+    expect(signals.weather.aborted).toBe(false);
+    expect(signals.image.aborted).toBe(false);
+
+    unmount();
+
+    expect(signals.weather.aborted).toBe(true);
+    expect(signals.image.aborted).toBe(true);
   });
 
   it('renders an explicit invalid-link state without calling providers', () => {
