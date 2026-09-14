@@ -9,21 +9,21 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10AM.
+6. Do not restart completed production-readiness work through Phase 10AP.
 
 ## Current fully verified release
 
-Phase 10AM — stable client abort classification — is complete.
+Phase 10AP — mobile route failure containment — is complete.
 
-- PR: `#129`
-- Final PR head: `d1c5390edd66ef1483989d5405c3a34a750d1e96`
-- Final PR CI run: `34783450486`
+- PR: `#133`
+- Final PR head: `f8b60985ed7110ecc2d5b57c63ce497c7cddda11`
+- Final PR CI run: `34866326214`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `a4adaeecd2e27ef9b3bc5d46024446175d61ef14`
-- Post-merge push CI run: `34783642156`
+- Exact squash-merged `develop`: `b0e2013d9ef753e3fca7c38e40bb02ba992a1ffe`
+- Post-merge push CI run: `34866922973`
 - All five canonical jobs passed
 
-The latest sequence protects planner database hot paths, defines supported replica topology for process-local controls, hardens accommodation-gallery accessibility, gives slow navigation immediate clean feedback, localizes route recovery, keeps client requests bounded with caller cancellation, and stops abandoned destination searches early.
+The latest sequence cancels abandoned destination searches and dashboard provider calls, preserves hard client deadlines, bounds JSON response memory in the shared client, and contains mobile route render failures with a clean retry experience and active mobile tests.
 
 ## Completed production-readiness sequence
 
@@ -73,6 +73,10 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10AK — preserve client deadlines with cancellation — PR `#127`
 - Phase 10AL — cancel abandoned destination searches — PR `#128`
 - Phase 10AM — stabilize client abort classification — PR `#129`
+- Maintenance handoff synchronization through Phase 10AM — PR `#130`
+- Phase 10AN — cancel abandoned destination provider requests — PR `#131`
+- Phase 10AO — bound shared API responses — PR `#132`
+- Phase 10AP — contain mobile route failures — PR `#133`
 
 PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
 
@@ -88,6 +92,9 @@ PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsol
 - Phases 10AA and 10AB harden accommodation-gallery behavior and keyboard focus.
 - Phases 10AH through 10AJ provide immediate budget-navigation feedback, a lightweight global loading skeleton and localized safe route recovery.
 - Phases 10AK through 10AM compose client deadlines with caller cancellation, stop abandoned searches and keep abort classification deterministic.
+- Phase 10AN cancels abandoned or superseded destination weather and image requests while keeping provider states independent.
+- Phase 10AO bounds shared-client JSON response reads for declared and streamed payloads before parsing.
+- Phase 10AP contains mobile route render failures with a privacy-safe accessible retry screen and activates the mobile recovery test foundation.
 
 ## Existing protections that should not be reimplemented
 
@@ -112,7 +119,9 @@ Before choosing another Issue #40 slice, remember that the live repository alrea
 - owner-scoped session listing/revocation APIs and the web session-security experience;
 - deterministic provider-failure isolation;
 - browser/mobile/cross-browser E2E, accessibility, slow-network and reconnect coverage;
-- a production-build web test path plus measured and enforced public-home mobile resource budgets.
+- a production-build web test path plus measured and enforced public-home mobile resource budgets;
+- bounded shared-client JSON response reads;
+- mobile nested-route failure containment and active mobile recovery tests.
 
 Do not introduce Redis, durable queues, shared rate-limit state, read replicas, external observability vendors or distributed tracing until a concrete measured/deployment need exists and the privacy/security boundary is defined.
 
@@ -171,7 +180,7 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 Issue `#40` remains the active broad production-readiness program, but the next functional slice is not automatically predetermined. Inspect the live code first.
 
-Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, route loading/recovery UX, client deadlines, and abandoned-search cancellation.
+Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, global web route loading/recovery UX, client deadlines, destination search and dashboard-provider cancellation, bounded shared-client JSON response reads, and mobile nested-route recovery.
 
 Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists.
 
