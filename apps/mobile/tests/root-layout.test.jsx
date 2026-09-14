@@ -27,9 +27,9 @@ describe('mobile root layout recovery', () => {
 
     render(<ErrorBoundary error={new Error('private native stack details')} retry={retry} />);
 
-    expect(screen.getByRole('alert')).toBeOnTheScreen();
-    expect(screen.getByRole('header', { name: 'Something went wrong' })).toBeOnTheScreen();
-    expect(screen.queryByText(/private native stack details/i)).not.toBeOnTheScreen();
+    expect(screen.getByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('header', { name: 'Something went wrong' })).toBeTruthy();
+    expect(screen.queryByText(/private native stack details/i)).toBeNull();
 
     fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
 
