@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { DEFAULT_RATE_LIMIT } from '../apps/server/src/config/constants.js';
 import { evaluateApiCapacityCheck, runApiCapacityCheck } from './http-capacity-check.js';
 
 function summary({ successful, failed, errorRate, p95, statusCounts, transportErrors = {} }) {
@@ -89,6 +90,22 @@ test('capacity evaluation rejects latency, transport, server, missing-backpressu
   assert.ok(failures.some((failure) => failure.includes('HTTP 429 backpressure boundary')));
   assert.ok(failures.some((failure) => failure.includes('Liveness probe')));
   assert.ok(failures.some((failure) => failure.includes('Readiness probe')));
+});
+
+test('capacity burst exceeds two complete aligned global-rate-limit windows', async () => {
+  let nowMs = 0;
+  const result = await runApiCapacityCheck(
+    {},
+    {
+      fetchImpl: async () => new Response(null, { status: 200 }),
+      now: () => {
+        nowMs += 1;
+        return nowMs;
+      },
+    },
+  );
+
+  assert.equal(result.thresholds.burstRequests, DEFAULT_RATE_LIMIT.max * 2 + 1);
 });
 
 test('capacity check refuses remote targets', async () => {
