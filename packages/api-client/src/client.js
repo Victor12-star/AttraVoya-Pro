@@ -58,6 +58,36 @@ function forwardAbort(controller, signal, markCallerAbort) {
   return () => signal.removeEventListener('abort', abort);
 }
 
+/**
+ * Keep pre-network dependencies inside the request deadline. The underlying
+ * platform lookup may not support cancellation, but callers can still recover.
+ */
+function waitForAbortable(value, signal) {
+  return new Promise((resolve, reject) => {
+    const stopWaiting = () => {
+      signal.removeEventListener('abort', stopWaiting);
+      reject(new DOMException('aborted', 'AbortError'));
+    };
+
+    if (signal.aborted) {
+      stopWaiting();
+      return;
+    }
+
+    signal.addEventListener('abort', stopWaiting, { once: true });
+    Promise.resolve(value).then(
+      (result) => {
+        signal.removeEventListener('abort', stopWaiting);
+        resolve(result);
+      },
+      (error) => {
+        signal.removeEventListener('abort', stopWaiting);
+        reject(error);
+      },
+    );
+  });
+}
+
 function invalidResponse(response, message, code = 'INVALID_API_RESPONSE') {
   return new ApiClientError(message, {
     status: response.status,
@@ -182,7 +212,9 @@ export function createApiClient(options) {
         body = JSON.stringify(body);
       }
 
-      const accessToken = getAccessToken ? await getAccessToken() : null;
+      const accessToken = getAccessToken
+        ? await waitForAbortable(getAccessToken(), controller.signal)
+        : null;
       if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
 
       const response = await fetchImpl(joinUrl(baseUrl, path), {
