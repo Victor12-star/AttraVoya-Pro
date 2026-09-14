@@ -148,4 +148,65 @@ describe('API client', () => {
     await expectation;
     vi.useRealTimers();
   });
+  it('rejects a response whose declared size exceeds the safe client boundary', async () => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      maxResponseBytes: 16,
+      fetchImpl: async () =>
+        new Response(JSON.stringify({ result: 'small body' }), {
+          status: 200,
+          headers: {
+            'content-type': 'application/json',
+            'content-length': '1024',
+            'x-request-id': 'request-large-declared',
+          },
+        }),
+    });
+
+    await expect(client.request('/api/v1/example')).rejects.toMatchObject({
+      name: 'ApiClientError',
+      status: 200,
+      code: 'API_RESPONSE_TOO_LARGE',
+      requestId: 'request-large-declared',
+    });
+  });
+
+  it('stops an undeclared streamed response after it crosses the safe boundary', async () => {
+    const encoder = new TextEncoder();
+    let cancelled = false;
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('{"items":'));
+        controller.enqueue(encoder.encode('["unexpectedly large"]}'));
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      maxResponseBytes: 12,
+      fetchImpl: async () =>
+        new Response(body, {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+    });
+
+    await expect(client.request('/api/v1/example')).rejects.toMatchObject({
+      code: 'API_RESPONSE_TOO_LARGE',
+    });
+    expect(cancelled).toBe(true);
+  });
+
+  it('rejects an invalid response-size configuration before making requests', () => {
+    expect(() =>
+      createApiClient({
+        baseUrl: 'http://localhost:5000',
+        maxResponseBytes: 0,
+        fetchImpl: vi.fn(),
+      }),
+    ).toThrow('maxResponseBytes must be a positive safe integer.');
+  });
+
 });
