@@ -14,6 +14,8 @@ const COLORS = {
 /**
  * Keep route failures local and recoverable without exposing private diagnostic
  * details to travellers. Expo Router supplies retry for the failed route tree.
+ *
+ * @param {{error: Error, retry: () => void}} props
  */
 export function ErrorBoundary({ retry }) {
   return (
