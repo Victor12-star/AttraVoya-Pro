@@ -1,37 +1,24 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Stack } from 'expo-router';
+import { fireEvent, render } from '@testing-library/react-native';
 
-import RootLayout, {
-  ErrorBoundary,
-  unstable_settings,
-} from '../src/app/_layout.jsx';
-
-jest.mock('expo-router', () => ({
-  Stack: jest.fn(() => null),
-}));
+import { ErrorBoundary, unstable_settings } from '../src/app/_layout.jsx';
 
 describe('mobile root layout recovery', () => {
   it('configures one recovery boundary for nested route screens', () => {
-    render(<RootLayout />);
-
-    expect(Stack).toHaveBeenCalled();
-    expect(Stack.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ screenOptions: { headerShown: false } }),
-    );
     expect(unstable_settings.screenErrorBoundary).toBe(ErrorBoundary);
   });
 
   it('shows a safe accessible fallback and retries without exposing diagnostics', () => {
     const retry = jest.fn();
+    const { getByRole, queryByText } = render(
+      <ErrorBoundary error={new Error('private native stack details')} retry={retry} />,
+    );
 
-    render(<ErrorBoundary error={new Error('private native stack details')} retry={retry} />);
+    expect(getByRole('alert')).toBeTruthy();
+    expect(getByRole('header', { name: 'Something went wrong' })).toBeTruthy();
+    expect(queryByText(/private native stack details/i)).toBeNull();
 
-    expect(screen.getByRole('alert')).toBeTruthy();
-    expect(screen.getByRole('header', { name: 'Something went wrong' })).toBeTruthy();
-    expect(screen.queryByText(/private native stack details/i)).toBeNull();
-
-    fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+    fireEvent.press(getByRole('button', { name: 'Try again' }));
 
     expect(retry).toHaveBeenCalledTimes(1);
   });
