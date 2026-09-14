@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Banknote,
@@ -124,15 +124,18 @@ function measurement(numberFormatter, value, unit) {
  * @param {DestinationPageDestination} destination
  * @returns {Promise<ProviderState>}
  */
-async function requestWeather(destination) {
+async function requestWeather(destination, requestOptions) {
   try {
     const response = /** @type {any} */ (
-      await apiClient.getWeather({
-        latitude: destination.latitude,
-        longitude: destination.longitude,
-        forecastDays: 4,
-        timezone: destination.timeZone ?? 'auto',
-      })
+      await apiClient.getWeather(
+        {
+          latitude: destination.latitude,
+          longitude: destination.longitude,
+          forecastDays: 4,
+          timezone: destination.timeZone ?? 'auto',
+        },
+        requestOptions,
+      )
     );
     const weather = response?.weather ?? null;
     const temperature = finiteNumber(weather?.current?.temperatureC);
@@ -150,14 +153,17 @@ async function requestWeather(destination) {
  * @param {DestinationPageDestination} destination
  * @returns {Promise<ProviderState>}
  */
-async function requestImage(destination) {
+async function requestImage(destination, requestOptions) {
   try {
     const response = /** @type {any} */ (
-      await apiClient.searchImages({
-        query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
-        orientation: 'landscape',
-        perPage: 1,
-      })
+      await apiClient.searchImages(
+        {
+          query: [destination.name, destination.countryDisplayName].filter(Boolean).join(' '),
+          orientation: 'landscape',
+          perPage: 1,
+        },
+        requestOptions,
+      )
     );
     const images = response?.images ?? null;
     const photo = images?.photos?.[0] ?? null;
@@ -218,6 +224,10 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
       data: null,
     }),
   );
+  const weatherRequest = useRef(/** @type {AbortController|null} */ (null));
+  const imageRequest = useRef(/** @type {AbortController|null} */ (null));
+  const weatherSequence = useRef(0);
+  const imageSequence = useRef(0);
 
   const numberFormatter = useMemo(
     () => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
@@ -230,30 +240,53 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
 
   useEffect(() => {
     if (!destination) return;
-    let active = true;
 
-    void requestWeather(destination).then((nextState) => {
-      if (active) setWeatherState(nextState);
+    const weatherController = new AbortController();
+    const imageController = new AbortController();
+    const weatherRequestId = ++weatherSequence.current;
+    const imageRequestId = ++imageSequence.current;
+    weatherRequest.current = weatherController;
+    imageRequest.current = imageController;
+
+    void requestWeather(destination, { signal: weatherController.signal }).then((nextState) => {
+      if (weatherRequestId === weatherSequence.current) setWeatherState(nextState);
     });
-    void requestImage(destination).then((nextState) => {
-      if (active) setImageState(nextState);
+    void requestImage(destination, { signal: imageController.signal }).then((nextState) => {
+      if (imageRequestId === imageSequence.current) setImageState(nextState);
     });
 
     return () => {
-      active = false;
+      weatherSequence.current += 1;
+      imageSequence.current += 1;
+      weatherController.abort();
+      imageController.abort();
+      if (weatherRequest.current === weatherController) weatherRequest.current = null;
+      if (imageRequest.current === imageController) imageRequest.current = null;
     };
   }, [destination]);
 
   function retryWeather() {
     if (!destination) return;
+    weatherRequest.current?.abort();
+    const controller = new AbortController();
+    const requestId = ++weatherSequence.current;
+    weatherRequest.current = controller;
     setWeatherState({ status: 'loading', data: null });
-    void requestWeather(destination).then(setWeatherState);
+    void requestWeather(destination, { signal: controller.signal }).then((nextState) => {
+      if (requestId === weatherSequence.current) setWeatherState(nextState);
+    });
   }
 
   function retryImage() {
     if (!destination) return;
+    imageRequest.current?.abort();
+    const controller = new AbortController();
+    const requestId = ++imageSequence.current;
+    imageRequest.current = controller;
     setImageState({ status: 'loading', data: null });
-    void requestImage(destination).then(setImageState);
+    void requestImage(destination, { signal: controller.signal }).then((nextState) => {
+      if (requestId === imageSequence.current) setImageState(nextState);
+    });
   }
 
   if (!destination) {

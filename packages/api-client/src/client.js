@@ -189,7 +189,8 @@ export function createApiClient(options) {
     resetPassword: (body) => request('/api/v1/auth/reset-password', { method: 'POST', body }),
     searchDestinations: (query, requestOptions) =>
       request(`/api/v1/destinations/search?${toSearchParams(query)}`, requestOptions),
-    getWeather: (query) => request(`/api/v1/weather?${toSearchParams(query)}`),
+    getWeather: (query, requestOptions) =>
+      request(`/api/v1/weather?${toSearchParams(query)}`, requestOptions),
     getCurrencyRates: ({ base = 'EUR', quotes = [] } = {}) =>
       request(
         `/api/v1/currency/rates?${toSearchParams({ base, ...(quotes.length ? { quotes } : {}) })}`,
@@ -202,7 +203,8 @@ export function createApiClient(options) {
     getMapRoute: (query) => request(`/api/v1/maps/route?${toSearchParams(query)}`),
     getEvents: (query) => request(`/api/v1/events?${toSearchParams(query)}`),
     getNews: (query) => request(`/api/v1/news?${toSearchParams(query)}`),
-    searchImages: (query) => request(`/api/v1/images/search?${toSearchParams(query)}`),
+    searchImages: (query, requestOptions) =>
+      request(`/api/v1/images/search?${toSearchParams(query)}`, requestOptions),
     translateText: (body) => request('/api/v1/translation', { method: 'POST', body }),
     getTranslationLanguages: () =>
       request('/api/v1/translation/languages', { cache: 'force-cache' }),
