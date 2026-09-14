@@ -8,9 +8,9 @@ describe('mobile root layout recovery', () => {
     expect(unstable_settings.screenErrorBoundary).toBe(ErrorBoundary);
   });
 
-  it('shows a safe accessible fallback and retries without exposing diagnostics', () => {
+  it('shows a safe accessible fallback and retries without exposing diagnostics', async () => {
     const retry = jest.fn();
-    const { getByRole, queryByText } = render(
+    const { getByRole, queryByText } = await render(
       <ErrorBoundary error={new Error('private native stack details')} retry={retry} />,
     );
 
