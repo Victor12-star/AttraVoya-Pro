@@ -258,10 +258,10 @@ export function DestinationPage({ destination, locale = 'en', messages }) {
     return () => {
       weatherSequence.current += 1;
       imageSequence.current += 1;
-      weatherController.abort();
-      imageController.abort();
-      if (weatherRequest.current === weatherController) weatherRequest.current = null;
-      if (imageRequest.current === imageController) imageRequest.current = null;
+      weatherRequest.current?.abort();
+      imageRequest.current?.abort();
+      weatherRequest.current = null;
+      imageRequest.current = null;
     };
   }, [destination]);
 
