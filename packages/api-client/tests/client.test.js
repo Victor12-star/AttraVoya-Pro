@@ -208,4 +208,47 @@ describe('API client', () => {
       }),
     ).toThrow('maxResponseBytes must be a positive safe integer.');
   });
+
+  it('rejects a successful non-JSON response at the shared client boundary', async () => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: async () =>
+        new Response('<html>proxy error</html>', {
+          status: 200,
+          headers: {
+            'content-type': 'text/html; charset=utf-8',
+            'x-request-id': 'request-unexpected-format',
+          },
+        }),
+    });
+
+    await expect(client.request('/api/v1/example')).rejects.toMatchObject({
+      name: 'ApiClientError',
+      status: 200,
+      code: 'INVALID_API_RESPONSE',
+      requestId: 'request-unexpected-format',
+    });
+  });
+
+  it('accepts JSON-compatible vendor media types', async () => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: async () =>
+        new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { 'content-type': 'application/problem+json; charset=utf-8' },
+        }),
+    });
+
+    await expect(client.request('/api/v1/example')).resolves.toEqual({ ok: true });
+  });
+
+  it('allows a valid no-content response without a content type', async () => {
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl: async () => new Response(null, { status: 204 }),
+    });
+
+    await expect(client.request('/api/v1/example')).resolves.toBeNull();
+  });
 });

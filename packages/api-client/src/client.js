@@ -73,7 +73,14 @@ function invalidResponse(response, message, code = 'INVALID_API_RESPONSE') {
 async function readResponseBody(response, maxResponseBytes) {
   if (response.status === 204) return null;
   const contentType = response.headers.get('content-type') ?? '';
-  if (!contentType.includes('application/json')) return null;
+  const mediaType = contentType.split(';', 1)[0].trim().toLowerCase();
+  const isJson = mediaType === 'application/json' || mediaType.endsWith('+json');
+  if (!isJson) {
+    if (response.ok) {
+      throw invalidResponse(response, 'The server returned an unexpected response format.');
+    }
+    return null;
+  }
 
   const declaredLength = Number(response.headers.get('content-length'));
   if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
