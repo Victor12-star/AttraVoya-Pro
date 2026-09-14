@@ -28,17 +28,17 @@ Never infer 5/5 from workflow-level status alone; inspect the individual jobs. D
 
 ## Current fully verified release
 
-Phase 10W — web session security controls — is complete.
+Phase 10AM — stable client abort classification — is complete.
 
-- PR: `#112`
-- Final PR head: `6971786b138fe9f762c983b216962ceee4919cc9`
-- Final PR CI run: `34699789733`
+- PR: `#129`
+- Final PR head: `d1c5390edd66ef1483989d5405c3a34a750d1e96`
+- Final PR CI run: `34783450486`
 - Result: all five canonical jobs passed
-- Squash-merged `develop` SHA: `d68d723deca5870ccb02129edfaa0b009853a71f`
-- Independent post-merge push CI run: `34699998083`
+- Squash-merged `develop` SHA: `a4adaeecd2e27ef9b3bc5d46024446175d61ef14`
+- Independent post-merge push CI run: `34783642156`
 - Result: all five canonical jobs passed
 
-Phase 10W exposes the existing owner-scoped session APIs through the web `/profile` security experience. It provides minimized browser/platform labels, safe loading/empty/error/authentication-required states, targeted session revocation, explicit sign-out-everywhere confirmation, duplicate-action protection, 18-locale copy, responsive theming, browser smoke coverage and blocking Axe accessibility coverage. Raw refresh hashes, IP hashes, tokens and other private session metadata remain unexposed.
+Phase 10AM makes shared web, admin and mobile request cancellation deterministic. It records whether an owned request ended because of its hard deadline or caller cancellation, normalizes arbitrary caller abort reasons, and preserves the correct safe error classification even when a fetch implementation rejects slowly.
 
 The public-home Pixel 7 Chromium production-build resource budget established by Phases 10K and 10L remains enforced. Current hard ceilings are 215,063 bytes total same-origin transfer, 190,003 bytes JavaScript transfer, 6,366 bytes CSS transfer, and 0 bytes image transfer for that specific route. The zero-image ceiling is route-specific and must not be generalized to unrelated routes.
 
@@ -76,6 +76,22 @@ The following Issue #40 slices are complete and must not be restarted:
 - Phase 10U — owner-scoped session controls — PR `#110`
 - Phase 10V — paid-provider request budgets — PR `#111`
 - Phase 10W — web session security controls — PR `#112`
+- Phase 10X — protect planner list PostgreSQL hot path — PR `#114`
+- Phase 10Y — fail closed on unsupported production replica topology — PR `#115`
+- Phase 10Z — bound planner list relation queries — PR `#116`
+- Phase 10AA — harden accommodation photo gallery — PR `#117`
+- Phase 10AB — contain accommodation gallery keyboard focus — PR `#118`
+- Phase 10AC — make provider budgets replica-safe — PR `#119`
+- Phase 10AD — prove process-local provider cache safety — PR `#120`
+- Phase 10AE — make API rate limits replica-safe — PR `#121`
+- Phase 10AF — prove provider circuit replica safety — PR `#122`
+- Phase 10AG — define replica metrics aggregation topology — PR `#123`
+- Phase 10AH — make budget navigation immediately responsive — PR `#124`
+- Phase 10AI — add immediate route loading skeleton — PR `#125`
+- Phase 10AJ — localize route recovery experience — PR `#126`
+- Phase 10AK — preserve client deadlines with cancellation — PR `#127`
+- Phase 10AL — cancel abandoned destination searches — PR `#128`
+- Phase 10AM — stabilize client abort classification — PR `#129`
 
 PR `#91` is obsolete and was superseded by the corrected Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` is also superseded and must never be merged.
 
@@ -102,6 +118,16 @@ Phase 10U added authenticated owner-scoped session visibility with a hard result
 Phase 10V added explicit operator-configured in-process request budgets for credentialed external providers. Allowance is consumed immediately before each real upstream attempt, including retries; production fails startup when an enabled credentialed provider lacks its required budget configuration; no vendor quota values are guessed.
 
 Phase 10W added the web account-security UI for those owner-scoped session controls, with privacy-minimized device labels, authoritative destructive-action handling, all maintained locales, responsive/accessibility behavior and blocking browser/Axe coverage.
+
+## What Phases 10X through 10AM added
+
+Phases 10X and 10Z protect the planner-list PostgreSQL hot path with bounded query behavior and relation-query evidence. Phase 10Y makes production reject unsupported replica configurations rather than silently running unsafe process-local controls across multiple instances.
+
+Phases 10AC through 10AG define truthful replica behavior for paid-provider budgets, provider caching, API rate limits, provider circuit state and service metrics. The request hot paths remain process-local and fast; multi-replica deployment requires the explicit supported topology and external per-instance metrics aggregation rather than hidden database or network writes.
+
+Phases 10AA and 10AB harden the accommodation photo gallery, including keyboard-focus containment. Phases 10AH through 10AJ add immediate duplicate-safe budget navigation feedback, a lightweight route loading skeleton and localized safe route-error recovery without increasing normal-route data traffic.
+
+Phases 10AK through 10AM keep client requests bounded when screens supply cancellation signals, stop abandoned destination searches early and classify caller cancellation separately from deadline expiry across web, admin and mobile consumers.
 
 ## Existing Issue #40 foundations that must be preserved
 
@@ -158,9 +184,9 @@ Preserve the completed Travel Companion rules:
 
 Issue `#40` — production scalability, reliability, performance and user-experience readiness — remains open. Continue it only through coherent, reviewable gaps supported by the live architecture. Before naming or implementing another phase, inspect the current repository and prior PRs so already completed protections are not duplicated.
 
-Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, basic owner-scoped session/device revocation controls, the web session-security experience, and first-stage credentialed-provider request budgets.
+Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, planner-list hot-path query bounds, basic owner-scoped session/device revocation controls, the web session-security experience, replica-safe process-local rate limits/provider budgets/cache/circuit state, external per-instance metrics topology, global route loading/recovery states, client request deadlines, and abandoned destination-search cancellation.
 
-Candidate remaining gaps that still require live verification include dependency timeout-and-recovery behavior beyond the existing provider-isolation test, unproven multi-instance deployment assumptions, shared-state decisions only where the current architecture actually requires them, database N+1/hot-path evidence, deployment-platform edge/load-balancer/WAF requirements when a real public production target is selected, route-specific partial/degraded-mode UX gaps, and whether provider-budget semantics need a shared coordinator only after a measured multi-replica deployment requirement exists.
+Candidate remaining gaps that still require live verification include dependency timeout-and-recovery behavior beyond the existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements when a real public production target is selected, route-specific partial/degraded-mode UX gaps, and operational integration of an external metrics collector only when a concrete multi-replica target is selected.
 
 Treat those as candidate gaps, not automatic implementation instructions. Inspect first and choose the smallest genuine missing production-readiness slice.
 
