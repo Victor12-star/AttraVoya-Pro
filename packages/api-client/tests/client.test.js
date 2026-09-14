@@ -278,4 +278,40 @@ describe('API client', () => {
       requestId: 'request-invalid-envelope',
     });
   });
+
+  it('applies the hard timeout while mobile access-token retrieval is stalled', async () => {
+    vi.useFakeTimers();
+    const fetchImpl = vi.fn();
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      timeoutMs: 25,
+      fetchImpl,
+      getAccessToken: () => new Promise(() => {}),
+    });
+
+    const request = client.request('/api/v1/example');
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' });
+    await vi.advanceTimersByTimeAsync(25);
+
+    await expectation;
+    expect(fetchImpl).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('releases a request when its caller cancels stalled access-token retrieval', async () => {
+    const callerController = new AbortController();
+    const fetchImpl = vi.fn();
+    const client = createApiClient({
+      baseUrl: 'http://localhost:5000',
+      fetchImpl,
+      getAccessToken: () => new Promise(() => {}),
+    });
+
+    const request = client.request('/api/v1/example', { signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    callerController.abort();
+
+    await expectation;
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
 });
