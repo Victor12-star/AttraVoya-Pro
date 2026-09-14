@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
 
+import { DEFAULT_RATE_LIMIT } from '../apps/server/src/config/constants.js';
 import { assertHttpLoadTargetAllowed, runHttpLoadTest } from './http-load-test.js';
 
 const DEFAULT_BASE_URL = 'http://127.0.0.1:5000';
@@ -8,7 +9,10 @@ const LIVENESS_PATH = '/api/v1/health/live';
 const READINESS_PATH = '/api/v1/health/ready';
 const STEADY_REQUESTS = 50;
 const STEADY_CONCURRENCY = 10;
-const BURST_REQUESTS = 100;
+// A bounded run can touch at most two aligned one-minute rate-limit windows.
+// Exceeding both complete allowances guarantees that one window observes 121
+// requests, even when the test begins immediately before a window rollover.
+const BURST_REQUESTS = DEFAULT_RATE_LIMIT.max * 2 + 1;
 const BURST_CONCURRENCY = 40;
 const REQUEST_TIMEOUT_MS = 2_000;
 const STEADY_MAX_P95_MS = 500;
