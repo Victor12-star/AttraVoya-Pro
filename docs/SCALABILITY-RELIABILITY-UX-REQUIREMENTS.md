@@ -24,6 +24,10 @@ The repository already contains several useful foundations:
 - Server-only provider secrets.
 - Owner-scoped private planner data and `private, no-store` planner responses.
 - Phase 8L bounded concurrent pricing-evidence collection with independent fail-closed handling.
+- Shared-client hard deadlines composed with caller cancellation and stable abort classification.
+- Abandoned destination search, weather and image request cancellation with stale-result guards.
+- Bounded shared-client JSON response reads for declared and streamed payloads.
+- Global web route recovery and mobile nested-route render recovery with accessible retry states.
 
 These foundations are helpful but are not yet proof of production-scale readiness.
 
