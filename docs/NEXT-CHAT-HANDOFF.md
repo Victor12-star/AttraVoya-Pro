@@ -9,21 +9,21 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10W.
+6. Do not restart completed production-readiness work through Phase 10AM.
 
 ## Current fully verified release
 
-Phase 10W — web session security controls — is complete.
+Phase 10AM — stable client abort classification — is complete.
 
-- PR: `#112`
-- Final PR head: `6971786b138fe9f762c983b216962ceee4919cc9`
-- Final PR CI run: `34699789733`
+- PR: `#129`
+- Final PR head: `d1c5390edd66ef1483989d5405c3a34a750d1e96`
+- Final PR CI run: `34783450486`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `d68d723deca5870ccb02129edfaa0b009853a71f`
-- Post-merge push CI run: `34699998083`
+- Exact squash-merged `develop`: `a4adaeecd2e27ef9b3bc5d46024446175d61ef14`
+- Post-merge push CI run: `34783642156`
 - All five canonical jobs passed
 
-Phase 10W exposes the existing Phase 10U owner-scoped session APIs through the web `/profile` security experience. It uses deliberately coarse browser/platform labels, never renders raw refresh hashes/IP hashes/tokens, provides safe loading/error/authentication/empty states, supports targeted revoke and explicit sign-out-everywhere confirmation, prevents duplicate destructive actions, preserves 18 locales and theme/reduced-motion/RTL behavior, and is covered by browser smoke plus blocking Axe accessibility checks.
+The latest sequence protects planner database hot paths, defines supported replica topology for process-local controls, hardens accommodation-gallery accessibility, gives slow navigation immediate clean feedback, localizes route recovery, keeps client requests bounded with caller cancellation, and stops abandoned destination searches early.
 
 ## Completed production-readiness sequence
 
@@ -57,6 +57,22 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10U — owner-scoped session controls — PR `#110`
 - Phase 10V — paid-provider request budgets — PR `#111`
 - Phase 10W — web session security controls — PR `#112`
+- Phase 10X — protect planner list PostgreSQL hot path — PR `#114`
+- Phase 10Y — fail closed on unsupported production replica topology — PR `#115`
+- Phase 10Z — bound planner list relation queries — PR `#116`
+- Phase 10AA — harden accommodation photo gallery — PR `#117`
+- Phase 10AB — contain accommodation gallery keyboard focus — PR `#118`
+- Phase 10AC — make provider budgets replica-safe — PR `#119`
+- Phase 10AD — prove process-local provider cache safety — PR `#120`
+- Phase 10AE — make API rate limits replica-safe — PR `#121`
+- Phase 10AF — prove provider circuit replica safety — PR `#122`
+- Phase 10AG — define replica metrics aggregation topology — PR `#123`
+- Phase 10AH — make budget navigation immediately responsive — PR `#124`
+- Phase 10AI — add immediate route loading skeleton — PR `#125`
+- Phase 10AJ — localize route recovery experience — PR `#126`
+- Phase 10AK — preserve client deadlines with cancellation — PR `#127`
+- Phase 10AL — cancel abandoned destination searches — PR `#128`
+- Phase 10AM — stabilize client abort classification — PR `#129`
 
 PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
 
@@ -67,6 +83,11 @@ PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsol
 - Phase 10U exposes bounded, authenticated, owner-scoped active-session visibility plus idempotent targeted revocation and revoke-all behavior with minimized metadata.
 - Phase 10V adds explicit operator-configured request budgets for credentialed external providers and consumes budget immediately before each real upstream attempt, including retries, without guessing vendor limits.
 - Phase 10W provides the traveller-facing web session-security experience on top of Phase 10U with privacy minimization, authoritative destructive actions, accessibility and browser evidence.
+- Phases 10X and 10Z bound the planner-list PostgreSQL hot path and relation queries with deterministic evidence.
+- Phases 10Y and 10AC through 10AG make supported replica assumptions explicit for rate limits, provider budgets, cache, circuit state and metrics aggregation without adding hot-path shared writes.
+- Phases 10AA and 10AB harden accommodation-gallery behavior and keyboard focus.
+- Phases 10AH through 10AJ provide immediate budget-navigation feedback, a lightweight global loading skeleton and localized safe route recovery.
+- Phases 10AK through 10AM compose client deadlines with caller cancellation, stop abandoned searches and keep abort classification deterministic.
 
 ## Existing protections that should not be reimplemented
 
@@ -150,9 +171,9 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 Issue `#40` remains the active broad production-readiness program, but the next functional slice is not automatically predetermined. Inspect the live code first.
 
-Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, basic owner-scoped session/device revocation controls, the web session-security experience, and first-stage credentialed-provider request budgets.
+Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, route loading/recovery UX, client deadlines, and abandoned-search cancellation.
 
-Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond the existing provider-isolation test, unproven multi-instance deployment assumptions, shared-state decisions only where the architecture actually requires them, database N+1/hot-path evidence, deployment-platform edge/load-balancer/WAF requirements once a concrete public production target exists, route-specific partial/degraded-mode UX gaps, and whether provider-budget coordination must become shared only after a measured multi-replica need is demonstrated.
+Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists.
 
 These are candidates only. Do not add Redis, queues, read replicas, distributed tracing, monitoring vendors, or other shared infrastructure simply because Issue `#40` mentions them.
 
