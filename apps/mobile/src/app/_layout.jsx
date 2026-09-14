@@ -9,6 +9,7 @@ const COLORS = {
   accent: '#0b7a53',
   accentPressed: '#086441',
   border: '#d8e7e0',
+  onAccent: '#ffffff',
 };
 
 /**
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accentPressed,
   },
   buttonLabel: {
-    color: '#ffffff',
+    color: COLORS.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },
