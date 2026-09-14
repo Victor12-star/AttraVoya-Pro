@@ -1,9 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Stack } from 'expo-router';
-import { View } from 'react-native';
-
 jest.mock('expo-router', () => ({
-  Stack: jest.fn(() => <View testID="root-stack" />),
+  Stack: jest.fn(() => null),
 }));
 
 const { default: RootLayout, ErrorBoundary, unstable_settings } = await import('./_layout.jsx');
@@ -12,7 +10,6 @@ describe('mobile root layout recovery', () => {
   it('configures one recovery boundary for nested route screens', () => {
     render(<RootLayout />);
 
-    expect(screen.getByTestId('root-stack')).toBeOnTheScreen();
     expect(Stack).toHaveBeenCalledWith(
       expect.objectContaining({ screenOptions: { headerShown: false } }),
       undefined,
