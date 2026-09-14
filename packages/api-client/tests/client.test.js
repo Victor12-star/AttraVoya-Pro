@@ -208,5 +208,4 @@ describe('API client', () => {
       }),
     ).toThrow('maxResponseBytes must be a positive safe integer.');
   });
-
 });
