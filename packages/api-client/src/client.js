@@ -1,6 +1,7 @@
 import { ApiClientError } from './errors.js';
 
 const DEFAULT_TIMEOUT_MS = 12_000;
+const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
 
 function joinUrl(baseUrl, path) {
@@ -57,19 +58,74 @@ function forwardAbort(controller, signal, markCallerAbort) {
   return () => signal.removeEventListener('abort', abort);
 }
 
-async function readResponseBody(response) {
+function invalidResponse(response, message, code = 'INVALID_API_RESPONSE') {
+  return new ApiClientError(message, {
+    status: response.status,
+    code,
+    requestId: response.headers.get('x-request-id'),
+  });
+}
+
+/**
+ * Bound JSON reads before decoding so a faulty endpoint cannot exhaust client
+ * memory with an unexpectedly large payload.
+ */
+async function readResponseBody(response, maxResponseBytes) {
   if (response.status === 204) return null;
   const contentType = response.headers.get('content-type') ?? '';
   if (!contentType.includes('application/json')) return null;
 
+  const declaredLength = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
+    throw invalidResponse(
+      response,
+      'The server response was too large to process safely.',
+      'API_RESPONSE_TOO_LARGE',
+    );
+  }
+
   try {
-    return await response.json();
-  } catch {
-    throw new ApiClientError('The server returned an unreadable response.', {
-      status: response.status,
-      code: 'INVALID_API_RESPONSE',
-      requestId: response.headers.get('x-request-id'),
-    });
+    if (!response.body?.getReader) {
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (bytes.byteLength > maxResponseBytes) {
+        throw invalidResponse(
+          response,
+          'The server response was too large to process safely.',
+          'API_RESPONSE_TOO_LARGE',
+        );
+      }
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let receivedBytes = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      receivedBytes += value.byteLength;
+      if (receivedBytes > maxResponseBytes) {
+        await reader.cancel();
+        throw invalidResponse(
+          response,
+          'The server response was too large to process safely.',
+          'API_RESPONSE_TOO_LARGE',
+        );
+      }
+      chunks.push(value);
+    }
+
+    const bytes = new Uint8Array(receivedBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch (error) {
+    if (error instanceof ApiClientError) throw error;
+    throw invalidResponse(response, 'The server returned an unreadable response.');
   }
 }
 
@@ -88,10 +144,14 @@ export function createApiClient(options) {
     getAccessToken,
     credentials = 'include',
     timeoutMs = DEFAULT_TIMEOUT_MS,
+    maxResponseBytes = DEFAULT_MAX_RESPONSE_BYTES,
   } = options ?? {};
 
   if (!baseUrl) throw new TypeError('createApiClient requires baseUrl.');
   if (typeof fetchImpl !== 'function') throw new TypeError('A fetch implementation is required.');
+  if (!Number.isSafeInteger(maxResponseBytes) || maxResponseBytes <= 0) {
+    throw new TypeError('maxResponseBytes must be a positive safe integer.');
+  }
 
   async function request(path, requestOptions = {}) {
     const controller = new AbortController();
@@ -127,7 +187,7 @@ export function createApiClient(options) {
         cache: requestOptions.cache,
       });
 
-      const payload = await readResponseBody(response);
+      const payload = await readResponseBody(response, maxResponseBytes);
       if (!response.ok) {
         const apiError = payload?.error;
         throw new ApiClientError(apiError?.message ?? 'The request could not be completed.', {
