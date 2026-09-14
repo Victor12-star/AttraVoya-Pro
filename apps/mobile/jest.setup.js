@@ -1,5 +1,4 @@
 import { afterEach } from '@jest/globals';
-import '@testing-library/react-native/extend-expect';
 import { cleanup } from '@testing-library/react-native';
 
 afterEach(() => {
