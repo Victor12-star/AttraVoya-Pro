@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ExternalLink,
   LoaderCircle,
@@ -326,6 +326,8 @@ function languageDisplayName(language) {
  */
 export function GroundedTravelAssistant({ locale = 'en', messages }) {
   const copy = getGroundedTravelAssistantCopy(locale);
+  const countriesRequestRef = useRef(0);
+  const countriesAbortRef = useRef(/** @type {AbortController|null} */ (null));
   const countryRequestRef = useRef(0);
   const answerRequestRef = useRef(0);
   const historyIdRef = useRef(0);
@@ -340,25 +342,37 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   const [answerStatus, setAnswerStatus] = useState('idle');
   const [history, setHistory] = useState(/** @type {any[]} */ ([]));
 
-  useEffect(() => {
-    let active = true;
+  const loadCountries = useCallback(() => {
+    countriesAbortRef.current?.abort();
+    const controller = new AbortController();
+    countriesAbortRef.current = controller;
+    countriesRequestRef.current += 1;
+    const requestId = countriesRequestRef.current;
+    setCountriesState({ status: 'loading', data: [] });
+
     void apiClient
-      .getCountries()
+      .getCountries({ signal: controller.signal })
       .then((response) => {
-        if (!active) return;
+        if (controller.signal.aborted || requestId !== countriesRequestRef.current) return;
         const countries = normalizeCountries(response);
         setCountriesState({ status: countries.length ? 'success' : 'error', data: countries });
       })
       .catch(() => {
-        if (active) setCountriesState({ status: 'error', data: [] });
+        if (!controller.signal.aborted && requestId === countriesRequestRef.current) {
+          setCountriesState({ status: 'error', data: [] });
+        }
       });
+  }, []);
 
+  useEffect(() => {
+    loadCountries();
     return () => {
-      active = false;
+      countriesAbortRef.current?.abort();
+      countriesRequestRef.current += 1;
       countryRequestRef.current += 1;
       answerRequestRef.current += 1;
     };
-  }, []);
+  }, [loadCountries]);
 
   async function loadPhrasebook(nextCountryCode) {
     countryRequestRef.current += 1;
@@ -616,7 +630,14 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
       ) : null}
       {countriesState.status === 'error' ? (
         <div className={styles.feedback} role="alert">
-          {copy.referenceUnavailable}
+          <span>{copy.referenceUnavailable}</span>
+          <button
+            className="button button--secondary button--compact"
+            type="button"
+            onClick={loadCountries}
+          >
+            {messages.common.retry}
+          </button>
         </div>
       ) : null}
 
