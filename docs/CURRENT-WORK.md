@@ -123,7 +123,7 @@ Phase 10V added explicit operator-configured in-process request budgets for cred
 
 Phase 10W added the web account-security UI for those owner-scoped session controls, with privacy-minimized device labels, authoritative destructive-action handling, all maintained locales, responsive/accessibility behavior and blocking browser/Axe coverage.
 
-## What Phases 10X through 10AP added
+## What Phases 10X through 10AV added
 
 Phases 10X and 10Z protect the planner-list PostgreSQL hot path with bounded query behavior and relation-query evidence. Phase 10Y makes production reject unsupported replica configurations rather than silently running unsafe process-local controls across multiple instances.
 
@@ -134,6 +134,12 @@ Phases 10AA and 10AB harden the accommodation photo gallery, including keyboard-
 Phases 10AK through 10AM keep client requests bounded when screens supply cancellation signals, stop abandoned destination searches early and classify caller cancellation separately from deadline expiry across web, admin and mobile consumers.
 
 Phase 10AN extends cancellation to the destination dashboard's independent weather and image requests, including superseded retries, while preserving partial and degraded states. Phase 10AO bounds JSON response reads in the shared web and mobile API client, rejects oversized declared responses before reading, stops undeclared streams once they cross the two-mebibyte default boundary, and preserves safe request-identifiable errors. Phase 10AP contains mobile route render failures with an accessible retry surface, private diagnostics, verified Expo production export and an active mobile unit-test foundation.
+
+Phase 10AQ rejects successful non-JSON responses while preserving vendor `+json` media types and valid 204 responses. Phase 10AR rejects null, array and primitive successful JSON bodies at the shared client boundary so malformed envelopes cannot reach feature code as trusted data.
+
+Phase 10AS keeps mobile secure-token retrieval inside the shared request deadline so a stalled platform bridge cannot leave a request pending forever. Phase 10AT makes capacity/backpressure evidence deterministic across aligned rate-limit window rollover by deriving a stronger burst from the production request ceiling.
+
+Phase 10AU gives failed Travel Companion country-reference loading a localized, accessible retry with cancellation and stale-result protection. Phase 10AV extends active cancellation to abandoned phrasebook and emergency-reference requests while retaining generation guards and grounded-data honesty.
 
 ## Existing Issue #40 foundations that must be preserved
 
@@ -162,6 +168,10 @@ The repository already contains production-readiness work that later slices must
 - web/mobile Core Web Vitals targets and the public-home production resource-budget gate;
 - bounded shared-client JSON response reads for declared and streamed payloads;
 - mobile nested-route render-failure containment with an accessible retry surface and active mobile recovery tests.
+- successful-response media-type and top-level object-envelope validation in the shared client;
+- request-deadline coverage for stalled mobile secure-token retrieval;
+- rollover-safe capacity/backpressure CI evidence derived from the production rate limit;
+- localized Travel Companion reference retry plus cancellation of stale country, phrasebook and emergency requests.
 
 Do not add Redis, queues, distributed tracing, a monitoring vendor, read replicas, shared rate-limit storage, or other distributed infrastructure merely because Issue #40 mentions them. Introduce such components only when the live architecture and measured need justify them.
 
@@ -192,7 +202,7 @@ Preserve the completed Travel Companion rules:
 
 Issue `#40` — production scalability, reliability, performance and user-experience readiness — remains open. Continue it only through coherent, reviewable gaps supported by the live architecture. Before naming or implementing another phase, inspect the current repository and prior PRs so already completed protections are not duplicated.
 
-Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, planner-list hot-path query bounds, basic owner-scoped session/device revocation controls, the web session-security experience, replica-safe process-local rate limits/provider budgets/cache/circuit state, external per-instance metrics topology, global web route loading/recovery states, client request deadlines, abandoned destination-search and dashboard-provider cancellation, bounded shared-client JSON response reads, and mobile nested-route render recovery.
+Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, planner-list hot-path query bounds, basic owner-scoped session/device revocation controls, the web session-security experience, replica-safe process-local rate limits/provider budgets/cache/circuit state, external per-instance metrics topology, global web route loading/recovery states, client request deadlines, abandoned destination-search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route render recovery, and Travel Companion country/phrasebook/emergency request recovery and cancellation.
 
 Candidate remaining gaps that still require live verification include dependency timeout-and-recovery behavior beyond the existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements when a real public production target is selected, route-specific partial/degraded-mode UX gaps, and operational integration of an external metrics collector only when a concrete multi-replica target is selected.
 
