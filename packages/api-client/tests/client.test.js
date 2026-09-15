@@ -45,6 +45,29 @@ describe('API client', () => {
     await expect(client.request('/api/v1/example')).resolves.toEqual({ ok: true });
   });
 
+  it('forwards cancellation to cached country reference requests', async () => {
+    const callerController = new AbortController();
+    const fetchImpl = vi.fn(
+      async (_url, options) =>
+        new Promise((_resolve, reject) => {
+          expect(options.cache).toBe('force-cache');
+          options.signal.addEventListener(
+            'abort',
+            () => reject(new DOMException('aborted', 'AbortError')),
+            { once: true },
+          );
+        }),
+    );
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    const request = client.getCountries({ signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    callerController.abort();
+
+    await expectation;
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('builds a provider-neutral destination search URL', async () => {
     const fetchImpl = vi.fn(async (url) => {
       expect(String(url)).toBe(
