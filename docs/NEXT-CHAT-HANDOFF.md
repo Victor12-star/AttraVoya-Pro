@@ -9,21 +9,21 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10AP.
+6. Do not restart completed production-readiness work through Phase 10AV.
 
 ## Current fully verified release
 
-Phase 10AP — mobile route failure containment — is complete.
+Phase 10AV — abandoned Travel Companion request cancellation — is complete.
 
-- PR: `#133`
-- Final PR head: `f8b60985ed7110ecc2d5b57c63ce497c7cddda11`
-- Final PR CI run: `34866326214`
+- PR: `#140`
+- Final PR head: `8b28329468b30f3d33948e584941216ea64b5073`
+- Final PR CI run: `34946276780`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `b0e2013d9ef753e3fca7c38e40bb02ba992a1ffe`
-- Post-merge push CI run: `34866922973`
-- All five canonical jobs passed
+- Exact squash-merged `develop`: `2b9f000f8efc88fda8052a6db59f45ecdc776095`
+- Post-merge push CI run: `34946637108`
+- All five canonical jobs passed on the first attempt
 
-The latest sequence cancels abandoned destination searches and dashboard provider calls, preserves hard client deadlines, bounds JSON response memory in the shared client, and contains mobile route render failures with a clean retry experience and active mobile tests.
+The latest sequence validates successful API response formats and envelopes, bounds mobile token retrieval, makes capacity evidence rollover-safe, restores failed Travel Companion country references through an accessible retry and cancels abandoned country, phrasebook and emergency-reference requests.
 
 ## Completed production-readiness sequence
 
@@ -77,6 +77,13 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10AN — cancel abandoned destination provider requests — PR `#131`
 - Phase 10AO — bound shared API responses — PR `#132`
 - Phase 10AP — contain mobile route failures — PR `#133`
+- Maintenance handoff synchronization through Phase 10AP — PR `#134`
+- Phase 10AQ — reject unexpected API response formats — PR `#135`
+- Phase 10AR — validate successful API envelopes — PR `#136`
+- Phase 10AS — bound mobile token retrieval — PR `#137`
+- Phase 10AT — make capacity gate rollover-safe — PR `#138`
+- Phase 10AU — recover Travel Companion references — PR `#139`
+- Phase 10AV — cancel abandoned assistant requests — PR `#140`
 
 PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
 
@@ -84,6 +91,10 @@ PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsol
 
 - Phase 10S verifies real API process replacement against disposable PostgreSQL: readiness, bounded SIGTERM shutdown, restart on the same host/port/database, and readiness again.
 - Phase 10T adds the Prisma `0_init` migration baseline, production-style `migrate deploy`, migration-status/schema-drift CI checks and safe rolling-compatible migration guidance.
+- Phases 10AQ and 10AR reject successful non-JSON responses and malformed top-level JSON envelopes before feature code can trust them.
+- Phase 10AS applies the shared deadline while mobile secure access-token retrieval is stalled.
+- Phase 10AT guarantees the local capacity gate crosses the production HTTP 429 boundary even across aligned one-minute rollover.
+- Phases 10AU and 10AV add localized Travel Companion reference recovery and actively cancel abandoned country, phrasebook and emergency-reference requests.
 - Phase 10U exposes bounded, authenticated, owner-scoped active-session visibility plus idempotent targeted revocation and revoke-all behavior with minimized metadata.
 - Phase 10V adds explicit operator-configured request budgets for credentialed external providers and consumes budget immediately before each real upstream attempt, including retries, without guessing vendor limits.
 - Phase 10W provides the traveller-facing web session-security experience on top of Phase 10U with privacy minimization, authoritative destructive actions, accessibility and browser evidence.
@@ -180,7 +191,7 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 Issue `#40` remains the active broad production-readiness program, but the next functional slice is not automatically predetermined. Inspect the live code first.
 
-Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, global web route loading/recovery UX, client deadlines, destination search and dashboard-provider cancellation, bounded shared-client JSON response reads, and mobile nested-route recovery.
+Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, global web route loading/recovery UX, client deadlines, destination search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route recovery, and Travel Companion reference retry/cancellation.
 
 Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists.
 
