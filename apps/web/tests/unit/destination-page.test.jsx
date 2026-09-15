@@ -98,78 +98,37 @@ describe('DestinationPage', () => {
     expect(screen.getByText('Geoapify')).toBeInTheDocument();
     expect(await screen.findByText('14 °C')).toBeInTheDocument();
     expect(await screen.findByRole('img', { name: 'Stockholm waterfront' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Pexels' })).toHaveAttribute(
-      'href',
-      'https://www.pexels.com',
-    );
-    expect(screen.getByRole('link', { name: 'Stays' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/accommodation?'),
-    );
-    expect(screen.getByRole('link', { name: 'Stays' })).toHaveAttribute(
+    const links = screen.getAllByRole('link');
+    const linkNamed = (name) => links.find((link) => link.textContent.trim() === name);
+
+    expect(linkNamed('Pexels')).toHaveAttribute('href', 'https://www.pexels.com');
+    expect(linkNamed('Stays')).toHaveAttribute('href', expect.stringContaining('/accommodation?'));
+    expect(linkNamed('Stays')).toHaveAttribute(
       'href',
       expect.stringContaining('destination=Stockholm'),
     );
-    expect(screen.getByRole('link', { name: 'Airports' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/airports?'),
-    );
-    expect(screen.getByRole('link', { name: 'ATMs' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/atms?'),
-    );
-    expect(screen.getByRole('link', { name: 'Parking' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/parking?'),
-    );
-    expect(screen.getByRole('link', { name: 'Hospitals' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/hospitals?'),
-    );
-    expect(screen.getByRole('link', { name: 'Pharmacies' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/pharmacies?'),
-    );
-    expect(screen.getByRole('link', { name: 'Police stations' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/police?'),
-    );
-    expect(screen.getByRole('link', { name: 'Museums' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/museums?'),
-    );
-    expect(screen.getByRole('link', { name: 'Events' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/events?'),
-    );
-    expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/news?'),
-    );
-    expect(screen.getByRole('link', { name: 'Restaurants' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/restaurants?'),
-    );
-    expect(screen.getByRole('link', { name: 'Cafés' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/cafes?'),
-    );
-    expect(screen.getByRole('link', { name: 'Beaches' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/beaches?'),
-    );
-    expect(screen.getByRole('link', { name: 'Shopping' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/shopping?'),
-    );
-    expect(screen.getByRole('link', { name: 'Supermarkets' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/supermarkets?'),
-    );
-    expect(screen.getByRole('link', { name: 'Transport' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/destinations/stockholm-se/transport?'),
-    );
+
+    const destinationLinks = {
+      Airports: '/destinations/stockholm-se/airports?',
+      ATMs: '/destinations/stockholm-se/atms?',
+      Parking: '/destinations/stockholm-se/parking?',
+      Hospitals: '/destinations/stockholm-se/hospitals?',
+      Pharmacies: '/destinations/stockholm-se/pharmacies?',
+      'Police stations': '/destinations/stockholm-se/police?',
+      Museums: '/destinations/stockholm-se/museums?',
+      Events: '/destinations/stockholm-se/events?',
+      News: '/destinations/stockholm-se/news?',
+      Restaurants: '/destinations/stockholm-se/restaurants?',
+      Cafés: '/destinations/stockholm-se/cafes?',
+      Beaches: '/destinations/stockholm-se/beaches?',
+      Shopping: '/destinations/stockholm-se/shopping?',
+      Supermarkets: '/destinations/stockholm-se/supermarkets?',
+      Transport: '/destinations/stockholm-se/transport?',
+    };
+
+    for (const [name, href] of Object.entries(destinationLinks)) {
+      expect(linkNamed(name)).toHaveAttribute('href', expect.stringContaining(href));
+    }
 
     expect(mocks.getWeather).toHaveBeenCalledWith(
       {
