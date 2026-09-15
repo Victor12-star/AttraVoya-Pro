@@ -28,6 +28,10 @@ The repository already contains several useful foundations:
 - Abandoned destination search, weather and image request cancellation with stale-result guards.
 - Bounded shared-client JSON response reads for declared and streamed payloads.
 - Global web route recovery and mobile nested-route render recovery with accessible retry states.
+- Successful-response media-type and top-level object-envelope validation in the shared web/mobile client.
+- Shared request deadlines that also bound stalled mobile secure-token retrieval.
+- Rollover-safe capacity evidence that deterministically exercises HTTP 429 backpressure.
+- Localized Travel Companion country-reference retry and active cancellation for stale country, phrasebook and emergency requests.
 
 These foundations are helpful but are not yet proof of production-scale readiness.
 
