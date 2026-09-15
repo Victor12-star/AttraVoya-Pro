@@ -112,7 +112,7 @@ describe('GroundedTravelAssistant', () => {
     render(<GroundedTravelAssistant locale="en" messages={messages} />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Trusted reference data is unavailable right now. Try again shortly.',
+      'The destination reference could not be loaded, so no answer was invented.',
     );
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
 
