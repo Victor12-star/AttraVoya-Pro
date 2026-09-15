@@ -20,6 +20,7 @@ const messages = {
   common: {
     chooseCountry: 'Choose country',
     loading: 'Loading…',
+    retry: 'Retry',
   },
 };
 
@@ -101,6 +102,24 @@ describe('GroundedTravelAssistant', () => {
       if (String(path).startsWith('/api/v1/emergency')) return Promise.resolve(emergencyResponse());
       return Promise.resolve(phrasebookResponse());
     });
+  });
+
+  it('recovers the destination selector after the country reference request fails', async () => {
+    mocks.getCountries
+      .mockRejectedValueOnce(new Error('temporary reference failure'))
+      .mockResolvedValueOnce({ countries: [{ iso2: 'SE', name: 'Sweden' }] });
+
+    render(<GroundedTravelAssistant locale="en" messages={messages} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Trusted reference data is unavailable right now. Try again shortly.',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByRole('option', { name: 'Sweden' })).toBeInTheDocument();
+    expect(mocks.getCountries).toHaveBeenCalledTimes(2);
+    expect(mocks.getCountries.mock.calls[0][0].signal.aborted).toBe(true);
+    expect(mocks.getCountries.mock.calls[1][0].signal.aborted).toBe(false);
   });
 
   it('answers a language question only from the normalized destination phrasebook', async () => {
