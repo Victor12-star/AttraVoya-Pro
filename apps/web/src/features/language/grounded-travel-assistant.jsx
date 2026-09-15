@@ -348,8 +348,6 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
     countriesAbortRef.current = controller;
     countriesRequestRef.current += 1;
     const requestId = countriesRequestRef.current;
-    setCountriesState({ status: 'loading', data: [] });
-
     void apiClient
       .getCountries({ signal: controller.signal })
       .then((response) => {
@@ -373,6 +371,11 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
       answerRequestRef.current += 1;
     };
   }, [loadCountries]);
+
+  function retryCountries() {
+    setCountriesState({ status: 'loading', data: [] });
+    loadCountries();
+  }
 
   async function loadPhrasebook(nextCountryCode) {
     countryRequestRef.current += 1;
@@ -634,7 +637,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
           <button
             className="button button--secondary button--compact"
             type="button"
-            onClick={loadCountries}
+            onClick={retryCountries}
           >
             {messages.common.retry}
           </button>
