@@ -47,19 +47,24 @@ describe('API client', () => {
 
   it('forwards cancellation to cached country reference requests', async () => {
     const callerController = new AbortController();
-    const fetchImpl = vi.fn(async (_url, options) => {
-      expect(options.cache).toBe('force-cache');
-      expect(options.signal).toBeInstanceOf(AbortSignal);
-      return new Response(JSON.stringify({ countries: [] }), {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-      });
-    });
+    const fetchImpl = vi.fn(
+      async (_url, options) =>
+        new Promise((_resolve, reject) => {
+          expect(options.cache).toBe('force-cache');
+          options.signal.addEventListener(
+            'abort',
+            () => reject(new DOMException('aborted', 'AbortError')),
+            { once: true },
+          );
+        }),
+    );
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
-    await expect(client.getCountries({ signal: callerController.signal })).resolves.toEqual({
-      countries: [],
-    });
+    const request = client.getCountries({ signal: callerController.signal });
+    const expectation = expect(request).rejects.toMatchObject({ code: 'REQUEST_ABORTED' });
+    callerController.abort();
+
+    await expectation;
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
