@@ -270,7 +270,8 @@ export function createApiClient(options) {
 
   return {
     request,
-    getCountries: () => request('/api/v1/countries', { cache: 'force-cache' }),
+    getCountries: (requestOptions = {}) =>
+      request('/api/v1/countries', { cache: 'force-cache', ...requestOptions }),
     getLanguages: () => request('/api/v1/languages', { cache: 'force-cache' }),
     register: (body) => request('/api/v1/auth/register', { method: 'POST', body }),
     login: (body) => request('/api/v1/auth/login', { method: 'POST', body }),
