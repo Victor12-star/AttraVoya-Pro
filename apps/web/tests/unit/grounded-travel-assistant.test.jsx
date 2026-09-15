@@ -87,9 +87,10 @@ async function chooseSweden() {
   expect(screen.getByRole('option', { name: 'Sweden' })).toBeInTheDocument();
   fireEvent.change(select, { target: { value: 'SE' } });
   await waitFor(() =>
-    expect(mocks.request).toHaveBeenCalledWith('/api/v1/phrasebook?countryCode=SE', {
-      cache: 'force-cache',
-    }),
+    expect(mocks.request).toHaveBeenCalledWith(
+      '/api/v1/phrasebook?countryCode=SE',
+      expect.objectContaining({ cache: 'force-cache', signal: expect.any(AbortSignal) }),
+    ),
   );
 }
 
@@ -122,6 +123,51 @@ describe('GroundedTravelAssistant', () => {
     expect(mocks.getCountries.mock.calls[1][0].signal.aborted).toBe(false);
   });
 
+  it('cancels a superseded phrasebook request when the destination changes', async () => {
+    mocks.getCountries.mockResolvedValue({
+      countries: [
+        { iso2: 'SE', name: 'Sweden' },
+        { iso2: 'NO', name: 'Norway' },
+      ],
+    });
+    let swedenSignal;
+    mocks.request.mockImplementation((path, options) => {
+      if (String(path).includes('countryCode=SE')) {
+        swedenSignal = options.signal;
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener(
+            'abort',
+            () => reject(new DOMException('aborted', 'AbortError')),
+            { once: true },
+          );
+        });
+      }
+      return Promise.resolve(phrasebookResponse('NO', 'Norway'));
+    });
+
+    render(<GroundedTravelAssistant locale="en" messages={messages} />);
+    const select = await screen.findByRole('combobox', { name: 'Assistant destination' });
+    await waitFor(() => expect(select).not.toBeDisabled());
+
+    fireEvent.change(select, { target: { value: 'SE' } });
+    await waitFor(() => expect(swedenSignal).toBeInstanceOf(AbortSignal));
+    fireEvent.change(select, { target: { value: 'NO' } });
+
+    await waitFor(() =>
+      expect(mocks.request).toHaveBeenCalledWith(
+        '/api/v1/phrasebook?countryCode=NO',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      ),
+    );
+    expect(swedenSignal.aborted).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Which local language should I use?' }));
+    expect(
+      await screen.findByText(
+        'For Norway, the supported destination language is: Swedish (Svenska).',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('answers a language question only from the normalized destination phrasebook', async () => {
     render(<GroundedTravelAssistant locale="en" messages={messages} />);
     await chooseSweden();
@@ -147,9 +193,10 @@ describe('GroundedTravelAssistant', () => {
     expect(screen.getByText('112')).toBeInTheDocument();
     const source = screen.getByRole('link', { name: /SOS Alarm/ });
     expect(source).toHaveAttribute('href', 'https://www.sosalarm.se/');
-    expect(mocks.request).toHaveBeenCalledWith('/api/v1/emergency?countryCode=SE', {
-      cache: 'no-store',
-    });
+    expect(mocks.request).toHaveBeenCalledWith(
+      '/api/v1/emergency?countryCode=SE',
+      expect.objectContaining({ cache: 'no-store', signal: expect.any(AbortSignal) }),
+    );
   });
 
   it('refuses unsupported questions instead of sending them to an unconfigured AI provider', async () => {
