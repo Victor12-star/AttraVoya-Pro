@@ -99,7 +99,8 @@ describe('DestinationPage', () => {
     expect(await screen.findByText('14 °C')).toBeInTheDocument();
     expect(await screen.findByRole('img', { name: 'Stockholm waterfront' })).toBeInTheDocument();
     const links = screen.getAllByRole('link');
-    const linkNamed = (name) => links.find((link) => link.textContent.trim() === name);
+    const linkNamed = (name) =>
+      links.find((link) => link.textContent.trim() === name);
 
     expect(linkNamed('Pexels')).toHaveAttribute('href', 'https://www.pexels.com');
     expect(linkNamed('Stays')).toHaveAttribute(
@@ -130,7 +131,10 @@ describe('DestinationPage', () => {
     };
 
     for (const [name, href] of Object.entries(destinationLinks)) {
-      expect(linkNamed(name)).toHaveAttribute('href', expect.stringContaining(href));
+      expect(linkNamed(name)).toHaveAttribute(
+        'href',
+        expect.stringContaining(href),
+      );
     }
 
     expect(mocks.getWeather).toHaveBeenCalledWith(
