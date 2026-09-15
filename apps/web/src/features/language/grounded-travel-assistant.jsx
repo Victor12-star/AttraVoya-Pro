@@ -329,7 +329,9 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   const countriesRequestRef = useRef(0);
   const countriesAbortRef = useRef(/** @type {AbortController|null} */ (null));
   const countryRequestRef = useRef(0);
+  const phrasebookAbortRef = useRef(/** @type {AbortController|null} */ (null));
   const answerRequestRef = useRef(0);
+  const answerAbortRef = useRef(/** @type {AbortController|null} */ (null));
   const historyIdRef = useRef(0);
   const [countriesState, setCountriesState] = useState(
     /** @type {{status:string, data:any[]}} */ ({ status: 'loading', data: [] }),
@@ -367,7 +369,9 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
     return () => {
       countriesAbortRef.current?.abort();
       countriesRequestRef.current += 1;
+      phrasebookAbortRef.current?.abort();
       countryRequestRef.current += 1;
+      answerAbortRef.current?.abort();
       answerRequestRef.current += 1;
     };
   }, [loadCountries]);
@@ -378,21 +382,26 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
   }
 
   async function loadPhrasebook(nextCountryCode) {
+    phrasebookAbortRef.current?.abort();
+    const controller = new AbortController();
+    phrasebookAbortRef.current = controller;
     countryRequestRef.current += 1;
     const requestId = countryRequestRef.current;
     setPhrasebookState({ status: 'loading', data: null });
     try {
       const response = await apiClient.request(
         `/api/v1/phrasebook?countryCode=${encodeURIComponent(nextCountryCode)}`,
-        { cache: 'force-cache' },
+        { cache: 'force-cache', signal: controller.signal },
       );
       if (requestId !== countryRequestRef.current) return;
       const phrasebook = normalizeAssistantPhrasebook(response, nextCountryCode);
       setPhrasebookState({ status: phrasebook ? 'success' : 'error', data: phrasebook });
     } catch {
-      if (requestId === countryRequestRef.current) {
+      if (!controller.signal.aborted && requestId === countryRequestRef.current) {
         setPhrasebookState({ status: 'error', data: null });
       }
+    } finally {
+      if (phrasebookAbortRef.current === controller) phrasebookAbortRef.current = null;
     }
   }
 
@@ -402,7 +411,9 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
       .toUpperCase();
     if (nextCountryCode && !/^[A-Z]{2}$/.test(nextCountryCode)) return;
 
+    phrasebookAbortRef.current?.abort();
     countryRequestRef.current += 1;
+    answerAbortRef.current?.abort();
     answerRequestRef.current += 1;
     setCountryCode(nextCountryCode);
     setHistory([]);
@@ -435,6 +446,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
     const intent = forcedIntent ?? classifyGroundedTravelQuestion(normalizedQuestion);
     const currentCountryCode = countryCode;
     const currentCountryName = destinationName();
+    answerAbortRef.current?.abort();
     answerRequestRef.current += 1;
     const requestId = answerRequestRef.current;
     setAnswerStatus('loading');
@@ -460,10 +472,12 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
     }
 
     if (intent === 'emergency') {
+      const controller = new AbortController();
+      answerAbortRef.current = controller;
       try {
         const response = await apiClient.request(
           `/api/v1/emergency?countryCode=${encodeURIComponent(currentCountryCode)}`,
-          { cache: 'no-store' },
+          { cache: 'no-store', signal: controller.signal },
         );
         if (requestId !== answerRequestRef.current) return;
         const emergency = normalizeAssistantEmergency(response, currentCountryCode);
@@ -495,7 +509,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
           });
         }
       } catch {
-        if (requestId === answerRequestRef.current) {
+        if (!controller.signal.aborted && requestId === answerRequestRef.current) {
           pushAnswer({
             question: normalizedQuestion,
             text: copy.referenceUnavailable,
@@ -503,6 +517,7 @@ export function GroundedTravelAssistant({ locale = 'en', messages }) {
           });
         }
       } finally {
+        if (answerAbortRef.current === controller) answerAbortRef.current = null;
         if (requestId === answerRequestRef.current) {
           setAnswerStatus('idle');
           setQuestion('');
