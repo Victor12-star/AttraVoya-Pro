@@ -24,8 +24,7 @@ const companionTripSelect = {
 export function createTripsRepository(prismaClient) {
   return {
     async listOwnedCompanionTrips({ userId, today, limit = 10 }) {
-      const client =
-        prismaClient ?? (await import('@attravoya/database')).prisma;
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
       return client.trip.findMany({
         where: {
           userId,
