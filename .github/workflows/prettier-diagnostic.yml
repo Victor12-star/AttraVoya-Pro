@@ -1,0 +1,46 @@
+name: Prettier diagnostic
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  prettier-diagnostic:
+    name: Exact Prettier diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Print exact Prettier diff for companion query-count test
+        run: |
+          set -euo pipefail
+          target="packages/database/src/companion-trip-query-count.integration.test.js"
+          pnpm exec prettier --write "$target"
+          echo "----- EXACT PRETTIER DIFF START -----"
+          git diff -- "$target" || true
+          echo "----- EXACT PRETTIER DIFF END -----"
+          if ! git diff --quiet -- "$target"; then
+            echo "Diagnostic intentionally failing because Prettier changed the target file."
+            exit 1
+          fi
