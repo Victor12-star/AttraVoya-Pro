@@ -130,7 +130,9 @@ describeCompanionTripQueryCount('Travel Companion PostgreSQL query-count contrac
 
         expect(singleTrip.queryCount).toBeGreaterThan(0);
         expect(fullCompanionSet.queryCount).toBe(singleTrip.queryCount);
-        expect(fullCompanionSet.queryCount).toBeLessThanOrEqual(MAX_EXPECTED_COMPANION_READ_QUERIES);
+        expect(fullCompanionSet.queryCount).toBeLessThanOrEqual(
+          MAX_EXPECTED_COMPANION_READ_QUERIES,
+        );
       } finally {
         try {
           await prisma.$transaction([
