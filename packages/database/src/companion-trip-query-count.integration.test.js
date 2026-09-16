@@ -47,7 +47,10 @@ describeCompanionTripQueryCount('Travel Companion PostgreSQL query-count contrac
     const cityId = `companion-query-city-${suffix}`;
     const destinationId = `companion-query-destination-${suffix}`;
     const userId = `companion-query-user-${suffix}`;
-    const tripIds = Array.from({ length: 10 }, (_, index) => `companion-query-trip-${suffix}-${index}`);
+    const tripIds = Array.from(
+      { length: 10 },
+      (_, index) => `companion-query-trip-${suffix}-${index}`,
+    );
     const today = new Date('2026-09-16T00:00:00.000Z');
 
     try {
@@ -125,7 +128,9 @@ describeCompanionTripQueryCount('Travel Companion PostgreSQL query-count contrac
 
       expect(singleTrip.queryCount).toBeGreaterThan(0);
       expect(fullCompanionSet.queryCount).toBe(singleTrip.queryCount);
-      expect(fullCompanionSet.queryCount).toBeLessThanOrEqual(MAX_EXPECTED_COMPANION_READ_QUERIES);
+      expect(fullCompanionSet.queryCount).toBeLessThanOrEqual(
+        MAX_EXPECTED_COMPANION_READ_QUERIES,
+      );
     } finally {
       try {
         await prisma.$transaction([
