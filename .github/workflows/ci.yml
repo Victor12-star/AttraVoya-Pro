@@ -192,6 +192,27 @@ jobs:
           API_RESTART_RECOVERY_TEST: '1'
         run: pnpm api:restart:check
 
+      - name: Verify live API database-outage recovery
+        env:
+          API_DATABASE_OUTAGE_RECOVERY_TEST: '1'
+        run: |
+          set -euo pipefail
+
+          mapfile -t postgres_containers < <(
+            docker ps \
+              --filter ancestor=postgres:17-alpine \
+              --filter publish=5432 \
+              --format '{{.ID}}'
+          )
+
+          if [ "${#postgres_containers[@]}" -ne 1 ]; then
+            echo "Expected exactly one disposable PostgreSQL service container."
+            docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Ports}}'
+            exit 1
+          fi
+
+          POSTGRES_OUTAGE_CONTAINER_ID="${postgres_containers[0]}" pnpm api:database-outage:check
+
       - name: Verify API early-load capacity and overload backpressure
         run: |
           set -euo pipefail

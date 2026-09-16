@@ -38,6 +38,7 @@
     "resilience:check": "node scripts/http-resilience-load-check.js",
     "load:harness:test": "node --test scripts/http-load-test.test.js scripts/http-capacity-check.test.js scripts/http-resilience-load-check.test.js",
     "api:restart:check": "node scripts/api-restart-recovery-check.js",
+    "api:database-outage:check": "node scripts/api-database-outage-recovery-check.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean",
