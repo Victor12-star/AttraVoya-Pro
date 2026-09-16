@@ -47,6 +47,7 @@
     "@attravoya/javascript-config": "workspace:*",
     "@types/node": "24.1.0",
     "@types/pg": "8.20.0",
+    "@vitest/coverage-v8": "4.1.10",
     "dotenv": "17.4.2",
     "prisma": "7.9.1",
     "vitest": "4.1.10"
