@@ -22,9 +22,7 @@ function sleep(milliseconds) {
 
 function parseSafetyContract() {
   if (process.env.API_DATABASE_OUTAGE_RECOVERY_TEST !== '1') {
-    fail(
-      'Refusing database-outage recovery check without API_DATABASE_OUTAGE_RECOVERY_TEST=1.',
-    );
+    fail('Refusing database-outage recovery check without API_DATABASE_OUTAGE_RECOVERY_TEST=1.');
   }
 
   const host = process.env.API_HOST?.trim() || '127.0.0.1';
@@ -204,7 +202,9 @@ async function stopApi(child) {
     ]);
 
     if (code !== 0 || signal !== null) {
-      fail(`API process did not complete graceful shutdown cleanly (code=${code}, signal=${signal}).`);
+      fail(
+        `API process did not complete graceful shutdown cleanly (code=${code}, signal=${signal}).`,
+      );
     }
   } finally {
     if (timeout !== undefined) clearTimeout(timeout);
