@@ -11,6 +11,7 @@ const RECOVERY_TIMEOUT_MS = 30_000;
 const STOP_TIMEOUT_MS = 30_000;
 const POLL_INTERVAL_MS = 500;
 
+/** @returns {never} */
 function fail(message) {
   throw new Error(message);
 }
@@ -106,6 +107,17 @@ function assertApiRunning(child, stage) {
   }
 }
 
+/**
+ * @typedef {object} HealthProbe
+ * @property {string} [status]
+ * @property {string} [service]
+ * @property {string} [database]
+ */
+
+/**
+ * @param {string} url
+ * @returns {Promise<{ body: HealthProbe | null, status: number } | null>}
+ */
 async function readProbe(url) {
   try {
     const response = await fetch(url, {
@@ -114,7 +126,7 @@ async function readProbe(url) {
     let body = null;
 
     try {
-      body = await response.json();
+      body = /** @type {HealthProbe} */ (await response.json());
     } catch {
       // The status code still provides safe diagnostic evidence if an error
       // handler cannot serialize a body during dependency failure.
