@@ -1,3 +1,5 @@
+import { MAX_PUBLIC_EMERGENCY_RECORDS } from './emergency.contracts.js';
+
 function safeText(value, maxLength) {
   if (typeof value !== 'string') return null;
   const normalized = value.trim();
@@ -70,7 +72,10 @@ export function createEmergencyService(repository) {
     async listVerifiedCountryEmergency(countryCode) {
       const rows = await repository.listPublishedVerifiedByCountryCode(countryCode);
       const records = Array.isArray(rows)
-        ? rows.map((record) => toPublicRecord(record, countryCode)).filter(Boolean)
+        ? rows
+            .map((record) => toPublicRecord(record, countryCode))
+            .filter(Boolean)
+            .slice(0, MAX_PUBLIC_EMERGENCY_RECORDS)
         : [];
 
       return {
