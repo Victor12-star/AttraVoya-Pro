@@ -1,3 +1,5 @@
+export const MAX_PUBLIC_EMERGENCY_RECORDS = 32;
+
 /**
  * Public emergency records are a verified reference-data contract, not a live
  * provider response. Only VERIFIED, published, country-wide records with
