@@ -1,10 +1,12 @@
-export function createEmergencyRepository() {
+import { MAX_PUBLIC_EMERGENCY_RECORDS } from './emergency.contracts.js';
+
+export function createEmergencyRepository(prismaClient) {
   return {
     /** @param {string} countryCode */
     async listPublishedVerifiedByCountryCode(countryCode) {
-      const { prisma } = await import('@attravoya/database');
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
 
-      return prisma.emergencyRecord.findMany({
+      return client.emergencyRecord.findMany({
         where: {
           country: { iso2: countryCode },
           regionName: null,
@@ -12,7 +14,8 @@ export function createEmergencyRepository() {
           isPublished: true,
           lastVerifiedAt: { not: null },
         },
-        orderBy: [{ service: 'asc' }, { serviceLabel: 'asc' }],
+        orderBy: [{ service: 'asc' }, { serviceLabel: 'asc' }, { id: 'asc' }],
+        take: MAX_PUBLIC_EMERGENCY_RECORDS,
         select: {
           id: true,
           regionName: true,
