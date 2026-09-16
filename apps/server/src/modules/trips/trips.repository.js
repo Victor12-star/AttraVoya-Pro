@@ -18,11 +18,14 @@ const companionTripSelect = {
   },
 };
 
-export function createTripsRepository() {
+// Accepting an optional Prisma client keeps normal production behavior unchanged
+// while allowing the PostgreSQL CI contract to observe the exact SQL emitted by
+// this repository without mocking away relation loading.
+export function createTripsRepository(prismaClient) {
   return {
     async listOwnedCompanionTrips({ userId, today, limit = 10 }) {
-      const { prisma } = await import('@attravoya/database');
-      return prisma.trip.findMany({
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
+      return client.trip.findMany({
         where: {
           userId,
           status: { in: ['ACTIVE', 'PLANNED'] },
