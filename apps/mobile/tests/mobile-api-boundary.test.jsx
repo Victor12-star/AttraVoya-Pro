@@ -48,7 +48,9 @@ describe('mobile API boundary', () => {
       fetchImpl,
     });
 
-    await expect(client.request('/api/v1/example')).resolves.toEqual({ ok: true });
+    await expect(client.request('/api/v1/example')).resolves.toEqual({
+      ok: true,
+    });
   });
 
   it('maps offline failures without exposing diagnostic details', async () => {
