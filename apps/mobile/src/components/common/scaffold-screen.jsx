@@ -89,12 +89,12 @@ const styles = StyleSheet.create({
   statusLabel: {
     color: lightTheme.brandPrimary,
     fontSize: 14,
-    fontWeight: String(typography.weight.semibold),
+    fontWeight: typography.weight.semibold,
   },
   eyebrow: {
     color: lightTheme.brandSecondary,
     fontSize: 14,
-    fontWeight: String(typography.weight.bold),
+    fontWeight: typography.weight.bold,
     letterSpacing: 1.2,
     marginBottom: spacing[2],
     textTransform: 'uppercase',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   title: {
     color: lightTheme.textPrimary,
     fontSize: 36,
-    fontWeight: String(typography.weight.bold),
+    fontWeight: typography.weight.bold,
     letterSpacing: -0.8,
     lineHeight: 42,
     marginBottom: spacing[4],
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   noticeTitle: {
     color: lightTheme.textPrimary,
     fontSize: 17,
-    fontWeight: String(typography.weight.semibold),
+    fontWeight: typography.weight.semibold,
   },
   noticeBody: {
     color: lightTheme.textSecondary,
