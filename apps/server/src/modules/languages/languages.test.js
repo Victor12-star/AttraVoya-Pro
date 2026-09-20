@@ -54,12 +54,7 @@ describe('languages repository', () => {
     await repository.list();
 
     expect(findMany).toHaveBeenCalledWith({
-      orderBy: [
-        { isUiSupported: 'desc' },
-        { name: 'asc' },
-        { code: 'asc' },
-        { id: 'asc' },
-      ],
+      orderBy: [{ isUiSupported: 'desc' }, { name: 'asc' }, { code: 'asc' }, { id: 'asc' }],
       take: MAX_PUBLIC_LANGUAGE_RECORDS,
       select: {
         id: true,
@@ -109,9 +104,8 @@ describe('language reference endpoint', () => {
   });
 
   it('caps records when an injected repository over-returns', async () => {
-    const records = Array.from(
-      { length: MAX_PUBLIC_LANGUAGE_RECORDS + 8 },
-      (_, index) => languageRecord(index),
+    const records = Array.from({ length: MAX_PUBLIC_LANGUAGE_RECORDS + 8 }, (_, index) =>
+      languageRecord(index),
     );
     const app = await buildApp(
       appOptions({
