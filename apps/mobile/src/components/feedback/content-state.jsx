@@ -1,10 +1,4 @@
-import {
-  contentWidths,
-  interaction,
-  lightTheme,
-  radius,
-  spacing,
-} from '@attravoya/design-tokens';
+import { contentWidths, interaction, lightTheme, radius, spacing } from '@attravoya/design-tokens';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const STATE_DEFAULTS = Object.freeze({
