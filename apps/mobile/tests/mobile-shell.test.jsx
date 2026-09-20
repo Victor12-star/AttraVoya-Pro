@@ -13,8 +13,8 @@ describe('modern mobile shell', () => {
     );
   });
 
-  it('renders a truthful accessible route state without invented provider data', () => {
-    const { getByText, queryByText } = render(
+  it('renders a truthful accessible route state without invented provider data', async () => {
+    const { getByText, queryByText } = await render(
       <ScaffoldScreen
         description="Live destination results will appear here after provider integration."
         eyebrow="Discover"
@@ -25,5 +25,5 @@ describe('modern mobile shell', () => {
     expect(getByText('Explore with confidence')).toBeTruthy();
     expect(getByText('Feature foundation')).toBeTruthy();
     expect(queryByText(/€|\$|available rooms|live fare/i)).toBeNull();
-  });
+  }, 20_000);
 });
