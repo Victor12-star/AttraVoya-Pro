@@ -14,7 +14,9 @@
     "./radius": "./src/radius.js",
     "./shadows": "./src/shadows.js",
     "./motion": "./src/motion.js",
-    "./themes": "./src/themes.js"
+    "./themes": "./src/themes.js",
+    "./layout": "./src/layout.js",
+    "./interaction": "./src/interaction.js"
   },
   "files": [
     "src"
