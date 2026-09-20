@@ -38,16 +38,10 @@ describe('mobile API boundary', () => {
   it('creates a cookie-free client for installed applications', async () => {
     const fetchImpl = jest.fn(async (_url, options) => {
       expect(options.credentials).toBe('omit');
-      return {
+      return new globalThis.Response(JSON.stringify({ ok: true }), {
         status: 200,
-        ok: true,
-        body: null,
-        headers: {
-          get: (name) => (name === 'content-type' ? 'application/json' : null),
-        },
-        arrayBuffer: async () =>
-          new Uint8Array([123, 34, 111, 107, 34, 58, 116, 114, 117, 101, 125]).buffer,
-      };
+        headers: { 'content-type': 'application/json' },
+      });
     });
     const client = createMobileApiClient({
       baseUrl: 'https://api.attravoya.example',
