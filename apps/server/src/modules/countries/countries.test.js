@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 process.env.NODE_ENV = 'test';
 process.env.API_HOST = '127.0.0.1';
@@ -13,17 +13,79 @@ process.env.COOKIE_SECRET = 'c'.repeat(64);
 process.env.DATA_ENCRYPTION_KEY = 'd'.repeat(64);
 
 const { buildApp } = await import('../../app.js');
+const { MAX_PUBLIC_COUNTRY_RECORDS } = await import('./countries.contracts.js');
+const { createCountriesRepository } = await import('./countries.repository.js');
 
 const apps = [];
 afterEach(async () => {
   await Promise.all(apps.splice(0).map((app) => app.close()));
 });
 
+function appOptions(countriesRepository) {
+  return {
+    logger: false,
+    countriesRepository,
+    languagesRepository: { list: async () => [] },
+    healthRepository: { checkDatabase: async () => true },
+    authRepository: {
+      findAuthorizationContextByUserId: async () => null,
+    },
+  };
+}
+
+function countryRecord(index = 0) {
+  return {
+    id: `country-${String(index).padStart(3, '0')}`,
+    iso2: String(index).padStart(2, '0'),
+    iso3: `Q${String(index).padStart(2, '0')}`,
+    name: `Country ${index}`,
+    callingCode: null,
+    region: 'Test region',
+    subregion: 'Test subregion',
+    defaultTimeZone: null,
+    languages: [],
+    currencies: [],
+  };
+}
+
+describe('countries repository', () => {
+  it('bounds the normal query and uses deterministic ordering', async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const repository = createCountriesRepository({
+      country: { findMany },
+    });
+
+    await repository.list();
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        take: MAX_PUBLIC_COUNTRY_RECORDS,
+        orderBy: [{ name: 'asc' }, { iso2: 'asc' }, { id: 'asc' }],
+      }),
+    );
+  });
+
+  it('preserves smaller internal limits and caps oversized ones', async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const repository = createCountriesRepository({
+      country: { findMany },
+    });
+
+    await repository.list({ limit: 20 });
+    await repository.list({ limit: MAX_PUBLIC_COUNTRY_RECORDS + 1 });
+
+    expect(findMany).toHaveBeenNthCalledWith(1, expect.objectContaining({ take: 20 }));
+    expect(findMany).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ take: MAX_PUBLIC_COUNTRY_RECORDS }),
+    );
+  });
+});
+
 describe('country reference endpoint', () => {
   it('returns cacheable country data without requiring authentication', async () => {
-    const app = await buildApp({
-      logger: false,
-      countriesRepository: {
+    const app = await buildApp(
+      appOptions({
         list: async () => [
           {
             id: 'country-se',
@@ -61,15 +123,8 @@ describe('country reference endpoint', () => {
             ],
           },
         ],
-      },
-      languagesRepository: { list: async () => [] },
-      healthRepository: { checkDatabase: async () => true },
-      // buildApp validates the same authorization-repository contract used in
-      // production even though this particular endpoint is public.
-      authRepository: {
-        findAuthorizationContextByUserId: async () => null,
-      },
-    });
+      }),
+    );
     apps.push(app);
 
     const response = await app.inject({ method: 'GET', url: '/api/v1/countries' });
@@ -81,5 +136,42 @@ describe('country reference endpoint', () => {
       currencies: [{ code: 'SEK', isPrimary: true }],
       languages: [{ code: 'sv', isOfficial: true }],
     });
+  });
+
+  it('caps records when an injected repository over-returns', async () => {
+    const records = Array.from(
+      { length: MAX_PUBLIC_COUNTRY_RECORDS + 8 },
+      (_, index) => countryRecord(index),
+    );
+    const app = await buildApp(
+      appOptions({
+        list: async () => records,
+      }),
+    );
+    apps.push(app);
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/countries' });
+
+    expect(response.statusCode).toBe(200);
+    const responseCountries = response.json().countries;
+    expect(responseCountries).toHaveLength(MAX_PUBLIC_COUNTRY_RECORDS);
+    expect(responseCountries[0].id).toBe('country-000');
+    expect(responseCountries.at(-1).id).toBe(
+      `country-${String(MAX_PUBLIC_COUNTRY_RECORDS - 1).padStart(3, '0')}`,
+    );
+  });
+
+  it('returns a safe empty list when an injected repository returns malformed data', async () => {
+    const app = await buildApp(
+      appOptions({
+        list: async () => null,
+      }),
+    );
+    apps.push(app);
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/countries' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ countries: [] });
   });
 });
