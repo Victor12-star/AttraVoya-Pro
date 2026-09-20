@@ -6,12 +6,7 @@ export function createLanguagesRepository(prismaClient) {
       const client = prismaClient ?? (await import('@attravoya/database')).prisma;
 
       return client.language.findMany({
-        orderBy: [
-          { isUiSupported: 'desc' },
-          { name: 'asc' },
-          { code: 'asc' },
-          { id: 'asc' },
-        ],
+        orderBy: [{ isUiSupported: 'desc' }, { name: 'asc' }, { code: 'asc' }, { id: 'asc' }],
         take: MAX_PUBLIC_LANGUAGE_RECORDS,
         select: {
           id: true,
