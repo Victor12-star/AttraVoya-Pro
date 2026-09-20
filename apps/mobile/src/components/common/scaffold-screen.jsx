@@ -6,7 +6,8 @@ import {
   radius,
   spacing,
 } from '@attravoya/design-tokens';
-import { SafeAreaView, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * Truthful foundation state for routes that are not connected yet. Keeping this
