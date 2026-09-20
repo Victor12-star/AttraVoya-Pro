@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 12,
-    fontWeight: String(typography.weight.semibold),
+    fontWeight: typography.weight.semibold,
   },
   tabSymbol: {
     minWidth: interaction.minimumTargetSize,
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabSymbolActive: {
-    fontWeight: String(typography.weight.bold),
+    fontWeight: typography.weight.bold,
   },
 });
