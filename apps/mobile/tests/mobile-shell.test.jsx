@@ -13,8 +13,8 @@ describe('modern mobile shell', () => {
     );
   });
 
-  it('renders a truthful accessible route state without invented provider data', async () => {
-    const { getByText, queryByText } = await render(
+  it('renders a truthful accessible route state without invented provider data', () => {
+    const { getByText, queryByText } = render(
       <ScaffoldScreen
         description="Live destination results will appear here after provider integration."
         eyebrow="Discover"
