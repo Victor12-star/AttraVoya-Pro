@@ -37,6 +37,14 @@ export function getConfiguredApiBaseUrl(
  * Create the mobile transport without cookies. Secure token retrieval will be
  * injected here when the authentication slice owns its SecureStore lifecycle.
  */
+/**
+ * @param {{
+ *   baseUrl?: string,
+ *   fetchImpl?: typeof globalThis.fetch,
+ *   getAccessToken?: () => string | null | Promise<string | null>,
+ *   allowInsecure?: boolean
+ * }} [options]
+ */
 export function createMobileApiClient({
   baseUrl,
   fetchImpl,
