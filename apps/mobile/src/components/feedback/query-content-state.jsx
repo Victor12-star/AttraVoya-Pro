@@ -68,11 +68,7 @@ export default function QueryContentState({ error, isEmpty, isLoading, onRetry }
     if (!state) return null;
 
     return (
-      <ContentState
-        {...state}
-        actionLabel={onRetry ? 'Try again' : undefined}
-        onAction={onRetry}
-      />
+      <ContentState {...state} actionLabel={onRetry ? 'Try again' : undefined} onAction={onRetry} />
     );
   }
 
