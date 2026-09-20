@@ -139,9 +139,8 @@ describe('country reference endpoint', () => {
   });
 
   it('caps records when an injected repository over-returns', async () => {
-    const records = Array.from(
-      { length: MAX_PUBLIC_COUNTRY_RECORDS + 8 },
-      (_, index) => countryRecord(index),
+    const records = Array.from({ length: MAX_PUBLIC_COUNTRY_RECORDS + 8 }, (_, index) =>
+      countryRecord(index),
     );
     const app = await buildApp(
       appOptions({
