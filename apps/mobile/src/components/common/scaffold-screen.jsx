@@ -5,7 +5,6 @@ import {
   lightTheme,
   radius,
   spacing,
-  typography,
 } from '@attravoya/design-tokens';
 import { SafeAreaView, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
@@ -89,12 +88,12 @@ const styles = StyleSheet.create({
   statusLabel: {
     color: lightTheme.brandPrimary,
     fontSize: 14,
-    fontWeight: typography.weight.semibold,
+    fontWeight: '600',
   },
   eyebrow: {
     color: lightTheme.brandSecondary,
     fontSize: 14,
-    fontWeight: typography.weight.bold,
+    fontWeight: '700',
     letterSpacing: 1.2,
     marginBottom: spacing[2],
     textTransform: 'uppercase',
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
   title: {
     color: lightTheme.textPrimary,
     fontSize: 36,
-    fontWeight: typography.weight.bold,
+    fontWeight: '700',
     letterSpacing: -0.8,
     lineHeight: 42,
     marginBottom: spacing[4],
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
   noticeTitle: {
     color: lightTheme.textPrimary,
     fontSize: 17,
-    fontWeight: typography.weight.semibold,
+    fontWeight: '600',
   },
   noticeBody: {
     color: lightTheme.textSecondary,
