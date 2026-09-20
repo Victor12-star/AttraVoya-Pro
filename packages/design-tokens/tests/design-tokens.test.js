@@ -46,8 +46,6 @@ describe('AttraVoya design tokens', () => {
 
   it('keeps every interactive control comfortably touch accessible', () => {
     expect(interaction.minimumTargetSize).toBeGreaterThanOrEqual(48);
-    expect(interaction.minimumControlHeight).toBeGreaterThanOrEqual(
-      interaction.minimumTargetSize,
-    );
+    expect(interaction.minimumControlHeight).toBeGreaterThanOrEqual(interaction.minimumTargetSize);
   });
 });
