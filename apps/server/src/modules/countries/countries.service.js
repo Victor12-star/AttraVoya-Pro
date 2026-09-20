@@ -1,7 +1,12 @@
+import { MAX_PUBLIC_COUNTRY_RECORDS } from './countries.contracts.js';
+
 export function createCountriesService(repository) {
   return {
     async listCountries() {
-      const countries = await repository.list();
+      const repositoryCountries = await repository.list();
+      const countries = Array.isArray(repositoryCountries)
+        ? repositoryCountries.slice(0, MAX_PUBLIC_COUNTRY_RECORDS)
+        : [];
 
       return countries.map((country) => ({
         id: country.id,
