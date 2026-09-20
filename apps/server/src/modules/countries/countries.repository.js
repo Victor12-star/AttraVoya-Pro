@@ -7,7 +7,10 @@ export function createCountriesRepository(prismaClient) {
   return {
     async list(options = {}) {
       const client = prismaClient ?? (await import('@attravoya/database')).prisma;
-      const limit = Math.min(options.limit ?? MAX_PUBLIC_COUNTRY_RECORDS, MAX_PUBLIC_COUNTRY_RECORDS);
+      const limit = Math.min(
+        options.limit ?? MAX_PUBLIC_COUNTRY_RECORDS,
+        MAX_PUBLIC_COUNTRY_RECORDS,
+      );
 
       return client.country.findMany({
         take: limit,
