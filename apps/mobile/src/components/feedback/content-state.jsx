@@ -43,13 +43,7 @@ function resolveState(kind) {
  *   title?: string
  * }} props
  */
-export default function ContentState({
-  actionLabel,
-  kind,
-  message,
-  onAction,
-  title,
-}) {
+export default function ContentState({ actionLabel, kind, message, onAction, title }) {
   const defaults = resolveState(kind);
   const isLoading = kind === 'loading';
   const canAct = typeof onAction === 'function' && Boolean(actionLabel);
