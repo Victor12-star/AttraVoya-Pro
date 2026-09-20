@@ -147,7 +147,7 @@ describe('users repository account erasure', () => {
       user: { findUnique: vi.fn() },
       $transaction: vi.fn(async (operation) => operation(tx)),
     };
-    const repository = createUsersRepository(prismaClient);
+    const repository = createUsersRepository(/** @type {any} */ (prismaClient));
 
     await expect(
       repository.deleteAccountData({
