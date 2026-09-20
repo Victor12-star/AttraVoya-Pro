@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import ContentState from '../components/feedback/content-state.jsx';
+import AppQueryProvider from '../providers/app-query-provider.jsx';
 
 /**
  * Keep route failures local and recoverable without exposing private diagnostic
@@ -30,7 +31,11 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <AppQueryProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AppQueryProvider>
+  );
 }
 
 const styles = StyleSheet.create({
