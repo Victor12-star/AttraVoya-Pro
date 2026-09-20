@@ -42,6 +42,7 @@ import { newsRoutes } from './modules/news/news.routes.js';
 import { imagesRoutes } from './modules/images/images.routes.js';
 import { plannerRoutes } from './modules/planner/planner.routes.js';
 import { tripsRoutes } from './modules/trips/trips.routes.js';
+import { usersRoutes } from './modules/users/users.routes.js';
 import {
   createHttpRequestMetrics,
   createHttpRequestMetricsHook,
@@ -147,6 +148,11 @@ export async function buildApp(options = {}) {
     emailProvider: options.emailProvider,
     onVerificationRequested: options.onVerificationRequested,
     onPasswordResetRequested: options.onPasswordResetRequested,
+  });
+
+  await app.register(usersRoutes, {
+    prefix: `${API_PREFIX}/users`,
+    repository: options.usersRepository,
   });
 
   await app.register(healthRoutes, {
