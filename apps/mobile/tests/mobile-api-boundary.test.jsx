@@ -4,10 +4,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 import QueryContentState, {
   getQueryContentState,
 } from '../src/components/feedback/query-content-state.jsx';
-import {
-  createMobileApiClient,
-  normalizeApiBaseUrl,
-} from '../src/services/api-client.js';
+import { createMobileApiClient, normalizeApiBaseUrl } from '../src/services/api-client.js';
 
 describe('mobile API boundary', () => {
   it('accepts HTTPS configuration and removes a trailing slash', () => {
@@ -24,15 +21,13 @@ describe('mobile API boundary', () => {
     ['an unsupported protocol', 'file:///private/config'],
     ['insecure production transport', 'http://api.attravoya.example'],
   ])('rejects %s in API configuration', (_label, value) => {
-    expect(() => normalizeApiBaseUrl(value)).toThrow(
-      'The mobile API configuration is invalid.',
-    );
+    expect(() => normalizeApiBaseUrl(value)).toThrow('The mobile API configuration is invalid.');
   });
 
   it('allows explicit insecure transport for local development only', () => {
-    expect(
-      normalizeApiBaseUrl('http://192.168.1.25:5000/', { allowInsecure: true }),
-    ).toBe('http://192.168.1.25:5000');
+    expect(normalizeApiBaseUrl('http://192.168.1.25:5000/', { allowInsecure: true })).toBe(
+      'http://192.168.1.25:5000',
+    );
   });
 
   it('creates a cookie-free client for installed applications', async () => {
@@ -70,9 +65,7 @@ describe('mobile API boundary', () => {
   }, 20_000);
 
   it('does not show an error when a disposed screen cancels its request', async () => {
-    const { toJSON } = await render(
-      <QueryContentState error={{ code: 'REQUEST_ABORTED' }} />,
-    );
+    const { toJSON } = await render(<QueryContentState error={{ code: 'REQUEST_ABORTED' }} />);
 
     expect(toJSON()).toBeNull();
     expect(getQueryContentState({ code: 'REQUEST_ABORTED' })).toBeNull();
