@@ -1,4 +1,4 @@
-import { interaction, lightTheme, spacing, typography } from '@attravoya/design-tokens';
+import { interaction, lightTheme, spacing } from '@attravoya/design-tokens';
 import { Tabs } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 12,
-    fontWeight: typography.weight.semibold,
+    fontWeight: '600',
   },
   tabSymbol: {
     minWidth: interaction.minimumTargetSize,
@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabSymbolActive: {
-    fontWeight: typography.weight.bold,
+    fontWeight: '700',
   },
 });
