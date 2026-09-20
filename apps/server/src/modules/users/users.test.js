@@ -111,12 +111,9 @@ describe('account deletion endpoint', () => {
 
     expect(response.statusCode).toBe(204);
     expect(response.headers['cache-control']).toBe('private, no-store');
-    expect(response.headers['set-cookie']).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('attravoya_access='),
-        expect.stringContaining('attravoya_refresh='),
-      ]),
-    );
+    const setCookie = String(response.headers['set-cookie']);
+    expect(setCookie).toContain('attravoya_access=');
+    expect(setCookie).toContain('attravoya_refresh=');
     expect(repository.deleteAccountData).toHaveBeenCalledWith({
       userId: 'user-1',
       replacementPasswordHash: expect.stringMatching(/^\$argon2id\$/),
