@@ -66,11 +66,7 @@ export default function ContentState({
           color={lightTheme.brandSecondary}
           size="large"
         />
-      ) : (
-        <View accessible={false} style={styles.symbol}>
-          <Text style={styles.symbolText}>{kind === 'empty' ? '○' : '!'}</Text>
-        </View>
-      )}
+      ) : null}
 
       <Text accessibilityRole="header" style={styles.title}>
         {title || defaults.title}
@@ -103,19 +99,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: radius.xl,
     padding: spacing[6],
-  },
-  symbol: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: lightTheme.surfaceMuted,
-    borderRadius: radius.pill,
-  },
-  symbolText: {
-    color: lightTheme.brandSecondary,
-    fontSize: 24,
-    fontWeight: '700',
   },
   title: {
     color: lightTheme.textPrimary,
