@@ -1,3 +1,5 @@
+import { MAX_PUBLIC_COUNTRY_RECORDS } from './countries.contracts.js';
+
 // The optional Prisma client and internal limit exist only so PostgreSQL CI can
 // observe the exact production relation query and compare small versus full
 // result sets without mocking Prisma or changing the public route contract.
@@ -5,11 +7,14 @@ export function createCountriesRepository(prismaClient) {
   return {
     async list(options = {}) {
       const client = prismaClient ?? (await import('@attravoya/database')).prisma;
-      const limit = options.limit;
+      const limit = Math.min(
+        options.limit ?? MAX_PUBLIC_COUNTRY_RECORDS,
+        MAX_PUBLIC_COUNTRY_RECORDS,
+      );
 
       return client.country.findMany({
-        ...(limit === undefined ? {} : { take: limit }),
-        orderBy: { name: 'asc' },
+        take: limit,
+        orderBy: [{ name: 'asc' }, { iso2: 'asc' }, { id: 'asc' }],
         select: {
           id: true,
           iso2: true,

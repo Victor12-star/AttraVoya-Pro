@@ -6,3 +6,7 @@
  * This avoids duplicating hundreds of translated country names in PostgreSQL.
  */
 export const COUNTRY_REFERENCE_VERSION = 1;
+
+// The generated ISO catalogue contains 249 countries. This ceiling preserves
+// the complete current set and controlled growth while bounding public reads.
+export const MAX_PUBLIC_COUNTRY_RECORDS = 300;
