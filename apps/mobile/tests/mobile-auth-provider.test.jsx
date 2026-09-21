@@ -4,6 +4,7 @@ import { Pressable, Text } from 'react-native';
 
 import {
   MobileAuthProvider,
+  parsePasswordResetRequestResponse,
   parseRegistrationResponse,
   useMobileAuth,
 } from '../src/providers/mobile-auth-provider.jsx';
@@ -27,6 +28,7 @@ function createClient(overrides = {}) {
     mobileLogin: jest.fn(),
     mobileLogout: jest.fn(async () => undefined),
     register: jest.fn(),
+    forgotPassword: jest.fn(),
     ...overrides,
   };
 }
@@ -93,5 +95,15 @@ describe('mobile authentication provider', () => {
         message: 'Account created.',
       }),
     ).toMatchObject({ verificationDelivery: 'sent' });
+  });
+
+  it('rejects malformed password-reset request responses', () => {
+    expect(parsePasswordResetRequestResponse({ message: '' })).toBeNull();
+    expect(
+      parsePasswordResetRequestResponse({ message: 'Instructions sent.', extra: true }),
+    ).toBeNull();
+    expect(parsePasswordResetRequestResponse({ message: 'Instructions sent.' })).toEqual({
+      message: 'Instructions sent.',
+    });
   });
 });
