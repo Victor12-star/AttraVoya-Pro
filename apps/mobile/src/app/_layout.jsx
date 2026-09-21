@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import ContentState from '../components/feedback/content-state.jsx';
 import AppQueryProvider from '../providers/app-query-provider.jsx';
+import { MobileAuthProvider, useMobileAuth } from '../providers/mobile-auth-provider.jsx';
 
 /**
  * Keep route failures local and recoverable without exposing private diagnostic
@@ -30,10 +31,56 @@ export const unstable_settings = {
   screenErrorBoundary: ErrorBoundary,
 };
 
+function SessionNavigator() {
+  const { retryRestore, status } = useMobileAuth();
+
+  if (status === 'loading') {
+    return (
+      <View style={styles.screen}>
+        <ContentState kind="loading" message="Restoring your secure travel session…" />
+      </View>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <View style={styles.screen}>
+        <ContentState
+          actionLabel="Try again"
+          kind="offline"
+          message="Your saved session is still secure. Reconnect to continue."
+          onAction={retryRestore}
+        />
+      </View>
+    );
+  }
+
+  const isAuthenticated = status === 'authenticated';
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen name="auth/login" />
+        <Stack.Screen name="auth/register" />
+        <Stack.Screen name="auth/forgot-password" />
+        <Stack.Screen name="auth/reset-password" />
+      </Stack.Protected>
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="destination/[slug]" />
+        <Stack.Screen name="emergency/index" />
+        <Stack.Screen name="premium/index" />
+        <Stack.Screen name="trip/[id]" />
+      </Stack.Protected>
+    </Stack>
+  );
+}
+
 export default function RootLayout() {
   return (
     <AppQueryProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <MobileAuthProvider>
+        <SessionNavigator />
+      </MobileAuthProvider>
     </AppQueryProvider>
   );
 }
