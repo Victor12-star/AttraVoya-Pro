@@ -1,6 +1,8 @@
 import { createApiClient } from '@attravoya/api-client';
 import Constants from 'expo-constants';
 
+import { mobileAccessTokenStore } from './access-token-store.js';
+
 function invalidConfiguration() {
   return new Error('The mobile API configuration is invalid.');
 }
@@ -48,7 +50,7 @@ export function getConfiguredApiBaseUrl(
 export function createMobileApiClient({
   baseUrl,
   fetchImpl,
-  getAccessToken,
+  getAccessToken = mobileAccessTokenStore.getAccessToken,
   allowInsecure = typeof __DEV__ !== 'undefined' && __DEV__,
 } = {}) {
   const normalizedBaseUrl = normalizeApiBaseUrl(baseUrl ?? getConfiguredApiBaseUrl(), {
@@ -59,6 +61,6 @@ export function createMobileApiClient({
     baseUrl: normalizedBaseUrl,
     credentials: 'omit',
     ...(fetchImpl ? { fetchImpl } : {}),
-    ...(getAccessToken ? { getAccessToken } : {}),
+    getAccessToken,
   });
 }
