@@ -49,6 +49,23 @@ function sendPrivate(reply, payload, statusCode = 200) {
   return reply.code(statusCode).send(payload);
 }
 
+function loginInput(request) {
+  return {
+    ...request.body,
+    userAgent: request.headers['user-agent'],
+    ip: request.ip,
+  };
+}
+
+function mobileSessionPayload(session) {
+  return {
+    accessToken: session.accessToken,
+    refreshToken: session.refreshToken,
+    refreshExpiresAt: session.refreshExpiresAt.toISOString(),
+    user: session.user,
+  };
+}
+
 export function createAuthController({
   service,
   env,
@@ -120,13 +137,14 @@ export function createAuthController({
     },
 
     async login(request, reply) {
-      const session = await service.login({
-        ...request.body,
-        userAgent: request.headers['user-agent'],
-        ip: request.ip,
-      });
+      const session = await service.login(loginInput(request));
       setSessionCookies(reply, session, env);
       return reply.send({ accessToken: session.accessToken, user: session.user });
+    },
+
+    async mobileLogin(request, reply) {
+      const session = await service.login(loginInput(request));
+      return sendPrivate(reply, mobileSessionPayload(session));
     },
 
     async listSessions(request, reply) {
@@ -158,6 +176,16 @@ export function createAuthController({
       await service.logout(request.cookies[AUTH_COOKIES.REFRESH]);
       clearSessionCookies(reply, env);
       return reply.status(204).send();
+    },
+
+    async mobileRefresh(request, reply) {
+      const session = await service.refresh(request.body.refreshToken);
+      return sendPrivate(reply, mobileSessionPayload(session));
+    },
+
+    async mobileLogout(request, reply) {
+      await service.logout(request.body.refreshToken);
+      return sendPrivate(reply, undefined, 204);
     },
 
     async forgotPassword(request, reply) {

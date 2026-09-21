@@ -9,6 +9,7 @@ const STRICT_AUTH_RATE_LIMIT = Object.freeze({ max: 10, timeWindow: '1 minute' }
 const PASSWORD_RESET_RATE_LIMIT = Object.freeze({ max: 5, timeWindow: '15 minutes' });
 const VERIFICATION_RESEND_RATE_LIMIT = Object.freeze({ max: 5, timeWindow: '15 minutes' });
 const SESSION_MANAGEMENT_RATE_LIMIT = Object.freeze({ max: 30, timeWindow: '1 minute' });
+const REFRESH_RATE_LIMIT = Object.freeze({ max: 30, timeWindow: '1 minute' });
 
 function resolveConfiguredEmailProvider(options) {
   if (options.emailProvider) return options.emailProvider;
@@ -81,6 +82,24 @@ export async function authRoutes(app, options = {}) {
     handler: controller.login,
   });
 
+  app.post('/mobile/login', {
+    schema: authSchemas.login,
+    config: { rateLimit: STRICT_AUTH_RATE_LIMIT },
+    handler: controller.mobileLogin,
+  });
+
+  app.post('/mobile/refresh', {
+    schema: authSchemas.mobileSession,
+    config: { rateLimit: REFRESH_RATE_LIMIT },
+    handler: controller.mobileRefresh,
+  });
+
+  app.post('/mobile/logout', {
+    schema: authSchemas.mobileSession,
+    config: { rateLimit: SESSION_MANAGEMENT_RATE_LIMIT },
+    handler: controller.mobileLogout,
+  });
+
   app.get('/sessions', {
     ...authenticated,
     config: { rateLimit: SESSION_MANAGEMENT_RATE_LIMIT },
@@ -101,7 +120,7 @@ export async function authRoutes(app, options = {}) {
   });
 
   app.post('/refresh', {
-    config: { rateLimit: { max: 30, timeWindow: '1 minute' } },
+    config: { rateLimit: REFRESH_RATE_LIMIT },
     handler: controller.refresh,
   });
 

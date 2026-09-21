@@ -9,6 +9,11 @@ import {
 } from '@attravoya/validation';
 
 const sessionIdParamsSchema = z.object({ sessionId: z.string().trim().min(1).max(128) }).strict();
+const mobileSessionSchema = z
+  .object({
+    refreshToken: z.string().trim().min(32).max(256),
+  })
+  .strict();
 
 export const authSchemas = Object.freeze({
   register: {
@@ -28,5 +33,8 @@ export const authSchemas = Object.freeze({
   },
   revokeSession: {
     params: sessionIdParamsSchema,
+  },
+  mobileSession: {
+    body: mobileSessionSchema,
   },
 });
