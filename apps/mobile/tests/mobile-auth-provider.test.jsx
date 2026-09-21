@@ -2,7 +2,11 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Pressable, Text } from 'react-native';
 
-import { MobileAuthProvider, useMobileAuth } from '../src/providers/mobile-auth-provider.jsx';
+import {
+  MobileAuthProvider,
+  parseRegistrationResponse,
+  useMobileAuth,
+} from '../src/providers/mobile-auth-provider.jsx';
 
 function AuthProbe() {
   const auth = useMobileAuth();
@@ -22,6 +26,7 @@ function createClient(overrides = {}) {
     restoreMobileSession: jest.fn(async () => null),
     mobileLogin: jest.fn(),
     mobileLogout: jest.fn(async () => undefined),
+    register: jest.fn(),
     ...overrides,
   };
 }
@@ -77,5 +82,16 @@ describe('mobile authentication provider', () => {
     await act(async () => fireEvent.press(getByText('Retry restore')));
     await waitFor(() => expect(getByText('authenticated')).toBeTruthy());
     expect(restoreMobileSession).toHaveBeenCalledTimes(2);
+  });
+
+  it('validates registration responses before exposing them to the screen', () => {
+    expect(parseRegistrationResponse({ user: { id: 'missing-fields' } })).toBeNull();
+    expect(
+      parseRegistrationResponse({
+        user: { id: 'user-1', email: 'user@example.test', emailVerified: false },
+        verificationDelivery: 'sent',
+        message: 'Account created.',
+      }),
+    ).toMatchObject({ verificationDelivery: 'sent' });
   });
 });
