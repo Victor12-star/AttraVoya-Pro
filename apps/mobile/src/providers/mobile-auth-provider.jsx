@@ -17,8 +17,17 @@ const registrationResponseSchema = z
   })
   .strict();
 
+const passwordResetRequestResponseSchema = z
+  .object({ message: z.string().trim().min(1).max(500) })
+  .strict();
+
 export function parseRegistrationResponse(value) {
   const parsed = registrationResponseSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
+export function parsePasswordResetRequestResponse(value) {
+  const parsed = passwordResetRequestResponseSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
 }
 
@@ -45,6 +54,14 @@ function safeRegistrationMessage(error) {
   }
   if (error?.code === 'REQUEST_TIMEOUT') return 'The request took too long. Please try again.';
   return 'We could not create your account. Please try again.';
+}
+
+function safePasswordResetRequestMessage(error) {
+  if (error?.code === 'NETWORK_ERROR') {
+    return 'You appear to be offline. Check your connection and try again.';
+  }
+  if (error?.code === 'REQUEST_TIMEOUT') return 'The request took too long. Please try again.';
+  return 'We could not request a password reset. Please try again.';
 }
 
 /** @param {{children: import('react').ReactNode, client?: any}} props */
@@ -122,14 +139,33 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
     [client],
   );
 
+  const requestPasswordReset = useCallback(
+    async (email) => {
+      try {
+        const response = await client.forgotPassword(email);
+        const result = parsePasswordResetRequestResponse(response);
+        if (!result) {
+          throw Object.assign(new Error('Invalid password-reset response.'), {
+            code: 'INVALID_API_RESPONSE',
+          });
+        }
+        return result;
+      } catch (passwordResetError) {
+        const message = safePasswordResetRequestMessage(passwordResetError);
+        throw Object.assign(new Error(message), { code: passwordResetError?.code });
+      }
+    },
+    [client],
+  );
+
   const retryRestore = useCallback(() => {
     setError(null);
     setStatus('loading');
     setRestoreAttempt((attempt) => attempt + 1);
   }, []);
   const value = useMemo(
-    () => ({ error, login, logout, register, retryRestore, status, user }),
-    [error, login, logout, register, retryRestore, status, user],
+    () => ({ error, login, logout, register, requestPasswordReset, retryRestore, status, user }),
+    [error, login, logout, register, requestPasswordReset, retryRestore, status, user],
   );
 
   return <MobileAuthContext.Provider value={value}>{children}</MobileAuthContext.Provider>;
