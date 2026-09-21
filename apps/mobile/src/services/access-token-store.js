@@ -4,8 +4,11 @@ export const MOBILE_ACCESS_TOKEN_KEY = 'attravoya.mobile.access-token.v1';
 
 const MAX_ACCESS_TOKEN_LENGTH = 8_192;
 
+/** @returns {Error & { code: string }} */
 function storageError() {
-  const error = new Error('The secure mobile session could not be updated.');
+  const error = /** @type {Error & { code: string }} */ (
+    new Error('The secure mobile session could not be updated.')
+  );
   error.code = 'MOBILE_TOKEN_STORAGE_ERROR';
   return error;
 }
@@ -55,8 +58,14 @@ async function removeUnsafeStoredToken(secureStore) {
 export function createMobileAccessTokenStore(secureStore = SecureStore) {
   let cachedToken = null;
   let hasLoaded = false;
+  /** @type {Promise<unknown>} */
   let operationQueue = Promise.resolve();
 
+  /**
+   * @template T
+   * @param {() => T | Promise<T>} operation
+   * @returns {Promise<T>}
+   */
   function enqueue(operation) {
     const result = operationQueue.then(operation, operation);
     operationQueue = result.catch(() => undefined);
