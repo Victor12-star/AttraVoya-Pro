@@ -1,7 +1,7 @@
 import { createApiClient } from '@attravoya/api-client';
 import Constants from 'expo-constants';
 
-import { mobileAccessTokenStore } from './access-token-store.js';
+import { createMobileSessionManager } from './mobile-session-manager.js';
 
 function invalidConfiguration() {
   return new Error('The mobile API configuration is invalid.');
@@ -44,23 +44,39 @@ export function getConfiguredApiBaseUrl(
  *   baseUrl?: string,
  *   fetchImpl?: typeof globalThis.fetch,
  *   getAccessToken?: () => string | null | Promise<string | null>,
+ *   sessionManager?: ReturnType<typeof createMobileSessionManager>,
  *   allowInsecure?: boolean
  * }} [options]
  */
 export function createMobileApiClient({
   baseUrl,
   fetchImpl,
-  getAccessToken = mobileAccessTokenStore.getAccessToken,
+  getAccessToken,
+  sessionManager,
   allowInsecure = typeof __DEV__ !== 'undefined' && __DEV__,
 } = {}) {
   const normalizedBaseUrl = normalizeApiBaseUrl(baseUrl ?? getConfiguredApiBaseUrl(), {
     allowInsecure,
   });
 
-  return createApiClient({
+  const mobileSessionManager =
+    sessionManager ??
+    createMobileSessionManager({
+      baseUrl: normalizedBaseUrl,
+      ...(fetchImpl ? { fetchImpl } : {}),
+    });
+
+  const client = createApiClient({
     baseUrl: normalizedBaseUrl,
     credentials: 'omit',
     ...(fetchImpl ? { fetchImpl } : {}),
-    getAccessToken,
+    getAccessToken: getAccessToken ?? mobileSessionManager.getAccessToken,
+  });
+
+  return Object.freeze({
+    ...client,
+    mobileLogin: mobileSessionManager.login,
+    mobileLogout: mobileSessionManager.logout,
+    refreshMobileSession: mobileSessionManager.refresh,
   });
 }
