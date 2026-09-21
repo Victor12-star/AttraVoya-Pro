@@ -36,9 +36,13 @@ function activeAuth(userId = 'mobile-user-1') {
 }
 
 async function createMobileAuthApp(repository) {
+  const authRepository = {
+    findAuthorizationContextByUserId: async () => null,
+    ...repository,
+  };
   const app = await buildApp({
     logger: false,
-    authRepository: repository,
+    authRepository,
     healthRepository: { checkDatabase: async () => true },
   });
   apps.push(app);
