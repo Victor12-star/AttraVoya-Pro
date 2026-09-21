@@ -41,6 +41,7 @@ describe('mobile API boundary', () => {
     const client = createMobileApiClient({
       baseUrl: 'https://api.attravoya.example',
       fetchImpl,
+      getAccessToken: () => null,
     });
 
     await expect(client.request('/api/v1/example')).resolves.toEqual({
