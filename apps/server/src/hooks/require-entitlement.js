@@ -2,6 +2,7 @@ import { ENTITLEMENTS } from '@attravoya/constants';
 
 import { AuthenticationError, SubscriptionRequiredError } from '../errors/app-error.js';
 
+/** @type {Set<string>} */
 const ENTITLEMENT_SET = new Set(Object.values(ENTITLEMENTS));
 
 /**
