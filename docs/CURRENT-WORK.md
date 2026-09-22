@@ -28,17 +28,17 @@ Never infer 5/5 from workflow-level status alone; inspect the individual jobs. D
 
 ## Current fully verified release
 
-Phase 10AP — mobile route failure containment — is complete.
+Phase 10BX — public terms of service — is complete.
 
-- PR: `#133`
-- Final PR head: `f8b60985ed7110ecc2d5b57c63ce497c7cddda11`
-- Final PR CI run: `34866326214`
+- PR: `#168`
+- Final PR head: `d70093e99ea7f2d43bbcd3a2452b06941969eb0b`
+- Final PR CI run: `35730925766`
 - Result: all five canonical jobs passed
-- Squash-merged `develop` SHA: `b0e2013d9ef753e3fca7c38e40bb02ba992a1ffe`
-- Independent post-merge push CI run: `34866922973`
+- Squash-merged `develop` SHA: `30b9fe9249bfa80ed37a74d97ff34bef0b553ace`
+- Independent post-merge push CI run: `35731580061`
 - Result: all five canonical jobs passed
 
-Phase 10AP contains mobile route render failures through Expo Router's supported layout-level screen boundary, presents an accessible retry experience without exposing internal diagnostics, and activates focused mobile recovery tests. It also repairs the previously dormant mobile test setup so future mobile safeguards can be verified rather than silently passing with no tests.
+Phase 10BX replaces the placeholder terms route with a truthful public Terms of Service, keeps provider/live-data honesty and mandatory consumer-right boundaries explicit, states that paid subscriptions are not yet enabled, and adds permanent footer and sitemap access without changing billing, authentication, provider, database, or mobile runtime behavior.
 
 The public-home Pixel 7 Chromium production-build resource budget established by Phases 10K and 10L remains enforced. Current hard ceilings are 215,063 bytes total same-origin transfer, 190,003 bytes JavaScript transfer, 6,366 bytes CSS transfer, and 0 bytes image transfer for that specific route. The zero-image ceiling is route-specific and must not be generalized to unrelated routes.
 
@@ -96,6 +96,41 @@ The following Issue #40 slices are complete and must not be restarted:
 - Phase 10AN — cancel abandoned destination provider requests — PR `#131`
 - Phase 10AO — bound shared API responses — PR `#132`
 - Phase 10AP — contain mobile route failures — PR `#133`
+- Maintenance handoff synchronization through Phase 10AP — PR `#134`
+- Phase 10AQ — reject unexpected API response formats — PR `#135`
+- Phase 10AR — validate successful API envelopes — PR `#136`
+- Phase 10AS — bound mobile token retrieval — PR `#137`
+- Phase 10AT — make capacity gate rollover-safe — PR `#138`
+- Phase 10AU — recover Travel Companion references — PR `#139`
+- Phase 10AV — cancel abandoned assistant requests — PR `#140`
+- Phase 10AW — synchronize reliability handoff — PR `#141`
+- Phase 10AX — stabilize destination page CI test — PR `#142`
+- Phase 10AY — bound Travel Companion relation queries — PR `#143`
+- Phase 10AZ — verify live database outage recovery — PR `#144`
+- Phase 10BA — bound country reference relation queries — PR `#145`
+- Phase 10BB — bound emergency reference responses — PR `#146`
+- Phase 10BC — bound language reference responses — PR `#147`
+- Phase 10BD — bound country reference responses — PR `#148`
+- Phase 10BE — add secure account deletion — PR `#149`
+- Phase 10BF — establish adaptive design foundations — PR `#150`
+- Phase 10BG — modernize the mobile application shell — PR `#151`
+- Phase 10BH — add safe reusable mobile feedback states — PR `#152`
+- Phase 10BI — add bounded mobile query boundary — PR `#153`
+- Phase 10BJ — add safe mobile API boundary — PR `#154`
+- Phase 10BK — upgrade CI actions to Node.js 24 — PR `#155`
+- Phase 10BL — pin canonical CI to Ubuntu 24.04 — PR `#156`
+- Phase 10BM — add secure mobile access-token storage — PR `#157`
+- Phase 10BN — add cookie-free mobile refresh sessions — PR `#158`
+- Phase 10BO — coordinate secure mobile session refresh — PR `#159`
+- Phase 10BP — connect mobile authentication entry — PR `#160`
+- Phase 10BQ — connect mobile account registration — PR `#161`
+- Phase 10BR — add safe mobile password recovery request — PR `#162`
+- Phase 10BS — add mobile verification recovery — PR `#163`
+- Phase 10BT — restore mobile session identity and profile — PR `#164`
+- Phase 10BU — add secure in-app account deletion — PR `#165`
+- Phase 10BV — add public web account deletion flow — PR `#166`
+- Phase 10BW — publish the public privacy policy — PR `#167`
+- Phase 10BX — publish the public terms of service — PR `#168`
 
 PR `#91` is obsolete and was superseded by the corrected Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` is also superseded and must never be merged.
 
@@ -123,7 +158,7 @@ Phase 10V added explicit operator-configured in-process request budgets for cred
 
 Phase 10W added the web account-security UI for those owner-scoped session controls, with privacy-minimized device labels, authoritative destructive-action handling, all maintained locales, responsive/accessibility behavior and blocking browser/Axe coverage.
 
-## What Phases 10X through 10AV added
+## What Phases 10X through 10BX added
 
 Phases 10X and 10Z protect the planner-list PostgreSQL hot path with bounded query behavior and relation-query evidence. Phase 10Y makes production reject unsupported replica configurations rather than silently running unsafe process-local controls across multiple instances.
 
@@ -140,6 +175,14 @@ Phase 10AQ rejects successful non-JSON responses while preserving vendor `+json`
 Phase 10AS keeps mobile secure-token retrieval inside the shared request deadline so a stalled platform bridge cannot leave a request pending forever. Phase 10AT makes capacity/backpressure evidence deterministic across aligned rate-limit window rollover by deriving a stronger burst from the production request ceiling.
 
 Phase 10AU gives failed Travel Companion country-reference loading a localized, accessible retry with cancellation and stale-result protection. Phase 10AV extends active cancellation to abandoned phrasebook and emergency-reference requests while retaining generation guards and grounded-data honesty.
+
+Phase 10AW synchronized the reliability handoff after Phase 10AV. Phase 10AX stabilized destination-page CI coverage without weakening the gate. Phases 10AY and 10BA bound additional Travel Companion and country-reference relation queries, while Phase 10AZ verified live database outage recovery.
+
+Phases 10BB through 10BD bounded emergency, language, and country reference responses. Phase 10BE added password-confirmed atomic account deletion. Phases 10BF through 10BJ established adaptive/mobile UI foundations, reusable safe feedback states, bounded query behavior, and a safe mobile API boundary.
+
+Phases 10BK and 10BL modernized and pinned the canonical CI runtime. Phases 10BM through 10BO added encrypted mobile access-token/session storage, cookie-free refresh-session APIs, and coordinated rotation/recovery behavior. Phases 10BP through 10BT connected mobile authentication, registration, password recovery, email-verification recovery, authenticated identity restoration, and the Profile account summary.
+
+Phases 10BU and 10BV expose secure server-authoritative account deletion in the mobile app and a public web deletion resource suitable for store-policy access. Phase 10BW publishes the public privacy policy, and Phase 10BX publishes the public Terms of Service. These public legal surfaces are release prerequisites, not substitutes for final operator/legal review and production configuration.
 
 ## Existing Issue #40 foundations that must be preserved
 
@@ -202,7 +245,7 @@ Preserve the completed Travel Companion rules:
 
 Issue `#40` — production scalability, reliability, performance and user-experience readiness — remains open. Continue it only through coherent, reviewable gaps supported by the live architecture. Before naming or implementing another phase, inspect the current repository and prior PRs so already completed protections are not duplicated.
 
-Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, planner-list hot-path query bounds, basic owner-scoped session/device revocation controls, the web session-security experience, replica-safe process-local rate limits/provider budgets/cache/circuit state, external per-instance metrics topology, global web route loading/recovery states, client request deadlines, abandoned destination-search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route render recovery, and Travel Companion country/phrasebook/emergency request recovery and cancellation.
+Already addressed and therefore not valid reasons for a new duplicate slice: process restart/recovery evidence, the Prisma migration baseline/deploy gate, planner-list hot-path query bounds, basic owner-scoped session/device revocation controls, the web session-security experience, replica-safe process-local rate limits/provider budgets/cache/circuit state, external per-instance metrics topology, global web route loading/recovery states, client request deadlines, abandoned destination-search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route render recovery, Travel Companion country/phrasebook/emergency request recovery and cancellation, reference-response bounds, database-outage recovery evidence, secure mobile authentication/session foundations, account deletion, the public privacy policy, and the public Terms of Service.
 
 Candidate remaining gaps that still require live verification include dependency timeout-and-recovery behavior beyond the existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements when a real public production target is selected, route-specific partial/degraded-mode UX gaps, and operational integration of an external metrics collector only when a concrete multi-replica target is selected.
 
