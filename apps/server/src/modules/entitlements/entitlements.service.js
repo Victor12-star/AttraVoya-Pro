@@ -2,6 +2,7 @@ import { ENTITLEMENTS, PLAN_LIMITS, PLANS, PRO_PLAN_KEYS } from '@attravoya/cons
 
 const PRO_PLAN_SET = new Set(PRO_PLAN_KEYS);
 const ENTITLEMENT_ORDER = Object.freeze(Object.values(ENTITLEMENTS));
+/** @type {Set<string>} */
 const ENTITLEMENT_SET = new Set(ENTITLEMENT_ORDER);
 
 const PLAN_NAMES = Object.freeze({
@@ -97,13 +98,16 @@ export function createEntitlementsService(repository, options = {}) {
   return {
     getCurrentAccess,
 
+    /**
+     * @param {{ userId: string, entitlement: string }} input
+     */
     async hasEntitlement({ userId, entitlement }) {
       if (!ENTITLEMENT_SET.has(entitlement)) {
         throw new TypeError('A recognized entitlement is required.');
       }
 
       const access = await getCurrentAccess({ userId });
-      return access.entitlements.includes(entitlement);
+      return /** @type {string[]} */ (access.entitlements).includes(entitlement);
     },
   };
 }
