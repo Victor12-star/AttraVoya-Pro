@@ -227,18 +227,38 @@ async function seedPlansAndEntitlements() {
     },
   });
 
-  const premiumPlan = await prisma.plan.upsert({
-    where: { key: PLANS.PREMIUM },
-    update: { name: 'Premium', isActive: true },
+  const proMonthlyPlan = await prisma.plan.upsert({
+    where: { key: PLANS.PRO_MONTHLY },
+    update: { name: 'Pro Monthly', isActive: true },
     create: {
-      key: PLANS.PREMIUM,
-      name: 'Premium',
-      description: 'Optional advanced planning and convenience capabilities.',
+      key: PLANS.PRO_MONTHLY,
+      name: 'Pro Monthly',
+      description: 'AttraVoya Pro capabilities billed monthly when billing launches.',
     },
   });
 
-  // Basic emergency/safety capabilities are intentionally absent here because
-  // they must remain accessible without a Premium subscription.
+  const proYearlyPlan = await prisma.plan.upsert({
+    where: { key: PLANS.PRO_YEARLY },
+    update: { name: 'Pro Yearly', isActive: true },
+    create: {
+      key: PLANS.PRO_YEARLY,
+      name: 'Pro Yearly',
+      description: 'AttraVoya Pro capabilities billed yearly when billing launches.',
+    },
+  });
+
+  // The old generic PREMIUM key predates the agreed monthly/yearly commercial
+  // structure. Keep any existing row for referential integrity but prevent it
+  // from granting new access. Billing is not enabled by this seed.
+  await prisma.plan.updateMany({
+    where: { key: PLANS.PREMIUM },
+    data: { name: 'Premium (legacy)', isActive: false },
+  });
+
+  const proPlans = [proMonthlyPlan, proYearlyPlan];
+
+  // Basic account security and emergency/safety capabilities are intentionally
+  // absent here because they must remain available without a Pro subscription.
   for (const key of Object.values(ENTITLEMENTS)) {
     const entitlement = await prisma.entitlement.upsert({
       where: { key },
@@ -246,23 +266,25 @@ async function seedPlansAndEntitlements() {
       create: { key, name: ENTITLEMENT_LABELS[key] ?? key },
     });
 
-    await prisma.planEntitlement.upsert({
-      where: {
-        planId_entitlementId: {
-          planId: premiumPlan.id,
+    for (const proPlan of proPlans) {
+      await prisma.planEntitlement.upsert({
+        where: {
+          planId_entitlementId: {
+            planId: proPlan.id,
+            entitlementId: entitlement.id,
+          },
+        },
+        update: {},
+        create: {
+          planId: proPlan.id,
           entitlementId: entitlement.id,
         },
-      },
-      update: {},
-      create: {
-        planId: premiumPlan.id,
-        entitlementId: entitlement.id,
-      },
-    });
+      });
+    }
   }
 
   // Keep the Free plan present even though its core capabilities are not
-  // modeled as Premium entitlements.
+  // modeled as Pro entitlements.
   void freePlan;
 }
 
