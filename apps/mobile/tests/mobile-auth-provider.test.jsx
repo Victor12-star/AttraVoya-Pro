@@ -8,6 +8,7 @@ import {
   parseRegistrationResponse,
   parseVerificationResendResponse,
   safeAuthMessage,
+  safeAccountDeletionMessage,
   useMobileAuth,
 } from '../src/providers/mobile-auth-provider.jsx';
 
@@ -29,6 +30,7 @@ function createClient(overrides = {}) {
     restoreMobileSession: jest.fn(async () => null),
     mobileLogin: jest.fn(),
     mobileLogout: jest.fn(async () => undefined),
+    deleteCurrentAccount: jest.fn(),
     register: jest.fn(),
     forgotPassword: jest.fn(),
     resendVerification: jest.fn(),
@@ -40,6 +42,18 @@ describe('mobile authentication provider', () => {
   it('preserves the specific unverified-email recovery message for HTTP 401 responses', () => {
     expect(safeAuthMessage({ code: 'EMAIL_NOT_VERIFIED', status: 401 })).toBe(
       'Verify your email before signing in.',
+    );
+  });
+
+  it('maps account deletion failures without exposing server details', () => {
+    expect(safeAccountDeletionMessage({ code: 'INVALID_CREDENTIALS' })).toBe(
+      'The password is incorrect.',
+    );
+    expect(safeAccountDeletionMessage({ code: 'NETWORK_ERROR', message: 'socket detail' })).toBe(
+      'You appear to be offline. Connect to the internet and try again.',
+    );
+    expect(safeAccountDeletionMessage({ status: 500, message: 'database detail' })).toBe(
+      'We could not delete your account. Please try again.',
     );
   });
 

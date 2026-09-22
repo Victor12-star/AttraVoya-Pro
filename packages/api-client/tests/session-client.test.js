@@ -48,4 +48,17 @@ describe('session API client', () => {
 
     await expect(client.revokeAllAuthSessions()).resolves.toBeNull();
   });
+
+  it('deletes the current account only through an authenticated non-cacheable request', async () => {
+    const fetchImpl = vi.fn(async (url, options) => {
+      expect(String(url)).toBe('http://localhost:5000/api/v1/users/me');
+      expect(options.method).toBe('DELETE');
+      expect(options.cache).toBe('no-store');
+      expect(JSON.parse(options.body)).toEqual({ password: 'correct-password-1' });
+      return new Response(null, { status: 204 });
+    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    await expect(client.deleteCurrentAccount('correct-password-1')).resolves.toBeNull();
+  });
 });
