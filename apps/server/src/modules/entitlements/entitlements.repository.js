@@ -13,7 +13,7 @@ export function createEntitlementsRepository(prismaClient = prisma) {
           plan: {
             is: {
               isActive: true,
-              key: { in: PRO_PLAN_KEYS },
+              key: { in: [...PRO_PLAN_KEYS] },
             },
           },
         },
