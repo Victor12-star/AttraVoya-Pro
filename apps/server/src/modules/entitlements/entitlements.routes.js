@@ -4,8 +4,11 @@ import { entitlementsSchemas } from './entitlements.schema.js';
 import { createEntitlementsService } from './entitlements.service.js';
 
 export async function entitlementsRoutes(app, options = {}) {
-  const repository = options.repository ?? createEntitlementsRepository();
-  const service = createEntitlementsService(repository, { now: options.now });
+  const service =
+    options.service ??
+    createEntitlementsService(options.repository ?? createEntitlementsRepository(), {
+      now: options.now,
+    });
   const controller = createEntitlementsController(service);
   const protectedApp = /** @type {any} */ (app);
 
