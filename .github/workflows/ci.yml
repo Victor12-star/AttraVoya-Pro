@@ -187,6 +187,11 @@ jobs:
       - name: Run database tests
         run: pnpm --filter @attravoya/database test
 
+      - name: Verify billing event idempotency
+        env:
+          BILLING_EVENT_IDEMPOTENCY_TEST: '1'
+        run: pnpm --filter @attravoya/database test:billing-idempotency
+
       - name: Verify API graceful restart and database recovery
         env:
           API_RESTART_RECOVERY_TEST: '1'
