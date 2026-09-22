@@ -32,7 +32,7 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    const result = renderContent(client);
+    const result = await renderContent(client);
 
     expect(await result.findByText('Free')).toBeTruthy();
     expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
@@ -58,7 +58,7 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    const result = renderContent(client);
+    const result = await renderContent(client);
 
     expect(await result.findByText('Pro Monthly')).toBeTruthy();
     expect(result.getByText('Active')).toBeTruthy();
@@ -89,7 +89,7 @@ describe('mobile subscription status', () => {
         }),
     };
 
-    const result = renderContent(client);
+    const result = await renderContent(client);
 
     expect(await result.findByText('Plan status unavailable')).toBeTruthy();
     fireEvent.press(result.getByText('Try again'));
@@ -106,7 +106,7 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    const result = renderContent(client);
+    const result = await renderContent(client);
 
     expect(await result.findByText('Plan status unavailable')).toBeTruthy();
     expect(result.getByText('You appear to be offline. Reconnect and try again.')).toBeTruthy();
