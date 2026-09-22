@@ -104,11 +104,12 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
   }
 
   if (query.isError) {
+    const queryError = /** @type {any} */ (query.error);
     return (
       <ContentState
         actionLabel="Try again"
-        kind={query.error?.code === 'NETWORK_ERROR' ? 'offline' : 'error'}
-        message={safeLoadMessage(query.error)}
+        kind={queryError?.code === 'NETWORK_ERROR' ? 'offline' : 'error'}
+        message={safeLoadMessage(queryError)}
         onAction={() => void query.refetch()}
         title="Plan status unavailable"
       />
