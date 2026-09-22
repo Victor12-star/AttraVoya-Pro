@@ -3,3 +3,5 @@
 // aggregate pool-observability helpers without direct access to pool secrets.
 
 export { closeDatabase, getDatabasePoolMetrics, prisma, default } from './client.js';
+
+export { processBillingEventOnce } from './billing-event-idempotency.js';
