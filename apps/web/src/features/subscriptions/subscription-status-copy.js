@@ -256,7 +256,8 @@ const COPY = Object.freeze({
     active: '有効',
     trialing: 'トライアル',
     periodEnds: '現在の期間の終了日',
-    privacyNote: 'プランへのアクセスはサーバーで検証されます。支払い識別子やプロバイダーの秘密情報はここには表示されません。',
+    privacyNote:
+      'プランへのアクセスはサーバーで検証されます。支払い識別子やプロバイダーの秘密情報はここには表示されません。',
   },
   ko: {
     eyebrow: '구독',
@@ -271,7 +272,8 @@ const COPY = Object.freeze({
     active: '활성',
     trialing: '체험',
     periodEnds: '현재 기간 종료',
-    privacyNote: '요금제 접근 권한은 서버에서 확인합니다. 결제 식별자나 제공업체 비밀 정보는 여기에 표시되지 않습니다.',
+    privacyNote:
+      '요금제 접근 권한은 서버에서 확인합니다. 결제 식별자나 제공업체 비밀 정보는 여기에 표시되지 않습니다.',
   },
   hi: {
     eyebrow: 'सदस्यता',

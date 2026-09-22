@@ -178,11 +178,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
               <h2>{access.name}</h2>
             </div>
             <span className={isPro ? styles.proBadge : styles.freeBadge}>
-              {isPro
-                ? access.status === 'TRIALING'
-                  ? copy.trialing
-                  : copy.active
-                : access.name}
+              {isPro ? (access.status === 'TRIALING' ? copy.trialing : copy.active) : access.name}
             </span>
           </div>
 

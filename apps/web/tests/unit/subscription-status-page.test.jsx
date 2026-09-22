@@ -81,22 +81,19 @@ describe('SubscriptionStatusPage', () => {
     expect(screen.queryByText(copy.purchaseUnavailable)).not.toBeInTheDocument();
   });
 
-  it(
-    'shows a sign-in action for an unauthenticated request without leaking backend details',
-    async () => {
-      mocks.getMyEntitlements.mockRejectedValue({
-        status: 401,
-        code: 'AUTHENTICATION_REQUIRED',
-        message: 'private backend details',
-      });
+  it('shows a sign-in action for an unauthenticated request without leaking backend details', async () => {
+    mocks.getMyEntitlements.mockRejectedValue({
+      status: 401,
+      code: 'AUTHENTICATION_REQUIRED',
+      message: 'private backend details',
+    });
 
-      renderPage();
+    renderPage();
 
-      expect(await screen.findByText(copy.signInPrompt)).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
-      expect(screen.queryByText('private backend details')).not.toBeInTheDocument();
-    },
-  );
+    expect(await screen.findByText(copy.signInPrompt)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
+    expect(screen.queryByText('private backend details')).not.toBeInTheDocument();
+  });
 
   it('fails closed on malformed access state and can retry safely', async () => {
     mocks.getMyEntitlements
