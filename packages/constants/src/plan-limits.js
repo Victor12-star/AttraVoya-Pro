@@ -38,7 +38,7 @@ export const PLAN_LIMITS = Object.freeze({
   [PLANS.PRO_MONTHLY]: PRO_LIMITS,
   [PLANS.PRO_YEARLY]: PRO_LIMITS,
 
-  // Fail closed if an old PREMUIM/PREMIUM record is encountered by legacy code.
+  // Fail closed if an old PREMIUM record is encountered by legacy code.
   // The seed marks this plan inactive and the entitlement service ignores it.
   [PLANS.PREMIUM]: FREE_LIMITS,
 });
