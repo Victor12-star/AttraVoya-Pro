@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   MobileSubscriptionStatusContent,
@@ -8,7 +8,7 @@ import {
 function renderContent(client) {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { retry: false, gcTime: Infinity },
+      queries: { retry: false, gcTime: 0 },
     },
   });
 
@@ -32,14 +32,14 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    renderContent(client);
+    const result = renderContent(client);
 
-    expect(await screen.findByText('Free')).toBeTruthy();
-    expect(screen.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(await result.findByText('Free')).toBeTruthy();
+    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
     expect(
-      screen.getByText('New subscription purchases are not available in this build yet.'),
+      result.getByText('New subscription purchases are not available in this build yet.'),
     ).toBeTruthy();
-    expect(screen.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
+    expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
   });
 
   it('renders only minimal active Pro state and never exposes provider identifiers', async () => {
@@ -58,14 +58,14 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    renderContent(client);
+    const result = renderContent(client);
 
-    expect(await screen.findByText('Pro Monthly')).toBeTruthy();
-    expect(screen.getByText('Active')).toBeTruthy();
-    expect(screen.getByText('Current period ends')).toBeTruthy();
-    expect(screen.queryByText('must-not-render')).toBeNull();
+    expect(await result.findByText('Pro Monthly')).toBeTruthy();
+    expect(result.getByText('Active')).toBeTruthy();
+    expect(result.getByText('Current period ends')).toBeTruthy();
+    expect(result.queryByText('must-not-render')).toBeNull();
     expect(
-      screen.queryByText('New subscription purchases are not available in this build yet.'),
+      result.queryByText('New subscription purchases are not available in this build yet.'),
     ).toBeNull();
   });
 
@@ -89,12 +89,12 @@ describe('mobile subscription status', () => {
         }),
     };
 
-    renderContent(client);
+    const result = renderContent(client);
 
-    expect(await screen.findByText('Plan status unavailable')).toBeTruthy();
-    fireEvent.press(screen.getByText('Try again'));
+    expect(await result.findByText('Plan status unavailable')).toBeTruthy();
+    fireEvent.press(result.getByText('Try again'));
 
-    expect(await screen.findByText('Free')).toBeTruthy();
+    expect(await result.findByText('Free')).toBeTruthy();
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
   });
 
@@ -106,11 +106,11 @@ describe('mobile subscription status', () => {
       }),
     };
 
-    renderContent(client);
+    const result = renderContent(client);
 
-    expect(await screen.findByText('Plan status unavailable')).toBeTruthy();
-    expect(screen.getByText('You appear to be offline. Reconnect and try again.')).toBeTruthy();
-    expect(screen.queryByText('private diagnostic detail')).toBeNull();
+    expect(await result.findByText('Plan status unavailable')).toBeTruthy();
+    expect(result.getByText('You appear to be offline. Reconnect and try again.')).toBeTruthy();
+    expect(result.queryByText('private diagnostic detail')).toBeNull();
   });
 });
 
