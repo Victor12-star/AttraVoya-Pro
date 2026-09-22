@@ -19,6 +19,7 @@ import { registerErrorHandler } from './errors/error-handler.js';
 import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
 import { createAuthorizeHook } from './hooks/authorize.js';
+import { createRequireEntitlementHook } from './hooks/require-entitlement.js';
 import { configureProviderRequestBudgets } from './integrations/http/provider-request-budget.js';
 import { createReadinessState } from './lifecycle/readiness-state.js';
 import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
@@ -32,7 +33,9 @@ import { weatherRoutes } from './modules/weather/weather.routes.js';
 import { currencyRoutes } from './modules/currency/currency.routes.js';
 import { destinationsRoutes } from './modules/destinations/destinations.routes.js';
 import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
+import { createEntitlementsRepository } from './modules/entitlements/entitlements.repository.js';
 import { entitlementsRoutes } from './modules/entitlements/entitlements.routes.js';
+import { createEntitlementsService } from './modules/entitlements/entitlements.service.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { mapsRoutes } from './modules/maps/maps.routes.js';
 import { phrasebookRoutes } from './modules/phrasebook/phrasebook.routes.js';
@@ -120,6 +123,15 @@ export async function buildApp(options = {}) {
   app.decorate('authenticate', createAuthenticateHook({ repository: authenticationRepository }));
   app.decorate('authorize', createAuthorizeHook);
 
+  const entitlementRepository =
+    options.entitlementsRepository ?? createEntitlementsRepository();
+  const entitlementService = createEntitlementsService(entitlementRepository, {
+    now: options.entitlementsNow,
+  });
+  app.decorate('requireEntitlement', (entitlement) =>
+    createRequireEntitlementHook({ service: entitlementService, entitlement }),
+  );
+
   const deploymentRateLimit = partitionDeploymentRateLimitConfig(DEFAULT_RATE_LIMIT, replicaCount);
 
   // Route-level limits are deployment-wide policies too. Normalize them before
@@ -158,8 +170,7 @@ export async function buildApp(options = {}) {
 
   await app.register(entitlementsRoutes, {
     prefix: `${API_PREFIX}/entitlements`,
-    repository: options.entitlementsRepository,
-    now: options.entitlementsNow,
+    service: entitlementService,
   });
 
   await app.register(healthRoutes, {
