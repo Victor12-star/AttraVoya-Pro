@@ -123,8 +123,7 @@ export async function buildApp(options = {}) {
   app.decorate('authenticate', createAuthenticateHook({ repository: authenticationRepository }));
   app.decorate('authorize', createAuthorizeHook);
 
-  const entitlementRepository =
-    options.entitlementsRepository ?? createEntitlementsRepository();
+  const entitlementRepository = options.entitlementsRepository ?? createEntitlementsRepository();
   const entitlementService = createEntitlementsService(entitlementRepository, {
     now: options.entitlementsNow,
   });
