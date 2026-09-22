@@ -63,8 +63,9 @@ function bearer(app, userId = 'user-1') {
 }
 
 function registerEntitlementProbe(app, entitlement = ENTITLEMENTS.ADVANCED_BUDGET_OPTIMIZATION) {
+  const protectedApp = /** @type {any} */ (app);
   app.get('/test/pro-entitlement', {
-    onRequest: [app.authenticate, app.requireEntitlement(entitlement)],
+    onRequest: [protectedApp.authenticate, protectedApp.requireEntitlement(entitlement)],
     handler: async () => ({ ok: true }),
   });
 }
@@ -246,7 +247,8 @@ describe('server entitlement authorization gate', () => {
   it('rejects unknown entitlement configuration before a route can be exposed', async () => {
     const app = await createApp(entitlementRepository());
 
-    expect(() => app.requireEntitlement('unknown_entitlement')).toThrow(
+    const protectedApp = /** @type {any} */ (app);
+    expect(() => protectedApp.requireEntitlement('unknown_entitlement')).toThrow(
       'A recognized entitlement is required.',
     );
   });
