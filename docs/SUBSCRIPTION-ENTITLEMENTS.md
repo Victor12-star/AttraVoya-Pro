@@ -52,6 +52,8 @@ The endpoint is intended for client rendering and feature discovery. It does not
 
 The web `/premium` route may present this authoritative state to the signed-in traveller. It must treat malformed responses as unavailable, never expose provider/payment identifiers, and never show purchase or upgrade actions until a verified billing integration actually exists.
 
+The protected mobile `/premium` route follows the same display-only rule. It reads the existing authenticated mobile API boundary, strictly normalizes Free and Pro state, provides safe loading/offline/retry handling, and must not expose purchase, upgrade, provider, customer, or payment-token controls until verified mobile billing exists.
+
 ## Server enforcement boundary
 
 Future premium API operations must use the centralized server entitlement gate rather than reading a client flag or duplicating subscription checks inside controllers. A protected route composes normal authentication with `app.requireEntitlement(ENTITLEMENTS.<KEY>)`.
