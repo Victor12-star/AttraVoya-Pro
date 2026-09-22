@@ -1,0 +1,89 @@
+# AttraVoya Pro — Subscription and Entitlement Architecture
+
+## Scope
+
+This document defines the server-authoritative Free/Pro access model. It does not enable billing, checkout, Google Play Billing, Apple In-App Purchase, RevenueCat, Stripe, advertising, or paid-provider purchases.
+
+A client must never become Pro by sending a flag such as `isPro: true`. Clients may display the access state returned by the API, but protected server operations must evaluate the authenticated user's authoritative entitlement state on the server.
+
+## Canonical commercial plans
+
+The initial commercial plan keys are:
+
+- `FREE`
+- `PRO_MONTHLY`
+- `PRO_YEARLY`
+
+Pro Monthly and Pro Yearly represent different future billing cadences for the same product tier. Billing cadence does not change authorization capabilities.
+
+The old generic `PREMIUM` key is legacy-only. Seed synchronization marks an existing legacy plan row inactive, and the entitlement resolver does not recognize it as Pro.
+
+## Source of truth
+
+The effective access flow is:
+
+`authenticated user -> server subscription lookup -> active plan -> plan entitlements -> server response`
+
+The server accepts Pro access only when all of the following are true:
+
+1. the request belongs to a currently authenticated active account;
+2. the stored plan is one of the server-recognized Pro plan keys;
+3. the plan itself is active;
+4. the subscription status is `ACTIVE` or `TRIALING`;
+5. the subscription has already started;
+6. the subscription has a future `currentPeriodEnd`.
+
+Unknown, legacy, expired or malformed subscription state fails closed to Free.
+
+No external customer ID, purchase token, payment identifier or provider secret is exposed by the entitlement response.
+
+## Entitlement API
+
+`GET /api/v1/entitlements/me` returns private, non-cacheable access state for the authenticated account.
+
+The response contains:
+
+- the effective plan key, tier and display name;
+- recognized entitlement keys;
+- current server-defined usage limits;
+- minimal subscription status and period-end information when Pro is active.
+
+The endpoint is intended for client rendering and feature discovery. It does not replace server-side authorization on future gated operations.
+
+## Free remains useful
+
+Core travel planning, essential emergency/safety access, account security, authentication, password recovery, session management, privacy controls, account export/deletion and future secure payment management must not be paywalled merely because an account is Free.
+
+Pro is intended to expand advanced planning, convenience, limits and future premium capabilities rather than disable the safe core product.
+
+## Future billing integration
+
+Billing providers will be added in later, separate CI-gated slices.
+
+The intended evidence path is:
+
+- Web: Stripe Billing, with supported wallet methods where available.
+- Android: Google Play Billing -> RevenueCat -> AttraVoya backend.
+- Future iOS: Apple In-App Purchase -> RevenueCat -> AttraVoya backend.
+
+Provider callbacks or purchase tokens must be verified server-side before they can create or change authoritative subscription state. Required future controls include signature/token verification, idempotency, replay protection, ownership checks, refund/revocation handling, database transactions, rate limiting, server-only secrets and privacy-safe audit events.
+
+Until those integrations exist, AttraVoya must not claim that subscriptions can be purchased.
+
+## Security boundary
+
+Account-security features are deliberately outside the entitlement gate. A payment failure, expired subscription or Free plan must never remove access to security and privacy controls.
+
+The entitlement resolver is fail-closed. Client state is advisory only, and no client-provided plan or entitlement claim is trusted.
+
+## Data and privacy boundary
+
+Store only subscription data required to make entitlement decisions and reconcile verified provider state. Never store raw card numbers. Do not place payment secrets, purchase tokens or unnecessary billing metadata in client-visible responses, logs or analytics.
+
+## Release discipline
+
+Every entitlement or billing change follows the repository release invariant:
+
+`verified develop -> dedicated branch -> implementation/tests -> exact PR-head 5/5 CI -> squash merge with expected-head protection -> exact post-merge develop 5/5 CI`
+
+Billing, AI and analytics/admin work must remain separate reviewable slices rather than becoming one coupled subsystem.
