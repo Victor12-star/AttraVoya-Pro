@@ -156,6 +156,26 @@ describe('authoritative entitlement endpoint', () => {
       subscription: null,
     });
   });
+
+  it('fails closed when a Pro record has no current subscription window', async () => {
+    const record = proSubscription(PLANS.PRO_YEARLY);
+    record.currentPeriodEnd = null;
+    const repository = entitlementRepository(record);
+    const app = await createApp(repository);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/entitlements/me',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().access).toMatchObject({
+      plan: { key: PLANS.FREE, tier: 'FREE' },
+      entitlements: [],
+      subscription: null,
+    });
+  });
 });
 
 describe('entitlements repository', () => {
@@ -172,7 +192,7 @@ describe('entitlements repository', () => {
         userId: 'user-1',
         status: { in: ['ACTIVE', 'TRIALING'] },
         startsAt: { lte: NOW },
-        OR: [{ currentPeriodEnd: null }, { currentPeriodEnd: { gt: NOW } }],
+        currentPeriodEnd: { gt: NOW },
         plan: {
           is: {
             isActive: true,
