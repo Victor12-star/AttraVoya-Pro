@@ -66,6 +66,18 @@ Core travel planning, essential emergency/safety access, account security, authe
 
 Pro is intended to expand advanced planning, convenience, limits and future premium capabilities rather than disable the safe core product.
 
+## Billing event integrity foundation
+
+Before any live billing provider is enabled, the database includes a provider-neutral billing event receipt ledger and a transactional `processBillingEventOnce` boundary.
+
+The ledger stores only a normalized provider key, the provider event ID, event type, a lowercase SHA-256 fingerprint of the verified raw payload, and the processing timestamp. It deliberately does not persist raw webhook bodies, card data, purchase tokens, customer email, or provider secrets.
+
+A future webhook adapter must authenticate or verify the provider request first and only then call the idempotency boundary. The receipt insert and the related subscription database mutation must stay in the same transaction. If processing fails, the transaction rolls back the receipt so a legitimate provider retry can try again. A matching repeated delivery becomes a no-op; reuse of the same provider event ID with a different event type or payload fingerprint is rejected rather than silently accepted.
+
+This foundation handles duplicate delivery of the same provider event. Provider-specific adapters must still follow each provider's documented rules for semantic duplicates, event ordering, authoritative subscription refresh, signature/token verification, and revocation/refund behavior.
+
+No billing webhook endpoint, provider secret, checkout session, purchase-token endpoint, or live payment capability is enabled by this foundation.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
