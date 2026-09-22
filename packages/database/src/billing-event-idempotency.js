@@ -103,6 +103,8 @@ export async function processBillingEventOnce(input, options = {}) {
       },
     });
 
+    if (!existing) throw error;
+
     if (!receiptMatches(existing, eventType, payloadSha256)) {
       throw new Error('Billing event replay does not match the stored receipt.', {
         cause: error,
