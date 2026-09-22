@@ -50,6 +50,6 @@ export const PLAN_LIMITS = Object.freeze({
  */
 export function getPlanLimit(plan, limit) {
   const limits = PLAN_LIMITS[plan];
-  if (!limits) return 0;
-  return limits[limit] ?? 0;
+  if (!limits || !Object.prototype.hasOwnProperty.call(limits, limit)) return 0;
+  return limits[limit];
 }
