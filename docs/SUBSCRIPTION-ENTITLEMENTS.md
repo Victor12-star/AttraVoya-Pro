@@ -50,6 +50,8 @@ The response contains:
 
 The endpoint is intended for client rendering and feature discovery. It does not replace server-side authorization on future gated operations.
 
+The web `/premium` route may present this authoritative state to the signed-in traveller. It must treat malformed responses as unavailable, never expose provider/payment identifiers, and never show purchase or upgrade actions until a verified billing integration actually exists.
+
 ## Server enforcement boundary
 
 Future premium API operations must use the centralized server entitlement gate rather than reading a client flag or duplicating subscription checks inside controllers. A protected route composes normal authentication with `app.requireEntitlement(ENTITLEMENTS.<KEY>)`.
