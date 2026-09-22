@@ -14,7 +14,8 @@ const COPY = Object.freeze({
     active: 'Active',
     trialing: 'Trial',
     periodEnds: 'Current period ends',
-    privacyNote: 'Plan access is verified by the server. Payment identifiers and provider secrets are never shown here.',
+    privacyNote:
+      'Plan access is verified by the server. Payment identifiers and provider secrets are never shown here.',
   },
   sv: {
     eyebrow: 'Prenumeration',
@@ -29,7 +30,8 @@ const COPY = Object.freeze({
     active: 'Aktiv',
     trialing: 'Provperiod',
     periodEnds: 'Nuvarande period slutar',
-    privacyNote: 'Planåtkomst verifieras av servern. Betalningsidentifierare och leverantörshemligheter visas aldrig här.',
+    privacyNote:
+      'Planåtkomst verifieras av servern. Betalningsidentifierare och leverantörshemligheter visas aldrig här.',
   },
   es: {
     eyebrow: 'Suscripción',
@@ -38,13 +40,15 @@ const COPY = Object.freeze({
     currentPlan: 'Plan actual',
     freeDetail: 'Tu cuenta utiliza el plan Free.',
     proDetail: 'Tu cuenta tiene actualmente acceso a AttraVoya Pro.',
-    purchaseUnavailable: 'Las nuevas compras de suscripción aún no están disponibles en esta versión.',
+    purchaseUnavailable:
+      'Las nuevas compras de suscripción aún no están disponibles en esta versión.',
     loadError: 'No se pudo cargar el estado de tu plan ahora mismo.',
     signInPrompt: 'Inicia sesión para consultar tu plan actual.',
     active: 'Activa',
     trialing: 'Prueba',
     periodEnds: 'El periodo actual termina',
-    privacyNote: 'El acceso al plan se verifica en el servidor. Aquí nunca se muestran identificadores de pago ni secretos de proveedores.',
+    privacyNote:
+      'El acceso al plan se verifica en el servidor. Aquí nunca se muestran identificadores de pago ni secretos de proveedores.',
   },
   fr: {
     eyebrow: 'Abonnement',
@@ -53,13 +57,15 @@ const COPY = Object.freeze({
     currentPlan: 'Forfait actuel',
     freeDetail: 'Votre compte utilise le forfait Free.',
     proDetail: 'Votre compte dispose actuellement de l’accès AttraVoya Pro.',
-    purchaseUnavailable: 'Les nouveaux achats d’abonnement ne sont pas encore disponibles dans cette version.',
+    purchaseUnavailable:
+      'Les nouveaux achats d’abonnement ne sont pas encore disponibles dans cette version.',
     loadError: 'Impossible de charger l’état de votre forfait pour le moment.',
     signInPrompt: 'Connectez-vous pour consulter votre forfait actuel.',
     active: 'Actif',
     trialing: 'Essai',
     periodEnds: 'Fin de la période en cours',
-    privacyNote: 'L’accès au forfait est vérifié par le serveur. Les identifiants de paiement et secrets de fournisseurs ne sont jamais affichés ici.',
+    privacyNote:
+      'L’accès au forfait est vérifié par le serveur. Les identifiants de paiement et secrets de fournisseurs ne sont jamais affichés ici.',
   },
   de: {
     eyebrow: 'Abonnement',
@@ -74,7 +80,8 @@ const COPY = Object.freeze({
     active: 'Aktiv',
     trialing: 'Testphase',
     periodEnds: 'Aktueller Zeitraum endet',
-    privacyNote: 'Der Tarifzugriff wird vom Server verifiziert. Zahlungskennungen und Anbieter-Geheimnisse werden hier nie angezeigt.',
+    privacyNote:
+      'Der Tarifzugriff wird vom Server verifiziert. Zahlungskennungen und Anbieter-Geheimnisse werden hier nie angezeigt.',
   },
   it: {
     eyebrow: 'Abbonamento',
@@ -83,13 +90,15 @@ const COPY = Object.freeze({
     currentPlan: 'Piano attuale',
     freeDetail: 'Il tuo account utilizza il piano Free.',
     proDetail: 'Il tuo account ha attualmente accesso ad AttraVoya Pro.',
-    purchaseUnavailable: 'I nuovi acquisti di abbonamento non sono ancora disponibili in questa versione.',
+    purchaseUnavailable:
+      'I nuovi acquisti di abbonamento non sono ancora disponibili in questa versione.',
     loadError: 'Non è stato possibile caricare lo stato del tuo piano.',
     signInPrompt: 'Accedi per controllare il tuo piano attuale.',
     active: 'Attivo',
     trialing: 'Prova',
     periodEnds: 'Il periodo attuale termina',
-    privacyNote: 'L’accesso al piano viene verificato dal server. Identificatori di pagamento e segreti dei provider non vengono mai mostrati qui.',
+    privacyNote:
+      'L’accesso al piano viene verificato dal server. Identificatori di pagamento e segreti dei provider non vengono mai mostrati qui.',
   },
   pt: {
     eyebrow: 'Subscrição',
@@ -104,7 +113,8 @@ const COPY = Object.freeze({
     active: 'Ativa',
     trialing: 'Teste',
     periodEnds: 'O período atual termina',
-    privacyNote: 'O acesso ao plano é verificado pelo servidor. Identificadores de pagamento e segredos de fornecedores nunca são apresentados aqui.',
+    privacyNote:
+      'O acesso ao plano é verificado pelo servidor. Identificadores de pagamento e segredos de fornecedores nunca são apresentados aqui.',
   },
   pl: {
     eyebrow: 'Subskrypcja',
@@ -119,7 +129,8 @@ const COPY = Object.freeze({
     active: 'Aktywna',
     trialing: 'Okres próbny',
     periodEnds: 'Bieżący okres kończy się',
-    privacyNote: 'Dostęp do planu jest weryfikowany przez serwer. Identyfikatory płatności i sekrety dostawców nigdy nie są tutaj wyświetlane.',
+    privacyNote:
+      'Dostęp do planu jest weryfikowany przez serwer. Identyfikatory płatności i sekrety dostawców nigdy nie są tutaj wyświetlane.',
   },
   nl: {
     eyebrow: 'Abonnement',
@@ -134,7 +145,8 @@ const COPY = Object.freeze({
     active: 'Actief',
     trialing: 'Proefperiode',
     periodEnds: 'Huidige periode eindigt',
-    privacyNote: 'Toegang tot het abonnement wordt door de server geverifieerd. Betalings-ID’s en providergeheimen worden hier nooit getoond.',
+    privacyNote:
+      'Toegang tot het abonnement wordt door de server geverifieerd. Betalings-ID’s en providergeheimen worden hier nooit getoond.',
   },
   no: {
     eyebrow: 'Abonnement',
@@ -149,7 +161,8 @@ const COPY = Object.freeze({
     active: 'Aktiv',
     trialing: 'Prøveperiode',
     periodEnds: 'Gjeldende periode slutter',
-    privacyNote: 'Plantilgang verifiseres av serveren. Betalingsidentifikatorer og leverandørhemmeligheter vises aldri her.',
+    privacyNote:
+      'Plantilgang verifiseres av serveren. Betalingsidentifikatorer og leverandørhemmeligheter vises aldri her.',
   },
   da: {
     eyebrow: 'Abonnement',
@@ -164,7 +177,8 @@ const COPY = Object.freeze({
     active: 'Aktiv',
     trialing: 'Prøveperiode',
     periodEnds: 'Nuværende periode slutter',
-    privacyNote: 'Planadgang verificeres af serveren. Betalingsidentifikatorer og leverandørhemmeligheder vises aldrig her.',
+    privacyNote:
+      'Planadgang verificeres af serveren. Betalingsidentifikatorer og leverandørhemmeligheder vises aldrig her.',
   },
   fi: {
     eyebrow: 'Tilaus',
@@ -179,7 +193,8 @@ const COPY = Object.freeze({
     active: 'Aktiivinen',
     trialing: 'Kokeilu',
     periodEnds: 'Nykyinen jakso päättyy',
-    privacyNote: 'Palvelin vahvistaa tilauksen käyttöoikeuden. Maksutunnisteita tai palveluntarjoajien salaisuuksia ei näytetä täällä.',
+    privacyNote:
+      'Palvelin vahvistaa tilauksen käyttöoikeuden. Maksutunnisteita tai palveluntarjoajien salaisuuksia ei näytetä täällä.',
   },
   tr: {
     eyebrow: 'Abonelik',
@@ -194,7 +209,8 @@ const COPY = Object.freeze({
     active: 'Aktif',
     trialing: 'Deneme',
     periodEnds: 'Mevcut dönem bitişi',
-    privacyNote: 'Plan erişimi sunucu tarafından doğrulanır. Ödeme tanımlayıcıları ve sağlayıcı sırları burada hiçbir zaman gösterilmez.',
+    privacyNote:
+      'Plan erişimi sunucu tarafından doğrulanır. Ödeme tanımlayıcıları ve sağlayıcı sırları burada hiçbir zaman gösterilmez.',
   },
   ar: {
     eyebrow: 'الاشتراك',
@@ -209,7 +225,8 @@ const COPY = Object.freeze({
     active: 'نشط',
     trialing: 'تجريبي',
     periodEnds: 'تنتهي الفترة الحالية',
-    privacyNote: 'يتم التحقق من الوصول إلى الخطة بواسطة الخادم. لا يتم عرض معرّفات الدفع أو أسرار مزودي الخدمة هنا.',
+    privacyNote:
+      'يتم التحقق من الوصول إلى الخطة بواسطة الخادم. لا يتم عرض معرّفات الدفع أو أسرار مزودي الخدمة هنا.',
   },
   zh: {
     eyebrow: '订阅',
@@ -269,7 +286,8 @@ const COPY = Object.freeze({
     active: 'सक्रिय',
     trialing: 'परीक्षण',
     periodEnds: 'वर्तमान अवधि समाप्त होती है',
-    privacyNote: 'प्लान की पहुँच सर्वर द्वारा सत्यापित की जाती है। भुगतान पहचानकर्ता और प्रदाता के रहस्य यहाँ कभी नहीं दिखाए जाते।',
+    privacyNote:
+      'प्लान की पहुँच सर्वर द्वारा सत्यापित की जाती है। भुगतान पहचानकर्ता और प्रदाता के रहस्य यहाँ कभी नहीं दिखाए जाते।',
   },
 });
 
