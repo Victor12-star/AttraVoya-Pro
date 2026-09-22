@@ -159,7 +159,11 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       {state.status === 'error' ? (
         <div className={styles.feedback} role="alert">
           <span>{copy.loadError}</span>
-          <button className="button button--secondary" type="button" onClick={() => void loadAccess()}>
+          <button
+            className="button button--secondary"
+            type="button"
+            onClick={() => void loadAccess()}
+          >
             <RefreshCw size={17} aria-hidden="true" />
             {common.retry}
           </button>
