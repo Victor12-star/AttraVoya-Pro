@@ -6,6 +6,8 @@ import {
   MobileAuthProvider,
   parsePasswordResetRequestResponse,
   parseRegistrationResponse,
+  parseVerificationResendResponse,
+  safeAuthMessage,
   useMobileAuth,
 } from '../src/providers/mobile-auth-provider.jsx';
 
@@ -29,11 +31,18 @@ function createClient(overrides = {}) {
     mobileLogout: jest.fn(async () => undefined),
     register: jest.fn(),
     forgotPassword: jest.fn(),
+    resendVerification: jest.fn(),
     ...overrides,
   };
 }
 
 describe('mobile authentication provider', () => {
+  it('preserves the specific unverified-email recovery message for HTTP 401 responses', () => {
+    expect(safeAuthMessage({ code: 'EMAIL_NOT_VERIFIED', status: 401 })).toBe(
+      'Verify your email before signing in.',
+    );
+  });
+
   it('restores an authenticated session before protected navigation renders', async () => {
     const client = createClient({ restoreMobileSession: jest.fn(async () => 'access-token') });
     const { getByText } = await render(
@@ -105,5 +114,11 @@ describe('mobile authentication provider', () => {
     expect(parsePasswordResetRequestResponse({ message: 'Instructions sent.' })).toEqual({
       message: 'Instructions sent.',
     });
+  });
+
+  it('validates verification-resend responses before exposing success', () => {
+    expect(parseVerificationResendResponse(null)).toBeNull();
+    expect(parseVerificationResendResponse({ message: 'Sent.', extra: true })).toBeNull();
+    expect(parseVerificationResendResponse({ message: 'Sent.' })).toEqual({ message: 'Sent.' });
   });
 });

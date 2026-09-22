@@ -21,6 +21,10 @@ const passwordResetRequestResponseSchema = z
   .object({ message: z.string().trim().min(1).max(500) })
   .strict();
 
+const verificationResendResponseSchema = z
+  .object({ message: z.string().trim().min(1).max(500) })
+  .strict();
+
 export function parseRegistrationResponse(value) {
   const parsed = registrationResponseSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
@@ -31,11 +35,16 @@ export function parsePasswordResetRequestResponse(value) {
   return parsed.success ? parsed.data : null;
 }
 
-function safeAuthMessage(error) {
+export function parseVerificationResendResponse(value) {
+  const parsed = verificationResendResponseSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
+export function safeAuthMessage(error) {
+  if (error?.code === 'EMAIL_NOT_VERIFIED') return 'Verify your email before signing in.';
   if (error?.code === 'INVALID_CREDENTIALS' || error?.status === 401) {
     return 'The email or password is incorrect.';
   }
-  if (error?.code === 'EMAIL_NOT_VERIFIED') return 'Verify your email before signing in.';
   if (error?.code === 'MOBILE_SESSION_NETWORK_ERROR' || error?.code === 'NETWORK_ERROR') {
     return 'You appear to be offline. Check your connection and try again.';
   }
@@ -62,6 +71,14 @@ function safePasswordResetRequestMessage(error) {
   }
   if (error?.code === 'REQUEST_TIMEOUT') return 'The request took too long. Please try again.';
   return 'We could not request a password reset. Please try again.';
+}
+
+function safeVerificationResendMessage(error) {
+  if (error?.code === 'NETWORK_ERROR') {
+    return 'You appear to be offline. Check your connection and try again.';
+  }
+  if (error?.code === 'REQUEST_TIMEOUT') return 'The request took too long. Please try again.';
+  return 'We could not request a new verification email. Please try again.';
 }
 
 /** @param {{children: import('react').ReactNode, client?: any}} props */
@@ -158,14 +175,53 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
     [client],
   );
 
+  const resendVerification = useCallback(
+    async (email) => {
+      try {
+        const response = await client.resendVerification(email);
+        const result = parseVerificationResendResponse(response);
+        if (!result) {
+          throw Object.assign(new Error('Invalid verification-resend response.'), {
+            code: 'INVALID_API_RESPONSE',
+          });
+        }
+        return result;
+      } catch (resendError) {
+        const message = safeVerificationResendMessage(resendError);
+        throw Object.assign(new Error(message), { code: resendError?.code });
+      }
+    },
+    [client],
+  );
+
   const retryRestore = useCallback(() => {
     setError(null);
     setStatus('loading');
     setRestoreAttempt((attempt) => attempt + 1);
   }, []);
   const value = useMemo(
-    () => ({ error, login, logout, register, requestPasswordReset, retryRestore, status, user }),
-    [error, login, logout, register, requestPasswordReset, retryRestore, status, user],
+    () => ({
+      error,
+      login,
+      logout,
+      register,
+      requestPasswordReset,
+      resendVerification,
+      retryRestore,
+      status,
+      user,
+    }),
+    [
+      error,
+      login,
+      logout,
+      register,
+      requestPasswordReset,
+      resendVerification,
+      retryRestore,
+      status,
+      user,
+    ],
   );
 
   return <MobileAuthContext.Provider value={value}>{children}</MobileAuthContext.Provider>;

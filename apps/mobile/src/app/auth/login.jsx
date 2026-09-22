@@ -6,7 +6,7 @@ import {
   radius,
   spacing,
 } from '@attravoya/design-tokens';
-import { loginSchema } from '@attravoya/validation';
+import { emailSchema, loginSchema } from '@attravoya/validation';
 import { Link } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
@@ -29,14 +29,43 @@ export function normalizeLoginInput(email, password) {
   return parsed.success ? parsed.data : null;
 }
 
-export function LoginForm({ onLogin }) {
+export function normalizeVerificationEmail(email) {
+  const parsed = emailSchema.safeParse(email);
+  return parsed.success ? parsed.data : null;
+}
+
+export function VerificationRecovery({ disabled, isResending, onPress }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.secondaryButton,
+        pressed && styles.buttonPressed,
+        disabled && styles.buttonDisabled,
+      ]}
+    >
+      <Text style={styles.secondaryButtonLabel}>
+        {isResending ? 'Requesting email…' : 'Resend verification email'}
+      </Text>
+    </Pressable>
+  );
+}
+
+export function LoginForm({ onLogin, onResendVerification }) {
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(/** @type {string | null} */ (null));
+  const [errorCode, setErrorCode] = useState(/** @type {string | null} */ (null));
+  const [recoveryMessage, setRecoveryMessage] = useState(/** @type {string | null} */ (null));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const submittingRef = useRef(false);
+  const resendingRef = useRef(false);
   const pageGutter = getPageGutter(width);
+  const isBusy = isSubmitting || isResending;
 
   async function submit() {
     if (submittingRef.current) return;
@@ -47,15 +76,46 @@ export function LoginForm({ onLogin }) {
     }
 
     setError(null);
+    setErrorCode(null);
+    setRecoveryMessage(null);
     submittingRef.current = true;
     setIsSubmitting(true);
     try {
       await onLogin(credentials);
     } catch (loginError) {
       setError(loginError?.message ?? 'We could not sign you in. Please try again.');
+      setErrorCode(loginError?.code ?? null);
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
+    }
+  }
+
+  async function resendVerification() {
+    if (resendingRef.current || submittingRef.current) return;
+    const normalizedEmail = normalizeVerificationEmail(email);
+    if (!normalizedEmail) {
+      setError('Enter a valid email address.');
+      return;
+    }
+
+    setRecoveryMessage(null);
+    resendingRef.current = true;
+    setIsResending(true);
+    try {
+      await onResendVerification(normalizedEmail);
+      setError(null);
+      setErrorCode(null);
+      setRecoveryMessage(
+        'If the account still needs verification, a new email will be sent. The secure verification link opens on the AttraVoya website.',
+      );
+    } catch (resendError) {
+      setError(
+        resendError?.message ?? 'We could not request a new verification email. Please try again.',
+      );
+    } finally {
+      resendingRef.current = false;
+      setIsResending(false);
     }
   }
 
@@ -90,7 +150,7 @@ export function LoginForm({ onLogin }) {
                 autoCapitalize="none"
                 autoComplete="email"
                 autoCorrect={false}
-                editable={!isSubmitting}
+                editable={!isBusy}
                 inputMode="email"
                 onChangeText={setEmail}
                 returnKeyType="next"
@@ -114,7 +174,7 @@ export function LoginForm({ onLogin }) {
                 accessibilityLabel="Password"
                 accessibilityLabelledBy="login-password-label"
                 autoComplete="current-password"
-                editable={!isSubmitting}
+                editable={!isBusy}
                 onChangeText={setPassword}
                 onSubmitEditing={submit}
                 returnKeyType="done"
@@ -132,14 +192,28 @@ export function LoginForm({ onLogin }) {
               </Text>
             ) : null}
 
+            {errorCode === 'EMAIL_NOT_VERIFIED' ? (
+              <VerificationRecovery
+                disabled={isBusy}
+                isResending={isResending}
+                onPress={resendVerification}
+              />
+            ) : null}
+
+            {recoveryMessage ? (
+              <Text accessibilityLiveRegion="polite" style={styles.successText}>
+                {recoveryMessage}
+              </Text>
+            ) : null}
+
             <Pressable
               accessibilityRole="button"
-              disabled={isSubmitting}
+              disabled={isBusy}
               onPress={submit}
               style={({ pressed }) => [
                 styles.primaryButton,
                 pressed && styles.buttonPressed,
-                isSubmitting && styles.buttonDisabled,
+                isBusy && styles.buttonDisabled,
               ]}
             >
               <Text style={styles.primaryButtonLabel}>
@@ -166,8 +240,8 @@ export function LoginForm({ onLogin }) {
 }
 
 export default function LoginScreen() {
-  const { login } = useMobileAuth();
-  return <LoginForm onLogin={login} />;
+  const { login, resendVerification } = useMobileAuth();
+  return <LoginForm onLogin={login} onResendVerification={resendVerification} />;
 }
 
 const styles = StyleSheet.create({
@@ -225,6 +299,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
   },
   errorText: { color: lightTheme.danger, fontSize: 14, lineHeight: 20 },
+  successText: { color: lightTheme.success, fontSize: 14, lineHeight: 21 },
   primaryButton: {
     minHeight: interaction.comfortableControlHeight,
     alignItems: 'center',
@@ -234,6 +309,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[5],
   },
   primaryButtonLabel: { color: lightTheme.surface, fontSize: 16, fontWeight: '700' },
+  secondaryButton: {
+    minHeight: interaction.minimumTargetSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: lightTheme.brandPrimary,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing[4],
+  },
+  secondaryButtonLabel: { color: lightTheme.brandPrimary, fontSize: 15, fontWeight: '700' },
   buttonPressed: { opacity: interaction.pressedOpacity },
   buttonDisabled: { opacity: interaction.disabledOpacity },
   registerRow: {
