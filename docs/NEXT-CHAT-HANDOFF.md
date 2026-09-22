@@ -9,21 +9,21 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10AV.
+6. Do not restart completed production-readiness work through Phase 10BX.
 
 ## Current fully verified release
 
-Phase 10AV — abandoned Travel Companion request cancellation — is complete.
+Phase 10BX — public terms of service — is complete.
 
-- PR: `#140`
-- Final PR head: `8b28329468b30f3d33948e584941216ea64b5073`
-- Final PR CI run: `34946276780`
+- PR: `#168`
+- Final PR head: `d70093e99ea7f2d43bbcd3a2452b06941969eb0b`
+- Final PR CI run: `35730925766`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `2b9f000f8efc88fda8052a6db59f45ecdc776095`
-- Post-merge push CI run: `34946637108`
-- All five canonical jobs passed on the first attempt
+- Exact squash-merged `develop`: `30b9fe9249bfa80ed37a74d97ff34bef0b553ace`
+- Post-merge push CI run: `35731580061`
+- All five canonical jobs passed
 
-The latest sequence validates successful API response formats and envelopes, bounds mobile token retrieval, makes capacity evidence rollover-safe, restores failed Travel Companion country references through an accessible retry and cancels abandoned country, phrasebook and emergency-reference requests.
+The newest sequence extends the verified foundation from reliability hardening into mobile authentication/session correctness, secure account deletion, adaptive mobile UX foundations, CI-runtime maintenance, public privacy disclosure, and a truthful public Terms of Service. Paid subscriptions are still not enabled.
 
 ## Completed production-readiness sequence
 
@@ -84,6 +84,34 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10AT — make capacity gate rollover-safe — PR `#138`
 - Phase 10AU — recover Travel Companion references — PR `#139`
 - Phase 10AV — cancel abandoned assistant requests — PR `#140`
+- Phase 10AW — synchronize reliability handoff — PR `#141`
+- Phase 10AX — stabilize destination page CI test — PR `#142`
+- Phase 10AY — bound Travel Companion relation queries — PR `#143`
+- Phase 10AZ — verify live database outage recovery — PR `#144`
+- Phase 10BA — bound country reference relation queries — PR `#145`
+- Phase 10BB — bound emergency reference responses — PR `#146`
+- Phase 10BC — bound language reference responses — PR `#147`
+- Phase 10BD — bound country reference responses — PR `#148`
+- Phase 10BE — add secure account deletion — PR `#149`
+- Phase 10BF — establish adaptive design foundations — PR `#150`
+- Phase 10BG — modernize the mobile application shell — PR `#151`
+- Phase 10BH — add safe reusable mobile feedback states — PR `#152`
+- Phase 10BI — add bounded mobile query boundary — PR `#153`
+- Phase 10BJ — add safe mobile API boundary — PR `#154`
+- Phase 10BK — upgrade CI actions to Node.js 24 — PR `#155`
+- Phase 10BL — pin canonical CI to Ubuntu 24.04 — PR `#156`
+- Phase 10BM — add secure mobile access-token storage — PR `#157`
+- Phase 10BN — add cookie-free mobile refresh sessions — PR `#158`
+- Phase 10BO — coordinate secure mobile session refresh — PR `#159`
+- Phase 10BP — connect mobile authentication entry — PR `#160`
+- Phase 10BQ — connect mobile account registration — PR `#161`
+- Phase 10BR — add safe mobile password recovery request — PR `#162`
+- Phase 10BS — add mobile verification recovery — PR `#163`
+- Phase 10BT — restore mobile session identity and profile — PR `#164`
+- Phase 10BU — add secure in-app account deletion — PR `#165`
+- Phase 10BV — add public web account deletion flow — PR `#166`
+- Phase 10BW — publish the public privacy policy — PR `#167`
+- Phase 10BX — publish the public terms of service — PR `#168`
 
 PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
 
@@ -106,6 +134,12 @@ PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsol
 - Phase 10AN cancels abandoned or superseded destination weather and image requests while keeping provider states independent.
 - Phase 10AO bounds shared-client JSON response reads for declared and streamed payloads before parsing.
 - Phase 10AP contains mobile route render failures with a privacy-safe accessible retry screen and activates the mobile recovery test foundation.
+- Phases 10AX through 10BD extend CI stability, bounded database/reference-query behavior, outage recovery evidence, and bounded country/language/emergency reference responses.
+- Phases 10BE through 10BJ add secure deletion plus adaptive/mobile UX and network-boundary foundations.
+- Phases 10BK and 10BL keep the canonical CI runtime current and reproducible.
+- Phases 10BM through 10BT establish secure mobile credentials/session rotation and connect authentication, registration, recovery, verification, identity restoration and Profile behavior.
+- Phases 10BU and 10BV provide mobile and public-web account deletion surfaces backed by authoritative server deletion.
+- Phases 10BW and 10BX publish the public privacy policy and Terms of Service while keeping future subscriptions explicitly disabled until billing is actually implemented.
 
 ## Existing protections that should not be reimplemented
 
@@ -191,7 +225,7 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 Issue `#40` remains the active broad production-readiness program, but the next functional slice is not automatically predetermined. Inspect the live code first.
 
-Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, global web route loading/recovery UX, client deadlines, destination search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route recovery, and Travel Companion reference retry/cancellation.
+Already completed and not valid reasons to duplicate work: API restart/recovery verification, the Prisma migration baseline/deploy gate, planner-list hot-path bounds, owner-scoped session/device controls, the web session-security experience, replica-safe process-local provider/rate-limit controls, metrics aggregation topology, global web route loading/recovery UX, client deadlines, destination search and dashboard-provider cancellation, bounded and structurally validated shared-client JSON responses, stalled mobile token-retrieval deadlines, rollover-safe capacity evidence, mobile nested-route recovery, Travel Companion reference retry/cancellation, reference-response bounds, database-outage recovery evidence, secure mobile authentication/session foundations, account deletion, and public privacy/terms pages.
 
 Candidate genuine gaps to investigate now include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists.
 
