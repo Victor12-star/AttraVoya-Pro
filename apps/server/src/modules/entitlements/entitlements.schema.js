@@ -26,7 +26,7 @@ const accessSchema = z
     subscription: z
       .object({
         status: z.enum(['ACTIVE', 'TRIALING']),
-        currentPeriodEnd: z.string().nullable(),
+        currentPeriodEnd: z.string(),
       })
       .strict()
       .nullable(),
