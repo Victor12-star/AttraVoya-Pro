@@ -34,7 +34,11 @@ export function SiteFooter({ messages }) {
       </div>
       <div className="shell site-footer__bottom">
         <span>© {new Date().getFullYear()} AttraVoya Pro</span>
-        <span>{messages.home.heroTitle}</span>
+        <span className="site-footer__legal">
+          <Link href="/privacy">Privacy policy</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/delete-account">Delete account</Link>
+        </span>
       </div>
     </footer>
   );
