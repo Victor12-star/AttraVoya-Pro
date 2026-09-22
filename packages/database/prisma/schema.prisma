@@ -347,6 +347,18 @@ model Subscription {
   @@index([externalSubscriptionId])
 }
 
+model BillingEventReceipt {
+  id              String   @id @default(cuid())
+  provider        String   @db.VarChar(40)
+  externalEventId String   @db.VarChar(255)
+  eventType       String   @db.VarChar(160)
+  payloadSha256   String   @db.Char(64)
+  processedAt     DateTime @default(now())
+
+  @@unique([provider, externalEventId])
+  @@index([provider, processedAt])
+}
+
 model AuthSession {
   id               String   @id @default(cuid())
   userId           String
