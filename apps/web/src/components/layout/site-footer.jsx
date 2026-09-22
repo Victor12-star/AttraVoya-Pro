@@ -29,6 +29,7 @@ export function SiteFooter({ messages }) {
           <Link href="/family">
             <HeartHandshake size={15} /> {messages.home.family}
           </Link>
+          <Link href="/delete-account">Delete account</Link>
         </div>
       </div>
       <div className="shell site-footer__bottom">
