@@ -7,7 +7,9 @@ import { Crown, LoaderCircle, RefreshCw, ShieldCheck } from 'lucide-react';
 import { apiClient } from '../../lib/api-client.js';
 import styles from './subscription-status-page.module.css';
 
+/** @type {Set<string>} */
 const PLAN_KEYS = new Set(['FREE', 'PRO_MONTHLY', 'PRO_YEARLY']);
+/** @type {Set<string>} */
 const PRO_STATUSES = new Set(['ACTIVE', 'TRIALING']);
 
 function textValue(value, maxLength) {
@@ -32,7 +34,7 @@ export function normalizeSubscriptionAccess(response) {
   const tier = textValue(access?.plan?.tier, 16);
   const name = textValue(access?.plan?.name, 80);
 
-  if (!PLAN_KEYS.has(key) || !name) return null;
+  if (!key || !PLAN_KEYS.has(key) || !name) return null;
 
   if (key === 'FREE') {
     if (tier !== 'FREE' || access?.subscription !== null) return null;
@@ -47,7 +49,7 @@ export function normalizeSubscriptionAccess(response) {
 
   const status = textValue(access?.subscription?.status, 20);
   const currentPeriodEnd = isoValue(access?.subscription?.currentPeriodEnd);
-  if (tier !== 'PRO' || !PRO_STATUSES.has(status) || !currentPeriodEnd) return null;
+  if (tier !== 'PRO' || !status || !PRO_STATUSES.has(status) || !currentPeriodEnd) return null;
 
   return {
     key,
