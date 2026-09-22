@@ -37,6 +37,8 @@ export function SiteFooter({ messages }) {
         <span className="site-footer__legal">
           <Link href="/privacy">Privacy policy</Link>
           <span aria-hidden="true">·</span>
+          <Link href="/terms">Terms of service</Link>
+          <span aria-hidden="true">·</span>
           <Link href="/delete-account">Delete account</Link>
         </span>
       </div>
