@@ -39,6 +39,7 @@ function authorizationRepository() {
   };
 }
 
+/** @param {any} [record] */
 function entitlementRepository(record = null) {
   return {
     findActiveProSubscription: vi.fn(async () => record),
@@ -61,6 +62,10 @@ function bearer(app, userId = 'user-1') {
   return { authorization: `Bearer ${app.jwt.sign({ sub: userId })}` };
 }
 
+/**
+ * @param {string} [planKey]
+ * @returns {any}
+ */
 function proSubscription(planKey = PLANS.PRO_MONTHLY) {
   return {
     status: 'ACTIVE',
@@ -196,7 +201,7 @@ describe('entitlements repository', () => {
         plan: {
           is: {
             isActive: true,
-            key: { in: PRO_PLAN_KEYS },
+            key: { in: [...PRO_PLAN_KEYS] },
           },
         },
       },
