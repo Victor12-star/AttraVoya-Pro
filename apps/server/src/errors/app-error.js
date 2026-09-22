@@ -51,6 +51,20 @@ export class AuthorizationError extends AppError {
   }
 }
 
+export class SubscriptionRequiredError extends AppError {
+  constructor(
+    message = 'An active AttraVoya Pro subscription is required for this feature.',
+    options = {},
+  ) {
+    super(message, {
+      ...options,
+      statusCode: 403,
+      code: ERROR_CODES.SUBSCRIPTION_REQUIRED,
+      expose: true,
+    });
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(message = 'The requested resource was not found.', options = {}) {
     super(message, {

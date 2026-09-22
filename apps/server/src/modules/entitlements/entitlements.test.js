@@ -62,6 +62,14 @@ function bearer(app, userId = 'user-1') {
   return { authorization: `Bearer ${app.jwt.sign({ sub: userId })}` };
 }
 
+function registerEntitlementProbe(app, entitlement = ENTITLEMENTS.ADVANCED_BUDGET_OPTIMIZATION) {
+  const protectedApp = /** @type {any} */ (app);
+  app.get('/test/pro-entitlement', {
+    onRequest: [protectedApp.authenticate, protectedApp.requireEntitlement(entitlement)],
+    handler: async () => ({ ok: true }),
+  });
+}
+
 /**
  * @param {string} [planKey]
  * @returns {any}
@@ -180,6 +188,69 @@ describe('authoritative entitlement endpoint', () => {
       entitlements: [],
       subscription: null,
     });
+  });
+});
+
+describe('server entitlement authorization gate', () => {
+  it('rejects Free accounts with a stable subscription-required error', async () => {
+    const repository = entitlementRepository();
+    const app = await createApp(repository);
+    registerEntitlementProbe(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/test/pro-entitlement',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json()).toMatchObject({
+      error: {
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: 'An active AttraVoya Pro subscription is required for this feature.',
+      },
+    });
+  });
+
+  it('allows an active Pro account only when the server grants the required entitlement', async () => {
+    const repository = entitlementRepository(proSubscription());
+    const app = await createApp(repository);
+    registerEntitlementProbe(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/test/pro-entitlement',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ ok: true });
+  });
+
+  it('fails closed when a Pro plan does not contain the required entitlement', async () => {
+    const record = proSubscription();
+    record.plan.entitlements = [{ entitlement: { key: ENTITLEMENTS.OFFLINE_MAPS } }];
+    const repository = entitlementRepository(record);
+    const app = await createApp(repository);
+    registerEntitlementProbe(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/test/pro-entitlement',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json().error.code).toBe('SUBSCRIPTION_REQUIRED');
+  });
+
+  it('rejects unknown entitlement configuration before a route can be exposed', async () => {
+    const app = await createApp(entitlementRepository());
+
+    const protectedApp = /** @type {any} */ (app);
+    expect(() => protectedApp.requireEntitlement('unknown_entitlement')).toThrow(
+      'A recognized entitlement is required.',
+    );
   });
 });
 

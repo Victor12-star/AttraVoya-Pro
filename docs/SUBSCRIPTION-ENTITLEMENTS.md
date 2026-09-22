@@ -50,6 +50,16 @@ The response contains:
 
 The endpoint is intended for client rendering and feature discovery. It does not replace server-side authorization on future gated operations.
 
+## Server enforcement boundary
+
+Future premium API operations must use the centralized server entitlement gate rather than reading a client flag or duplicating subscription checks inside controllers. A protected route composes normal authentication with `app.requireEntitlement(ENTITLEMENTS.<KEY>)`.
+
+The gate resolves the authenticated account through the same authoritative entitlement service used by the access endpoint. Access is granted only when the current verified subscription contains the specific server-recognized entitlement. Free accounts, expired or malformed subscriptions, and Pro plans missing the requested capability fail closed with the stable `SUBSCRIPTION_REQUIRED` API error.
+
+Unknown entitlement keys are rejected as server configuration errors before the route is exposed. The public denial response contains no provider identifiers, payment metadata, purchase tokens, or subscription internals.
+
+Account security, authentication, session controls, privacy controls, account export/deletion, essential emergency/safety functions, and future secure payment-management routes must remain outside this premium gate.
+
 ## Free remains useful
 
 Core travel planning, essential emergency/safety access, account security, authentication, password recovery, session management, privacy controls, account export/deletion and future secure payment management must not be paywalled merely because an account is Free.
