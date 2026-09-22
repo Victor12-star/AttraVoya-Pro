@@ -78,6 +78,6 @@ export function createMobileApiClient({
     mobileLogin: mobileSessionManager.login,
     mobileLogout: mobileSessionManager.logout,
     refreshMobileSession: mobileSessionManager.refresh,
-    restoreMobileSession: mobileSessionManager.getAccessToken,
+    restoreMobileSession: mobileSessionManager.restore,
   });
 }

@@ -14,6 +14,12 @@ function session(overrides = {}) {
     accessToken: accessToken(now + 5_000),
     refreshToken: 'r'.repeat(64),
     refreshExpiresAt: '2026-10-21T12:00:00.000Z',
+    user: {
+      id: 'user-1',
+      email: 'user-1@example.test',
+      roles: ['USER'],
+      emailVerified: true,
+    },
     ...overrides,
   };
 }
@@ -135,5 +141,32 @@ describe('mobile session manager', () => {
 
     await expect(manager.logout()).rejects.toMatchObject({ code: 'MOBILE_SESSION_NETWORK_ERROR' });
     expect(store.clearSession).toHaveBeenCalledTimes(1);
+  });
+
+  it('restores validated identity and refreshes legacy envelopes that lack it', async () => {
+    const current = session({ accessToken: accessToken(now + 5 * 60_000) });
+    const currentStore = createStore(current);
+    const currentManager = createMobileSessionManager({
+      baseUrl: 'https://api.attravoya.example',
+      fetchImpl: jest.fn(),
+      store: currentStore,
+      now: () => now,
+    });
+
+    await expect(currentManager.restore()).resolves.toEqual(current);
+
+    const legacy = { ...current, user: null };
+    const legacyStore = createStore(legacy);
+    const refreshed = session({ accessToken: accessToken(now + 15 * 60_000) });
+    const fetchImpl = jest.fn(async () => sessionResponse(refreshed));
+    const legacyManager = createMobileSessionManager({
+      baseUrl: 'https://api.attravoya.example',
+      fetchImpl,
+      store: legacyStore,
+      now: () => now,
+    });
+
+    await expect(legacyManager.restore()).resolves.toMatchObject({ user: refreshed.user });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 });

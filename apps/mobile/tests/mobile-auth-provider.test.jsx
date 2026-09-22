@@ -44,7 +44,11 @@ describe('mobile authentication provider', () => {
   });
 
   it('restores an authenticated session before protected navigation renders', async () => {
-    const client = createClient({ restoreMobileSession: jest.fn(async () => 'access-token') });
+    const client = createClient({
+      restoreMobileSession: jest.fn(async () => ({
+        user: { id: 'user-1', email: 'user@example.test', roles: ['USER'], emailVerified: true },
+      })),
+    });
     const { getByText } = await render(
       <MobileAuthProvider client={client}>
         <AuthProbe />
@@ -78,7 +82,9 @@ describe('mobile authentication provider', () => {
       .mockRejectedValueOnce(
         Object.assign(new Error('socket detail'), { code: 'MOBILE_SESSION_NETWORK_ERROR' }),
       )
-      .mockResolvedValueOnce('access-token');
+      .mockResolvedValueOnce({
+        user: { id: 'user-1', email: 'user@example.test', roles: ['USER'], emailVerified: true },
+      });
     const client = createClient({ restoreMobileSession });
     const { getByText, queryByText } = await render(
       <MobileAuthProvider client={client}>

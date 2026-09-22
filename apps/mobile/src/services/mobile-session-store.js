@@ -1,9 +1,28 @@
 import * as SecureStore from 'expo-secure-store';
+import { z } from 'zod';
 
 export const MOBILE_SESSION_KEY = 'attravoya.mobile.session.v1';
 
 const MAX_ACCESS_TOKEN_LENGTH = 8_192;
 const MAX_REFRESH_TOKEN_LENGTH = 256;
+
+const storedUserSchema = z
+  .object({
+    id: z.string().trim().min(1).max(128),
+    email: z.email().max(320),
+    roles: z.array(z.string().trim().min(1).max(64)).max(16),
+    emailVerified: z.boolean(),
+  })
+  .strict();
+
+function normalizeUser(value) {
+  // Older development builds stored credentials without public identity. Keep
+  // those readable so the session manager can refresh and migrate them safely.
+  if (value === undefined || value === null) return null;
+  const parsed = storedUserSchema.safeParse(value);
+  if (!parsed.success) throw sessionStorageError();
+  return Object.freeze({ ...parsed.data, roles: Object.freeze(parsed.data.roles) });
+}
 
 function sessionStorageError() {
   const error = /** @type {Error & { code: string }} */ (
@@ -34,6 +53,7 @@ function normalizeSession(value) {
     accessToken,
     refreshToken,
     refreshExpiresAt: refreshExpiresAt.toISOString(),
+    user: normalizeUser(value.user),
   });
 }
 
