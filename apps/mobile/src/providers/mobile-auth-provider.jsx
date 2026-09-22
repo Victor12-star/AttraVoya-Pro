@@ -81,6 +81,18 @@ function safeVerificationResendMessage(error) {
   return 'We could not request a new verification email. Please try again.';
 }
 
+export function safeAccountDeletionMessage(error) {
+  if (error?.code === 'INVALID_CREDENTIALS' || error?.status === 401) {
+    return 'The password is incorrect.';
+  }
+  if (error?.code === 'NETWORK_ERROR') {
+    return 'You appear to be offline. Connect to the internet and try again.';
+  }
+  if (error?.code === 'REQUEST_TIMEOUT') return 'The request took too long. Please try again.';
+  if (error?.status === 429) return 'Too many attempts. Wait a few minutes and try again.';
+  return 'We could not delete your account. Please try again.';
+}
+
 /** @param {{children: import('react').ReactNode, client?: any}} props */
 export function MobileAuthProvider({ children, client: suppliedClient }) {
   const [client] = useState(() => suppliedClient ?? createMobileApiClient());
@@ -138,6 +150,31 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
       setStatus('anonymous');
     }
   }, [client]);
+
+  const deleteAccount = useCallback(
+    async (password) => {
+      setError(null);
+      try {
+        await client.deleteCurrentAccount(password);
+      } catch (deletionError) {
+        const message = safeAccountDeletionMessage(deletionError);
+        throw Object.assign(new Error(message), { code: deletionError?.code });
+      }
+
+      try {
+        // The deletion transaction revokes every server session. This call is
+        // still needed to reliably erase the encrypted local credential.
+        await client.mobileLogout();
+      } catch {
+        // A revoked server session is expected here; local cleanup is the
+        // security boundary after the server confirms deletion.
+      } finally {
+        setUser(null);
+        setStatus('anonymous');
+      }
+    },
+    [client],
+  );
 
   const register = useCallback(
     async (details) => {
@@ -204,6 +241,7 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
   const value = useMemo(
     () => ({
       error,
+      deleteAccount,
       login,
       logout,
       register,
@@ -215,6 +253,7 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
     }),
     [
       error,
+      deleteAccount,
       login,
       logout,
       register,

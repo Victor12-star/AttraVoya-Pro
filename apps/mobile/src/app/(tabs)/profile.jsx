@@ -6,16 +6,36 @@ import {
   radius,
   spacing,
 } from '@attravoya/design-tokens';
+import { passwordSchema } from '@attravoya/validation';
 import { useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMobileAuth } from '../../providers/mobile-auth-provider.jsx';
 
-export function ProfileContent({ onLogout, user }) {
+export function normalizeDeletionConfirmation(password, confirmation) {
+  if (confirmation !== 'DELETE') return null;
+  const parsed = passwordSchema.safeParse(password);
+  return parsed.success ? parsed.data : null;
+}
+
+export function ProfileContent({ onDeleteAccount, onLogout, user }) {
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeletion, setShowDeletion] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState(/** @type {string | null} */ (null));
   const signingOutRef = useRef(false);
+  const deletingRef = useRef(false);
 
   async function signOut() {
     if (signingOutRef.current) return;
@@ -32,6 +52,35 @@ export function ProfileContent({ onLogout, user }) {
       signingOutRef.current = false;
       setIsSigningOut(false);
     }
+  }
+
+  async function deleteAccount() {
+    if (deletingRef.current || signingOutRef.current) return;
+    const confirmedPassword = normalizeDeletionConfirmation(password, confirmation);
+    if (!confirmedPassword) {
+      setError('Enter your current password and type DELETE exactly to confirm.');
+      return;
+    }
+
+    deletingRef.current = true;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      await onDeleteAccount(confirmedPassword);
+    } catch (deletionError) {
+      setError(deletionError?.message ?? 'We could not delete your account. Please try again.');
+    } finally {
+      deletingRef.current = false;
+      setIsDeleting(false);
+    }
+  }
+
+  function cancelDeletion() {
+    if (isDeleting) return;
+    setShowDeletion(false);
+    setPassword('');
+    setConfirmation('');
+    setError(null);
   }
 
   if (!user) {
@@ -77,8 +126,8 @@ export function ProfileContent({ onLogout, user }) {
       <View style={styles.notice}>
         <Text style={styles.noticeTitle}>Privacy and account controls</Text>
         <Text style={styles.bodyText}>
-          Session management, data export, and account deletion will be added here in verified
-          stages before public release.
+          Account deletion is available below. Session management and data export will be added in
+          verified stages before public release.
         </Text>
       </View>
 
@@ -91,25 +140,121 @@ export function ProfileContent({ onLogout, user }) {
       <Pressable
         accessibilityHint="Removes the secure session from this device."
         accessibilityRole="button"
-        disabled={isSigningOut}
+        disabled={isSigningOut || isDeleting}
         onPress={signOut}
         style={({ pressed }) => [
           styles.logoutButton,
           pressed && styles.buttonPressed,
-          isSigningOut && styles.buttonDisabled,
+          (isSigningOut || isDeleting) && styles.buttonDisabled,
         ]}
       >
         <Text style={styles.logoutLabel}>
           {isSigningOut ? 'Signing out…' : 'Sign out securely'}
         </Text>
       </Pressable>
+
+      <View style={styles.dangerZone}>
+        <Text accessibilityRole="header" style={styles.dangerTitle}>
+          Delete account
+        </Text>
+        {!showDeletion ? (
+          <>
+            <Text style={styles.bodyText}>
+              Permanently remove your AttraVoya account and associated personal data.
+            </Text>
+            <Pressable
+              accessibilityHint="Opens the permanent account deletion confirmation."
+              accessibilityRole="button"
+              disabled={isSigningOut}
+              onPress={() => {
+                setError(null);
+                setShowDeletion(true);
+              }}
+              style={({ pressed }) => [
+                styles.dangerOutlineButton,
+                pressed && styles.buttonPressed,
+                isSigningOut && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.dangerButtonLabel}>Delete account</Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <Text style={styles.dangerWarning}>
+              This permanently deletes your trips, plans, favourites, searches, subscription
+              records, and profile information. This cannot be undone.
+            </Text>
+            <View style={styles.fieldGroup}>
+              <Text nativeID="delete-password-label" style={styles.label}>
+                Current password
+              </Text>
+              <TextInput
+                accessibilityLabel="Current password"
+                accessibilityLabelledBy="delete-password-label"
+                autoComplete="current-password"
+                editable={!isDeleting}
+                onChangeText={setPassword}
+                secureTextEntry
+                style={styles.input}
+                testID="delete-account-password"
+                textContentType="password"
+                value={password}
+              />
+            </View>
+            <View style={styles.fieldGroup}>
+              <Text nativeID="delete-confirmation-label" style={styles.label}>
+                Type DELETE to confirm
+              </Text>
+              <TextInput
+                accessibilityLabel="Type DELETE to confirm"
+                accessibilityLabelledBy="delete-confirmation-label"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                editable={!isDeleting}
+                onChangeText={setConfirmation}
+                style={styles.input}
+                testID="delete-account-confirmation"
+                value={confirmation}
+              />
+            </View>
+            <Pressable
+              accessibilityHint="Permanently deletes your account and associated data."
+              accessibilityRole="button"
+              disabled={isDeleting}
+              onPress={deleteAccount}
+              style={({ pressed }) => [
+                styles.dangerButton,
+                pressed && styles.buttonPressed,
+                isDeleting && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.dangerFilledLabel}>
+                {isDeleting ? 'Deleting account…' : 'Permanently delete account'}
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              disabled={isDeleting}
+              onPress={cancelDeletion}
+              style={({ pressed }) => [
+                styles.cancelButton,
+                pressed && styles.buttonPressed,
+                isDeleting && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.cancelLabel}>Cancel</Text>
+            </Pressable>
+          </>
+        )}
+      </View>
     </>
   );
 }
 
 export default function ProfileScreen() {
   const { width } = useWindowDimensions();
-  const { logout, user } = useMobileAuth();
+  const { deleteAccount, logout, user } = useMobileAuth();
   const pageGutter = getPageGutter(width);
 
   return (
@@ -126,7 +271,7 @@ export default function ProfileScreen() {
           <Text style={styles.subtitle}>
             Review your account identity and control the secure session on this device.
           </Text>
-          <ProfileContent onLogout={logout} user={user} />
+          <ProfileContent onDeleteAccount={deleteAccount} onLogout={logout} user={user} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -216,6 +361,53 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[5],
   },
   logoutLabel: { color: lightTheme.surface, fontSize: 16, fontWeight: '700' },
+  dangerZone: {
+    gap: spacing[4],
+    borderColor: lightTheme.danger,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    marginTop: spacing[6],
+    padding: spacing[6],
+  },
+  dangerTitle: { color: lightTheme.danger, fontSize: 20, fontWeight: '700' },
+  dangerWarning: { color: lightTheme.textPrimary, fontSize: 15, fontWeight: '600', lineHeight: 23 },
+  fieldGroup: { gap: spacing[2] },
+  label: { color: lightTheme.textPrimary, fontSize: 14, fontWeight: '700' },
+  input: {
+    minHeight: interaction.comfortableControlHeight,
+    color: lightTheme.textPrimary,
+    backgroundColor: lightTheme.surface,
+    borderColor: lightTheme.borderStrong,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    fontSize: 16,
+    paddingHorizontal: spacing[4],
+  },
+  dangerOutlineButton: {
+    minHeight: interaction.comfortableControlHeight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: lightTheme.danger,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing[5],
+  },
+  dangerButton: {
+    minHeight: interaction.comfortableControlHeight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: lightTheme.danger,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing[5],
+  },
+  dangerButtonLabel: { color: lightTheme.danger, fontSize: 16, fontWeight: '700' },
+  dangerFilledLabel: { color: lightTheme.surface, fontSize: 16, fontWeight: '700' },
+  cancelButton: {
+    minHeight: interaction.minimumTargetSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelLabel: { color: lightTheme.textSecondary, fontSize: 16, fontWeight: '700' },
   buttonPressed: { opacity: interaction.pressedOpacity },
   buttonDisabled: { opacity: interaction.disabledOpacity },
 });

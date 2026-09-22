@@ -285,6 +285,12 @@ export function createApiClient(options) {
       ),
     revokeAllAuthSessions: () =>
       request('/api/v1/auth/sessions', { method: 'DELETE', cache: 'no-store' }),
+    deleteCurrentAccount: (password) =>
+      request('/api/v1/users/me', {
+        method: 'DELETE',
+        cache: 'no-store',
+        body: { password },
+      }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
     resendVerification: (email) =>
