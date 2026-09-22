@@ -52,7 +52,10 @@ export class AuthorizationError extends AppError {
 }
 
 export class SubscriptionRequiredError extends AppError {
-  constructor(message = 'An active AttraVoya Pro subscription is required for this feature.', options = {}) {
+  constructor(
+    message = 'An active AttraVoya Pro subscription is required for this feature.',
+    options = {},
+  ) {
     super(message, {
       ...options,
       statusCode: 403,
