@@ -32,6 +32,7 @@
     "check:js": "node ../../scripts/check-javascript.js .",
     "test": "vitest run --passWithNoTests",
     "test:pool-exhaustion": "vitest run src/pool-exhaustion.integration.test.js src/auth-token-concurrency.integration.test.js src/query-index.integration.test.js src/planner-query-count.integration.test.js src/companion-trip-query-count.integration.test.js src/country-reference-query-count.integration.test.js",
+    "test:billing-idempotency": "vitest run src/billing-event-idempotency.integration.test.js",
     "test:watch": "vitest",
     "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('coverage',{recursive:true,force:true});\""
   },
