@@ -9,6 +9,12 @@ const session = Object.freeze({
   accessToken: 'header.payload.signature',
   refreshToken: 'r'.repeat(64),
   refreshExpiresAt: '2026-10-21T10:00:00.000Z',
+  user: {
+    id: 'user-1',
+    email: 'user@example.test',
+    roles: ['USER'],
+    emailVerified: true,
+  },
 });
 
 function createSecureStore(overrides = {}) {
@@ -74,5 +80,26 @@ describe('mobile session store', () => {
       store.saveSession({ ...session, refreshToken: 'too-short' }),
     ).rejects.toMatchObject({ code: 'MOBILE_SESSION_STORAGE_ERROR' });
     expect(secureStore.setItemAsync).not.toHaveBeenCalled();
+  });
+
+  it('rejects malformed identity before it reaches authenticated UI', async () => {
+    const secureStore = createSecureStore();
+    const store = createMobileSessionStore(secureStore);
+
+    await expect(
+      store.saveSession({ ...session, user: { ...session.user, email: 'not-an-email' } }),
+    ).rejects.toMatchObject({ code: 'MOBILE_SESSION_STORAGE_ERROR' });
+    expect(secureStore.setItemAsync).not.toHaveBeenCalled();
+  });
+
+  it('accepts a legacy credential envelope so restoration can migrate it', async () => {
+    const legacySession = { ...session };
+    delete legacySession.user;
+    const secureStore = createSecureStore({
+      getItemAsync: jest.fn(async () => JSON.stringify(legacySession)),
+    });
+    const store = createMobileSessionStore(secureStore);
+
+    await expect(store.getSession()).resolves.toMatchObject({ user: null });
   });
 });

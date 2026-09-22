@@ -92,8 +92,10 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
   useEffect(() => {
     let active = true;
     client.restoreMobileSession().then(
-      (accessToken) => {
-        if (active) setStatus(accessToken ? 'authenticated' : 'anonymous');
+      (session) => {
+        if (!active) return;
+        setUser(session?.user ?? null);
+        setStatus(session?.user ? 'authenticated' : 'anonymous');
       },
       (restoreError) => {
         if (!active) return;

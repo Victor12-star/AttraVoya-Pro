@@ -174,6 +174,22 @@ export function createMobileSessionManager({
     return refreshed?.accessToken ?? null;
   }
 
+  async function restore() {
+    const session = await store.getSession();
+    if (!session) return null;
+    if (Date.parse(session.refreshExpiresAt) <= now()) {
+      await store.clearSession();
+      return null;
+    }
+
+    const accessExpiresAt = decodeAccessTokenExpiry(session.accessToken);
+    if (session.user && accessExpiresAt > now() + ACCESS_TOKEN_REFRESH_WINDOW_MS) return session;
+
+    // Refresh legacy envelopes that have no identity as well as tokens close
+    // to expiry. This prevents an authenticated shell with an undefined user.
+    return refresh();
+  }
+
   async function logout() {
     const session = await store.getSession();
     try {
@@ -189,5 +205,5 @@ export function createMobileSessionManager({
     }
   }
 
-  return Object.freeze({ getAccessToken, login, logout, refresh });
+  return Object.freeze({ getAccessToken, login, logout, refresh, restore });
 }
