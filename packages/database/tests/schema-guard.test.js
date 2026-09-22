@@ -15,6 +15,7 @@ const requiredModels = [
   'Plan',
   'Entitlement',
   'Subscription',
+  'BillingEventReceipt',
   'Country',
   'Language',
   'Currency',
@@ -64,5 +65,15 @@ describe('database schema guardrails', () => {
   it('keeps provider status separate from provider secrets', () => {
     const providerModel = schema.split('model ProviderStatus {')[1]?.split('\n}')[0] ?? '';
     expect(providerModel).not.toMatch(/apiKey|secret|token/i);
+  });
+
+  it('keeps billing replay receipts minimal and provider-event unique', () => {
+    const receiptModel = schema.split('model BillingEventReceipt {')[1]?.split('\n}')[0] ?? '';
+    expect(receiptModel).toContain('provider');
+    expect(receiptModel).toContain('externalEventId');
+    expect(receiptModel).toContain('eventType');
+    expect(receiptModel).toContain('payloadSha256');
+    expect(receiptModel).toContain('@@unique([provider, externalEventId])');
+    expect(receiptModel).not.toMatch(/rawPayload|payloadJson|cardNumber|paymentMethod|customerEmail/i);
   });
 });
