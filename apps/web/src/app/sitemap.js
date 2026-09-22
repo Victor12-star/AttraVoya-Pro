@@ -14,6 +14,7 @@ const publicRoutes = [
   '/transport',
   '/plan-by-budget',
   '/delete-account',
+  '/privacy',
 ];
 
 export default function sitemap() {

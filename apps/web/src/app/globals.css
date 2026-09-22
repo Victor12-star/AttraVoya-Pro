@@ -927,6 +927,18 @@ img {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 12px;
 }
+.site-footer__legal {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.site-footer__legal a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.site-footer__legal a:hover {
+  color: #fff;
+}
 
 .feature-page {
   min-height: 62vh;
