@@ -55,44 +55,55 @@ export function createEntitlementsService(repository, options = {}) {
 
   const now = options.now ?? (() => new Date());
 
+  async function getCurrentAccess({ userId }) {
+    const evaluatedAt = now();
+    if (!validDate(evaluatedAt)) throw new TypeError('A valid current time is required.');
+
+    const subscription = await repository.findActiveProSubscription({
+      userId,
+      now: evaluatedAt,
+    });
+    const planKey = subscription?.plan?.key;
+    const status = subscription?.status;
+    const currentPeriodEnd = subscription?.currentPeriodEnd;
+
+    // Fail closed. Only a server-recognized Pro plan with a currently
+    // effective subscription window can unlock paid capabilities. Legacy,
+    // unknown, expired or malformed records resolve to Free.
+    if (
+      !PRO_PLAN_SET.has(planKey) ||
+      (status !== 'ACTIVE' && status !== 'TRIALING') ||
+      !validDate(currentPeriodEnd) ||
+      currentPeriodEnd <= evaluatedAt
+    ) {
+      return freeAccess();
+    }
+
+    return {
+      plan: {
+        key: planKey,
+        tier: 'PRO',
+        name: PLAN_NAMES[planKey],
+      },
+      entitlements: entitlementKeys(subscription),
+      limits: planLimits(planKey),
+      subscription: {
+        status,
+        currentPeriodEnd: currentPeriodEnd.toISOString(),
+      },
+    };
+  }
+
   return {
-    async getCurrentAccess({ userId }) {
-      const evaluatedAt = now();
-      if (!validDate(evaluatedAt)) throw new TypeError('A valid current time is required.');
+    getCurrentAccess,
 
-      const subscription = await repository.findActiveProSubscription({
-        userId,
-        now: evaluatedAt,
-      });
-      const planKey = subscription?.plan?.key;
-      const status = subscription?.status;
-      const currentPeriodEnd = subscription?.currentPeriodEnd;
-
-      // Fail closed. Only a server-recognized Pro plan with a currently
-      // effective subscription window can unlock paid capabilities. Legacy,
-      // unknown, expired or malformed records resolve to Free.
-      if (
-        !PRO_PLAN_SET.has(planKey) ||
-        (status !== 'ACTIVE' && status !== 'TRIALING') ||
-        !validDate(currentPeriodEnd) ||
-        currentPeriodEnd <= evaluatedAt
-      ) {
-        return freeAccess();
+    async hasEntitlement({ userId, entitlement }) {
+      if (!ENTITLEMENT_SET.has(entitlement)) {
+        throw new TypeError('A recognized entitlement is required.');
       }
 
-      return {
-        plan: {
-          key: planKey,
-          tier: 'PRO',
-          name: PLAN_NAMES[planKey],
-        },
-        entitlements: entitlementKeys(subscription),
-        limits: planLimits(planKey),
-        subscription: {
-          status,
-          currentPeriodEnd: currentPeriodEnd.toISOString(),
-        },
-      };
+      const access = await getCurrentAccess({ userId });
+      return access.entitlements.includes(entitlement);
     },
   };
 }
