@@ -32,6 +32,7 @@ import { weatherRoutes } from './modules/weather/weather.routes.js';
 import { currencyRoutes } from './modules/currency/currency.routes.js';
 import { destinationsRoutes } from './modules/destinations/destinations.routes.js';
 import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
+import { entitlementsRoutes } from './modules/entitlements/entitlements.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { mapsRoutes } from './modules/maps/maps.routes.js';
 import { phrasebookRoutes } from './modules/phrasebook/phrasebook.routes.js';
@@ -153,6 +154,12 @@ export async function buildApp(options = {}) {
   await app.register(usersRoutes, {
     prefix: `${API_PREFIX}/users`,
     repository: options.usersRepository,
+  });
+
+  await app.register(entitlementsRoutes, {
+    prefix: `${API_PREFIX}/entitlements`,
+    repository: options.entitlementsRepository,
+    now: options.entitlementsNow,
   });
 
   await app.register(healthRoutes, {

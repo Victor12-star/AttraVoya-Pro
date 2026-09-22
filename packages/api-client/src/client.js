@@ -291,6 +291,10 @@ export function createApiClient(options) {
         cache: 'no-store',
         body: { password },
       }),
+    getMyEntitlements: () =>
+      request('/api/v1/entitlements/me', {
+        cache: 'no-store',
+      }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
     resendVerification: (email) =>
