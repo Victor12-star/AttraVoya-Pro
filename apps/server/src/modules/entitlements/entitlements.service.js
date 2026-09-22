@@ -65,10 +65,20 @@ export function createEntitlementsService(repository, options = {}) {
         now: evaluatedAt,
       });
       const planKey = subscription?.plan?.key;
+      const status = subscription?.status;
+      const currentPeriodEnd = subscription?.currentPeriodEnd;
 
-      // Fail closed. Only server-recognized active Pro plans can unlock paid
-      // capabilities; legacy, unknown or malformed records resolve to Free.
-      if (!PRO_PLAN_SET.has(planKey)) return freeAccess();
+      // Fail closed. Only a server-recognized Pro plan with a currently
+      // effective subscription window can unlock paid capabilities. Legacy,
+      // unknown, expired or malformed records resolve to Free.
+      if (
+        !PRO_PLAN_SET.has(planKey) ||
+        (status !== 'ACTIVE' && status !== 'TRIALING') ||
+        !validDate(currentPeriodEnd) ||
+        currentPeriodEnd <= evaluatedAt
+      ) {
+        return freeAccess();
+      }
 
       return {
         plan: {
@@ -79,10 +89,8 @@ export function createEntitlementsService(repository, options = {}) {
         entitlements: entitlementKeys(subscription),
         limits: planLimits(planKey),
         subscription: {
-          status: subscription.status === 'TRIALING' ? 'TRIALING' : 'ACTIVE',
-          currentPeriodEnd: validDate(subscription.currentPeriodEnd)
-            ? subscription.currentPeriodEnd.toISOString()
-            : null,
+          status,
+          currentPeriodEnd: currentPeriodEnd.toISOString(),
         },
       };
     },
