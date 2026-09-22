@@ -13,6 +13,7 @@ const publicRoutes = [
   '/language',
   '/transport',
   '/plan-by-budget',
+  '/delete-account',
 ];
 
 export default function sitemap() {

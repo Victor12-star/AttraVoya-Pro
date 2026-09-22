@@ -7,7 +7,7 @@ import { ArrowRight, LockKeyhole, Mail } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
 
-export function LoginForm({ messages, recoveryMessages }) {
+export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -23,7 +23,7 @@ export function LoginForm({ messages, recoveryMessages }) {
         email: String(form.get('email') ?? '').trim(),
         password: String(form.get('password') ?? ''),
       });
-      router.push('/trips');
+      router.push(returnTo);
       router.refresh();
     } catch {
       // Authentication responses stay generic so the UI does not help attackers
