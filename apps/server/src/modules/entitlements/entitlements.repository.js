@@ -9,7 +9,7 @@ export function createEntitlementsRepository(prismaClient = prisma) {
           userId,
           status: { in: ['ACTIVE', 'TRIALING'] },
           startsAt: { lte: now },
-          OR: [{ currentPeriodEnd: null }, { currentPeriodEnd: { gt: now } }],
+          currentPeriodEnd: { gt: now },
           plan: {
             is: {
               isActive: true,
