@@ -3,19 +3,25 @@ import { describe, expect, it } from 'vitest';
 
 import { createStripeCheckoutPolicy } from './payments.stripe-checkout-policy.js';
 
-function environment(overrides = {}) {
+function configuration(overrides = {}) {
   return {
-    STRIPE_PURCHASE_ENABLED: true,
-    STRIPE_PRO_MONTHLY_PRICE_ID: 'price_monthly123',
-    STRIPE_PRO_YEARLY_PRICE_ID: 'price_yearly456',
-    WEB_URL: 'https://app.example.test',
+    enabled: true,
+    priceIds: {
+      [PLANS.PRO_MONTHLY]: 'price_monthly123',
+      [PLANS.PRO_YEARLY]: 'price_yearly456',
+    },
+    returnUrls: {
+      successUrl:
+        'https://app.example.test/premium?checkout=success&session_id={CHECKOUT_SESSION_ID}',
+      cancelUrl: 'https://app.example.test/premium?checkout=cancelled',
+    },
     ...overrides,
   };
 }
 
 describe('server-owned Stripe checkout policy', () => {
   it('resolves recognized Pro plans to server-owned prices and return URLs', () => {
-    const policy = createStripeCheckoutPolicy(environment());
+    const policy = createStripeCheckoutPolicy(configuration());
 
     expect(policy.resolve(PLANS.PRO_MONTHLY)).toEqual({
       planKey: PLANS.PRO_MONTHLY,
@@ -34,7 +40,7 @@ describe('server-owned Stripe checkout policy', () => {
   });
 
   it('rejects Free, legacy, and unknown plans before any provider call exists', () => {
-    const policy = createStripeCheckoutPolicy(environment());
+    const policy = createStripeCheckoutPolicy(configuration());
 
     for (const planKey of [PLANS.FREE, PLANS.PREMIUM, 'UNKNOWN']) {
       expect(() => policy.resolve(planKey)).toThrow('Selected subscription plan is not available.');
@@ -42,7 +48,7 @@ describe('server-owned Stripe checkout policy', () => {
   });
 
   it('does not let caller-supplied Stripe identifiers override server configuration', () => {
-    const policy = createStripeCheckoutPolicy(environment());
+    const policy = createStripeCheckoutPolicy(configuration());
 
     const request = {
       planKey: PLANS.PRO_MONTHLY,
@@ -65,10 +71,10 @@ describe('server-owned Stripe checkout policy', () => {
 
   it('fails closed while purchase creation is disabled or incomplete', () => {
     const disabled = createStripeCheckoutPolicy(
-      environment({
-        STRIPE_PURCHASE_ENABLED: false,
-        STRIPE_PRO_MONTHLY_PRICE_ID: undefined,
-        STRIPE_PRO_YEARLY_PRICE_ID: undefined,
+      configuration({
+        enabled: false,
+        priceIds: {},
+        returnUrls: {},
       }),
     );
 
@@ -77,8 +83,10 @@ describe('server-owned Stripe checkout policy', () => {
     );
 
     const incomplete = createStripeCheckoutPolicy(
-      environment({
-        STRIPE_PRO_MONTHLY_PRICE_ID: undefined,
+      configuration({
+        priceIds: {
+          [PLANS.PRO_YEARLY]: 'price_yearly456',
+        },
       }),
     );
 
