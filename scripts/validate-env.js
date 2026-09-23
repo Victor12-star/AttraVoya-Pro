@@ -51,6 +51,14 @@ requireValue('JWT_ACCESS_SECRET', 32);
 requireValue('COOKIE_SECRET', 32);
 requireValue('DATA_ENCRYPTION_KEY', 32);
 
+const stripeWebhookEnabled = env.STRIPE_WEBHOOK_ENABLED?.trim().toLowerCase();
+if (stripeWebhookEnabled && !['true', 'false'].includes(stripeWebhookEnabled)) {
+  errors.push('STRIPE_WEBHOOK_ENABLED must be either true or false.');
+}
+if (stripeWebhookEnabled === 'true') {
+  requireValue('STRIPE_WEBHOOK_SECRET', 16);
+}
+
 for (const [providerKey, credentialKey] of [
   ['MAPS_PROVIDER', 'GEOAPIFY_API_KEY'],
   ['PLACES_PROVIDER', 'GEOAPIFY_API_KEY'],
