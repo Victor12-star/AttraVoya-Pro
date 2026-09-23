@@ -14,7 +14,7 @@ describe('Stripe Checkout Session gateway', () => {
         id: 'cs_test_123',
         mode: 'subscription',
         url: 'https://checkout.stripe.com/c/pay/cs_test_123',
-      })),
+      }))
     );
     const gateway = createStripeCheckoutGateway({
       secretKey: 'sk_test_server_only_example_key',
