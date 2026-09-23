@@ -32,6 +32,13 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
+enum BillingEventProcessingStatus {
+  PENDING
+  APPLIED
+  IGNORED
+  FAILED
+}
+
 enum DestinationStatus {
   DRAFT
   PUBLISHED
@@ -340,11 +347,38 @@ model Subscription {
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          Plan           @relation(fields: [planId], references: [id], onDelete: Restrict)
+  billingEvents BillingEvent[]
 
   @@index([userId, status])
   @@index([externalSubscriptionId])
+}
+
+// BillingEvent is an internal replay/idempotency ledger for provider events that
+// have already passed provider verification. It deliberately stores a digest
+// instead of a raw webhook/payment payload so card/payment metadata and purchase
+// tokens are not retained just to deduplicate delivery retries.
+model BillingEvent {
+  id               String                       @id @default(cuid())
+  provider         String
+  externalEventId  String
+  eventType        String
+  payloadHash      String                       @db.VarChar(64)
+  processingStatus BillingEventProcessingStatus @default(PENDING)
+  occurredAt       DateTime?
+  verifiedAt       DateTime
+  receivedAt       DateTime                     @default(now())
+  processedAt      DateTime?
+  failureCode      String?                      @db.VarChar(80)
+  subscriptionId   String?
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, externalEventId])
+  @@index([processingStatus, receivedAt])
+  @@index([subscriptionId, receivedAt])
+  @@index([provider, eventType, receivedAt])
 }
 
 model AuthSession {
