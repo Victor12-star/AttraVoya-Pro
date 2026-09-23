@@ -59,9 +59,8 @@ export function createPaymentsService(repository = paymentsRepository, options =
     /**
      * Finalize a verified event without applying subscription state.
      *
-     * APPLIED is intentionally excluded here. A future processor may only
-     * mark an event APPLIED in the same transaction that mutates authoritative
-     * subscription state.
+     * APPLIED is intentionally excluded here. Use applyVerifiedSubscriptionState
+     * so APPLIED is coupled to the authoritative subscription mutation.
      *
      * @param {{
      *   eventId: string,
@@ -254,10 +253,21 @@ export function createPaymentsService(repository = paymentsRepository, options =
       }
 
       if (result.outcome === 'ALREADY_PROCESSED') {
+        const processingStatus = result.event?.processingStatus;
+        const stale =
+          processingStatus === 'IGNORED' &&
+          result.event?.failureCode === 'STALE_PROVIDER_STATE';
+
+        if (processingStatus !== 'APPLIED' && !stale) {
+          throw new ConflictError(
+            'Verified billing event was already finalized without applying subscription state.',
+          );
+        }
+
         return {
           applied: false,
           duplicate: true,
-          stale: result.event?.processingStatus === 'IGNORED',
+          stale,
           event: result.event ?? null,
           subscription: null,
         };
@@ -285,7 +295,6 @@ export function createPaymentsService(repository = paymentsRepository, options =
         subscription: result.subscription,
       };
     },
-
   };
 }
 
