@@ -22,6 +22,7 @@ function stripeSignatureHeader(headers) {
   return value.trim();
 }
 
+/** @returns {{ timestamp: number, signatures: string[] }} */
 function parseSignatureHeader(value) {
   let timestamp = null;
   const signatures = [];
@@ -44,7 +45,12 @@ function parseSignatureHeader(value) {
     }
   }
 
-  if (!Number.isSafeInteger(timestamp) || timestamp <= 0 || signatures.length === 0) {
+  if (
+    typeof timestamp !== 'number' ||
+    !Number.isSafeInteger(timestamp) ||
+    timestamp <= 0 ||
+    signatures.length === 0
+  ) {
     throw new ValidationError('Stripe signature header is invalid.');
   }
 
