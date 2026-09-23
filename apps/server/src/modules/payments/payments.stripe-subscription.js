@@ -34,7 +34,9 @@ function parseStripeEvent(rawPayload, evidence) {
   const eventId = typeof event.id === 'string' ? event.id.trim() : '';
   const eventType = typeof event.type === 'string' ? event.type.trim() : '';
   if (eventId !== evidence.externalEventId || eventType !== evidence.eventType) {
-    throw new StripeVerifiedIdentityMismatchError('Stripe verified event identity does not match payload.');
+    throw new StripeVerifiedIdentityMismatchError(
+      'Stripe verified event identity does not match payload.',
+    );
   }
 
   const object = event.data?.object;
