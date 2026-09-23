@@ -198,6 +198,18 @@ Checkout attempts now default to 35 minutes and reject configured TTLs below 31 
 
 This phase still does not expose an authenticated purchase endpoint, return a Checkout URL to a web/mobile client, create an AttraVoya Subscription row from a first purchase, enable a buy button, or grant Pro from checkout success. Those remain separately gated work, and verified provider reconciliation remains authoritative for subscription state.
 
+### Verified checkout-completion ownership bridge
+
+A separately verified Stripe `checkout.session.completed` event may connect the external Stripe subscription identity to the exact server-owned `CheckoutAttempt` identified by its already-bound `cs_...` Checkout Session ID. The processor rechecks that the verified Stripe event ID and type match the exact authenticated payload, requires `mode=subscription`, and accepts only Stripe-shaped `cs_...` and `sub_...` identities.
+
+The checkout payload does not choose the AttraVoya user or plan. Ownership comes only from the existing `CheckoutAttempt`, which was created from the authenticated user and server-resolved plan before any provider session could be bound. The billing event claim, checkout-attempt completion, provider subscription identity, and internal subscription creation are coupled through the server transaction boundary and provider identity uniqueness constraints.
+
+Checkout completion creates only a `PENDING` internal subscription. `PENDING` is deliberately excluded from entitlement resolution, which recognizes only current `ACTIVE` or `TRIALING` subscriptions with a future period end. A browser success redirect and a completed Checkout Session therefore cannot grant Pro by themselves. A later separately verified `customer.subscription.*` lifecycle event must supply authoritative subscription status and period state before the existing entitlement resolver can expose Pro access.
+
+Malformed authenticated completion state is terminalized with a bounded privacy-safe machine code. Unknown checkout ownership, inactive plans, conflicting provider identities, and checkout-attempt state races fail closed. Raw Stripe bodies, signature headers, card data, provider secrets, and client-selected ownership data are not stored in the resulting subscription.
+
+This bridge remains internal. Stripe Checkout Session creation is handled by the separate Phase 10CP server gateway, but neither boundary is exposed as an authenticated purchase endpoint yet. No browser/mobile success state grants entitlement; verified lifecycle reconciliation remains authoritative.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
@@ -210,7 +222,7 @@ The intended evidence path is:
 
 Provider callbacks or purchase tokens must be verified server-side before they can create or change authoritative subscription state. Required future controls include signature/token verification, idempotency, replay protection, ownership checks, refund/revocation handling, database transactions, rate limiting, server-only secrets and privacy-safe audit events.
 
-The Stripe webhook trust chain and disabled purchase configuration now exist, but a purchase-creation flow does not. Until checkout or mobile-store purchase integrations are separately implemented and verified, AttraVoya must not claim that new subscriptions can be purchased.
+The Stripe webhook trust chain, durable checkout ownership, and internal Stripe Checkout Session creation now exist, but no authenticated public purchase endpoint or buy UI is enabled yet. Until those client-facing purchase surfaces and mobile-store purchase integrations are separately implemented and verified, AttraVoya must not claim that users can purchase new subscriptions from the product.
 
 ## Security boundary
 
