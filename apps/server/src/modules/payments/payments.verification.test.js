@@ -58,9 +58,11 @@ describe('billing provider verification boundary', () => {
       maxPayloadBytes: 4,
     });
 
-    await expect(
-      boundary.verifyEvent({ rawPayload: /** @type {any} */ ('{"id":"evt"}') }),
-    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+    const nonBytePayload = /** @type {any} */ ('{"id":"evt"}');
+    await expect(boundary.verifyEvent({ rawPayload: nonBytePayload })).rejects.toMatchObject({
+      statusCode: 400,
+      code: 'VALIDATION_ERROR',
+    });
     await expect(boundary.verifyEvent({ rawPayload: Buffer.alloc(0) })).rejects.toMatchObject({
       statusCode: 400,
       code: 'VALIDATION_ERROR',
