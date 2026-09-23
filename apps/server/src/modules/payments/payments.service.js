@@ -56,7 +56,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
      *
      * @param {{
      *   eventId: string,
-     *   outcome: 'IGNORED' | 'FAILED',
+     *   outcome: string,
      *   failureCode?: string | null
      * }} input
      */
