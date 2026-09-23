@@ -17,7 +17,7 @@ const STRIPE_STATUS_MAP = Object.freeze({
   paused: 'EXPIRED',
 });
 
-function parseStripeObject(rawPayload) {
+function parseStripeEvent(rawPayload, evidence) {
   let event;
   try {
     event = JSON.parse(rawPayload.toString('utf8'));
@@ -27,6 +27,12 @@ function parseStripeObject(rawPayload) {
 
   if (!event || typeof event !== 'object' || Array.isArray(event)) {
     throw new ValidationError('Stripe subscription event payload is invalid.');
+  }
+
+  const eventId = typeof event.id === 'string' ? event.id.trim() : '';
+  const eventType = typeof event.type === 'string' ? event.type.trim() : '';
+  if (eventId !== evidence.externalEventId || eventType !== evidence.eventType) {
+    throw new ValidationError('Stripe verified event identity does not match payload.');
   }
 
   const object = event.data?.object;
@@ -56,7 +62,7 @@ function unixDate(value, name, { required = false } = {}) {
 }
 
 function normalizeSubscriptionState(rawPayload, evidence) {
-  const object = parseStripeObject(rawPayload);
+  const object = parseStripeEvent(rawPayload, evidence);
   const externalSubscriptionId = typeof object.id === 'string' ? object.id.trim() : '';
   const stripeStatus = typeof object.status === 'string' ? object.status.trim().toLowerCase() : '';
   const status = STRIPE_STATUS_MAP[stripeStatus];
