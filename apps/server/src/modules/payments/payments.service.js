@@ -116,7 +116,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
      * boundary owns the raw-byte hash and server verification timestamp, so a
      * caller cannot promote a plain object into trusted billing evidence.
      *
-     * @param {object} evidence
+     * @param {any} evidence
      */
     async recordVerifiedEvent(evidence) {
       if (!isVerifiedBillingEvidence(evidence)) {
