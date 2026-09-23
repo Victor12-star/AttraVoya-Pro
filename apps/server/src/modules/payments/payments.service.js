@@ -3,6 +3,7 @@ import { paymentsRepository } from './payments.repository.js';
 
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
 const FAILURE_CODE = /^[A-Z][A-Z0-9_]{0,79}$/;
+/** @type {Set<string>} */
 const TERMINAL_OUTCOMES = new Set(['IGNORED', 'FAILED']);
 
 function requiredText(value, name, maxLength) {
