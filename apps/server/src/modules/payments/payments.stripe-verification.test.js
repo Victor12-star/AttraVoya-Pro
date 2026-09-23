@@ -3,6 +3,10 @@ import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
 import { createStripeWebhookVerifier } from './payments.stripe-verification.js';
+import {
+  createBillingVerificationBoundary,
+  isVerifiedBillingEvidence,
+} from './payments.verification.js';
 
 const SECRET = 'whsec_test_secret';
 const NOW = new Date('2026-09-23T16:30:00.000Z');
@@ -48,6 +52,32 @@ describe('Stripe webhook verifier', () => {
       occurredAt: new Date((TIMESTAMP - 10) * 1000),
     });
     expect(JSON.stringify(result)).not.toContain(SECRET);
+  });
+
+  it('mints opaque billing evidence only after Stripe authentication succeeds', async () => {
+    const rawPayload = payload();
+    const boundary = createBillingVerificationBoundary({
+      provider: 'stripe',
+      verify: createStripeWebhookVerifier({
+        webhookSecret: SECRET,
+        now: () => NOW,
+      }),
+      now: () => NOW,
+    });
+
+    const evidence = await boundary.verifyEvent({
+      rawPayload,
+      headers: { 'stripe-signature': header(rawPayload) },
+    });
+
+    expect(isVerifiedBillingEvidence(evidence)).toBe(true);
+    expect(evidence).toMatchObject({
+      provider: 'stripe',
+      externalEventId: 'evt_123',
+      eventType: 'customer.subscription.updated',
+      verifiedAt: NOW,
+    });
+    expect(JSON.stringify(evidence)).not.toContain(SECRET);
   });
 
   it('accepts one valid v1 signature among rotation candidates', async () => {
