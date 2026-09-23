@@ -556,4 +556,5 @@ describe('verified billing event repository', () => {
         providerStateUpdatedAt: existingSubscription.providerStateUpdatedAt,
       },
     });
-  })});
+  });
+});
