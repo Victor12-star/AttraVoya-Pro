@@ -78,7 +78,7 @@ Each record stores the provider name, provider event identifier, event type, a S
 
 The ledger deliberately does not store a raw webhook body, raw purchase token, card data, client secret, provider API secret, or other payment credential. Future provider adapters must verify signatures or purchase evidence before inserting an event into this verified ledger. Receiving an unverified request is not sufficient to grant Pro access.
 
-A ledger entry being present also does not itself grant Pro. Subscription state may change only through a later server-side processor that validates the verified event, maps it to an owned account/subscription, applies an idempotent database transaction, and then lets the existing entitlement resolver evaluate the resulting subscription state.
+A ledger entry being present also does not itself grant Pro. Subscription state may change only through the internal server-side application boundary after provider-specific verification has mapped the event to an existing owned subscription; that boundary applies the state transactionally and then lets the existing entitlement resolver evaluate the resulting subscription state.
 
 ### Internal verified-event recording boundary
 
@@ -86,7 +86,7 @@ The payments module exposes an internal-only `recordVerifiedEvent` service for e
 
 The database unique constraint on provider plus external event ID is the concurrency-safe replay boundary. The first verified delivery creates the record. An exact later retry returns the existing record as a duplicate. Reuse of the same provider event identity with a different event type or payload digest fails closed as a conflict instead of silently replacing the original evidence.
 
-This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification and authoritative subscription mutation remain later separately gated slices.
+This recording service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Phase 10CF keeps mutation in a separate internal transactional boundary; provider-specific verification remains a later separately gated slice.
 
 ### Terminal processing state boundary
 
