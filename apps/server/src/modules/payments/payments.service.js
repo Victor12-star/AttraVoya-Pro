@@ -112,14 +112,11 @@ export function createPaymentsService(repository = paymentsRepository, options =
     },
 
     /**
-     * @param {{
-     *   provider: string,
-     *   externalEventId: string,
-     *   eventType: string,
-     *   payloadHash: string,
-     *   occurredAt?: Date | null,
-     *   verifiedAt: Date,
-     * }} input
+     * Persist only evidence minted by the server verification boundary. The
+     * boundary owns the raw-byte hash and server verification timestamp, so a
+     * caller cannot promote a plain object into trusted billing evidence.
+     *
+     * @param {object} evidence
      */
     async recordVerifiedEvent(evidence) {
       if (!isVerifiedBillingEvidence(evidence)) {
