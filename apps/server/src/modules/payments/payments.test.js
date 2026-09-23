@@ -142,7 +142,7 @@ describe('verified billing event service', () => {
 });
 
 describe('verified subscription state application', () => {
-  it('applies normalized current provider state through the transactional repository boundary', async () => {
+  it('applies normalized current provider state transactionally', async () => {
     const repository = {
       recordVerifiedEvent: vi.fn(),
       applyVerifiedSubscriptionState: vi.fn(async (input) => ({
@@ -485,7 +485,7 @@ describe('verified billing event repository', () => {
     });
   });
 
-  it('marks an older concurrent provider event ignored instead of overwriting newer state', async () => {
+  it('ignores an older concurrent provider event', async () => {
     const staleTime = new Date('2026-09-23T14:20:00.000Z');
     const processedAt = new Date('2026-09-23T14:45:00.000Z');
     const existingSubscription = {
