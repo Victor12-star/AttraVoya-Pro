@@ -34,7 +34,6 @@ describe('Stripe webhook environment contract', () => {
     expect(environment.STRIPE_WEBHOOK_TOLERANCE_SECONDS).toBe(300);
   });
 
-
   it('treats a blank disabled webhook secret as unconfigured', () => {
     const environment = loadEnvironment(
       baseEnvironment({
