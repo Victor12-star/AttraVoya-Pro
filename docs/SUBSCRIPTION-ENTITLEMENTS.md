@@ -164,7 +164,15 @@ The server owns the plan-to-Price mapping. A future checkout request may select 
 
 The purchase secret and Price IDs are deployment configuration only. They are not returned by entitlement APIs, rendered in web/mobile plan status, stored in the billing-event ledger, or logged as request metadata. The committed-secret scan rejects Stripe live/test secret-key patterns, while the example environment contains only blank placeholders.
 
-This phase does not install or call the Stripe API client, create Checkout Sessions, create customers, attach provider subscriptions, define success/cancel return URLs, expose a buy button, or change any user's subscription. Purchase creation remains disabled until a later slice adds authenticated ownership, idempotent checkout creation, safe return URLs, duplicate-click/retry behavior, and webhook reconciliation.
+Purchase mode also requires the verified Stripe webhook ingress and secret to be enabled. In production, the configured web origin must use HTTPS and cannot contain embedded credentials.
+
+### Server-owned Stripe checkout policy
+
+The internal checkout policy accepts only the existing `PRO_MONTHLY` or `PRO_YEARLY` AttraVoya plan key. It resolves the corresponding Stripe Price ID from server configuration and derives both return destinations from `WEB_URL` and the existing `/premium` route. A caller cannot override the Stripe Price ID, customer ID, subscription ID, amount, currency, billing interval, success URL, or cancel URL.
+
+The success destination is server-derived as `/premium?checkout=success&session_id={CHECKOUT_SESSION_ID}`, preserving Stripe's future Checkout Session placeholder without trusting a client redirect. Cancellation returns to the same origin at `/premium?checkout=cancelled`. Deployment paths, query strings, and fragments supplied in `WEB_URL` are not reused as arbitrary checkout redirects.
+
+This policy remains internal and makes no network request. It does not install or call the Stripe API client, create a Checkout Session, create a customer, attach a provider subscription, expose a purchase route, show a buy button, or change any user's subscription. A later slice still needs authenticated ownership, idempotent provider-side Checkout Session creation, duplicate-click/retry handling, and reconciliation with the existing verified webhook path.
 
 ## Future billing integration
 
