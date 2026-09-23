@@ -260,6 +260,7 @@ describe('internal Stripe Checkout Session service', () => {
             id: 'attempt-123',
             userId: 'user-1',
             expiresAt: EXPIRES_AT,
+            plan: { key: 'PRO_MONTHLY' },
           },
           duplicate: false,
           idempotencyKey: 'attravoya-checkout-attempt-123',
