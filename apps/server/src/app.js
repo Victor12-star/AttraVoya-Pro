@@ -36,6 +36,7 @@ import { emergencyRoutes } from './modules/emergency/emergency.routes.js';
 import { createEntitlementsRepository } from './modules/entitlements/entitlements.repository.js';
 import { entitlementsRoutes } from './modules/entitlements/entitlements.routes.js';
 import { createEntitlementsService } from './modules/entitlements/entitlements.service.js';
+import { paymentsRoutes } from './modules/payments/payments.routes.js';
 import { placesRoutes } from './modules/places/places.routes.js';
 import { mapsRoutes } from './modules/maps/maps.routes.js';
 import { phrasebookRoutes } from './modules/phrasebook/phrasebook.routes.js';
@@ -170,6 +171,17 @@ export async function buildApp(options = {}) {
   await app.register(entitlementsRoutes, {
     prefix: `${API_PREFIX}/entitlements`,
     service: entitlementService,
+  });
+
+  await app.register(paymentsRoutes, {
+    prefix: `${API_PREFIX}/payments`,
+    stripeWebhookEnabled: options.stripeWebhookEnabled ?? env.STRIPE_WEBHOOK_ENABLED,
+    stripeWebhookSecret: options.stripeWebhookSecret ?? env.STRIPE_WEBHOOK_SECRET,
+    stripeWebhookToleranceSeconds:
+      options.stripeWebhookToleranceSeconds ?? env.STRIPE_WEBHOOK_TOLERANCE_SECONDS,
+    stripeWebhookProcessor: options.stripeWebhookProcessor,
+    paymentsService: options.paymentsService,
+    now: options.stripeWebhookNow,
   });
 
   await app.register(healthRoutes, {

@@ -1,5 +1,22 @@
 import { z } from 'zod';
 
+const strictBoolean = z.preprocess((value) => {
+  if (value === undefined || value === '') return false;
+  if (value === true || value === false) return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return value;
+}, z.boolean());
+
+const optionalSecret = (minimum, maximum) =>
+  z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().trim().min(minimum).max(maximum).optional(),
+  );
+
 const optionalPositiveInteger = (maximum) =>
   z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -30,6 +47,10 @@ const environmentSchema = z.object({
   JWT_ISSUER: z.string().trim().min(1).default('attravoya-pro-api'),
   JWT_AUDIENCE: z.string().trim().min(1).default('attravoya-pro'),
   COOKIE_DOMAIN: z.string().trim().min(1).optional(),
+
+  STRIPE_WEBHOOK_ENABLED: strictBoolean,
+  STRIPE_WEBHOOK_SECRET: optionalSecret(16, 512),
+  STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
 
   // Provider selection is environment-driven so development providers can be
   // replaced for public/commercial launch without rewriting application code.
@@ -160,6 +181,16 @@ function validateProductionProviderBudgets(environment) {
   }
 }
 
+function validateStripeWebhookConfiguration(environment) {
+  if (!environment.STRIPE_WEBHOOK_ENABLED) return;
+
+  if (!environment.STRIPE_WEBHOOK_SECRET?.trim()) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nSTRIPE_WEBHOOK_SECRET: required when STRIPE_WEBHOOK_ENABLED=true.',
+    );
+  }
+}
+
 function validateProductionEmailConfiguration(environment) {
   if (environment.NODE_ENV !== 'production') return;
 
@@ -214,6 +245,7 @@ export function loadEnvironment(source = process.env) {
   }
 
   validateProviderBudgetPairs(result.data);
+  validateStripeWebhookConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);
