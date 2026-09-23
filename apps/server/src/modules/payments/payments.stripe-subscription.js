@@ -6,6 +6,8 @@ const STRIPE_SUBSCRIPTION_EVENT_TYPES = new Set([
   'customer.subscription.deleted',
 ]);
 
+class StripeVerifiedIdentityMismatchError extends ValidationError {}
+
 const STRIPE_STATUS_MAP = Object.freeze({
   active: 'ACTIVE',
   trialing: 'TRIALING',
@@ -32,7 +34,7 @@ function parseStripeEvent(rawPayload, evidence) {
   const eventId = typeof event.id === 'string' ? event.id.trim() : '';
   const eventType = typeof event.type === 'string' ? event.type.trim() : '';
   if (eventId !== evidence.externalEventId || eventType !== evidence.eventType) {
-    throw new ValidationError('Stripe verified event identity does not match payload.');
+    throw new StripeVerifiedIdentityMismatchError('Stripe verified event identity does not match payload.');
   }
 
   const object = event.data?.object;
@@ -150,7 +152,13 @@ export function createStripeSubscriptionEventProcessor({ verificationBoundary, p
       let state;
       try {
         state = normalizeSubscriptionState(rawPayload, evidence);
-      } catch {
+      } catch (error) {
+        // A mismatch between verifier-minted identity and the exact payload is a
+        // trust-chain invariant breach, not ordinary malformed subscription
+        // state. Do not acknowledge or terminalize it as a handled provider
+        // event; fail closed so the delivery can be investigated/retried.
+        if (error instanceof StripeVerifiedIdentityMismatchError) throw error;
+
         const finalized = await paymentsService.finalizeVerifiedEvent({
           eventId,
           outcome: 'FAILED',
