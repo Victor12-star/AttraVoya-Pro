@@ -1,5 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 import { paymentsRepository } from './payments.repository.js';
+import { isVerifiedBillingEvidence } from './payments.verification.js';
 
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
 const FAILURE_CODE = /^[A-Z][A-Z0-9_]{0,79}$/;
@@ -120,14 +121,19 @@ export function createPaymentsService(repository = paymentsRepository, options =
      *   verifiedAt: Date,
      * }} input
      */
-    async recordVerifiedEvent({
-      provider,
-      externalEventId,
-      eventType,
-      payloadHash,
-      occurredAt = null,
-      verifiedAt,
-    }) {
+    async recordVerifiedEvent(evidence) {
+      if (!isVerifiedBillingEvidence(evidence)) {
+        throw new TypeError('Verified billing evidence is required.');
+      }
+
+      const {
+        provider,
+        externalEventId,
+        eventType,
+        payloadHash,
+        occurredAt = null,
+        verifiedAt,
+      } = evidence;
       const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
       const normalizedExternalEventId = requiredText(externalEventId, 'externalEventId', 255);
       const normalizedEventType = requiredText(eventType, 'eventType', 120);
