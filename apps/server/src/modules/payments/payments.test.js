@@ -11,6 +11,7 @@ function serviceRepository(overrides = {}) {
   return {
     recordVerifiedEvent: vi.fn(),
     finalizePendingEvent: vi.fn(),
+    applyVerifiedSubscriptionState: vi.fn(),
     ...overrides,
   };
 }
@@ -271,6 +272,179 @@ describe('verified billing event terminalization', () => {
   });
 });
 
+describe('verified subscription state application', () => {
+  it('applies normalized current provider state transactionally', async () => {
+    const repository = serviceRepository({
+      applyVerifiedSubscriptionState: vi.fn(async (input) => ({
+        outcome: 'APPLIED',
+        event: storedEvent({
+          id: input.eventId,
+          provider: input.provider,
+          processingStatus: 'APPLIED',
+          processedAt: input.processedAt,
+          subscriptionId: input.subscriptionId,
+        }),
+        subscription: {
+          id: input.subscriptionId,
+          provider: input.provider,
+          status: input.status,
+          currentPeriodEnd: input.currentPeriodEnd,
+          providerStateUpdatedAt: input.providerStateUpdatedAt,
+          canceledAt: input.canceledAt,
+        },
+      })),
+    });
+    const processedAt = new Date('2026-09-23T14:30:00.000Z');
+    const service = createPaymentsService(repository, { now: () => processedAt });
+    const stateTime = new Date('2026-09-23T14:25:00.000Z');
+    const periodEnd = new Date('2026-10-23T14:25:00.000Z');
+
+    const result = await service.applyVerifiedSubscriptionState({
+      eventId: ' billing-event-1 ',
+      subscriptionId: ' subscription-1 ',
+      provider: ' Stripe ',
+      status: ' active ',
+      currentPeriodEnd: periodEnd,
+      providerStateUpdatedAt: stateTime,
+    });
+
+    expect(repository.applyVerifiedSubscriptionState).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'ACTIVE',
+      currentPeriodEnd: periodEnd,
+      canceledAt: null,
+      providerStateUpdatedAt: stateTime,
+      processedAt,
+    });
+    expect(result).toMatchObject({
+      applied: true,
+      duplicate: false,
+      stale: false,
+      subscription: { status: 'ACTIVE', provider: 'stripe' },
+    });
+  });
+
+  it('treats a previously processed event as an idempotent duplicate', async () => {
+    const repository = serviceRepository({
+      applyVerifiedSubscriptionState: vi.fn(async () => ({
+        outcome: 'ALREADY_PROCESSED',
+        event: storedEvent({ processingStatus: 'APPLIED' }),
+      })),
+    });
+    const service = createPaymentsService(repository, {
+      now: () => new Date('2026-09-23T14:30:00.000Z'),
+    });
+
+    const result = await service.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-1',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'ACTIVE',
+      currentPeriodEnd: new Date('2026-10-23T14:25:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-23T14:25:00.000Z'),
+    });
+
+    expect(result).toMatchObject({
+      applied: false,
+      duplicate: true,
+      stale: false,
+    });
+  });
+
+  it('fails closed when the event was finalized without applying subscription state', async () => {
+    const repository = serviceRepository({
+      applyVerifiedSubscriptionState: vi.fn(async () => ({
+        outcome: 'ALREADY_PROCESSED',
+        event: storedEvent({
+          processingStatus: 'FAILED',
+          failureCode: 'PROCESSING_ERROR',
+        }),
+      })),
+    });
+    const service = createPaymentsService(repository, {
+      now: () => new Date('2026-09-23T14:30:00.000Z'),
+    });
+
+    await expect(
+      service.applyVerifiedSubscriptionState({
+        eventId: 'billing-event-1',
+        subscriptionId: 'subscription-1',
+        provider: 'stripe',
+        status: 'ACTIVE',
+        currentPeriodEnd: new Date('2026-10-23T14:25:00.000Z'),
+        providerStateUpdatedAt: new Date('2026-09-23T14:25:00.000Z'),
+      }),
+    ).rejects.toMatchObject({ statusCode: 409, code: 'CONFLICT' });
+  });
+
+  it('returns stale without rolling authoritative subscription state backward', async () => {
+    const repository = serviceRepository({
+      applyVerifiedSubscriptionState: vi.fn(async () => ({
+        outcome: 'STALE',
+        event: storedEvent({ processingStatus: 'IGNORED', failureCode: 'STALE_PROVIDER_STATE' }),
+        subscription: {
+          id: 'subscription-1',
+          provider: 'stripe',
+          status: 'ACTIVE',
+          providerStateUpdatedAt: new Date('2026-09-23T14:40:00.000Z'),
+        },
+      })),
+    });
+    const service = createPaymentsService(repository, {
+      now: () => new Date('2026-09-23T14:45:00.000Z'),
+    });
+
+    const result = await service.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-older',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'PAST_DUE',
+      providerStateUpdatedAt: new Date('2026-09-23T14:20:00.000Z'),
+    });
+
+    expect(result).toMatchObject({
+      applied: false,
+      duplicate: false,
+      stale: true,
+      event: { failureCode: 'STALE_PROVIDER_STATE' },
+      subscription: { status: 'ACTIVE' },
+    });
+  });
+
+  it('rejects unsafe active and canceled state before database mutation', async () => {
+    const repository = serviceRepository();
+    const service = createPaymentsService(repository, {
+      now: () => new Date('2026-09-23T14:30:00.000Z'),
+    });
+    const stateTime = new Date('2026-09-23T14:25:00.000Z');
+
+    await expect(
+      service.applyVerifiedSubscriptionState({
+        eventId: 'billing-event-1',
+        subscriptionId: 'subscription-1',
+        provider: 'stripe',
+        status: 'ACTIVE',
+        currentPeriodEnd: stateTime,
+        providerStateUpdatedAt: stateTime,
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    await expect(
+      service.applyVerifiedSubscriptionState({
+        eventId: 'billing-event-2',
+        subscriptionId: 'subscription-1',
+        provider: 'stripe',
+        status: 'CANCELED',
+        providerStateUpdatedAt: stateTime,
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    expect(repository.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+});
+
 describe('verified billing event repository', () => {
   it('creates the first delivery using only privacy-minimized ledger fields', async () => {
     const create = vi.fn(async () => storedEvent());
@@ -421,5 +595,253 @@ describe('verified billing event repository', () => {
         verifiedAt: VERIFIED_AT,
       }),
     ).rejects.toBe(databaseError);
+  });
+
+  it('claims the event and compare-and-swaps newer provider state in one transaction', async () => {
+    const stateTime = new Date('2026-09-23T14:25:00.000Z');
+    const processedAt = new Date('2026-09-23T14:30:00.000Z');
+    const periodEnd = new Date('2026-10-23T14:25:00.000Z');
+    const pendingEvent = storedEvent();
+    const appliedEvent = storedEvent({
+      processingStatus: 'APPLIED',
+      processedAt,
+      subscriptionId: 'subscription-1',
+    });
+    const existingSubscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'TRIALING',
+      provider: 'stripe',
+      currentPeriodEnd: new Date('2026-10-01T00:00:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-20T00:00:00.000Z'),
+      canceledAt: null,
+    };
+    const appliedSubscription = {
+      ...existingSubscription,
+      status: 'ACTIVE',
+      currentPeriodEnd: periodEnd,
+      providerStateUpdatedAt: stateTime,
+    };
+
+    const billingEventFindUnique = vi
+      .fn()
+      .mockResolvedValueOnce(pendingEvent)
+      .mockResolvedValueOnce(appliedEvent);
+    const subscriptionFindUnique = vi
+      .fn()
+      .mockResolvedValueOnce(existingSubscription)
+      .mockResolvedValueOnce(appliedSubscription);
+    const billingEventUpdateMany = vi.fn(async () => ({ count: 1 }));
+    const subscriptionUpdateMany = vi.fn(async () => ({ count: 1 }));
+    const tx = {
+      billingEvent: {
+        findUnique: billingEventFindUnique,
+        updateMany: billingEventUpdateMany,
+        update: vi.fn(),
+      },
+      subscription: {
+        findUnique: subscriptionFindUnique,
+        updateMany: subscriptionUpdateMany,
+      },
+    };
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        $transaction: vi.fn(async (callback) => callback(tx)),
+      }),
+    );
+
+    const result = await repository.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-1',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'ACTIVE',
+      currentPeriodEnd: periodEnd,
+      canceledAt: null,
+      providerStateUpdatedAt: stateTime,
+      processedAt,
+    });
+
+    expect(billingEventUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'billing-event-1', processingStatus: 'PENDING' },
+        data: expect.objectContaining({
+          processingStatus: 'APPLIED',
+          subscriptionId: 'subscription-1',
+          processedAt,
+        }),
+      }),
+    );
+    expect(subscriptionUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'subscription-1',
+        AND: [
+          { OR: [{ provider: null }, { provider: 'stripe' }] },
+          {
+            OR: [{ providerStateUpdatedAt: null }, { providerStateUpdatedAt: { lt: stateTime } }],
+          },
+        ],
+      },
+      data: {
+        provider: 'stripe',
+        status: 'ACTIVE',
+        currentPeriodEnd: periodEnd,
+        providerStateUpdatedAt: stateTime,
+        canceledAt: null,
+      },
+    });
+    expect(result).toMatchObject({
+      outcome: 'APPLIED',
+      event: { processingStatus: 'APPLIED' },
+      subscription: { status: 'ACTIVE' },
+    });
+  });
+
+  it('fails a claimed event when the subscription provider changes concurrently', async () => {
+    const stateTime = new Date('2026-09-23T14:25:00.000Z');
+    const processedAt = new Date('2026-09-23T14:30:00.000Z');
+    const initialSubscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'ACTIVE',
+      provider: 'stripe',
+      currentPeriodEnd: new Date('2026-10-23T00:00:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-20T00:00:00.000Z'),
+      canceledAt: null,
+    };
+    const changedSubscription = {
+      ...initialSubscription,
+      provider: 'other-provider',
+      providerStateUpdatedAt: new Date('2026-09-23T14:27:00.000Z'),
+    };
+    const failedEvent = storedEvent({
+      processingStatus: 'FAILED',
+      processedAt,
+      failureCode: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+      subscriptionId: 'subscription-1',
+    });
+    const subscriptionFindUnique = vi
+      .fn()
+      .mockResolvedValueOnce(initialSubscription)
+      .mockResolvedValueOnce(changedSubscription);
+    const billingEventUpdate = vi.fn(async () => failedEvent);
+    const tx = {
+      billingEvent: {
+        findUnique: vi.fn(async () => storedEvent()),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+        update: billingEventUpdate,
+      },
+      subscription: {
+        findUnique: subscriptionFindUnique,
+        updateMany: vi.fn(async () => ({ count: 0 })),
+      },
+    };
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        $transaction: vi.fn(async (callback) => callback(tx)),
+      }),
+    );
+
+    const result = await repository.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-1',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'ACTIVE',
+      currentPeriodEnd: new Date('2026-10-23T14:25:00.000Z'),
+      canceledAt: null,
+      providerStateUpdatedAt: stateTime,
+      processedAt,
+    });
+
+    expect(billingEventUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          processingStatus: 'FAILED',
+          failureCode: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+        }),
+      }),
+    );
+    expect(result).toMatchObject({
+      outcome: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+      event: {
+        processingStatus: 'FAILED',
+        failureCode: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+      },
+      subscription: { provider: 'other-provider' },
+    });
+  });
+
+  it('ignores an older concurrent provider event', async () => {
+    const staleTime = new Date('2026-09-23T14:20:00.000Z');
+    const processedAt = new Date('2026-09-23T14:45:00.000Z');
+    const existingSubscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'ACTIVE',
+      provider: 'stripe',
+      currentPeriodEnd: new Date('2026-10-23T00:00:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-23T14:40:00.000Z'),
+      canceledAt: null,
+    };
+    const ignoredEvent = storedEvent({
+      id: 'billing-event-older',
+      processingStatus: 'IGNORED',
+      processedAt,
+      failureCode: 'STALE_PROVIDER_STATE',
+      subscriptionId: 'subscription-1',
+    });
+    const billingEventUpdate = vi.fn(async () => ignoredEvent);
+    const tx = {
+      billingEvent: {
+        findUnique: vi.fn(async () => storedEvent({ id: 'billing-event-older' })),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+        update: billingEventUpdate,
+      },
+      subscription: {
+        findUnique: vi.fn(async () => existingSubscription),
+        updateMany: vi.fn(async () => ({ count: 0 })),
+      },
+    };
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        $transaction: vi.fn(async (callback) => callback(tx)),
+      }),
+    );
+
+    const result = await repository.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-older',
+      subscriptionId: 'subscription-1',
+      provider: 'stripe',
+      status: 'PAST_DUE',
+      currentPeriodEnd: null,
+      canceledAt: null,
+      providerStateUpdatedAt: staleTime,
+      processedAt,
+    });
+
+    expect(billingEventUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'billing-event-older' },
+        data: {
+          processingStatus: 'IGNORED',
+          processedAt,
+          subscriptionId: 'subscription-1',
+          failureCode: 'STALE_PROVIDER_STATE',
+        },
+      }),
+    );
+    expect(result).toMatchObject({
+      outcome: 'STALE',
+      event: {
+        processingStatus: 'IGNORED',
+        failureCode: 'STALE_PROVIDER_STATE',
+      },
+      subscription: {
+        status: 'ACTIVE',
+        providerStateUpdatedAt: existingSubscription.providerStateUpdatedAt,
+      },
+    });
   });
 });

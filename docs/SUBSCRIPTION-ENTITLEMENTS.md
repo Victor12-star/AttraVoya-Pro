@@ -78,7 +78,7 @@ Each record stores the provider name, provider event identifier, event type, a S
 
 The ledger deliberately does not store a raw webhook body, raw purchase token, card data, client secret, provider API secret, or other payment credential. Future provider adapters must verify signatures or purchase evidence before inserting an event into this verified ledger. Receiving an unverified request is not sufficient to grant Pro access.
 
-A ledger entry being present also does not itself grant Pro. Subscription state may change only through a later server-side processor that validates the verified event, maps it to an owned account/subscription, applies an idempotent database transaction, and then lets the existing entitlement resolver evaluate the resulting subscription state.
+A ledger entry being present also does not itself grant Pro. Subscription state may change only through the internal server-side application boundary after provider-specific verification has mapped the event to an existing owned subscription; that boundary applies the state transactionally and then lets the existing entitlement resolver evaluate the resulting subscription state.
 
 ### Internal verified-event recording boundary
 
@@ -86,7 +86,7 @@ The payments module exposes an internal-only `recordVerifiedEvent` service for e
 
 The database unique constraint on provider plus external event ID is the concurrency-safe replay boundary. The first verified delivery creates the record. An exact later retry returns the existing record as a duplicate. Reuse of the same provider event identity with a different event type or payload digest fails closed as a conflict instead of silently replacing the original evidence.
 
-This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification and authoritative subscription mutation remain later separately gated slices.
+This recording service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Phase 10CF keeps mutation in a separate internal transactional boundary; provider-specific verification remains a later separately gated slice.
 
 ### Terminal processing state boundary
 
@@ -94,9 +94,19 @@ Verified billing events begin in `PENDING`. Internal processing may move a pendi
 
 An exact retry of the same terminal outcome is idempotent. A later attempt to finalize the same event with a different outcome fails closed as a conflict. Failed events accept only bounded machine-safe failure codes such as `UNSUPPORTED_EVENT`; free-text failure messages are rejected so payment or personal data cannot be written into the ledger accidentally.
 
-`APPLIED` is intentionally not exposed by this internal terminalization service. A future provider-specific processor may mark an event `APPLIED` only in the same database transaction that performs the authoritative subscription mutation and ownership checks. Until that transaction exists, this slice cannot grant or revoke Pro access.
+`APPLIED` is intentionally not exposed by the standalone terminalization service. Phase 10CF adds a separate internal transaction that may mark an event `APPLIED` only while it performs the authoritative subscription mutation and ownership checks in that same database transaction.
 
 No HTTP route, webhook endpoint, payment-provider verification, checkout action, subscription mutation, or entitlement mutation is added by this state-machine layer.
+
+### Transactional subscription-state application
+
+After an event has already entered the verified ledger, the internal payments service may apply provider-normalized state to an existing authoritative subscription. The pending-event claim, subscription mutation, and final `APPLIED` ledger state are coupled in one database transaction; no public billing route is added.
+
+`Subscription.providerStateUpdatedAt` records when the provider says the state became current. Subscription mutation uses that timestamp as a compare-and-swap condition, so a delayed or concurrently processed older event cannot overwrite newer provider state. A stale event is retained as `IGNORED` with the privacy-safe machine code `STALE_PROVIDER_STATE`.
+
+The transaction also requires provider consistency between the verified event and existing subscription. Already-processed events remain idempotent. Active or trialing state requires a current period end later than the provider-state timestamp, and canceled state requires a cancellation timestamp.
+
+This boundary updates only an existing subscription. It does not create a purchase, create a provider customer or subscription, verify Stripe signatures, verify Google Play purchase tokens, process RevenueCat or Apple evidence, expose checkout, or make a billing-event row an entitlement by itself. Pro access still comes only from the server-authoritative subscription and entitlement resolver.
 
 ## Future billing integration
 
