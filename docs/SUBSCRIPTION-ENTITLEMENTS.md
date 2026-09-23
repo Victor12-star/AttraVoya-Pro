@@ -88,7 +88,15 @@ The server boundary, not the caller and not the provider adapter, computes the S
 
 Raw request bodies, signatures, authorization headers, purchase tokens and provider secrets are not included in the evidence object and are not written to the billing ledger. Payload size is bounded before provider verification so an attacker cannot force unbounded buffering through a future callback route.
 
-This phase remains provider-neutral. It does not yet implement Stripe signature verification, Google Play purchase-token verification, RevenueCat webhook verification, Apple transaction verification, or a public callback endpoint.
+The provider-neutral boundary does not itself know any provider secret or signature format. Concrete adapters plug into it separately.
+
+### Stripe webhook verification adapter
+
+The internal Stripe adapter verifies Stripe's timestamped `v1` HMAC-SHA-256 signature against the exact raw request bytes before event JSON is trusted. It accepts multiple `v1` values so webhook-secret rotation can overlap safely, compares signatures with a timing-safe primitive, and rejects timestamps outside the configured replay tolerance.
+
+Only after authentication succeeds does the adapter parse the event and return the bounded Stripe event ID, event type, and optional provider occurrence time to the provider-neutral verification boundary. The webhook secret, Stripe signature header, and raw payload are not returned in verifier-minted evidence and are not persisted in the billing ledger.
+
+This adapter is internal only. No Stripe webhook route, environment-secret wiring, checkout session, customer creation, subscription purchase, refund handler, or Stripe API call is enabled by this phase. A future HTTP callback must preserve exact raw request bytes and supply the secret from server-only configuration before this verifier can be used in production.
 
 ### Internal verified-event recording boundary
 
