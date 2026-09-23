@@ -173,6 +173,43 @@ export function createPaymentsRepository(prismaClient = prisma) {
         });
 
         if (updated.count !== 1) {
+          const currentSubscription = await tx.subscription.findUnique({
+            where: { id: subscriptionId },
+            select: SUBSCRIPTION_SELECT,
+          });
+
+          if (!currentSubscription) {
+            const failedEvent = await tx.billingEvent.update({
+              where: { id: eventId },
+              data: {
+                processingStatus: 'FAILED',
+                processedAt,
+                subscriptionId,
+                failureCode: 'SUBSCRIPTION_NOT_FOUND',
+              },
+              select: EVENT_SELECT,
+            });
+            return { outcome: 'SUBSCRIPTION_NOT_FOUND', event: failedEvent };
+          }
+
+          if (currentSubscription.provider && currentSubscription.provider !== provider) {
+            const failedEvent = await tx.billingEvent.update({
+              where: { id: eventId },
+              data: {
+                processingStatus: 'FAILED',
+                processedAt,
+                subscriptionId,
+                failureCode: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+              },
+              select: EVENT_SELECT,
+            });
+            return {
+              outcome: 'SUBSCRIPTION_PROVIDER_MISMATCH',
+              event: failedEvent,
+              subscription: currentSubscription,
+            };
+          }
+
           const ignoredEvent = await tx.billingEvent.update({
             where: { id: eventId },
             data: {
@@ -184,7 +221,11 @@ export function createPaymentsRepository(prismaClient = prisma) {
             select: EVENT_SELECT,
           });
 
-          return { outcome: 'STALE', event: ignoredEvent, subscription };
+          return {
+            outcome: 'STALE',
+            event: ignoredEvent,
+            subscription: currentSubscription,
+          };
         }
 
         const appliedSubscription = await tx.subscription.findUnique({
