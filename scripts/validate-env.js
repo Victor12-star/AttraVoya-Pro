@@ -29,6 +29,7 @@ function parseEnvFile(filePath) {
   return values;
 }
 
+/** @type {Record<string, string | undefined>} */
 const env = {
   ...parseEnvFile(path.join(process.cwd(), '.env')),
   ...process.env,
