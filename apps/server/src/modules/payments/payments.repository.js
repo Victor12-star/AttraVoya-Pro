@@ -25,36 +25,39 @@ export function createPaymentsRepository(prismaClient = prisma) {
       occurredAt,
       verifiedAt,
     }) {
-      let created = false;
-
-      const event = await prismaClient.billingEvent.upsert({
-        where: {
-          provider_externalEventId: {
+      try {
+        const event = await prismaClient.billingEvent.create({
+          data: {
             provider,
             externalEventId,
+            eventType,
+            payloadHash,
+            occurredAt,
+            verifiedAt,
           },
-        },
-        create: {
-          provider,
-          externalEventId,
-          eventType,
-          payloadHash,
-          occurredAt,
-          verifiedAt,
-        },
-        update: {},
-        select: EVENT_SELECT,
-      });
+          select: EVENT_SELECT,
+        });
 
-      // Prisma upsert does not expose whether the create branch won. A second
-      // read is unnecessary: the immutable identity fields let the service
-      // safely classify exact retries versus conflicting replay attempts.
-      created =
-        event.eventType === eventType &&
-        event.payloadHash === payloadHash &&
-        event.verifiedAt.getTime() === verifiedAt.getTime();
+        return { event, created: true };
+      } catch (error) {
+        // The provider/event unique constraint is the concurrency-safe replay
+        // boundary. If another worker won the insert race, return that existing
+        // record so the service can distinguish an exact retry from a conflict.
+        if (error?.code !== 'P2002') throw error;
 
-      return { event, created };
+        const event = await prismaClient.billingEvent.findUnique({
+          where: {
+            provider_externalEventId: {
+              provider,
+              externalEventId,
+            },
+          },
+          select: EVENT_SELECT,
+        });
+
+        if (!event) throw error;
+        return { event, created: false };
+      }
     },
   };
 }
