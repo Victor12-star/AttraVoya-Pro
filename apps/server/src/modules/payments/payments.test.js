@@ -56,7 +56,7 @@ function storedEvent(overrides = {}) {
 }
 
 describe('verified billing event service', () => {
-  it('records normalized already-verified evidence without storing raw payload input', async () => {
+  it('records only evidence produced by the provider verification boundary', async () => {
     const repository = serviceRepository({
       recordVerifiedEvent: vi.fn(async (input) => ({
         event: storedEvent({
@@ -71,19 +71,13 @@ describe('verified billing event service', () => {
       })),
     });
     const service = createPaymentsService(repository);
+    const evidence = await verifiedEvidence({
+      provider: ' Stripe ',
+      externalEventId: ' evt_123 ',
+      eventType: ' customer.subscription.updated ',
+    });
 
-    const result = await service.recordVerifiedEvent(
-      /** @type {any} */ ({
-        provider: ' Stripe ',
-        externalEventId: ' evt_123 ',
-        eventType: ' customer.subscription.updated ',
-        payloadHash: HASH.toUpperCase(),
-        occurredAt: OCCURRED_AT,
-        verifiedAt: VERIFIED_AT,
-        rawPayload: '{"must":"not persist"}',
-        purchaseToken: 'must-not-persist',
-      }),
-    );
+    const result = await service.recordVerifiedEvent(evidence);
 
     expect(repository.recordVerifiedEvent).toHaveBeenCalledWith({
       provider: 'stripe',
@@ -94,6 +88,9 @@ describe('verified billing event service', () => {
       verifiedAt: VERIFIED_AT,
     });
     expect(result.duplicate).toBe(false);
+    expect(JSON.stringify(repository.recordVerifiedEvent.mock.calls)).not.toContain(
+      'must-not-persist',
+    );
   });
 
   it('treats an exact provider retry as a harmless duplicate', async () => {
@@ -104,15 +101,11 @@ describe('verified billing event service', () => {
       })),
     });
     const service = createPaymentsService(repository);
-
-    const result = await service.recordVerifiedEvent({
-      provider: 'stripe',
-      externalEventId: 'evt_123',
-      eventType: 'customer.subscription.updated',
-      payloadHash: HASH,
-      occurredAt: OCCURRED_AT,
+    const evidence = await verifiedEvidence({
       verifiedAt: new Date('2026-09-23T13:02:00.000Z'),
     });
+
+    const result = await service.recordVerifiedEvent(evidence);
 
     expect(result).toMatchObject({
       duplicate: true,
@@ -128,22 +121,15 @@ describe('verified billing event service', () => {
       })),
     });
     const service = createPaymentsService(repository);
+    const evidence = await verifiedEvidence();
 
-    await expect(
-      service.recordVerifiedEvent({
-        provider: 'stripe',
-        externalEventId: 'evt_123',
-        eventType: 'customer.subscription.updated',
-        payloadHash: HASH,
-        verifiedAt: VERIFIED_AT,
-      }),
-    ).rejects.toMatchObject({
+    await expect(service.recordVerifiedEvent(evidence)).rejects.toMatchObject({
       statusCode: 409,
       code: 'CONFLICT',
     });
   });
 
-  it('rejects malformed digests and invalid verification times before persistence', async () => {
+  it('rejects caller-forged evidence before persistence', async () => {
     const repository = serviceRepository();
     const service = createPaymentsService(repository);
 
@@ -152,20 +138,11 @@ describe('verified billing event service', () => {
         provider: 'stripe',
         externalEventId: 'evt_123',
         eventType: 'customer.subscription.updated',
-        payloadHash: 'not-a-sha256-digest',
+        payloadHash: HASH,
+        occurredAt: OCCURRED_AT,
         verifiedAt: VERIFIED_AT,
       }),
-    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
-
-    await expect(
-      service.recordVerifiedEvent({
-        provider: 'stripe',
-        externalEventId: 'evt_123',
-        eventType: 'customer.subscription.updated',
-        payloadHash: HASH,
-        verifiedAt: new Date('invalid'),
-      }),
-    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+    ).rejects.toThrow('Verified billing evidence is required.');
 
     expect(repository.recordVerifiedEvent).not.toHaveBeenCalled();
   });
