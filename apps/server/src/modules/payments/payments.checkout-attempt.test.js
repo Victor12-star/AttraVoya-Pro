@@ -4,7 +4,7 @@ import { createPaymentsRepository } from './payments.repository.js';
 import { createCheckoutAttemptService } from './payments.checkout-attempt.js';
 
 const NOW = new Date('2026-09-23T20:05:00.000Z');
-const EXPIRES_AT = new Date('2026-09-23T20:35:00.000Z');
+const EXPIRES_AT = new Date('2026-09-23T20:40:00.000Z');
 
 function attempt(overrides = {}) {
   return {
