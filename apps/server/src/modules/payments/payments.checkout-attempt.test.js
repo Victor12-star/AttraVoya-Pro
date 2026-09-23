@@ -234,6 +234,22 @@ describe('checkout attempt service', () => {
   });
 });
 
+  it('rejects checkout-attempt TTLs that cannot satisfy Stripe expiry minimums', () => {
+    const repository = {
+      createOrReuseCheckoutAttempt: vi.fn(),
+      bindCheckoutSession: vi.fn(),
+    };
+
+    expect(() =>
+      createCheckoutAttemptService({
+        repository,
+        checkoutPolicy: checkoutPolicy(),
+        now: () => NOW,
+        attemptTtlMs: 30 * 60 * 1000,
+      }),
+    ).toThrow('Checkout-attempt TTL is invalid.');
+  });
+
 describe('checkout attempt repository', () => {
   it('expires an old active attempt before creating a new one', async () => {
     const planFindUnique = vi.fn(async () => ({
