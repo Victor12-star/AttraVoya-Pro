@@ -11,9 +11,7 @@ function stripeSignatureHeader(headers) {
   }
 
   const value =
-    headers['stripe-signature'] ??
-    headers['Stripe-Signature'] ??
-    headers['STRIPE-SIGNATURE'];
+    headers['stripe-signature'] ?? headers['Stripe-Signature'] ?? headers['STRIPE-SIGNATURE'];
 
   if (typeof value !== 'string' || !value.trim()) {
     throw new ValidationError('Stripe signature header is required.');
