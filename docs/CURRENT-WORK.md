@@ -28,17 +28,17 @@ Never infer 5/5 from workflow-level status alone; inspect the individual jobs. D
 
 ## Current fully verified release
 
-Phase 10BX — public terms of service — is complete.
+Phase 10CK — opt-in Stripe webhook ingress — is complete.
 
-- PR: `#168`
-- Final PR head: `d70093e99ea7f2d43bbcd3a2452b06941969eb0b`
-- Final PR CI run: `35730925766`
+- PR: `#183`
+- Final PR head: `ea62a33a7ec93299a6bd3d55d5e63edd0eb2a03b`
+- Final PR CI run: `35899831282`
 - Result: all five canonical jobs passed
-- Squash-merged `develop` SHA: `30b9fe9249bfa80ed37a74d97ff34bef0b553ace`
-- Independent post-merge push CI run: `35731580061`
+- Squash-merged `develop` SHA: `ef0550e3dcb60f3d17f720dba256f7e7e1c18a31`
+- Independent post-merge push CI run: `35904007095`
 - Result: all five canonical jobs passed
 
-Phase 10BX replaces the placeholder terms route with a truthful public Terms of Service, keeps provider/live-data honesty and mandatory consumer-right boundaries explicit, states that paid subscriptions are not yet enabled, and adds permanent footer and sitemap access without changing billing, authentication, provider, database, or mobile runtime behavior.
+Phase 10CK exposes the first public payment-provider ingress, but it remains deliberately opt-in and disabled unless `STRIPE_WEBHOOK_ENABLED=true` and a real server-only `STRIPE_WEBHOOK_SECRET` are configured. The route preserves exact Stripe raw bytes, applies dedicated body/rate limits, verifies signatures before trusting lifecycle data, records privacy-minimized verified evidence, resolves provider subscription ownership by provider-scoped external identity, and applies authoritative subscription state transactionally. It does not enable checkout, customer creation, new purchases, refunds, restore-purchase flows, advertising, payment UI, Google Play Billing, RevenueCat purchase flows, or Apple In-App Purchase.
 
 The public-home Pixel 7 Chromium production-build resource budget established by Phases 10K and 10L remains enforced. Current hard ceilings are 215,063 bytes total same-origin transfer, 190,003 bytes JavaScript transfer, 6,366 bytes CSS transfer, and 0 bytes image transfer for that specific route. The zero-image ceiling is route-specific and must not be generalized to unrelated routes.
 
@@ -131,6 +131,20 @@ The following Issue #40 slices are complete and must not be restarted:
 - Phase 10BV — add public web account deletion flow — PR `#166`
 - Phase 10BW — publish the public privacy policy — PR `#167`
 - Phase 10BX — publish the public terms of service — PR `#168`
+- Maintenance handoff synchronization through Phase 10BX — PR `#169`
+- Phase 10BY — establish authoritative Free and Pro entitlements — PR `#170`
+- Phase 10BZ — centralize server entitlement authorization — PR `#171`
+- Phase 10CA — publish truthful web subscription status — PR `#172`
+- Phase 10CB — publish truthful mobile subscription status — PR `#173`
+- Phase 10CC — add verified billing event ledger — PR `#174`
+- Phase 10CD — add idempotent verified billing event recording — PR `#175`
+- Phase 10CE — make billing-event terminalization concurrency-safe — PR `#176`
+- Phase 10CF — apply verified subscription state transactionally — PR `#178`
+- Phase 10CG — establish provider verification evidence boundary — PR `#179`
+- Phase 10CH — add internal Stripe webhook signature verifier — PR `#180`
+- Phase 10CI — enforce provider subscription identity — PR `#181`
+- Phase 10CJ — process verified Stripe subscription events internally — PR `#182`
+- Phase 10CK — add opt-in Stripe webhook ingress — PR `#183`
 
 PR `#91` is obsolete and was superseded by the corrected Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` is also superseded and must never be merged.
 
@@ -183,6 +197,8 @@ Phases 10BB through 10BD bounded emergency, language, and country reference resp
 Phases 10BK and 10BL modernized and pinned the canonical CI runtime. Phases 10BM through 10BO added encrypted mobile access-token/session storage, cookie-free refresh-session APIs, and coordinated rotation/recovery behavior. Phases 10BP through 10BT connected mobile authentication, registration, password recovery, email-verification recovery, authenticated identity restoration, and the Profile account summary.
 
 Phases 10BU and 10BV expose secure server-authoritative account deletion in the mobile app and a public web deletion resource suitable for store-policy access. Phase 10BW publishes the public privacy policy, and Phase 10BX publishes the public Terms of Service. These public legal surfaces are release prerequisites, not substitutes for final operator/legal review and production configuration.
+
+Phases 10BY through 10CK establish the subscription trust chain without yet enabling purchase creation. Phase 10BY defines server-authoritative Free/Pro plans and entitlement resolution; 10BZ centralizes server-side premium authorization; 10CA and 10CB expose truthful read-only web/mobile plan status. Phases 10CC through 10CF add the verified billing-event ledger, replay-safe recording, terminalization, and transactional provider-state application with stale-event protection. Phase 10CG adds opaque verifier-minted evidence from exact raw provider bytes; 10CH adds Stripe HMAC-SHA-256 signature verification with replay tolerance; 10CI makes provider plus external subscription identity unique and fail-closed; 10CJ composes verification, ledger, ownership resolution and state mutation internally; and 10CK adds the disabled-by-default public Stripe webhook ingress with dedicated limits and minimal acknowledgements. Checkout, new subscription purchase creation, customer creation, refunds, restore-purchase flows, Google Play Billing, RevenueCat purchase flows, Apple In-App Purchase, advertising and payment UI remain unimplemented.
 
 ## Existing Issue #40 foundations that must be preserved
 
@@ -252,5 +268,7 @@ Candidate remaining gaps that still require live verification include dependency
 Treat those as candidate gaps, not automatic implementation instructions. Inspect first and choose the smallest genuine missing production-readiness slice.
 
 Issue `#36` — privacy-conscious analytics/admin monitoring — also remains a standing program. Its sequencing still defers implementation until the required authoritative product/subscription actions exist and before final release hardening. Any analytics/admin dashboard remains administrator-only and must never appear in the normal traveller application.
+
+After Phase 10CK, the next subscription slice is not automatically checkout. Inspect the live repository first. Any real purchase-creation work must define server-only Stripe API credentials, canonical server-owned price mapping, authenticated account ownership, idempotency, redirect/return URL safety, duplicate-click/retry behavior, webhook reconciliation, cancellation/refund semantics, and truthful web/mobile UX before enabling a buy action. Google Play and future iOS purchase flows remain separate provider-specific work.
 
 Repository state wins over this document if newer fully verified work lands. Before starting another slice, always inspect the live `develop` SHA, its exact push CI, open PRs/issues, and relevant code paths.
