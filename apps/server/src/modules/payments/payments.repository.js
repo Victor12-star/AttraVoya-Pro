@@ -216,6 +216,22 @@ export function createPaymentsRepository(prismaClient = prisma) {
             };
           }
 
+          const isFreshOwnedAttempt =
+            attempt.status === 'SESSION_CREATED' && attempt.activeUserKey === attempt.userId;
+          const isAlreadyLinked =
+            attempt.status === 'COMPLETED' &&
+            attempt.activeUserKey === null &&
+            Boolean(existingSubscription);
+
+          if (!isFreshOwnedAttempt && !isAlreadyLinked) {
+            return {
+              outcome: 'CHECKOUT_ATTEMPT_STATE_CONFLICT',
+              event,
+              attempt,
+              subscription: existingSubscription,
+            };
+          }
+
           const claimed = await tx.billingEvent.updateMany({
             where: { id: eventId, processingStatus: 'PENDING' },
             data: {
