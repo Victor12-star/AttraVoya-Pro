@@ -245,5 +245,7 @@ For subscription work, do not jump directly from webhook ingress to a public buy
 
 Android Google Play Billing plus RevenueCat and future iOS Apple In-App Purchase plus RevenueCat remain separate provider-specific purchase integrations. Do not reuse the Stripe web purchase path as mobile store billing.
 
-Issue `#40` remains the broad production-readiness program. Issue `#36` remains the separate privacy-conscious analytics/admin-monitoring program; an admin analytics surface must remain administrator-only and outside the traveller application.
+Issue `#40` remains the broad production-readiness program. Candidate genuine gaps still include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists. Treat these as candidates only; do not add Redis, queues, read replicas, distributed tracing, monitoring vendors, or other shared infrastructure without measured need.
+
+Issue `#36` remains the separate privacy-conscious analytics/admin-monitoring program. Its sequencing still defers implementation until the necessary authoritative product/subscription actions exist and before final release hardening. Any admin analytics surface must remain administrator-only and outside the traveller application.
 
