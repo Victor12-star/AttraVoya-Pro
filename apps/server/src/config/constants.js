@@ -33,3 +33,10 @@ export const PROVIDER_DISCOVERY_RATE_LIMIT = Object.freeze({
   max: 30,
   timeWindow: '1 minute',
 });
+
+// Stripe can legitimately retry and burst webhook delivery, but the public
+// endpoint still needs a separate abuse ceiling from ordinary application API traffic.
+export const STRIPE_WEBHOOK_RATE_LIMIT = Object.freeze({
+  max: 60,
+  timeWindow: '1 minute',
+});
