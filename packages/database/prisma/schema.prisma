@@ -343,6 +343,7 @@ model Subscription {
   externalSubscriptionId String?
   startsAt              DateTime            @default(now())
   currentPeriodEnd      DateTime?
+  providerStateUpdatedAt DateTime?
   canceledAt            DateTime?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
