@@ -60,6 +60,28 @@ if (stripeWebhookEnabled === 'true') {
   requireValue('STRIPE_WEBHOOK_SECRET', 16);
 }
 
+const stripePurchaseEnabled = env.STRIPE_PURCHASE_ENABLED?.trim().toLowerCase();
+if (stripePurchaseEnabled && !['true', 'false'].includes(stripePurchaseEnabled)) {
+  errors.push('STRIPE_PURCHASE_ENABLED must be either true or false.');
+}
+if (stripePurchaseEnabled === 'true') {
+  requireValue('STRIPE_SECRET_KEY', 16);
+  requireValue('STRIPE_PRO_MONTHLY_PRICE_ID', 8);
+  requireValue('STRIPE_PRO_YEARLY_PRICE_ID', 8);
+
+  const monthlyPrice = env.STRIPE_PRO_MONTHLY_PRICE_ID?.trim();
+  const yearlyPrice = env.STRIPE_PRO_YEARLY_PRICE_ID?.trim();
+  if (monthlyPrice && !/^price_[A-Za-z0-9]+$/.test(monthlyPrice)) {
+    errors.push('STRIPE_PRO_MONTHLY_PRICE_ID must be a Stripe Price ID beginning with price_.');
+  }
+  if (yearlyPrice && !/^price_[A-Za-z0-9]+$/.test(yearlyPrice)) {
+    errors.push('STRIPE_PRO_YEARLY_PRICE_ID must be a Stripe Price ID beginning with price_.');
+  }
+  if (monthlyPrice && yearlyPrice && monthlyPrice === yearlyPrice) {
+    errors.push('STRIPE_PRO_MONTHLY_PRICE_ID and STRIPE_PRO_YEARLY_PRICE_ID must be different.');
+  }
+}
+
 for (const [providerKey, credentialKey] of [
   ['MAPS_PROVIDER', 'GEOAPIFY_API_KEY'],
   ['PLACES_PROVIDER', 'GEOAPIFY_API_KEY'],
