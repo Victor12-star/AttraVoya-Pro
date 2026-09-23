@@ -29,7 +29,11 @@ function signature(rawPayload, timestamp = TIMESTAMP, secret = SECRET) {
     .digest('hex');
 }
 
-function header(rawPayload, timestamp = TIMESTAMP, signatures = [signature(rawPayload, timestamp)]) {
+function header(
+  rawPayload,
+  timestamp = TIMESTAMP,
+  signatures = [signature(rawPayload, timestamp)],
+) {
   return `t=${timestamp},${signatures.map((value) => `v1=${value}`).join(',')}`;
 }
 
