@@ -1,7 +1,10 @@
-import { ConflictError, ValidationError } from '../../errors/app-error.js';
+import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 import { paymentsRepository } from './payments.repository.js';
 
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
+const FAILURE_CODE = /^[A-Z][A-Z0-9_]{0,79}$/;
+/** @type {Set<string>} */
+const TERMINAL_OUTCOMES = new Set(['IGNORED', 'FAILED']);
 
 function requiredText(value, name, maxLength) {
   if (typeof value !== 'string') {
@@ -30,14 +33,81 @@ function optionalDate(value, name) {
 }
 
 /**
- * @param {{ recordVerifiedEvent: (input: any) => Promise<any> }} [repository]
+ * @param {{
+ *   recordVerifiedEvent: (input: any) => Promise<any>,
+ *   finalizePendingEvent: (input: any) => Promise<any>
+ * }} [repository]
+ * @param {{ now?: () => Date }} [options]
  */
-export function createPaymentsService(repository = paymentsRepository) {
-  if (!repository?.recordVerifiedEvent) {
+export function createPaymentsService(repository = paymentsRepository, options = {}) {
+  if (!repository?.recordVerifiedEvent || !repository?.finalizePendingEvent) {
     throw new TypeError('Payments repository is required.');
   }
 
+  const now = options.now ?? (() => new Date());
+
   return {
+    /**
+     * Finalize a verified event without applying subscription state.
+     *
+     * APPLIED is intentionally excluded here. A future processor may only
+     * mark an event APPLIED in the same transaction that mutates authoritative
+     * subscription state.
+     *
+     * @param {{
+     *   eventId: string,
+     *   outcome: string,
+     *   failureCode?: string | null
+     * }} input
+     */
+    async finalizeVerifiedEvent({ eventId, outcome, failureCode = null }) {
+      const normalizedEventId = requiredText(eventId, 'eventId', 255);
+      const normalizedOutcome = requiredText(outcome, 'outcome', 16).toUpperCase();
+
+      if (!TERMINAL_OUTCOMES.has(normalizedOutcome)) {
+        throw new ValidationError('outcome must be IGNORED or FAILED.');
+      }
+
+      let normalizedFailureCode = null;
+      if (normalizedOutcome === 'FAILED') {
+        normalizedFailureCode = requiredText(failureCode, 'failureCode', 80).toUpperCase();
+        if (!FAILURE_CODE.test(normalizedFailureCode)) {
+          throw new ValidationError('failureCode must be a privacy-safe machine code.');
+        }
+      } else if (failureCode != null) {
+        throw new ValidationError('failureCode is only valid for FAILED events.');
+      }
+
+      const processedAt = requiredDate(now(), 'processedAt');
+      const result = await repository.finalizePendingEvent({
+        eventId: normalizedEventId,
+        status: normalizedOutcome,
+        failureCode: normalizedFailureCode,
+        processedAt,
+      });
+
+      if (!result.event) {
+        throw new NotFoundError('Verified billing event was not found.');
+      }
+
+      if (!result.transitioned) {
+        const sameOutcome =
+          result.event.processingStatus === normalizedOutcome &&
+          (result.event.failureCode ?? null) === normalizedFailureCode;
+
+        if (!sameOutcome) {
+          throw new ConflictError(
+            'Verified billing event is already finalized with a different outcome.',
+          );
+        }
+      }
+
+      return {
+        event: result.event,
+        duplicate: !result.transitioned,
+      };
+    },
+
     /**
      * @param {{
      *   provider: string,

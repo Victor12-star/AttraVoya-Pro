@@ -88,6 +88,16 @@ The database unique constraint on provider plus external event ID is the concurr
 
 This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification and authoritative subscription mutation remain later separately gated slices.
 
+### Terminal processing state boundary
+
+Verified billing events begin in `PENDING`. Internal processing may move a pending event to `IGNORED` or `FAILED` through one compare-and-set update that requires the row to still be pending. This prevents two workers from overwriting one another's terminal decision.
+
+An exact retry of the same terminal outcome is idempotent. A later attempt to finalize the same event with a different outcome fails closed as a conflict. Failed events accept only bounded machine-safe failure codes such as `UNSUPPORTED_EVENT`; free-text failure messages are rejected so payment or personal data cannot be written into the ledger accidentally.
+
+`APPLIED` is intentionally not exposed by this internal terminalization service. A future provider-specific processor may mark an event `APPLIED` only in the same database transaction that performs the authoritative subscription mutation and ownership checks. Until that transaction exists, this slice cannot grant or revoke Pro access.
+
+No HTTP route, webhook endpoint, payment-provider verification, checkout action, subscription mutation, or entitlement mutation is added by this state-machine layer.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
