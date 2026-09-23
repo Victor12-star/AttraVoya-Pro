@@ -163,41 +163,41 @@ describe('checkout attempt service', () => {
   it(
     'binds a trusted Stripe Checkout Session once and treats exact retry as idempotent',
     async () => {
-    const firstAttempt = attempt({
-      status: 'SESSION_CREATED',
-      externalCheckoutSessionId: 'cs_test_123',
-    });
-    const repository = {
-      createOrReuseCheckoutAttempt: vi.fn(),
-      bindCheckoutSession: vi
-        .fn()
-        .mockResolvedValueOnce({
-          attempt: firstAttempt,
-          transitioned: true,
-        })
-        .mockResolvedValueOnce({
-          attempt: firstAttempt,
-          transitioned: false,
-        }),
-    };
-    const service = createCheckoutAttemptService({
-      repository,
-      checkoutPolicy: checkoutPolicy(),
-      now: () => NOW,
-    });
+      const firstAttempt = attempt({
+        status: 'SESSION_CREATED',
+        externalCheckoutSessionId: 'cs_test_123',
+      });
+      const repository = {
+        createOrReuseCheckoutAttempt: vi.fn(),
+        bindCheckoutSession: vi
+          .fn()
+          .mockResolvedValueOnce({
+            attempt: firstAttempt,
+            transitioned: true,
+          })
+          .mockResolvedValueOnce({
+            attempt: firstAttempt,
+            transitioned: false,
+          }),
+      };
+      const service = createCheckoutAttemptService({
+        repository,
+        checkoutPolicy: checkoutPolicy(),
+        now: () => NOW,
+      });
 
-    const first = await service.bindStripeSession({
-      userId: 'user-1',
-      attemptId: 'attempt-1',
-      externalCheckoutSessionId: 'cs_test_123',
-    });
-    const retry = await service.bindStripeSession({
-      userId: 'user-1',
-      attemptId: 'attempt-1',
-      externalCheckoutSessionId: 'cs_test_123',
-    });
+      const first = await service.bindStripeSession({
+        userId: 'user-1',
+        attemptId: 'attempt-1',
+        externalCheckoutSessionId: 'cs_test_123',
+      });
+      const retry = await service.bindStripeSession({
+        userId: 'user-1',
+        attemptId: 'attempt-1',
+        externalCheckoutSessionId: 'cs_test_123',
+      });
 
-    expect(first.duplicate).toBe(false);
+      expect(first.duplicate).toBe(false);
       expect(retry.duplicate).toBe(true);
     },
   );
