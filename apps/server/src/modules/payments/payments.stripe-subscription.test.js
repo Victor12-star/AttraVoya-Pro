@@ -142,6 +142,32 @@ describe('internal Stripe subscription event processor', () => {
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
+  it('rejects a post-verification payload identity mismatch before subscription lookup', async () => {
+    const deps = dependencies({
+      verificationBoundary: {
+        verifyEvent: vi.fn(async () => evidence({ externalEventId: 'evt_verified' })),
+      },
+    });
+    const processor = createStripeSubscriptionEventProcessor(deps);
+
+    await expect(
+      processor.process({
+        rawPayload: rawStripeEvent({ id: 'evt_payload' }),
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 400,
+      code: 'VALIDATION_ERROR',
+    });
+
+    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      outcome: 'FAILED',
+      failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
+    });
+    expect(deps.paymentsService.resolveProviderSubscription).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
   it('records and ignores authenticated Stripe events outside the subscription lifecycle', async () => {
     const deps = dependencies({
       verificationBoundary: {
