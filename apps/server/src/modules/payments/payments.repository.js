@@ -15,6 +15,25 @@ const EVENT_SELECT = Object.freeze({
   subscriptionId: true,
 });
 
+const CHECKOUT_ATTEMPT_SELECT = Object.freeze({
+  id: true,
+  userId: true,
+  provider: true,
+  status: true,
+  activeUserKey: true,
+  externalCheckoutSessionId: true,
+  createdAt: true,
+  updatedAt: true,
+  expiresAt: true,
+  plan: {
+    select: {
+      id: true,
+      key: true,
+      isActive: true,
+    },
+  },
+});
+
 const SUBSCRIPTION_SELECT = Object.freeze({
   id: true,
   userId: true,
@@ -28,6 +47,108 @@ const SUBSCRIPTION_SELECT = Object.freeze({
 
 export function createPaymentsRepository(prismaClient = prisma) {
   return {
+    async createOrReuseCheckoutAttempt({ userId, planKey, provider, now, expiresAt }) {
+      const plan = await prismaClient.plan.findUnique({
+        where: { key: planKey },
+        select: { id: true, key: true, isActive: true },
+      });
+
+      if (!plan?.isActive) {
+        return { outcome: 'PLAN_NOT_FOUND', attempt: null, created: false };
+      }
+
+      // Release only an already-expired active attempt. The conditional update
+      // makes concurrent callers race safely without deleting audit history.
+      await prismaClient.checkoutAttempt.updateMany({
+        where: {
+          activeUserKey: userId,
+          status: { in: ['PENDING', 'SESSION_CREATED'] },
+          expiresAt: { lte: now },
+        },
+        data: {
+          status: 'EXPIRED',
+          activeUserKey: null,
+        },
+      });
+
+      const existing = await prismaClient.checkoutAttempt.findUnique({
+        where: { activeUserKey: userId },
+        select: CHECKOUT_ATTEMPT_SELECT,
+      });
+
+      if (existing) {
+        return { outcome: 'EXISTING', attempt: existing, created: false };
+      }
+
+      try {
+        const attempt = await prismaClient.checkoutAttempt.create({
+          data: {
+            userId,
+            planId: plan.id,
+            provider,
+            activeUserKey: userId,
+            expiresAt,
+          },
+          select: CHECKOUT_ATTEMPT_SELECT,
+        });
+
+        return { outcome: 'CREATED', attempt, created: true };
+      } catch (error) {
+        // The activeUserKey unique constraint is the duplicate-click/concurrent
+        // request boundary. A second worker returns the winner's attempt.
+        if (error?.code !== 'P2002') throw error;
+
+        const attempt = await prismaClient.checkoutAttempt.findUnique({
+          where: { activeUserKey: userId },
+          select: CHECKOUT_ATTEMPT_SELECT,
+        });
+
+        if (!attempt) throw error;
+        return { outcome: 'EXISTING', attempt, created: false };
+      }
+    },
+
+    async bindCheckoutSession({
+      attemptId,
+      userId,
+      provider,
+      externalCheckoutSessionId,
+    }) {
+      try {
+        const update = await prismaClient.checkoutAttempt.updateMany({
+          where: {
+            id: attemptId,
+            userId,
+            provider,
+            status: 'PENDING',
+            activeUserKey: userId,
+            externalCheckoutSessionId: null,
+          },
+          data: {
+            status: 'SESSION_CREATED',
+            externalCheckoutSessionId,
+          },
+        });
+
+        const attempt = await prismaClient.checkoutAttempt.findUnique({
+          where: { id: attemptId },
+          select: CHECKOUT_ATTEMPT_SELECT,
+        });
+
+        return {
+          attempt,
+          transitioned: update.count === 1,
+        };
+      } catch (error) {
+        // A Stripe Checkout Session must map to exactly one server-owned
+        // attempt. Do not hide provider-session uniqueness collisions.
+        if (error?.code === 'P2002') {
+          return { attempt: null, transitioned: false, providerIdentityConflict: true };
+        }
+        throw error;
+      }
+    },
+
     async findSubscriptionByProviderIdentity({ provider, externalSubscriptionId }) {
       return prismaClient.subscription.findUnique({
         where: {
