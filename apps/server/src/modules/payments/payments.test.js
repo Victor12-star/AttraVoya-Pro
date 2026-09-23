@@ -176,7 +176,7 @@ describe('verified billing event terminalization', () => {
       processedAt,
     });
     expect(result.duplicate).toBe(false);
-    expect(result.event.processingStatus).toBe('IGNORED');
+    expect(result.event?.processingStatus).toBe('IGNORED');
   });
 
   it('treats an exact FAILED terminalization retry as idempotent', async () => {
