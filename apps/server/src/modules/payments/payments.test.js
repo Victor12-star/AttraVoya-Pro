@@ -1,11 +1,15 @@
+import { createHash } from 'node:crypto';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { createPaymentsRepository } from './payments.repository.js';
 import { createPaymentsService } from './payments.service.js';
+import { createBillingVerificationBoundary } from './payments.verification.js';
 
 const VERIFIED_AT = new Date('2026-09-23T13:00:00.000Z');
 const OCCURRED_AT = new Date('2026-09-23T12:59:00.000Z');
-const HASH = 'a'.repeat(64);
+const RAW_PAYLOAD = Buffer.from('{"id":"evt_123","type":"customer.subscription.updated"}');
+const HASH = createHash('sha256').update(RAW_PAYLOAD).digest('hex');
 
 function serviceRepository(overrides = {}) {
   return {
@@ -14,6 +18,23 @@ function serviceRepository(overrides = {}) {
     applyVerifiedSubscriptionState: vi.fn(),
     ...overrides,
   };
+}
+
+async function verifiedEvidence(overrides = {}) {
+  const boundary = createBillingVerificationBoundary({
+    provider: overrides.provider ?? 'stripe',
+    verify: async () => ({
+      externalEventId: overrides.externalEventId ?? 'evt_123',
+      eventType: overrides.eventType ?? 'customer.subscription.updated',
+      occurredAt: overrides.occurredAt ?? OCCURRED_AT,
+    }),
+    now: () => overrides.verifiedAt ?? VERIFIED_AT,
+  });
+
+  return boundary.verifyEvent({
+    rawPayload: overrides.rawPayload ?? RAW_PAYLOAD,
+    headers: { authorization: 'must-not-persist' },
+  });
 }
 
 function storedEvent(overrides = {}) {
