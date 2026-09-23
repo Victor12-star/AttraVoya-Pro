@@ -1,8 +1,4 @@
-import {
-  ConflictError,
-  NotFoundError,
-  ValidationError,
-} from '../../errors/app-error.js';
+import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 
 const DEFAULT_ATTEMPT_TTL_MS = 30 * 60 * 1000;
 const PROVIDER = 'stripe';
@@ -88,10 +84,7 @@ export function createCheckoutAttemptService({
         throw new NotFoundError('Subscription plan was not found.');
       }
 
-      if (
-        result.attempt.userId !== normalizedUserId ||
-        result.attempt.provider !== PROVIDER
-      ) {
+      if (result.attempt.userId !== normalizedUserId || result.attempt.provider !== PROVIDER) {
         throw new ConflictError('Checkout attempt ownership is invalid.');
       }
 
