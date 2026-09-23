@@ -1,30 +1,28 @@
 import { PRO_PLAN_KEYS } from '@attravoya/constants';
 
-import {
-  stripeCheckoutReturnUrlsFromEnvironment,
-  stripePurchasePriceIdsFromEnvironment,
-} from '../../config/env.js';
 import { ServiceUnavailableError, ValidationError } from '../../errors/app-error.js';
 
 /** @type {Set<string>} */
 const PRO_PLAN_SET = new Set(PRO_PLAN_KEYS);
 
 /**
- * Build the internal server-owned Stripe checkout policy.
+ * Build the internal server-owned Stripe checkout policy from configuration
+ * that has already passed startup validation.
  *
- * This does not call Stripe and is not an HTTP route. It only resolves a
- * recognized AttraVoya plan to deployment-owned billing configuration.
+ * This does not call Stripe, read process environment, or register an HTTP
+ * route. Keeping configuration injection explicit makes this policy deterministic
+ * in tests and prevents hidden startup side effects.
  *
- * @param {Record<string, any>} environment Validated server environment.
+ * @param {{
+ *   enabled?: boolean,
+ *   priceIds?: Record<string, string | undefined>,
+ *   returnUrls?: { successUrl?: string, cancelUrl?: string },
+ * }} [configuration]
  */
-export function createStripeCheckoutPolicy(environment) {
-  const enabled = environment.STRIPE_PURCHASE_ENABLED === true;
-  const priceIds = /** @type {Record<string, string | undefined>} */ (
-    stripePurchasePriceIdsFromEnvironment(environment)
-  );
-  const returnUrls = /** @type {{ successUrl?: string, cancelUrl?: string }} */ (
-    stripeCheckoutReturnUrlsFromEnvironment(environment)
-  );
+export function createStripeCheckoutPolicy(configuration = {}) {
+  const enabled = configuration.enabled === true;
+  const priceIds = configuration.priceIds ?? {};
+  const returnUrls = configuration.returnUrls ?? {};
 
   return Object.freeze({
     enabled,
