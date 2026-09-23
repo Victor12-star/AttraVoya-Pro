@@ -230,6 +230,25 @@ function validateStripePurchaseConfiguration(environment) {
       'Invalid AttraVoya Pro server environment:\nSTRIPE_PRO_MONTHLY_PRICE_ID and STRIPE_PRO_YEARLY_PRICE_ID must be different.',
     );
   }
+
+  if (!environment.STRIPE_WEBHOOK_ENABLED || !environment.STRIPE_WEBHOOK_SECRET?.trim()) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nSTRIPE_WEBHOOK_ENABLED=true with STRIPE_WEBHOOK_SECRET is required before Stripe purchase creation can be enabled.',
+    );
+  }
+
+  const webUrl = new URL(environment.WEB_URL);
+  if (!['http:', 'https:'].includes(webUrl.protocol) || webUrl.username || webUrl.password) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nWEB_URL must be an HTTP(S) origin without embedded credentials for Stripe checkout returns.',
+    );
+  }
+
+  if (environment.NODE_ENV === 'production' && webUrl.protocol !== 'https:') {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nWEB_URL must use HTTPS when Stripe purchase creation is enabled in production.',
+    );
+  }
 }
 
 function validateProductionEmailConfiguration(environment) {
@@ -259,6 +278,20 @@ export function stripePurchasePriceIdsFromEnvironment(environment) {
   return Object.freeze({
     [PLANS.PRO_MONTHLY]: environment.STRIPE_PRO_MONTHLY_PRICE_ID,
     [PLANS.PRO_YEARLY]: environment.STRIPE_PRO_YEARLY_PRICE_ID,
+  });
+}
+
+export function stripeCheckoutReturnUrlsFromEnvironment(environment) {
+  if (!environment.STRIPE_PURCHASE_ENABLED) return Object.freeze({});
+
+  const premiumUrl = new URL('/premium', environment.WEB_URL);
+  premiumUrl.search = '';
+  premiumUrl.hash = '';
+  const premiumBase = premiumUrl.toString();
+
+  return Object.freeze({
+    successUrl: `${premiumBase}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: `${premiumBase}?checkout=cancelled`,
   });
 }
 

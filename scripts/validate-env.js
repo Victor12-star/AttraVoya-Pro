@@ -80,6 +80,31 @@ if (stripePurchaseEnabled === 'true') {
   if (monthlyPrice && yearlyPrice && monthlyPrice === yearlyPrice) {
     errors.push('STRIPE_PRO_MONTHLY_PRICE_ID and STRIPE_PRO_YEARLY_PRICE_ID must be different.');
   }
+
+  if (stripeWebhookEnabled !== 'true') {
+    errors.push(
+      'STRIPE_WEBHOOK_ENABLED must be true before STRIPE_PURCHASE_ENABLED can be enabled.',
+    );
+  }
+  requireValue('STRIPE_WEBHOOK_SECRET', 16);
+  requireValue('WEB_URL');
+
+  const webUrlValue = env.WEB_URL?.trim();
+  if (webUrlValue) {
+    try {
+      const webUrl = new URL(webUrlValue);
+      if (!['http:', 'https:'].includes(webUrl.protocol) || webUrl.username || webUrl.password) {
+        errors.push('WEB_URL must be an HTTP(S) origin without embedded credentials.');
+      }
+      if (env.NODE_ENV?.trim() === 'production' && webUrl.protocol !== 'https:') {
+        errors.push(
+          'WEB_URL must use HTTPS when Stripe purchase creation is enabled in production.',
+        );
+      }
+    } catch {
+      errors.push('WEB_URL must be a valid URL for Stripe checkout returns.');
+    }
+  }
 }
 
 for (const [providerKey, credentialKey] of [
