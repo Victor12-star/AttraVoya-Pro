@@ -42,16 +42,18 @@ describe('verified billing event service', () => {
     };
     const service = createPaymentsService(repository);
 
-    const result = await service.recordVerifiedEvent({
-      provider: ' Stripe ',
-      externalEventId: ' evt_123 ',
-      eventType: ' customer.subscription.updated ',
-      payloadHash: HASH.toUpperCase(),
-      occurredAt: OCCURRED_AT,
-      verifiedAt: VERIFIED_AT,
-      rawPayload: '{"must":"not persist"}',
-      purchaseToken: 'must-not-persist',
-    });
+    const result = await service.recordVerifiedEvent(
+      /** @type {any} */ ({
+        provider: ' Stripe ',
+        externalEventId: ' evt_123 ',
+        eventType: ' customer.subscription.updated ',
+        payloadHash: HASH.toUpperCase(),
+        occurredAt: OCCURRED_AT,
+        verifiedAt: VERIFIED_AT,
+        rawPayload: '{"must":"not persist"}',
+        purchaseToken: 'must-not-persist',
+      }),
+    );
 
     expect(repository.recordVerifiedEvent).toHaveBeenCalledWith({
       provider: 'stripe',
