@@ -146,7 +146,6 @@ Unknown provider subscription identities fail closed and are terminalized with t
 
 Stripe lifecycle statuses are compressed into AttraVoya's existing server domain only for authorization-safe state: active and trialing may grant access through the normal entitlement resolver; all mapped non-active states remain non-Pro. No client field, email address, plan name, or unverified provider metadata is used to choose subscription ownership.
 
-
 ### Opt-in Stripe webhook ingress
 
 The public Stripe callback is `POST /api/v1/payments/webhooks/stripe`, but the route is not registered unless `STRIPE_WEBHOOK_ENABLED=true`. Enabling it also requires a server-only `STRIPE_WEBHOOK_SECRET`; startup fails closed if the route is enabled without that secret. The signature replay tolerance is bounded by `STRIPE_WEBHOOK_TOLERANCE_SECONDS`.
