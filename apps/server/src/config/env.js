@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+const strictBoolean = z.preprocess((value) => {
+  if (value === undefined || value === '') return false;
+  if (value === true || value === false) return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return value;
+}, z.boolean());
+
 const optionalPositiveInteger = (maximum) =>
   z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -31,10 +42,7 @@ const environmentSchema = z.object({
   JWT_AUDIENCE: z.string().trim().min(1).default('attravoya-pro'),
   COOKIE_DOMAIN: z.string().trim().min(1).optional(),
 
-  STRIPE_WEBHOOK_ENABLED: z
-    .enum(['true', 'false'])
-    .transform((value) => value === 'true')
-    .default('false'),
+  STRIPE_WEBHOOK_ENABLED: strictBoolean,
   STRIPE_WEBHOOK_SECRET: z.string().trim().min(16).max(512).optional(),
   STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
 
