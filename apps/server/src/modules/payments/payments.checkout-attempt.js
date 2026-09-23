@@ -1,6 +1,9 @@
 import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 
-const DEFAULT_ATTEMPT_TTL_MS = 30 * 60 * 1000;
+// Stripe Checkout requires an explicit expiry to be at least 30 minutes in the
+// future. Keep a small server-side buffer so database work/network setup cannot
+// push the provider request below that minimum.
+const DEFAULT_ATTEMPT_TTL_MS = 35 * 60 * 1000;
 const PROVIDER = 'stripe';
 
 function requiredText(value, name, maxLength) {
