@@ -350,5 +350,4 @@ describe('verified checkout completion repository', () => {
     expect(eventUpdateMany).not.toHaveBeenCalled();
     expect(subscriptionCreate).not.toHaveBeenCalled();
   });
-
 });
