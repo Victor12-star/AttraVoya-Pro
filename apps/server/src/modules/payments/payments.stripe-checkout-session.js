@@ -54,7 +54,7 @@ function validExpiry(value) {
  *   httpClient?: { requestJson: (url: string, options?: any) => Promise<any> },
  * }} options
  */
-export function createStripeCheckoutGateway({ secretKey, httpClient } = {}) {
+export function createStripeCheckoutGateway({ secretKey, httpClient }) {
   const normalizedSecret = requiredText(secretKey, 'Stripe secret key', 512);
   const client =
     httpClient ??
