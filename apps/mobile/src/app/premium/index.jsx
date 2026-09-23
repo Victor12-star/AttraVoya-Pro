@@ -1,1 +1,1 @@
-export { default } from '../../components/common/scaffold-screen.jsx';
+export { default } from '../../features/subscriptions/subscription-status-screen.jsx';
