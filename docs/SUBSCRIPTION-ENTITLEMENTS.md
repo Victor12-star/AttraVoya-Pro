@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document defines the server-authoritative Free/Pro access model. It does not enable billing, checkout, Google Play Billing, Apple In-App Purchase, RevenueCat, Stripe, advertising, or paid-provider purchases.
+This document defines the server-authoritative Free/Pro access model. The backend now contains a narrowly scoped, opt-in Stripe webhook ingestion path for verified subscription lifecycle events, but it still does not enable checkout, customer creation, new subscription purchases, Google Play Billing, Apple In-App Purchase, RevenueCat purchase flows, advertising, or paid-provider purchases.
 
 A client must never become Pro by sending a flag such as `isPro: true`. Clients may display the access state returned by the API, but protected server operations must evaluate the authenticated user's authoritative entitlement state on the server.
 
@@ -104,7 +104,7 @@ The internal Stripe adapter verifies Stripe's timestamped `v1` HMAC-SHA-256 sign
 
 Only after authentication succeeds does the adapter parse the event and return the bounded Stripe event ID, event type, and optional provider occurrence time to the provider-neutral verification boundary. The webhook secret, Stripe signature header, and raw payload are not returned in verifier-minted evidence and are not persisted in the billing ledger.
 
-This adapter is internal only. No Stripe webhook route, environment-secret wiring, checkout session, customer creation, subscription purchase, refund handler, or Stripe API call is enabled by this phase. A future HTTP callback must preserve exact raw request bytes and supply the secret from server-only configuration before this verifier can be used in production.
+The verifier itself remains an internal adapter. Phase 10CK wires it only through the opt-in HTTP ingress described below. Checkout sessions, customer creation, new subscription purchases, refund handlers, and Stripe API calls remain disabled.
 
 ### Internal verified-event recording boundary
 
@@ -136,7 +136,7 @@ This boundary updates only an existing subscription. It does not create a purcha
 
 ### Internal Stripe subscription-event processing
 
-The Stripe verifier, provider-neutral evidence boundary, verified-event ledger, provider subscription identity resolver, and transactional subscription-state updater are composed by an internal-only subscription-event processor. This processor is not an HTTP route and does not read an environment webhook secret by itself.
+The Stripe verifier, provider-neutral evidence boundary, verified-event ledger, provider subscription identity resolver, and transactional subscription-state updater are composed by an internal-only subscription-event processor. The processor itself remains transport-agnostic and does not read an environment webhook secret by itself.
 
 Processing order is fixed: authenticate the exact raw Stripe request bytes, mint verified evidence, record the verified event, reject any post-verification event identity mismatch, normalize only recognized Stripe subscription lifecycle state, resolve the existing authoritative subscription by `stripe + externalSubscriptionId`, then call the transactional state updater.
 
@@ -145,6 +145,17 @@ Only `customer.subscription.created`, `customer.subscription.updated`, and `cust
 Unknown provider subscription identities fail closed and are terminalized with the privacy-safe machine code `SUBSCRIPTION_IDENTITY_NOT_FOUND`. Authenticated but malformed or unsupported subscription state is terminalized as `STRIPE_SUBSCRIPTION_STATE_INVALID`. Neither case creates an account, subscription, provider customer, plan, or entitlement.
 
 Stripe lifecycle statuses are compressed into AttraVoya's existing server domain only for authorization-safe state: active and trialing may grant access through the normal entitlement resolver; all mapped non-active states remain non-Pro. No client field, email address, plan name, or unverified provider metadata is used to choose subscription ownership.
+
+
+### Opt-in Stripe webhook ingress
+
+The public Stripe callback is `POST /api/v1/payments/webhooks/stripe`, but the route is not registered unless `STRIPE_WEBHOOK_ENABLED=true`. Enabling it also requires a server-only `STRIPE_WEBHOOK_SECRET`; startup fails closed if the route is enabled without that secret. The signature replay tolerance is bounded by `STRIPE_WEBHOOK_TOLERANCE_SECONDS`.
+
+The payments plugin replaces JSON parsing only inside its own Fastify scope so Stripe's exact raw request bytes reach signature verification unchanged. Ordinary application JSON routes keep the normal parser. Webhook bodies remain bounded by the server body-size ceiling and the route has a dedicated rate limit so provider retries cannot become an unbounded public ingress.
+
+After an event is authenticated and deterministically handled, the route returns only `{ "received": true }`. It does not echo plan state, provider IDs, customer IDs, subscription IDs, ledger results, payment metadata, or internal failure codes. Authenticated permanent failures that have already been terminalized in the billing ledger are acknowledged so Stripe does not retry them forever. Invalid signatures and malformed unauthenticated requests fail before acknowledgment, while unexpected database/server failures remain non-2xx so Stripe can retry transient outages.
+
+The webhook secret, signature header, and raw payload are not written to the billing ledger. The raw body exists only long enough to verify the signature, derive privacy-minimized evidence, and process the authenticated event.
 
 ## Future billing integration
 
