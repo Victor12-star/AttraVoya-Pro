@@ -70,6 +70,16 @@ Core travel planning, essential emergency/safety access, account security, authe
 
 Pro is intended to expand advanced planning, convenience, limits and future premium capabilities rather than disable the safe core product.
 
+## Verified billing-event ledger
+
+Before any payment provider webhook can change subscription state, verified provider events are recorded in the internal `BillingEvent` ledger. The ledger is provider-neutral and exists to make retries, duplicate delivery, reconciliation, and replay handling deterministic.
+
+Each record stores the provider name, provider event identifier, event type, a SHA-256-sized payload digest, verification time, processing status, optional event occurrence time, optional related subscription, and privacy-safe internal failure code. The combination of provider plus external event ID is unique so the same provider event cannot be applied twice.
+
+The ledger deliberately does not store a raw webhook body, raw purchase token, card data, client secret, provider API secret, or other payment credential. Future provider adapters must verify signatures or purchase evidence before inserting an event into this verified ledger. Receiving an unverified request is not sufficient to grant Pro access.
+
+A ledger entry being present also does not itself grant Pro. Subscription state may change only through a later server-side processor that validates the verified event, maps it to an owned account/subscription, applies an idempotent database transaction, and then lets the existing entitlement resolver evaluate the resulting subscription state.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
