@@ -6,13 +6,7 @@ const FAILURE_CODE = /^[A-Z][A-Z0-9_]{0,79}$/;
 /** @type {Set<string>} */
 const TERMINAL_OUTCOMES = new Set(['IGNORED', 'FAILED']);
 /** @type {Set<string>} */
-const SUBSCRIPTION_STATUSES = new Set([
-  'ACTIVE',
-  'TRIALING',
-  'PAST_DUE',
-  'CANCELED',
-  'EXPIRED',
-]);
+const SUBSCRIPTION_STATUSES = new Set(['ACTIVE', 'TRIALING', 'PAST_DUE', 'CANCELED', 'EXPIRED']);
 
 function requiredText(value, name, maxLength) {
   if (typeof value !== 'string') {
@@ -255,8 +249,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
       if (result.outcome === 'ALREADY_PROCESSED') {
         const processingStatus = result.event?.processingStatus;
         const stale =
-          processingStatus === 'IGNORED' &&
-          result.event?.failureCode === 'STALE_PROVIDER_STATE';
+          processingStatus === 'IGNORED' && result.event?.failureCode === 'STALE_PROVIDER_STATE';
 
         if (processingStatus !== 'APPLIED' && !stale) {
           throw new ConflictError(
