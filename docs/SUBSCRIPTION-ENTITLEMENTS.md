@@ -182,7 +182,21 @@ Only one active checkout attempt may exist per user. The nullable `activeUserKey
 
 The server-created attempt ID is the future provider idempotency anchor: `attravoya-checkout-<attemptId>`. The client does not provide or choose the Stripe idempotency key. A later trusted Stripe API call may bind exactly one `cs_...` Checkout Session identity to the owned pending attempt. The provider plus external Checkout Session identity is unique at the database layer, and an exact binding retry is idempotent.
 
-This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, create or attach an external subscription, expose a purchase endpoint, render payment UI, or grant Pro. A later slice still needs the server-side Stripe API adapter and then a separately authenticated HTTP purchase route. Verified webhook reconciliation remains the only path that may ultimately update authoritative subscription state.
+This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, create or attach an external subscription, expose a purchase endpoint, render payment UI, or grant Pro. Verified webhook reconciliation remains the only path that may ultimately update authoritative subscription state.
+
+### Internal Stripe Checkout Session creation
+
+Phase 10CP adds the internal server-side Stripe Checkout Session boundary, but it is still not registered as an HTTP purchase route. The service first obtains the durable server-owned checkout attempt, resolves the trusted persisted plan through the server-owned checkout policy, then submits a subscription-mode Checkout Session request to Stripe.
+
+The request uses only the configured server Price ID, quantity one, server-derived success/cancel URLs, the attempt expiry and the attempt-derived idempotency key. The only ownership correlation sent to Stripe is the opaque CheckoutAttempt ID through client reference/metadata fields; the user's email and internal user ID are not sent for ownership selection. The same attempt ID is also copied into subscription metadata so a later verified reconciliation slice can connect the newly created provider subscription back to the durable server attempt without trusting browser state.
+
+Checkout creation uses the existing bounded provider HTTP client with a hard request/total deadline, concurrency queue bounds, provider metrics, circuit behavior and privacy-safe error mapping. The POST is not automatically retried inside one call. A caller retry reuses the same active attempt and the same Stripe idempotency key, which is the duplicate-subscription safety boundary.
+
+The Stripe response is accepted only when it represents a subscription-mode `cs_...` Checkout Session with an HTTPS `checkout.stripe.com` URL. The returned session ID is then bound once to the owned CheckoutAttempt. If Stripe succeeds but database binding fails, the operation does not report success; a later retry uses the same Stripe idempotency key and can safely recover the same provider session.
+
+Checkout attempts now default to 35 minutes and reject configured TTLs below 31 minutes, preserving a buffer above Stripe's 30-minute minimum explicit Session expiry. The provider `expires_at` is derived from the durable attempt expiry so provider and local ownership lifetimes stay aligned.
+
+This phase still does not expose an authenticated purchase endpoint, return a Checkout URL to a web/mobile client, create an AttraVoya Subscription row from a first purchase, enable a buy button, or grant Pro from checkout success. Those remain separately gated work, and verified provider reconciliation remains authoritative for subscription state.
 
 ## Future billing integration
 
