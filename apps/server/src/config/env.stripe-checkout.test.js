@@ -64,7 +64,7 @@ describe('Stripe checkout return policy', () => {
           NODE_ENV: 'production',
           WEB_URL: 'http://app.example.test',
           EMAIL_PROVIDER: 'resend',
-          RESEND_API_KEY: 're_example_only_123456789012345',
+          RESEND_API_KEY: 'example-resend-key-1234567890',
           EMAIL_FROM: 'noreply@example.test',
         }),
       ),
