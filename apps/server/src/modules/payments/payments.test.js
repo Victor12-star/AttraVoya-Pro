@@ -678,10 +678,7 @@ describe('verified billing event repository', () => {
         AND: [
           { OR: [{ provider: null }, { provider: 'stripe' }] },
           {
-            OR: [
-              { providerStateUpdatedAt: null },
-              { providerStateUpdatedAt: { lt: stateTime } },
-            ],
+            OR: [{ providerStateUpdatedAt: null }, { providerStateUpdatedAt: { lt: stateTime } }],
           },
         ],
       },
