@@ -302,10 +302,7 @@ describe('checkout attempt repository', () => {
         },
         checkoutAttempt: {
           updateMany: vi.fn(async () => ({ count: 0 })),
-          findUnique: vi
-            .fn()
-            .mockResolvedValueOnce(null)
-            .mockResolvedValueOnce(winner),
+          findUnique: vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(winner),
           create: vi.fn(async () => {
             throw duplicateError;
           }),
