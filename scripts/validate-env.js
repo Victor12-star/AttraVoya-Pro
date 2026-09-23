@@ -97,7 +97,9 @@ if (stripePurchaseEnabled === 'true') {
         errors.push('WEB_URL must be an HTTP(S) origin without embedded credentials.');
       }
       if (env.NODE_ENV?.trim() === 'production' && webUrl.protocol !== 'https:') {
-        errors.push('WEB_URL must use HTTPS when Stripe purchase creation is enabled in production.');
+        errors.push(
+          'WEB_URL must use HTTPS when Stripe purchase creation is enabled in production.',
+        );
       }
     } catch {
       errors.push('WEB_URL must be a valid URL for Stripe checkout returns.');
