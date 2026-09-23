@@ -50,7 +50,7 @@ describe('Stripe webhook ingress', () => {
   });
 
   it('passes the exact raw JSON bytes and request headers into the verified processor', async () => {
-    const process = vi.fn(async () => ({
+    const process = vi.fn(async (/** @type {any} */ _input) => ({
       outcome: 'APPLIED',
       subscription: { id: 'must-not-leak' },
     }));
@@ -193,10 +193,13 @@ describe('Stripe webhook ingress', () => {
 
   it('keeps ordinary parent-scope JSON parsing unchanged when webhook ingress is enabled', async () => {
     const app = await webhookApp(vi.fn());
-    app.post('/test-json-parent', async (request) => ({
-      isBuffer: Buffer.isBuffer(request.body),
-      value: request.body?.value,
-    }));
+    app.post('/test-json-parent', async (request) => {
+      const body = /** @type {any} */ (request.body);
+      return {
+        isBuffer: Buffer.isBuffer(body),
+        value: body?.value,
+      };
+    });
 
     const response = await app.inject({
       method: 'POST',
