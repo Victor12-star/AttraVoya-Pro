@@ -15,6 +15,7 @@ const requiredModels = [
   'Plan',
   'Entitlement',
   'Subscription',
+  'BillingEvent',
   'Country',
   'Language',
   'Currency',
@@ -64,5 +65,15 @@ describe('database schema guardrails', () => {
   it('keeps provider status separate from provider secrets', () => {
     const providerModel = schema.split('model ProviderStatus {')[1]?.split('\n}')[0] ?? '';
     expect(providerModel).not.toMatch(/apiKey|secret|token/i);
+  });
+
+  it('keeps billing event replay protection provider-neutral and privacy-minimized', () => {
+    const billingEventModel = schema.split('model BillingEvent {')[1]?.split('\n}')[0] ?? '';
+
+    expect(billingEventModel).toContain('@@unique([provider, externalEventId])');
+    expect(billingEventModel).toContain('payloadHash');
+    expect(billingEventModel).toContain('verifiedAt');
+    expect(billingEventModel).toContain('processingStatus');
+    expect(billingEventModel).not.toMatch(/rawPayload|payloadJson|cardNumber|purchaseToken|clientSecret/i);
   });
 });
