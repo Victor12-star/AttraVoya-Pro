@@ -192,8 +192,12 @@ export function createStripeCheckoutSessionService({
      * @param {{ userId: string, planKey: string }} input
      */
     async create({ userId, planKey }) {
-      const policy = checkoutPolicy.resolve(planKey);
       const ownership = await checkoutAttemptService.createOrReuse({ userId, planKey });
+      const trustedPlanKey = ownership.attempt?.plan?.key;
+      if (typeof trustedPlanKey !== 'string') {
+        throw new TypeError('Checkout attempt is missing its trusted plan identity.');
+      }
+      const policy = checkoutPolicy.resolve(trustedPlanKey);
 
       const session = await stripeGateway.createSubscriptionSession({
         attemptId: ownership.attempt.id,
