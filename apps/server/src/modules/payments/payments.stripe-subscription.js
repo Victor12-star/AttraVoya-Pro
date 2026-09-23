@@ -108,10 +108,7 @@ function normalizeSubscriptionState(rawPayload, evidence) {
  *   }
  * }} dependencies
  */
-export function createStripeSubscriptionEventProcessor({
-  verificationBoundary,
-  paymentsService,
-}) {
+export function createStripeSubscriptionEventProcessor({ verificationBoundary, paymentsService }) {
   if (!verificationBoundary?.verifyEvent) {
     throw new TypeError('Stripe billing verification boundary is required.');
   }
@@ -198,7 +195,11 @@ export function createStripeSubscriptionEventProcessor({
       });
 
       return {
-        outcome: applied.stale ? 'IGNORED' : applied.applied ? 'APPLIED' : 'DUPLICATE',
+        outcome: applied.stale
+          ? 'IGNORED'
+          : applied.applied
+            ? 'APPLIED'
+            : 'DUPLICATE',
         duplicate: recorded.duplicate || applied.duplicate,
         event: applied.event,
         subscription: applied.subscription,
