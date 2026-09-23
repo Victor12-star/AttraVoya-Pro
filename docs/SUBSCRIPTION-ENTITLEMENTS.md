@@ -172,7 +172,17 @@ The internal checkout policy accepts only the existing `PRO_MONTHLY` or `PRO_YEA
 
 The success destination is server-derived as `/premium?checkout=success&session_id={CHECKOUT_SESSION_ID}`, preserving Stripe's future Checkout Session placeholder without trusting a client redirect. Cancellation returns to the same origin at `/premium?checkout=cancelled`. Deployment paths, query strings, and fragments supplied in `WEB_URL` are not reused as arbitrary checkout redirects.
 
-This policy remains internal and makes no network request. It does not install or call the Stripe API client, create a Checkout Session, create a customer, attach a provider subscription, expose a purchase route, show a buy button, or change any user's subscription. A later slice still needs authenticated ownership, idempotent provider-side Checkout Session creation, duplicate-click/retry handling, and reconciliation with the existing verified webhook path.
+This policy remains internal and makes no network request. It does not install or call the Stripe API client, create a Checkout Session, create a customer, attach a provider subscription, expose a purchase route, show a buy button, or change any user's subscription.
+
+### Server-owned checkout-attempt ledger
+
+Before a future Stripe Checkout Session can be created, the backend now creates or reuses a durable `CheckoutAttempt` owned by the authenticated AttraVoya user and an active server-side plan. The record stores only internal ownership/state, provider name, optional Stripe Checkout Session ID, timestamps, and the selected internal plan relation. It stores no card data, Stripe secret, raw provider payload, client redirect, price amount, currency, or entitlement claim.
+
+Only one active checkout attempt may exist per user. The nullable `activeUserKey` has a database unique constraint, so duplicate clicks or concurrent server workers cannot create two independent active attempts for the same account. An expired pending/session-created attempt is first terminalized as `EXPIRED` and releases that unique key before a replacement may be created. A still-active attempt for the same plan is returned idempotently; a still-active attempt for a different plan fails closed as a conflict instead of silently switching the purchase.
+
+The server-created attempt ID is the future provider idempotency anchor: `attravoya-checkout-<attemptId>`. The client does not provide or choose the Stripe idempotency key. A later trusted Stripe API call may bind exactly one `cs_...` Checkout Session identity to the owned pending attempt. The provider plus external Checkout Session identity is unique at the database layer, and an exact binding retry is idempotent.
+
+This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, create or attach an external subscription, expose a purchase endpoint, render payment UI, or grant Pro. A later slice still needs the server-side Stripe API adapter and then a separately authenticated HTTP purchase route. Verified webhook reconciliation remains the only path that may ultimately update authoritative subscription state.
 
 ## Future billing integration
 
