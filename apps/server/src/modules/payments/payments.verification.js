@@ -84,6 +84,9 @@ export function createBillingVerificationBoundary({
   const normalizedProvider = provider.trim().toLowerCase();
 
   return {
+    /**
+     * @param {{ rawPayload: Buffer | Uint8Array, headers?: object }} input
+     */
     async verifyEvent({ rawPayload, headers = {} }) {
       const payload = rawPayloadBytes(rawPayload, maxPayloadBytes);
       const payloadHash = createHash('sha256').update(payload).digest('hex');
