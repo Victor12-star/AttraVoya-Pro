@@ -104,6 +104,8 @@ describe('Stripe purchase environment contract', () => {
         STRIPE_SECRET_KEY: 'sk_test_example_only_1234567890',
         STRIPE_PRO_MONTHLY_PRICE_ID: 'price_monthly123',
         STRIPE_PRO_YEARLY_PRICE_ID: 'price_yearly456',
+        STRIPE_WEBHOOK_ENABLED: 'true',
+        STRIPE_WEBHOOK_SECRET: 'whsec_example_only_1234567890',
       }),
     );
 
