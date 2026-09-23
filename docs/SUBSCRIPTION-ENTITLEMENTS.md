@@ -134,6 +134,18 @@ The transaction also requires provider consistency between the verified event an
 
 This boundary updates only an existing subscription. It does not create a purchase, create a provider customer or subscription, verify Stripe signatures, verify Google Play purchase tokens, process RevenueCat or Apple evidence, expose checkout, or make a billing-event row an entitlement by itself. Pro access still comes only from the server-authoritative subscription and entitlement resolver.
 
+### Internal Stripe subscription-event processing
+
+The Stripe verifier, provider-neutral evidence boundary, verified-event ledger, provider subscription identity resolver, and transactional subscription-state updater are composed by an internal-only subscription-event processor. This processor is not an HTTP route and does not read an environment webhook secret by itself.
+
+Processing order is fixed: authenticate the exact raw Stripe request bytes, mint verified evidence, record the verified event, reject any post-verification event identity mismatch, normalize only recognized Stripe subscription lifecycle state, resolve the existing authoritative subscription by `stripe + externalSubscriptionId`, then call the transactional state updater.
+
+Only `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted` can enter subscription-state normalization in this slice. Other authenticated Stripe event types are retained as verified ledger evidence and terminalized as `IGNORED` without touching subscription state.
+
+Unknown provider subscription identities fail closed and are terminalized with the privacy-safe machine code `SUBSCRIPTION_IDENTITY_NOT_FOUND`. Authenticated but malformed or unsupported subscription state is terminalized as `STRIPE_SUBSCRIPTION_STATE_INVALID`. Neither case creates an account, subscription, provider customer, plan, or entitlement.
+
+Stripe lifecycle statuses are compressed into AttraVoya's existing server domain only for authorization-safe state: active and trialing may grant access through the normal entitlement resolver; all mapped non-active states remain non-Pro. No client field, email address, plan name, or unverified provider metadata is used to choose subscription ownership.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
