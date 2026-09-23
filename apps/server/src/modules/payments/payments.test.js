@@ -15,6 +15,7 @@ function serviceRepository(overrides = {}) {
   return {
     recordVerifiedEvent: vi.fn(),
     finalizePendingEvent: vi.fn(),
+    findSubscriptionByProviderIdentity: vi.fn(),
     applyVerifiedSubscriptionState: vi.fn(),
     ...overrides,
   };
@@ -146,6 +147,67 @@ describe('verified billing event service', () => {
     ).rejects.toThrow('Verified billing evidence is required.');
 
     expect(repository.recordVerifiedEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe('provider subscription identity resolution', () => {
+  it('normalizes provider identity and resolves one existing subscription', async () => {
+    const subscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'ACTIVE',
+      provider: 'stripe',
+      currentPeriodEnd: new Date('2026-10-23T00:00:00.000Z'),
+      providerStateUpdatedAt: VERIFIED_AT,
+      canceledAt: null,
+    };
+    const repository = serviceRepository({
+      findSubscriptionByProviderIdentity: vi.fn(async () => subscription),
+    });
+    const service = createPaymentsService(repository);
+
+    const result = await service.resolveProviderSubscription({
+      provider: ' Stripe ',
+      externalSubscriptionId: ' sub_123 ',
+    });
+
+    expect(repository.findSubscriptionByProviderIdentity).toHaveBeenCalledWith({
+      provider: 'stripe',
+      externalSubscriptionId: 'sub_123',
+    });
+    expect(result).toBe(subscription);
+  });
+
+  it('fails closed when a provider subscription identity is unknown', async () => {
+    const repository = serviceRepository({
+      findSubscriptionByProviderIdentity: vi.fn(async () => null),
+    });
+    const service = createPaymentsService(repository);
+
+    await expect(
+      service.resolveProviderSubscription({
+        provider: 'stripe',
+        externalSubscriptionId: 'sub_missing',
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 404,
+      code: 'NOT_FOUND',
+    });
+  });
+
+  it('rejects malformed provider subscription identity before lookup', async () => {
+    const repository = serviceRepository();
+    const service = createPaymentsService(repository);
+
+    await expect(
+      service.resolveProviderSubscription({
+        provider: ' ',
+        externalSubscriptionId: 'sub_123',
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    expect(repository.findSubscriptionByProviderIdentity).not.toHaveBeenCalled();
   });
 });
 
@@ -445,6 +507,40 @@ describe('verified subscription state application', () => {
 });
 
 describe('verified billing event repository', () => {
+  it('resolves provider subscription identity through the compound unique key', async () => {
+    const subscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'ACTIVE',
+      provider: 'stripe',
+      currentPeriodEnd: new Date('2026-10-23T00:00:00.000Z'),
+      providerStateUpdatedAt: VERIFIED_AT,
+      canceledAt: null,
+    };
+    const findUnique = vi.fn(async () => subscription);
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({ subscription: { findUnique } }),
+    );
+
+    const result = await repository.findSubscriptionByProviderIdentity({
+      provider: 'stripe',
+      externalSubscriptionId: 'sub_123',
+    });
+
+    expect(findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          provider_externalSubscriptionId: {
+            provider: 'stripe',
+            externalSubscriptionId: 'sub_123',
+          },
+        },
+      }),
+    );
+    expect(result).toBe(subscription);
+  });
+
   it('creates the first delivery using only privacy-minimized ledger fields', async () => {
     const create = vi.fn(async () => storedEvent());
     const repository = createPaymentsRepository(

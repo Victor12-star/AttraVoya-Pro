@@ -39,6 +39,7 @@ function optionalDate(value, name) {
  * @param {{
  *   recordVerifiedEvent: (input: any) => Promise<any>,
  *   finalizePendingEvent: (input: any) => Promise<any>,
+ *   findSubscriptionByProviderIdentity?: (input: any) => Promise<any>,
  *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>
  * }} [repository]
  * @param {{ now?: () => Date }} [options]
@@ -51,6 +52,38 @@ export function createPaymentsService(repository = paymentsRepository, options =
   const now = options.now ?? (() => new Date());
 
   return {
+    /**
+     * Resolve one existing AttraVoya subscription from a provider-owned
+     * subscription identity. The database uniqueness constraint is the safety
+     * boundary that prevents one provider subscription from mapping to two
+     * internal subscriptions.
+     *
+     * @param {{ provider: string, externalSubscriptionId: string }} input
+     */
+    async resolveProviderSubscription({ provider, externalSubscriptionId }) {
+      if (!repository.findSubscriptionByProviderIdentity) {
+        throw new TypeError('Provider-subscription repository boundary is required.');
+      }
+
+      const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
+      const normalizedExternalSubscriptionId = requiredText(
+        externalSubscriptionId,
+        'externalSubscriptionId',
+        255,
+      );
+
+      const subscription = await repository.findSubscriptionByProviderIdentity({
+        provider: normalizedProvider,
+        externalSubscriptionId: normalizedExternalSubscriptionId,
+      });
+
+      if (!subscription) {
+        throw new NotFoundError('Provider subscription was not found.');
+      }
+
+      return subscription;
+    },
+
     /**
      * Finalize a verified event without applying subscription state.
      *

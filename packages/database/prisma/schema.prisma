@@ -354,6 +354,7 @@ model Subscription {
 
   @@index([userId, status])
   @@index([externalSubscriptionId])
+  @@unique([provider, externalSubscriptionId])
 }
 
 // BillingEvent is an internal replay/idempotency ledger for provider events that

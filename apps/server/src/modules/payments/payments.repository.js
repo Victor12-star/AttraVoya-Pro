@@ -28,6 +28,18 @@ const SUBSCRIPTION_SELECT = Object.freeze({
 
 export function createPaymentsRepository(prismaClient = prisma) {
   return {
+    async findSubscriptionByProviderIdentity({ provider, externalSubscriptionId }) {
+      return prismaClient.subscription.findUnique({
+        where: {
+          provider_externalSubscriptionId: {
+            provider,
+            externalSubscriptionId,
+          },
+        },
+        select: SUBSCRIPTION_SELECT,
+      });
+    },
+
     async finalizePendingEvent({ eventId, status, failureCode, processedAt }) {
       const update = await prismaClient.billingEvent.updateMany({
         where: {

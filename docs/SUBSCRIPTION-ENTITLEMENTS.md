@@ -90,6 +90,14 @@ Raw request bodies, signatures, authorization headers, purchase tokens and provi
 
 The provider-neutral boundary does not itself know any provider secret or signature format. Concrete adapters plug into it separately.
 
+### Provider subscription identity boundary
+
+Before a verified provider event may target authoritative subscription state, the backend resolves the provider-owned subscription identity through the compound key `provider + externalSubscriptionId`. That identity is unique at the database layer so one Stripe or future provider subscription cannot silently map to multiple AttraVoya subscriptions.
+
+Rows without provider identity remain valid because provider linkage is nullable until a real purchase integration creates or attaches the external subscription. Once an external subscription ID is present, event processing must use the provider-scoped resolver rather than searching by customer-controlled fields, email address, plan name, or client-supplied account identifiers.
+
+Unknown provider subscription identities fail closed and do not create, upgrade, downgrade, cancel, or otherwise mutate an AttraVoya subscription. Initial provider subscription creation and ownership attachment remain later payment-flow work.
+
 ### Stripe webhook verification adapter
 
 The internal Stripe adapter verifies Stripe's timestamped `v1` HMAC-SHA-256 signature against the exact raw request bytes before event JSON is trusted. It accepts multiple `v1` values so webhook-secret rotation can overlap safely, compares signatures with a timing-safe primitive, and rejects timestamps outside the configured replay tolerance.
