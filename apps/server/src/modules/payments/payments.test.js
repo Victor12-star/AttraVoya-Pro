@@ -395,7 +395,7 @@ describe('verified billing event repository', () => {
     });
 
     expect(result.transitioned).toBe(false);
-    expect(result.event.processingStatus).toBe('IGNORED');
+    expect(result.event?.processingStatus).toBe('IGNORED');
   });
 
   it('does not hide unrelated database failures', async () => {
