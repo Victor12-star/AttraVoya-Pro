@@ -274,8 +274,7 @@ describe('verified billing event terminalization', () => {
 
 describe('verified subscription state application', () => {
   it('applies normalized current provider state transactionally', async () => {
-    const repository = {
-      recordVerifiedEvent: vi.fn(),
+    const repository = serviceRepository({
       applyVerifiedSubscriptionState: vi.fn(async (input) => ({
         outcome: 'APPLIED',
         event: storedEvent({
@@ -294,7 +293,7 @@ describe('verified subscription state application', () => {
           canceledAt: input.canceledAt,
         },
       })),
-    };
+    });
     const processedAt = new Date('2026-09-23T14:30:00.000Z');
     const service = createPaymentsService(repository, { now: () => processedAt });
     const stateTime = new Date('2026-09-23T14:25:00.000Z');
@@ -328,13 +327,12 @@ describe('verified subscription state application', () => {
   });
 
   it('treats a previously processed event as an idempotent duplicate', async () => {
-    const repository = {
-      recordVerifiedEvent: vi.fn(),
+    const repository = serviceRepository({
       applyVerifiedSubscriptionState: vi.fn(async () => ({
         outcome: 'ALREADY_PROCESSED',
         event: storedEvent({ processingStatus: 'APPLIED' }),
       })),
-    };
+    });
     const service = createPaymentsService(repository, {
       now: () => new Date('2026-09-23T14:30:00.000Z'),
     });
@@ -356,8 +354,7 @@ describe('verified subscription state application', () => {
   });
 
   it('returns stale without rolling authoritative subscription state backward', async () => {
-    const repository = {
-      recordVerifiedEvent: vi.fn(),
+    const repository = serviceRepository({
       applyVerifiedSubscriptionState: vi.fn(async () => ({
         outcome: 'STALE',
         event: storedEvent({ processingStatus: 'IGNORED', failureCode: 'STALE_PROVIDER_STATE' }),
@@ -368,7 +365,7 @@ describe('verified subscription state application', () => {
           providerStateUpdatedAt: new Date('2026-09-23T14:40:00.000Z'),
         },
       })),
-    };
+    });
     const service = createPaymentsService(repository, {
       now: () => new Date('2026-09-23T14:45:00.000Z'),
     });
@@ -391,10 +388,7 @@ describe('verified subscription state application', () => {
   });
 
   it('rejects unsafe active and canceled state before database mutation', async () => {
-    const repository = {
-      recordVerifiedEvent: vi.fn(),
-      applyVerifiedSubscriptionState: vi.fn(),
-    };
+    const repository = serviceRepository();
     const service = createPaymentsService(repository, {
       now: () => new Date('2026-09-23T14:30:00.000Z'),
     });
@@ -576,6 +570,7 @@ describe('verified billing event repository', () => {
       }),
     ).rejects.toBe(databaseError);
   });
+
   it('claims the event and compare-and-swaps newer provider state in one transaction', async () => {
     const stateTime = new Date('2026-09-23T14:25:00.000Z');
     const processedAt = new Date('2026-09-23T14:30:00.000Z');
