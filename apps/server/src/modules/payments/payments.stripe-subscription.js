@@ -195,11 +195,7 @@ export function createStripeSubscriptionEventProcessor({ verificationBoundary, p
       });
 
       return {
-        outcome: applied.stale
-          ? 'IGNORED'
-          : applied.applied
-            ? 'APPLIED'
-            : 'DUPLICATE',
+        outcome: applied.stale ? 'IGNORED' : applied.applied ? 'APPLIED' : 'DUPLICATE',
         duplicate: recorded.duplicate || applied.duplicate,
         event: applied.event,
         subscription: applied.subscription,
