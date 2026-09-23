@@ -174,7 +174,9 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
             query.isFetching && styles.buttonDisabled,
           ]}
         >
-          <Text style={styles.refreshLabel}>{query.isFetching ? 'Refreshing…' : 'Refresh status'}</Text>
+          <Text style={styles.refreshLabel}>
+            {query.isFetching ? 'Refreshing…' : 'Refresh status'}
+          </Text>
         </Pressable>
       </View>
     </>
