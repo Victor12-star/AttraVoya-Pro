@@ -11,6 +11,12 @@ const strictBoolean = z.preprocess((value) => {
   return value;
 }, z.boolean());
 
+const optionalSecret = (minimum, maximum) =>
+  z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().trim().min(minimum).max(maximum).optional(),
+  );
+
 const optionalPositiveInteger = (maximum) =>
   z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -43,7 +49,7 @@ const environmentSchema = z.object({
   COOKIE_DOMAIN: z.string().trim().min(1).optional(),
 
   STRIPE_WEBHOOK_ENABLED: strictBoolean,
-  STRIPE_WEBHOOK_SECRET: z.string().trim().min(16).max(512).optional(),
+  STRIPE_WEBHOOK_SECRET: optionalSecret(16, 512),
   STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
 
   // Provider selection is environment-driven so development providers can be
