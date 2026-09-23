@@ -108,12 +108,7 @@ export function createPaymentsRepository(prismaClient = prisma) {
       }
     },
 
-    async bindCheckoutSession({
-      attemptId,
-      userId,
-      provider,
-      externalCheckoutSessionId,
-    }) {
+    async bindCheckoutSession({ attemptId, userId, provider, externalCheckoutSessionId }) {
       try {
         const update = await prismaClient.checkoutAttempt.updateMany({
           where: {
