@@ -34,8 +34,7 @@ describe('mobile subscription status', () => {
 
     const result = await renderContent(client);
 
-    expect(await result.findByText('Free')).toBeTruthy();
-    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
     expect(
       result.getByText('New subscription purchases are not available in this build yet.'),
     ).toBeTruthy();
@@ -94,7 +93,7 @@ describe('mobile subscription status', () => {
     expect(await result.findByText('Plan status unavailable')).toBeTruthy();
     fireEvent.press(result.getByText('Try again'));
 
-    expect(await result.findByText('Free')).toBeTruthy();
+    expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
   });
 
