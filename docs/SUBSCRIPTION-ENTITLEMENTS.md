@@ -80,13 +80,23 @@ The ledger deliberately does not store a raw webhook body, raw purchase token, c
 
 A ledger entry being present also does not itself grant Pro. Subscription state may change only through the internal server-side application boundary after provider-specific verification has mapped the event to an existing owned subscription; that boundary applies the state transactionally and then lets the existing entitlement resolver evaluate the resulting subscription state.
 
+### Provider verification evidence boundary
+
+Before an event can enter the verified ledger, an internal provider verification boundary receives the exact raw request bytes plus request metadata and delegates authenticity checks to a provider-specific adapter. The adapter may inspect signatures, authorization metadata, purchase evidence or other provider proof, but it returns only normalized event identity and occurrence time after verification succeeds.
+
+The server boundary, not the caller and not the provider adapter, computes the SHA-256 digest from the exact raw bytes and assigns the server verification timestamp. It then mints an opaque in-process evidence object. The payments service accepts only evidence minted by this boundary; a plain object or copied object containing a plausible hash, event ID or verification time is rejected before persistence.
+
+Raw request bodies, signatures, authorization headers, purchase tokens and provider secrets are not included in the evidence object and are not written to the billing ledger. Payload size is bounded before provider verification so an attacker cannot force unbounded buffering through a future callback route.
+
+This phase remains provider-neutral. It does not yet implement Stripe signature verification, Google Play purchase-token verification, RevenueCat webhook verification, Apple transaction verification, or a public callback endpoint.
+
 ### Internal verified-event recording boundary
 
-The payments module exposes an internal-only `recordVerifiedEvent` service for evidence that has already passed provider-specific verification. The service normalizes bounded provider/event identifiers, requires a valid SHA-256 payload digest and verification timestamp, and writes only the privacy-minimized ledger fields.
+The payments module exposes an internal-only `recordVerifiedEvent` service that accepts only verifier-minted evidence. It still normalizes bounded provider/event identifiers, validates the server-owned SHA-256 digest and verification timestamp, and writes only the privacy-minimized ledger fields.
 
 The database unique constraint on provider plus external event ID is the concurrency-safe replay boundary. The first verified delivery creates the record. An exact later retry returns the existing record as a duplicate. Reuse of the same provider event identity with a different event type or payload digest fails closed as a conflict instead of silently replacing the original evidence.
 
-This recording service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Phase 10CF keeps mutation in a separate internal transactional boundary; provider-specific verification remains a later separately gated slice.
+This recording service is not registered as an HTTP route and does not mutate subscription or entitlement state. Phase 10CF keeps mutation in a separate internal transactional boundary; concrete provider-specific adapters remain later separately gated slices.
 
 ### Terminal processing state boundary
 
