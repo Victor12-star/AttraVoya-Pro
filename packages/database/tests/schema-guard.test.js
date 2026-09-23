@@ -74,6 +74,8 @@ describe('database schema guardrails', () => {
     expect(billingEventModel).toContain('payloadHash');
     expect(billingEventModel).toContain('verifiedAt');
     expect(billingEventModel).toContain('processingStatus');
-    expect(billingEventModel).not.toMatch(/rawPayload|payloadJson|cardNumber|purchaseToken|clientSecret/i);
+    expect(billingEventModel).not.toMatch(
+      /rawPayload|payloadJson|cardNumber|purchaseToken|clientSecret/i,
+    );
   });
 });
