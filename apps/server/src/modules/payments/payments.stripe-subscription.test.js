@@ -159,11 +159,7 @@ describe('internal Stripe subscription event processor', () => {
       code: 'VALIDATION_ERROR',
     });
 
-    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
-      eventId: 'billing-event-1',
-      outcome: 'FAILED',
-      failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
-    });
+    expect(deps.paymentsService.finalizeVerifiedEvent).not.toHaveBeenCalled();
     expect(deps.paymentsService.resolveProviderSubscription).not.toHaveBeenCalled();
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
