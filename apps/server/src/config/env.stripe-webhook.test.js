@@ -34,6 +34,19 @@ describe('Stripe webhook environment contract', () => {
     expect(environment.STRIPE_WEBHOOK_TOLERANCE_SECONDS).toBe(300);
   });
 
+
+  it('treats a blank disabled webhook secret as unconfigured', () => {
+    const environment = loadEnvironment(
+      baseEnvironment({
+        STRIPE_WEBHOOK_ENABLED: 'false',
+        STRIPE_WEBHOOK_SECRET: '   ',
+      }),
+    );
+
+    expect(environment.STRIPE_WEBHOOK_ENABLED).toBe(false);
+    expect(environment.STRIPE_WEBHOOK_SECRET).toBeUndefined();
+  });
+
   it('fails startup when webhook ingress is enabled without a server secret', () => {
     expect(() =>
       loadEnvironment(
