@@ -25,6 +25,7 @@ enum UserStatus {
 }
 
 enum SubscriptionStatus {
+  PENDING
   ACTIVE
   TRIALING
   PAST_DUE
