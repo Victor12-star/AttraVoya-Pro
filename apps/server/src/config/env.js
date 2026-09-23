@@ -31,6 +31,13 @@ const environmentSchema = z.object({
   JWT_AUDIENCE: z.string().trim().min(1).default('attravoya-pro'),
   COOKIE_DOMAIN: z.string().trim().min(1).optional(),
 
+  STRIPE_WEBHOOK_ENABLED: z
+    .enum(['true', 'false'])
+    .transform((value) => value === 'true')
+    .default('false'),
+  STRIPE_WEBHOOK_SECRET: z.string().trim().min(16).max(512).optional(),
+  STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
+
   // Provider selection is environment-driven so development providers can be
   // replaced for public/commercial launch without rewriting application code.
   MAPS_PROVIDER: z.string().trim().min(1).default('geoapify'),
@@ -160,6 +167,16 @@ function validateProductionProviderBudgets(environment) {
   }
 }
 
+function validateStripeWebhookConfiguration(environment) {
+  if (!environment.STRIPE_WEBHOOK_ENABLED) return;
+
+  if (!environment.STRIPE_WEBHOOK_SECRET?.trim()) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nSTRIPE_WEBHOOK_SECRET: required when STRIPE_WEBHOOK_ENABLED=true.',
+    );
+  }
+}
+
 function validateProductionEmailConfiguration(environment) {
   if (environment.NODE_ENV !== 'production') return;
 
@@ -214,6 +231,7 @@ export function loadEnvironment(source = process.env) {
   }
 
   validateProviderBudgetPairs(result.data);
+  validateStripeWebhookConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);
