@@ -20,6 +20,7 @@ function serviceRepository(overrides = {}) {
   };
 }
 
+/** @param {any} [overrides] */
 async function verifiedEvidence(overrides = {}) {
   const boundary = createBillingVerificationBoundary({
     provider: overrides.provider ?? 'stripe',
