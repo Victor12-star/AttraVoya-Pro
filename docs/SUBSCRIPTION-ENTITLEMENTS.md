@@ -182,7 +182,19 @@ Only one active checkout attempt may exist per user. The nullable `activeUserKey
 
 The server-created attempt ID is the future provider idempotency anchor: `attravoya-checkout-<attemptId>`. The client does not provide or choose the Stripe idempotency key. A later trusted Stripe API call may bind exactly one `cs_...` Checkout Session identity to the owned pending attempt. The provider plus external Checkout Session identity is unique at the database layer, and an exact binding retry is idempotent.
 
-This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, create or attach an external subscription, expose a purchase endpoint, render payment UI, or grant Pro. A later slice still needs the server-side Stripe API adapter and then a separately authenticated HTTP purchase route. Verified webhook reconciliation remains the only path that may ultimately update authoritative subscription state.
+This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, expose a purchase endpoint, render payment UI, or grant Pro. A later slice still needs the server-side Stripe API adapter and then a separately authenticated HTTP purchase route.
+
+### Verified checkout-completion ownership bridge
+
+A separately verified Stripe `checkout.session.completed` event may now connect the external Stripe subscription identity to the exact server-owned `CheckoutAttempt` identified by its already-bound `cs_...` Checkout Session ID. The processor rechecks that the verified Stripe event ID and type match the exact authenticated payload, requires `mode=subscription`, and accepts only Stripe-shaped `cs_...` and `sub_...` identities.
+
+The checkout payload does not choose the AttraVoya user or plan. Ownership comes only from the existing `CheckoutAttempt`, which was created from the authenticated user and server-resolved plan before any provider session could be bound. The billing event claim, checkout-attempt completion, provider subscription identity, and internal subscription creation are coupled through the server transaction boundary and provider identity uniqueness constraints.
+
+Checkout completion creates only a `PENDING` internal subscription. `PENDING` is deliberately excluded from entitlement resolution, which recognizes only current `ACTIVE` or `TRIALING` subscriptions with a future period end. A browser success redirect and a completed Checkout Session therefore cannot grant Pro by themselves. A later separately verified `customer.subscription.*` lifecycle event must supply authoritative subscription status and period state before the existing entitlement resolver can expose Pro access.
+
+Malformed authenticated completion state is terminalized with a bounded privacy-safe machine code. Unknown checkout ownership, inactive plans, conflicting provider identities, and checkout-attempt state races fail closed. Raw Stripe bodies, signature headers, card data, provider secrets, and client-selected ownership data are not stored in the resulting subscription.
+
+This bridge remains internal and does not create Stripe Checkout Sessions or expose a purchase endpoint. A later slice still needs the server-side Stripe API adapter and then a separately authenticated HTTP purchase route.
 
 ## Future billing integration
 
