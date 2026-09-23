@@ -368,10 +368,6 @@ model Subscription {
   @@unique([provider, externalSubscriptionId])
 }
 
-// BillingEvent is an internal replay/idempotency ledger for provider events that
-// have already passed provider verification. It deliberately stores a digest
-// instead of a raw webhook/payment payload so card/payment metadata and purchase
-// tokens are not retained just to deduplicate delivery retries.
 // CheckoutAttempt is the server-owned ownership/idempotency record for a future
 // Stripe Checkout Session. It stores no card data, provider secret, raw payment
 // payload, client redirect, or authoritative entitlement state.
@@ -396,6 +392,10 @@ model CheckoutAttempt {
   @@index([provider, status, createdAt])
 }
 
+// BillingEvent is an internal replay/idempotency ledger for provider events that
+// have already passed provider verification. It deliberately stores a digest
+// instead of a raw webhook/payment payload so card/payment metadata and purchase
+// tokens are not retained just to deduplicate delivery retries.
 model BillingEvent {
   id               String                       @id @default(cuid())
   provider         String
