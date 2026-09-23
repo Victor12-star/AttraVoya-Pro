@@ -9,11 +9,13 @@ const EXPIRES_AT = new Date('2026-09-23T20:40:00.000Z');
 
 describe('Stripe Checkout Session gateway', () => {
   it('creates a subscription session using only server-owned checkout values', async () => {
-    const requestJson = vi.fn(async () => ({
-      id: 'cs_test_123',
-      mode: 'subscription',
-      url: 'https://checkout.stripe.com/c/pay/cs_test_123',
-    }));
+    const requestJson = /** @type {any} */ (
+      vi.fn(async () => ({
+        id: 'cs_test_123',
+        mode: 'subscription',
+        url: 'https://checkout.stripe.com/c/pay/cs_test_123',
+      })),
+    );
     const gateway = createStripeCheckoutGateway({
       secretKey: 'sk_test_server_only_example_key',
       httpClient: { requestJson },
