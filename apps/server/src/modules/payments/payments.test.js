@@ -334,6 +334,70 @@ describe('verified billing event repository', () => {
     );
   });
 
+  it('uses a pending-only compare-and-set for terminal processing state', async () => {
+    const updateMany = vi.fn(async () => ({ count: 1 }));
+    const findUnique = vi.fn(async () =>
+      storedEvent({
+        processingStatus: 'FAILED',
+        failureCode: 'PROCESSING_ERROR',
+        processedAt: new Date('2026-09-23T14:15:00.000Z'),
+      }),
+    );
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({ billingEvent: { updateMany, findUnique } }),
+    );
+    const processedAt = new Date('2026-09-23T14:15:00.000Z');
+
+    const result = await repository.finalizePendingEvent({
+      eventId: 'billing-event-1',
+      status: 'FAILED',
+      failureCode: 'PROCESSING_ERROR',
+      processedAt,
+    });
+
+    expect(updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'billing-event-1',
+        processingStatus: 'PENDING',
+      },
+      data: {
+        processingStatus: 'FAILED',
+        processedAt,
+        failureCode: 'PROCESSING_ERROR',
+      },
+    });
+    expect(findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 'billing-event-1' } }),
+    );
+    expect(result).toMatchObject({
+      transitioned: true,
+      event: { processingStatus: 'FAILED' },
+    });
+  });
+
+  it('reports a lost terminalization race without overwriting the winner', async () => {
+    const updateMany = vi.fn(async () => ({ count: 0 }));
+    const findUnique = vi.fn(async () =>
+      storedEvent({
+        processingStatus: 'IGNORED',
+        processedAt: new Date('2026-09-23T14:14:59.000Z'),
+      }),
+    );
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({ billingEvent: { updateMany, findUnique } }),
+    );
+
+    const result = await repository.finalizePendingEvent({
+      eventId: 'billing-event-1',
+      status: 'FAILED',
+      failureCode: 'PROCESSING_ERROR',
+      processedAt: new Date('2026-09-23T14:15:00.000Z'),
+    });
+
+    expect(result.transitioned).toBe(false);
+    expect(result.event.processingStatus).toBe('IGNORED');
+  });
+
   it('does not hide unrelated database failures', async () => {
     const databaseError = Object.assign(new Error('database unavailable'), { code: 'P1001' });
     const repository = createPaymentsRepository(
