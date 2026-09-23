@@ -218,21 +218,22 @@ describe('internal Stripe subscription event processor', () => {
     });
   });
 
-  it('terminalizes malformed authenticated subscription state before mutation', async () => {
+  it('terminalizes malformed authenticated subscription state as a handled failure', async () => {
     const deps = dependencies();
     const processor = createStripeSubscriptionEventProcessor(deps);
 
-    await expect(
-      processor.process({
-        rawPayload: rawStripeEvent({
-          subscription: { status: 'future_unknown_status' },
-        }),
+    const result = await processor.process({
+      rawPayload: rawStripeEvent({
+        subscription: { status: 'future_unknown_status' },
       }),
-    ).rejects.toMatchObject({
-      statusCode: 400,
-      code: 'VALIDATION_ERROR',
     });
 
+    expect(result).toMatchObject({
+      outcome: 'FAILED',
+      duplicate: false,
+      failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
+      subscription: null,
+    });
     expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
       eventId: 'billing-event-1',
       outcome: 'FAILED',
