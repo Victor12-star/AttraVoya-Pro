@@ -116,7 +116,10 @@ jobs:
         run: pnpm --filter @attravoya/web test:e2e:ci
 
       - name: Check formatting
-        run: pnpm format:check
+        run: |
+          pnpm exec prettier --write             apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
+          git diff -- apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
+          exit 1
 
   database:
     name: PostgreSQL and Prisma verification
