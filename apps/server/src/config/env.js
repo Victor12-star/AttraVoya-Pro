@@ -1,3 +1,4 @@
+import { PLANS } from '@attravoya/constants';
 import { z } from 'zod';
 
 const strictBoolean = z.preprocess((value) => {
@@ -22,6 +23,17 @@ const optionalPositiveInteger = (maximum) =>
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
     z.coerce.number().int().min(1).max(maximum).optional(),
   );
+
+const optionalStripePriceId = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z
+    .string()
+    .trim()
+    .min(8)
+    .max(255)
+    .regex(/^price_[A-Za-z0-9]+$/, 'Use a Stripe Price ID beginning with price_')
+    .optional(),
+);
 
 const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -51,6 +63,13 @@ const environmentSchema = z.object({
   STRIPE_WEBHOOK_ENABLED: strictBoolean,
   STRIPE_WEBHOOK_SECRET: optionalSecret(16, 512),
   STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
+
+  // Purchase creation remains opt-in and disabled by default. These values are
+  // server-only configuration; clients must never choose Stripe prices directly.
+  STRIPE_PURCHASE_ENABLED: strictBoolean,
+  STRIPE_SECRET_KEY: optionalSecret(16, 512),
+  STRIPE_PRO_MONTHLY_PRICE_ID: optionalStripePriceId,
+  STRIPE_PRO_YEARLY_PRICE_ID: optionalStripePriceId,
 
   // Provider selection is environment-driven so development providers can be
   // replaced for public/commercial launch without rewriting application code.
@@ -191,6 +210,28 @@ function validateStripeWebhookConfiguration(environment) {
   }
 }
 
+function validateStripePurchaseConfiguration(environment) {
+  if (!environment.STRIPE_PURCHASE_ENABLED) return;
+
+  const missing = [
+    !environment.STRIPE_SECRET_KEY?.trim() ? 'STRIPE_SECRET_KEY' : null,
+    !environment.STRIPE_PRO_MONTHLY_PRICE_ID?.trim() ? 'STRIPE_PRO_MONTHLY_PRICE_ID' : null,
+    !environment.STRIPE_PRO_YEARLY_PRICE_ID?.trim() ? 'STRIPE_PRO_YEARLY_PRICE_ID' : null,
+  ].filter(Boolean);
+
+  if (missing.length) {
+    throw new Error(
+      `Invalid AttraVoya Pro server environment:\n${missing.join(', ')}: required when STRIPE_PURCHASE_ENABLED=true.`,
+    );
+  }
+
+  if (environment.STRIPE_PRO_MONTHLY_PRICE_ID === environment.STRIPE_PRO_YEARLY_PRICE_ID) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nSTRIPE_PRO_MONTHLY_PRICE_ID and STRIPE_PRO_YEARLY_PRICE_ID must be different.',
+    );
+  }
+}
+
 function validateProductionEmailConfiguration(environment) {
   if (environment.NODE_ENV !== 'production') return;
 
@@ -210,6 +251,15 @@ function validateProductionEmailConfiguration(environment) {
       `Invalid AttraVoya Pro server environment:\n${missing.join(', ')}: required in production for transactional authentication email.`,
     );
   }
+}
+
+export function stripePurchasePriceIdsFromEnvironment(environment) {
+  if (!environment.STRIPE_PURCHASE_ENABLED) return Object.freeze({});
+
+  return Object.freeze({
+    [PLANS.PRO_MONTHLY]: environment.STRIPE_PRO_MONTHLY_PRICE_ID,
+    [PLANS.PRO_YEARLY]: environment.STRIPE_PRO_YEARLY_PRICE_ID,
+  });
 }
 
 export function providerRequestBudgetPoliciesFromEnvironment(environment) {
@@ -246,6 +296,7 @@ export function loadEnvironment(source = process.env) {
 
   validateProviderBudgetPairs(result.data);
   validateStripeWebhookConfiguration(result.data);
+  validateStripePurchaseConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);

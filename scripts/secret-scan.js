@@ -13,6 +13,7 @@ const patterns = [
   { name: 'GitHub token', pattern: /\bgh[pousr]_[A-Za-z0-9_]{30,}\b/ },
   { name: 'AWS access key', pattern: /\bAKIA[0-9A-Z]{16}\b/ },
   { name: 'Stripe live secret', pattern: /\bsk_live_[A-Za-z0-9]{20,}\b/ },
+  { name: 'Stripe test secret', pattern: /\bsk_test_[A-Za-z0-9]{20,}\b/ },
   { name: 'Stripe webhook secret', pattern: /\bwhsec_[A-Za-z0-9]{20,}\b/ },
   { name: 'Resend API key', pattern: /\bre_[A-Za-z0-9_-]{20,}\b/ },
 ];

@@ -156,6 +156,16 @@ After an event is authenticated and deterministically handled, the route returns
 
 The webhook secret, signature header, and raw payload are not written to the billing ledger. The raw body exists only long enough to verify the signature, derive privacy-minimized evidence, and process the authenticated event.
 
+### Disabled-by-default Stripe purchase configuration
+
+Web purchase creation now has a configuration contract, but no purchase API or UI is enabled. `STRIPE_PURCHASE_ENABLED` defaults to `false`. When an operator explicitly enables it, startup requires a server-only `STRIPE_SECRET_KEY` plus distinct canonical Stripe Price IDs for the existing `PRO_MONTHLY` and `PRO_YEARLY` plan keys.
+
+The server owns the plan-to-Price mapping. A future checkout request may select only a recognized AttraVoya plan key and must resolve the external Price ID from server configuration. Clients must never supply or override a Stripe Price ID, customer ID, subscription ID, price amount, currency, billing interval, or success claim as authoritative billing state.
+
+The purchase secret and Price IDs are deployment configuration only. They are not returned by entitlement APIs, rendered in web/mobile plan status, stored in the billing-event ledger, or logged as request metadata. The committed-secret scan rejects Stripe live/test secret-key patterns, while the example environment contains only blank placeholders.
+
+This phase does not install or call the Stripe API client, create Checkout Sessions, create customers, attach provider subscriptions, define success/cancel return URLs, expose a buy button, or change any user's subscription. Purchase creation remains disabled until a later slice adds authenticated ownership, idempotent checkout creation, safe return URLs, duplicate-click/retry behavior, and webhook reconciliation.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
@@ -168,7 +178,7 @@ The intended evidence path is:
 
 Provider callbacks or purchase tokens must be verified server-side before they can create or change authoritative subscription state. Required future controls include signature/token verification, idempotency, replay protection, ownership checks, refund/revocation handling, database transactions, rate limiting, server-only secrets and privacy-safe audit events.
 
-Until those integrations exist, AttraVoya must not claim that subscriptions can be purchased.
+The Stripe webhook trust chain and disabled purchase configuration now exist, but a purchase-creation flow does not. Until checkout or mobile-store purchase integrations are separately implemented and verified, AttraVoya must not claim that new subscriptions can be purchased.
 
 ## Security boundary
 
