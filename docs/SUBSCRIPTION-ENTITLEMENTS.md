@@ -86,7 +86,17 @@ The payments module exposes an internal-only `recordVerifiedEvent` service for e
 
 The database unique constraint on provider plus external event ID is the concurrency-safe replay boundary. The first verified delivery creates the record. An exact later retry returns the existing record as a duplicate. Reuse of the same provider event identity with a different event type or payload digest fails closed as a conflict instead of silently replacing the original evidence.
 
-This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification and authoritative subscription mutation remain later separately gated slices.
+This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification remains a later separately gated slice.
+
+### Transactional subscription-state application
+
+After an event has already entered the verified ledger, the internal payments service may apply a provider-normalized state change to an existing authoritative subscription. The event claim, subscription mutation, and final ledger status are performed in one database transaction; there is still no public billing route in this phase.
+
+`Subscription.providerStateUpdatedAt` records when the provider says that subscription state became current. The database update uses that timestamp as a compare-and-swap condition, so a delayed or concurrently processed older provider event cannot overwrite newer subscription state. Stale events are retained in the ledger as `IGNORED` with the privacy-safe internal code `STALE_PROVIDER_STATE` rather than being deleted or treated as current truth.
+
+The processor also requires provider ownership consistency between the verified event and the existing subscription, treats an already-processed ledger event as idempotent, and fails closed when the event or subscription cannot be resolved. Active or trialing state requires a period end later than the provider state timestamp, while canceled state requires a cancellation timestamp.
+
+This boundary updates only an existing subscription. It does not create purchases, create a provider customer, create the initial provider subscription, verify provider evidence, expose checkout, or make a ledger row an entitlement by itself. Pro access continues to come only from the existing server-authoritative subscription and entitlement resolver.
 
 ## Future billing integration
 
