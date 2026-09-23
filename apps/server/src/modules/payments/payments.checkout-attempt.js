@@ -3,6 +3,7 @@ import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-
 // Stripe Checkout requires an explicit expiry to be at least 30 minutes in the
 // future. Keep a small server-side buffer so database work/network setup cannot
 // push the provider request below that minimum.
+const MIN_ATTEMPT_TTL_MS = 31 * 60 * 1000;
 const DEFAULT_ATTEMPT_TTL_MS = 35 * 60 * 1000;
 const PROVIDER = 'stripe';
 
@@ -57,7 +58,11 @@ export function createCheckoutAttemptService({
     throw new TypeError('Stripe checkout policy is required.');
   }
 
-  if (!Number.isInteger(attemptTtlMs) || attemptTtlMs < 60_000 || attemptTtlMs > 86_400_000) {
+  if (
+    !Number.isInteger(attemptTtlMs) ||
+    attemptTtlMs < MIN_ATTEMPT_TTL_MS ||
+    attemptTtlMs > 86_400_000
+  ) {
     throw new TypeError('Checkout-attempt TTL is invalid.');
   }
 
