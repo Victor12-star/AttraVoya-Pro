@@ -16,7 +16,8 @@ describe('billing provider verification boundary', () => {
     const verify = vi.fn(async ({ rawPayload: adapterPayload, headers }) => {
       expect(Buffer.isBuffer(adapterPayload)).toBe(true);
       expect(adapterPayload.equals(rawPayload)).toBe(true);
-      expect(/** @type {any} */ (headers).authorization).toBe('provider-signature-secret');
+      const adapterHeaders = /** @type {any} */ (headers);
+      expect(adapterHeaders.authorization).toBe('provider-signature-secret');
 
       return {
         externalEventId: ' evt_123 ',
