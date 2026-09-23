@@ -149,7 +149,7 @@ export function createPaymentsRepository(prismaClient = prisma) {
         });
 
         if (updated.count !== 1) {
-          await tx.billingEvent.update({
+          const ignoredEvent = await tx.billingEvent.update({
             where: { id: eventId },
             data: {
               processingStatus: 'IGNORED',
@@ -157,10 +157,10 @@ export function createPaymentsRepository(prismaClient = prisma) {
               subscriptionId,
               failureCode: 'STALE_PROVIDER_STATE',
             },
-            select: { id: true },
+            select: EVENT_SELECT,
           });
 
-          return { outcome: 'STALE', event, subscription };
+          return { outcome: 'STALE', event: ignoredEvent, subscription };
         }
 
         const appliedSubscription = await tx.subscription.findUnique({
