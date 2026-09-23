@@ -141,7 +141,6 @@ describe('verified billing event service', () => {
   });
 });
 
-
 describe('verified subscription state application', () => {
   it('applies normalized current provider state through the transactional repository boundary', async () => {
     const repository = {
@@ -557,6 +556,4 @@ describe('verified billing event repository', () => {
         providerStateUpdatedAt: existingSubscription.providerStateUpdatedAt,
       },
     });
-  });
-
-});
+  })});
