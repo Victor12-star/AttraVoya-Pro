@@ -29,12 +29,25 @@ function optionalDate(value, name) {
   return requiredDate(value, name);
 }
 
+/**
+ * @param {{ recordVerifiedEvent: (input: any) => Promise<any> }} [repository]
+ */
 export function createPaymentsService(repository = paymentsRepository) {
   if (!repository?.recordVerifiedEvent) {
     throw new TypeError('Payments repository is required.');
   }
 
   return {
+    /**
+     * @param {{
+     *   provider: string,
+     *   externalEventId: string,
+     *   eventType: string,
+     *   payloadHash: string,
+     *   occurredAt?: Date | null,
+     *   verifiedAt: Date,
+     * }} input
+     */
     async recordVerifiedEvent({
       provider,
       externalEventId,
