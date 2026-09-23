@@ -160,7 +160,9 @@ describe('checkout attempt service', () => {
     expect(repository.createOrReuseCheckoutAttempt).not.toHaveBeenCalled();
   });
 
-  it('binds a trusted Stripe Checkout Session once and treats exact retry as idempotent', async () => {
+  it(
+    'binds a trusted Stripe Checkout Session once and treats exact retry as idempotent',
+    async () => {
     const firstAttempt = attempt({
       status: 'SESSION_CREATED',
       externalCheckoutSessionId: 'cs_test_123',
@@ -196,8 +198,9 @@ describe('checkout attempt service', () => {
     });
 
     expect(first.duplicate).toBe(false);
-    expect(retry.duplicate).toBe(true);
-  });
+      expect(retry.duplicate).toBe(true);
+    },
+  );
 
   it('rejects invalid or conflicting Stripe Checkout Session identity', async () => {
     const repository = {
