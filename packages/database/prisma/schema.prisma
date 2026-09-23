@@ -39,6 +39,15 @@ enum BillingEventProcessingStatus {
   FAILED
 }
 
+enum CheckoutAttemptStatus {
+  PENDING
+  SESSION_CREATED
+  COMPLETED
+  CANCELED
+  EXPIRED
+  FAILED
+}
+
 enum DestinationStatus {
   DRAFT
   PUBLISHED
@@ -215,6 +224,7 @@ model User {
   profile                   UserProfile?
   roles                     UserRole[]
   subscriptions             Subscription[]
+  checkoutAttempts          CheckoutAttempt[]
   authSessions              AuthSession[]
   emailVerificationTokens   EmailVerificationToken[]
   passwordResetTokens       PasswordResetToken[]
@@ -307,8 +317,9 @@ model Plan {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  entitlements PlanEntitlement[]
-  subscriptions Subscription[]
+  entitlements     PlanEntitlement[]
+  subscriptions    Subscription[]
+  checkoutAttempts CheckoutAttempt[]
 }
 
 model Entitlement {
@@ -361,6 +372,30 @@ model Subscription {
 // have already passed provider verification. It deliberately stores a digest
 // instead of a raw webhook/payment payload so card/payment metadata and purchase
 // tokens are not retained just to deduplicate delivery retries.
+// CheckoutAttempt is the server-owned ownership/idempotency record for a future
+// Stripe Checkout Session. It stores no card data, provider secret, raw payment
+// payload, client redirect, or authoritative entitlement state.
+model CheckoutAttempt {
+  id                        String                @id @default(cuid())
+  userId                    String
+  planId                    String
+  provider                  String
+  status                    CheckoutAttemptStatus @default(PENDING)
+  activeUserKey             String?               @unique
+  externalCheckoutSessionId String?
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+  expiresAt                 DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, externalCheckoutSessionId])
+  @@index([userId, status, createdAt])
+  @@index([planId, status])
+  @@index([provider, status, createdAt])
+}
+
 model BillingEvent {
   id               String                       @id @default(cuid())
   provider         String
