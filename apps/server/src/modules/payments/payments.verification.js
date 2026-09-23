@@ -90,11 +90,6 @@ export function createBillingVerificationBoundary({
     async verifyEvent({ rawPayload, headers = {} }) {
       const payload = rawPayloadBytes(rawPayload, maxPayloadBytes);
       const payloadHash = createHash('sha256').update(payload).digest('hex');
-      const verifiedAt = now();
-
-      if (!(verifiedAt instanceof Date) || !Number.isFinite(verifiedAt.getTime())) {
-        throw new TypeError('Billing verification requires a valid server time.');
-      }
 
       const result = await verify({
         rawPayload: Buffer.from(payload),
@@ -103,6 +98,11 @@ export function createBillingVerificationBoundary({
 
       if (!result || typeof result !== 'object') {
         throw new ProviderResponseError('Billing provider verifier returned invalid evidence.');
+      }
+
+      const verifiedAt = now();
+      if (!(verifiedAt instanceof Date) || !Number.isFinite(verifiedAt.getTime())) {
+        throw new TypeError('Billing verification requires a valid server time.');
       }
 
       const evidence = Object.freeze({
