@@ -4,7 +4,7 @@ import { createPaymentsRepository } from './payments.repository.js';
 import { createCheckoutAttemptService } from './payments.checkout-attempt.js';
 
 const NOW = new Date('2026-09-23T20:05:00.000Z');
-const EXPIRES_AT = new Date('2026-09-23T20:35:00.000Z');
+const EXPIRES_AT = new Date('2026-09-23T20:40:00.000Z');
 
 function attempt(overrides = {}) {
   return {
@@ -231,6 +231,22 @@ describe('checkout attempt service', () => {
         externalCheckoutSessionId: 'cs_test_conflict',
       }),
     ).rejects.toMatchObject({ statusCode: 409, code: 'CONFLICT' });
+  });
+
+  it('rejects checkout-attempt TTLs that cannot satisfy Stripe expiry minimums', () => {
+    const repository = {
+      createOrReuseCheckoutAttempt: vi.fn(),
+      bindCheckoutSession: vi.fn(),
+    };
+
+    expect(() =>
+      createCheckoutAttemptService({
+        repository,
+        checkoutPolicy: checkoutPolicy(),
+        now: () => NOW,
+        attemptTtlMs: 30 * 60 * 1000,
+      }),
+    ).toThrow('Checkout-attempt TTL is invalid.');
   });
 });
 
