@@ -69,10 +69,7 @@ function parseVerifiedCheckoutCompletion(rawPayload, evidence) {
  *   }
  * }} dependencies
  */
-export function createStripeCheckoutCompletionProcessor({
-  verificationBoundary,
-  paymentsService,
-}) {
+export function createStripeCheckoutCompletionProcessor({ verificationBoundary, paymentsService }) {
   if (!verificationBoundary?.verifyEvent) {
     throw new TypeError('Stripe billing verification boundary is required.');
   }
@@ -144,12 +141,12 @@ export function createStripeCheckoutCompletionProcessor({
           subscription: applied.subscription,
         };
       } catch (error) {
-        const failureCode =
-          error?.code === 'NOT_FOUND'
-            ? 'CHECKOUT_ATTEMPT_NOT_FOUND'
-            : error?.code === 'CONFLICT'
-              ? 'CHECKOUT_COMPLETION_CONFLICT'
-              : null;
+        let failureCode = null;
+        if (error?.code === 'NOT_FOUND') {
+          failureCode = 'CHECKOUT_ATTEMPT_NOT_FOUND';
+        } else if (error?.code === 'CONFLICT') {
+          failureCode = 'CHECKOUT_COMPLETION_CONFLICT';
+        }
 
         if (!failureCode) throw error;
 
