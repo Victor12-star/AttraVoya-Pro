@@ -150,13 +150,20 @@ export function createStripeSubscriptionEventProcessor({ verificationBoundary, p
       let state;
       try {
         state = normalizeSubscriptionState(rawPayload, evidence);
-      } catch (error) {
-        await paymentsService.finalizeVerifiedEvent({
+      } catch {
+        const finalized = await paymentsService.finalizeVerifiedEvent({
           eventId,
           outcome: 'FAILED',
           failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
         });
-        throw error;
+
+        return {
+          outcome: 'FAILED',
+          duplicate: recorded.duplicate || finalized.duplicate,
+          failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
+          event: finalized.event,
+          subscription: null,
+        };
       }
 
       let subscription;
