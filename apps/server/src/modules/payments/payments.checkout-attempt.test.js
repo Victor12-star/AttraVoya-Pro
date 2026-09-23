@@ -232,7 +232,6 @@ describe('checkout attempt service', () => {
       }),
     ).rejects.toMatchObject({ statusCode: 409, code: 'CONFLICT' });
   });
-});
 
   it('rejects checkout-attempt TTLs that cannot satisfy Stripe expiry minimums', () => {
     const repository = {
@@ -249,6 +248,7 @@ describe('checkout attempt service', () => {
       }),
     ).toThrow('Checkout-attempt TTL is invalid.');
   });
+});
 
 describe('checkout attempt repository', () => {
   it('expires an old active attempt before creating a new one', async () => {
