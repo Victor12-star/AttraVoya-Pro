@@ -310,4 +310,45 @@ describe('verified checkout completion repository', () => {
     expect(result.outcome).toBe('PROVIDER_IDENTITY_CONFLICT');
     expect(eventUpdateMany).not.toHaveBeenCalled();
   });
+
+  it('does not recreate ownership from a completed attempt without its linked subscription', async () => {
+    const eventUpdateMany = vi.fn();
+    const subscriptionCreate = vi.fn();
+    const tx = {
+      billingEvent: {
+        findUnique: vi.fn(async () => pendingEvent()),
+        updateMany: eventUpdateMany,
+      },
+      checkoutAttempt: {
+        findUnique: vi.fn(async () =>
+          checkoutAttempt({
+            status: 'COMPLETED',
+            activeUserKey: null,
+          }),
+        ),
+      },
+      subscription: {
+        findUnique: vi.fn(async () => null),
+        create: subscriptionCreate,
+      },
+    };
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        $transaction: vi.fn(async (callback) => callback(tx)),
+      }),
+    );
+
+    const result = await repository.applyVerifiedCheckoutCompletion({
+      eventId: 'billing-event-1',
+      provider: 'stripe',
+      externalCheckoutSessionId: 'cs_test_123',
+      externalSubscriptionId: 'sub_123',
+      processedAt: PROCESSED_AT,
+    });
+
+    expect(result.outcome).toBe('CHECKOUT_ATTEMPT_STATE_CONFLICT');
+    expect(eventUpdateMany).not.toHaveBeenCalled();
+    expect(subscriptionCreate).not.toHaveBeenCalled();
+  });
+
 });
