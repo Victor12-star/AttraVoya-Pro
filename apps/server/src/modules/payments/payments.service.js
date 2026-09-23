@@ -1,8 +1,4 @@
-import {
-  ConflictError,
-  NotFoundError,
-  ValidationError,
-} from '../../errors/app-error.js';
+import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 import { paymentsRepository } from './payments.repository.js';
 
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
