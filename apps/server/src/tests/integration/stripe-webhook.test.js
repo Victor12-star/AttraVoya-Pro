@@ -1,3 +1,5 @@
+import { createHmac } from 'node:crypto';
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 process.env.NODE_ENV = 'test';
@@ -74,6 +76,119 @@ describe('Stripe webhook ingress', () => {
     expect(input.rawPayload.equals(Buffer.from(rawPayload))).toBe(true);
     expect(input.headers['stripe-signature']).toBe('t=123,v1=signature-placeholder');
     expect(JSON.stringify(response.json())).not.toContain('must-not-leak');
+  });
+
+  it('verifies a real Stripe signature before recording or mutating subscription state', async () => {
+    const webhookSecret = 'whsec_test_secret_1234567890';
+    const now = new Date('2026-09-23T17:45:00.000Z');
+    const timestamp = Math.floor(now.getTime() / 1000);
+    const rawPayload = JSON.stringify({
+      id: 'evt_signed_123',
+      type: 'customer.subscription.updated',
+      created: timestamp,
+      data: {
+        object: {
+          id: 'sub_provider_123',
+          status: 'active',
+          current_period_end: timestamp + 30 * 24 * 60 * 60,
+          canceled_at: null,
+        },
+      },
+    });
+    const signature = createHmac('sha256', webhookSecret)
+      .update(`${timestamp}.${rawPayload}`)
+      .digest('hex');
+
+    const paymentsService = {
+      recordVerifiedEvent: vi.fn(async () => ({
+        event: { id: 'billing-event-1' },
+        duplicate: false,
+      })),
+      finalizeVerifiedEvent: vi.fn(),
+      resolveProviderSubscription: vi.fn(async () => ({
+        id: 'subscription-1',
+      })),
+      applyVerifiedSubscriptionState: vi.fn(async () => ({
+        applied: true,
+        duplicate: false,
+        stale: false,
+        event: { id: 'billing-event-1', processingStatus: 'APPLIED' },
+        subscription: { id: 'subscription-1', status: 'ACTIVE' },
+      })),
+    };
+    const app = await buildApp({
+      logger: false,
+      stripeWebhookEnabled: true,
+      stripeWebhookSecret: webhookSecret,
+      stripeWebhookNow: () => now,
+      paymentsService,
+    });
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/payments/webhooks/stripe',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': `t=${timestamp},v1=${signature}`,
+      },
+      payload: rawPayload,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ received: true });
+    expect(paymentsService.recordVerifiedEvent).toHaveBeenCalledTimes(1);
+    expect(paymentsService.resolveProviderSubscription).toHaveBeenCalledWith({
+      provider: 'stripe',
+      externalSubscriptionId: 'sub_provider_123',
+    });
+    expect(paymentsService.applyVerifiedSubscriptionState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventId: 'billing-event-1',
+        subscriptionId: 'subscription-1',
+        provider: 'stripe',
+        status: 'ACTIVE',
+      }),
+    );
+  });
+
+  it('rejects an invalid Stripe signature before billing evidence is recorded', async () => {
+    const now = new Date('2026-09-23T17:45:00.000Z');
+    const timestamp = Math.floor(now.getTime() / 1000);
+    const paymentsService = {
+      recordVerifiedEvent: vi.fn(),
+      finalizeVerifiedEvent: vi.fn(),
+      resolveProviderSubscription: vi.fn(),
+      applyVerifiedSubscriptionState: vi.fn(),
+    };
+    const app = await buildApp({
+      logger: false,
+      stripeWebhookEnabled: true,
+      stripeWebhookSecret: 'whsec_test_secret_1234567890',
+      stripeWebhookNow: () => now,
+      paymentsService,
+    });
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/payments/webhooks/stripe',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': `t=${timestamp},v1=${'0'.repeat(64)}`,
+      },
+      payload: JSON.stringify({
+        id: 'evt_invalid_signature',
+        type: 'customer.subscription.updated',
+        created: timestamp,
+      }),
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error.code).toBe('VALIDATION_ERROR');
+    expect(paymentsService.recordVerifiedEvent).not.toHaveBeenCalled();
+    expect(paymentsService.resolveProviderSubscription).not.toHaveBeenCalled();
+    expect(paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
   it('keeps ordinary parent-scope JSON parsing unchanged when webhook ingress is enabled', async () => {
