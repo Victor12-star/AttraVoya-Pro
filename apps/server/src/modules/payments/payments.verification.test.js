@@ -104,9 +104,9 @@ describe('billing provider verification boundary', () => {
       now: () => NOW,
     });
 
-    await expect(
-      boundary.verifyEvent({ rawPayload: Buffer.from('provider-event') }),
-    ).rejects.toBe(authenticationFailure);
+    await expect(boundary.verifyEvent({ rawPayload: Buffer.from('provider-event') })).rejects.toBe(
+      authenticationFailure,
+    );
   });
 
   it('requires a valid server verification time', async () => {
