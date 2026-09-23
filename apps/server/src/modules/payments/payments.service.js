@@ -40,6 +40,7 @@ function optionalDate(value, name) {
  *   recordVerifiedEvent: (input: any) => Promise<any>,
  *   finalizePendingEvent: (input: any) => Promise<any>,
  *   findSubscriptionByProviderIdentity?: (input: any) => Promise<any>,
+ *   applyVerifiedCheckoutCompletion?: (input: any) => Promise<any>,
  *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>
  * }} [repository]
  * @param {{ now?: () => Date }} [options]
@@ -52,6 +53,94 @@ export function createPaymentsService(repository = paymentsRepository, options =
   const now = options.now ?? (() => new Date());
 
   return {
+    /**
+     * Atomically attach a verified completed provider checkout to the
+     * server-owned checkout attempt and create only non-entitling PENDING
+     * subscription ownership. A later verified subscription lifecycle event is
+     * still required before Pro access can become ACTIVE or TRIALING.
+     *
+     * @param {{
+     *   eventId: string,
+     *   provider: string,
+     *   externalCheckoutSessionId: string,
+     *   externalSubscriptionId: string
+     * }} input
+     */
+    async applyVerifiedCheckoutCompletion({
+      eventId,
+      provider,
+      externalCheckoutSessionId,
+      externalSubscriptionId,
+    }) {
+      if (!repository.applyVerifiedCheckoutCompletion) {
+        throw new TypeError('Checkout-completion repository boundary is required.');
+      }
+
+      const normalizedEventId = requiredText(eventId, 'eventId', 255);
+      const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
+      const normalizedCheckoutSessionId = requiredText(
+        externalCheckoutSessionId,
+        'externalCheckoutSessionId',
+        255,
+      );
+      const normalizedSubscriptionId = requiredText(
+        externalSubscriptionId,
+        'externalSubscriptionId',
+        255,
+      );
+
+      if (!normalizedCheckoutSessionId.startsWith('cs_')) {
+        throw new ValidationError('externalCheckoutSessionId is invalid.');
+      }
+      if (!normalizedSubscriptionId.startsWith('sub_')) {
+        throw new ValidationError('externalSubscriptionId is invalid.');
+      }
+
+      const processedAt = requiredDate(now(), 'processedAt');
+      const result = await repository.applyVerifiedCheckoutCompletion({
+        eventId: normalizedEventId,
+        provider: normalizedProvider,
+        externalCheckoutSessionId: normalizedCheckoutSessionId,
+        externalSubscriptionId: normalizedSubscriptionId,
+        processedAt,
+      });
+
+      if (result.outcome === 'EVENT_NOT_FOUND') {
+        throw new NotFoundError('Verified billing event was not found.');
+      }
+      if (result.outcome === 'CHECKOUT_ATTEMPT_NOT_FOUND') {
+        throw new NotFoundError('Owned checkout attempt was not found.');
+      }
+      if (result.outcome === 'PLAN_NOT_ACTIVE') {
+        throw new ConflictError('Checkout plan is no longer available.');
+      }
+      if (
+        result.outcome === 'PROVIDER_MISMATCH' ||
+        result.outcome === 'PROVIDER_IDENTITY_CONFLICT' ||
+        result.outcome === 'CHECKOUT_ATTEMPT_STATE_CONFLICT'
+      ) {
+        throw new ConflictError('Verified checkout completion conflicts with owned state.');
+      }
+      if (result.outcome === 'ALREADY_PROCESSED') {
+        return {
+          applied: false,
+          duplicate: true,
+          event: result.event ?? null,
+          subscription: null,
+        };
+      }
+      if (result.outcome !== 'APPLIED' && result.outcome !== 'ALREADY_LINKED') {
+        throw new ConflictError('Verified checkout completion could not be applied safely.');
+      }
+
+      return {
+        applied: true,
+        duplicate: result.outcome === 'ALREADY_LINKED',
+        event: result.event,
+        subscription: result.subscription,
+      };
+    },
+
     /**
      * Resolve one existing AttraVoya subscription from a provider-owned
      * subscription identity. The database uniqueness constraint is the safety
