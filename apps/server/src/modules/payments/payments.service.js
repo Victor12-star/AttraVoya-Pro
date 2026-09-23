@@ -57,17 +57,9 @@ export function createPaymentsService(repository = paymentsRepository) {
       verifiedAt,
     }) {
       const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
-      const normalizedExternalEventId = requiredText(
-        externalEventId,
-        'externalEventId',
-        255,
-      );
+      const normalizedExternalEventId = requiredText(externalEventId, 'externalEventId', 255);
       const normalizedEventType = requiredText(eventType, 'eventType', 120);
-      const normalizedPayloadHash = requiredText(
-        payloadHash,
-        'payloadHash',
-        64,
-      ).toLowerCase();
+      const normalizedPayloadHash = requiredText(payloadHash, 'payloadHash', 64).toLowerCase();
 
       if (!SHA256_HEX.test(normalizedPayloadHash)) {
         throw new ValidationError('payloadHash must be a SHA-256 hex digest.');
@@ -93,9 +85,7 @@ export function createPaymentsService(repository = paymentsRepository) {
         // Reusing one provider event ID for different verified content is not
         // an idempotent retry. Fail closed so no later processor can silently
         // apply ambiguous billing evidence.
-        throw new ConflictError(
-          'Verified billing event identity conflicts with existing content.',
-        );
+        throw new ConflictError('Verified billing event identity conflicts with existing content.');
       }
 
       return {
