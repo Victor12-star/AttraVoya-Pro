@@ -17,6 +17,30 @@ const EVENT_SELECT = Object.freeze({
 
 export function createPaymentsRepository(prismaClient = prisma) {
   return {
+    async finalizePendingEvent({ eventId, status, failureCode, processedAt }) {
+      const update = await prismaClient.billingEvent.updateMany({
+        where: {
+          id: eventId,
+          processingStatus: 'PENDING',
+        },
+        data: {
+          processingStatus: status,
+          processedAt,
+          failureCode,
+        },
+      });
+
+      const event = await prismaClient.billingEvent.findUnique({
+        where: { id: eventId },
+        select: EVENT_SELECT,
+      });
+
+      return {
+        event,
+        transitioned: update.count === 1,
+      };
+    },
+
     async recordVerifiedEvent({
       provider,
       externalEventId,
