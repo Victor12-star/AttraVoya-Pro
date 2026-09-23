@@ -7,6 +7,14 @@ const VERIFIED_AT = new Date('2026-09-23T13:00:00.000Z');
 const OCCURRED_AT = new Date('2026-09-23T12:59:00.000Z');
 const HASH = 'a'.repeat(64);
 
+function serviceRepository(overrides = {}) {
+  return {
+    recordVerifiedEvent: vi.fn(),
+    finalizePendingEvent: vi.fn(),
+    ...overrides,
+  };
+}
+
 function storedEvent(overrides = {}) {
   return {
     id: 'billing-event-1',
@@ -27,7 +35,7 @@ function storedEvent(overrides = {}) {
 
 describe('verified billing event service', () => {
   it('records normalized already-verified evidence without storing raw payload input', async () => {
-    const repository = {
+    const repository = serviceRepository({
       recordVerifiedEvent: vi.fn(async (input) => ({
         event: storedEvent({
           provider: input.provider,
@@ -39,7 +47,7 @@ describe('verified billing event service', () => {
         }),
         created: true,
       })),
-    };
+    });
     const service = createPaymentsService(repository);
 
     const result = await service.recordVerifiedEvent(
@@ -67,12 +75,12 @@ describe('verified billing event service', () => {
   });
 
   it('treats an exact provider retry as a harmless duplicate', async () => {
-    const repository = {
+    const repository = serviceRepository({
       recordVerifiedEvent: vi.fn(async () => ({
         event: storedEvent(),
         created: false,
       })),
-    };
+    });
     const service = createPaymentsService(repository);
 
     const result = await service.recordVerifiedEvent({
@@ -91,12 +99,12 @@ describe('verified billing event service', () => {
   });
 
   it('rejects reuse of one provider event identity for different verified content', async () => {
-    const repository = {
+    const repository = serviceRepository({
       recordVerifiedEvent: vi.fn(async () => ({
         event: storedEvent({ payloadHash: 'b'.repeat(64) }),
         created: false,
       })),
-    };
+    });
     const service = createPaymentsService(repository);
 
     await expect(
@@ -114,7 +122,7 @@ describe('verified billing event service', () => {
   });
 
   it('rejects malformed digests and invalid verification times before persistence', async () => {
-    const repository = { recordVerifiedEvent: vi.fn() };
+    const repository = serviceRepository();
     const service = createPaymentsService(repository);
 
     await expect(
@@ -138,6 +146,128 @@ describe('verified billing event service', () => {
     ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
 
     expect(repository.recordVerifiedEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe('verified billing event terminalization', () => {
+  it('transitions a pending event to IGNORED exactly once', async () => {
+    const processedAt = new Date('2026-09-23T14:15:00.000Z');
+    const repository = serviceRepository({
+      finalizePendingEvent: vi.fn(async (input) => ({
+        event: storedEvent({
+          processingStatus: input.status,
+          processedAt: input.processedAt,
+          failureCode: input.failureCode,
+        }),
+        transitioned: true,
+      })),
+    });
+    const service = createPaymentsService(repository, { now: () => processedAt });
+
+    const result = await service.finalizeVerifiedEvent({
+      eventId: ' billing-event-1 ',
+      outcome: 'ignored',
+    });
+
+    expect(repository.finalizePendingEvent).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      status: 'IGNORED',
+      failureCode: null,
+      processedAt,
+    });
+    expect(result.duplicate).toBe(false);
+    expect(result.event.processingStatus).toBe('IGNORED');
+  });
+
+  it('treats an exact FAILED terminalization retry as idempotent', async () => {
+    const repository = serviceRepository({
+      finalizePendingEvent: vi.fn(async () => ({
+        event: storedEvent({
+          processingStatus: 'FAILED',
+          failureCode: 'UNSUPPORTED_EVENT',
+          processedAt: new Date('2026-09-23T14:15:00.000Z'),
+        }),
+        transitioned: false,
+      })),
+    });
+    const service = createPaymentsService(repository);
+
+    const result = await service.finalizeVerifiedEvent({
+      eventId: 'billing-event-1',
+      outcome: 'FAILED',
+      failureCode: ' unsupported_event ',
+    });
+
+    expect(result.duplicate).toBe(true);
+    expect(result.event.processingStatus).toBe('FAILED');
+  });
+
+  it('fails closed when the event was already finalized differently', async () => {
+    const repository = serviceRepository({
+      finalizePendingEvent: vi.fn(async () => ({
+        event: storedEvent({
+          processingStatus: 'IGNORED',
+          processedAt: new Date('2026-09-23T14:15:00.000Z'),
+        }),
+        transitioned: false,
+      })),
+    });
+    const service = createPaymentsService(repository);
+
+    await expect(
+      service.finalizeVerifiedEvent({
+        eventId: 'billing-event-1',
+        outcome: 'FAILED',
+        failureCode: 'PROCESSING_ERROR',
+      }),
+    ).rejects.toMatchObject({ statusCode: 409, code: 'CONFLICT' });
+  });
+
+  it('rejects APPLIED, free-text failure reasons, and failure codes on ignored events', async () => {
+    const repository = serviceRepository();
+    const service = createPaymentsService(repository);
+
+    await expect(
+      service.finalizeVerifiedEvent({
+        eventId: 'billing-event-1',
+        outcome: 'APPLIED',
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    await expect(
+      service.finalizeVerifiedEvent({
+        eventId: 'billing-event-1',
+        outcome: 'FAILED',
+        failureCode: 'card declined for user@example.test',
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    await expect(
+      service.finalizeVerifiedEvent({
+        eventId: 'billing-event-1',
+        outcome: 'IGNORED',
+        failureCode: 'UNSUPPORTED_EVENT',
+      }),
+    ).rejects.toMatchObject({ statusCode: 400, code: 'VALIDATION_ERROR' });
+
+    expect(repository.finalizePendingEvent).not.toHaveBeenCalled();
+  });
+
+  it('returns not found when the verified event does not exist', async () => {
+    const repository = serviceRepository({
+      finalizePendingEvent: vi.fn(async () => ({
+        event: null,
+        transitioned: false,
+      })),
+    });
+    const service = createPaymentsService(repository);
+
+    await expect(
+      service.finalizeVerifiedEvent({
+        eventId: 'missing-event',
+        outcome: 'IGNORED',
+      }),
+    ).rejects.toMatchObject({ statusCode: 404, code: 'NOT_FOUND' });
   });
 });
 
