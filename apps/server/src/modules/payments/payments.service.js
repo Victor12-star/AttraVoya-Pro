@@ -6,6 +6,7 @@ import {
 import { paymentsRepository } from './payments.repository.js';
 
 const SHA256_HEX = /^[a-f0-9]{64}$/i;
+/** @type {Set<string>} */
 const SUBSCRIPTION_STATUSES = new Set([
   'ACTIVE',
   'TRIALING',
