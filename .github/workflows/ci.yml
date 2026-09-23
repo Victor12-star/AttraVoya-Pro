@@ -74,11 +74,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Show exact payment formatting diff
-        run: |
-          pnpm exec prettier --write             apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
-          git diff -- apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
-          exit 1
+      - name: Validate environment contract
+        run: pnpm env:check
 
       - name: Generate Prisma client for JavaScript checks
         run: pnpm db:generate
@@ -119,10 +116,7 @@ jobs:
         run: pnpm --filter @attravoya/web test:e2e:ci
 
       - name: Check formatting
-        run: |
-          pnpm exec prettier --write             apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
-          git diff -- apps/server/src/modules/payments/payments.service.js             apps/server/src/modules/payments/payments.test.js
-          exit 1
+        run: pnpm format:check
 
   database:
     name: PostgreSQL and Prisma verification
