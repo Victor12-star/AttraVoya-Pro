@@ -80,6 +80,14 @@ The ledger deliberately does not store a raw webhook body, raw purchase token, c
 
 A ledger entry being present also does not itself grant Pro. Subscription state may change only through a later server-side processor that validates the verified event, maps it to an owned account/subscription, applies an idempotent database transaction, and then lets the existing entitlement resolver evaluate the resulting subscription state.
 
+### Internal verified-event recording boundary
+
+The payments module exposes an internal-only `recordVerifiedEvent` service for evidence that has already passed provider-specific verification. The service normalizes bounded provider/event identifiers, requires a valid SHA-256 payload digest and verification timestamp, and writes only the privacy-minimized ledger fields.
+
+The database unique constraint on provider plus external event ID is the concurrency-safe replay boundary. The first verified delivery creates the record. An exact later retry returns the existing record as a duplicate. Reuse of the same provider event identity with a different event type or payload digest fails closed as a conflict instead of silently replacing the original evidence.
+
+This service is not registered as an HTTP route. It does not verify Stripe signatures, Google Play purchase tokens, RevenueCat events, or Apple transactions, and it does not mutate subscription or entitlement state. Provider-specific verification and authoritative subscription mutation remain later separately gated slices.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
