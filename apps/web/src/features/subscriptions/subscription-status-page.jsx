@@ -162,7 +162,16 @@ function formatPrice(plan, locale) {
     const amount = plan.unitAmount / 10 ** fractionDigits;
     return probe.format(amount);
   } catch {
-    return `${plan.unitAmount} ${plan.currency.toUpperCase()}`;
+    try {
+      const fallback = new Intl.NumberFormat('en', {
+        style: 'currency',
+        currency: plan.currency.toUpperCase(),
+      });
+      const fractionDigits = fallback.resolvedOptions().maximumFractionDigits;
+      return fallback.format(plan.unitAmount / 10 ** fractionDigits);
+    } catch {
+      return '—';
+    }
   }
 }
 
@@ -182,6 +191,7 @@ function checkoutReturnState() {
 export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabel }) {
   const sequenceRef = useRef(0);
   const purchaseSequenceRef = useRef(0);
+  const checkoutInFlightRef = useRef(false);
   const [state, setState] = useState(
     /** @type {{status:string, access:any|null}} */ ({ status: 'loading', access: null }),
   );
@@ -196,6 +206,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
 
   const loadPurchaseOptions = useCallback(async () => {
     purchaseSequenceRef.current += 1;
+    checkoutInFlightRef.current = false;
     const sequence = purchaseSequenceRef.current;
     setPurchase({ status: 'loading', plans: [], selected: null });
 
@@ -266,12 +277,20 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       clearTimeout(timer);
       sequenceRef.current += 1;
       purchaseSequenceRef.current += 1;
+      checkoutInFlightRef.current = false;
     };
   }, [loadAccess]);
 
   const startCheckout = useCallback(
     async (planKey) => {
-      if (!PRO_PLAN_KEYS.has(planKey) || purchase.status === 'redirecting') return;
+      if (
+        !PRO_PLAN_KEYS.has(planKey) ||
+        purchase.status === 'redirecting' ||
+        checkoutInFlightRef.current
+      ) {
+        return;
+      }
+      checkoutInFlightRef.current = true;
       setPurchase((current) => ({ ...current, status: 'redirecting', selected: planKey }));
 
       try {
@@ -281,6 +300,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
         }
         globalThis.location.assign(checkoutUrl);
       } catch {
+        checkoutInFlightRef.current = false;
         setPurchase((current) => ({ ...current, status: 'checkout-error', selected: null }));
       }
     },
