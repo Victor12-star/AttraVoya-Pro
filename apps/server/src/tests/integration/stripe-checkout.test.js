@@ -55,6 +55,7 @@ async function checkoutApp(create) {
       cancelUrl: 'https://example.test/premium?checkout=cancelled',
     },
     stripeCheckoutSessionService: { create },
+    stripePlanCatalogService: { list: vi.fn() },
   });
   apps.push(app);
   return app;
