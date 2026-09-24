@@ -1,9 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createPaymentsRepository } from './payments.repository.js';
-import {
-  createRevenueCatSubscriberIdentityService,
-} from './payments.revenuecat-subscriber-identity.js';
+import { createRevenueCatSubscriberIdentityService } from './payments.revenuecat-subscriber-identity.js';
 
 function identity(overrides = {}) {
   return {
