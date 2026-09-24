@@ -70,10 +70,14 @@ export function normalizeCheckoutAvailability(response) {
     return response.planKeys.length === 0 ? { available: false, planKeys: [] } : null;
   }
 
-  const planKeys = response.planKeys.filter(
-    (key, index, values) => PRO_PLAN_KEYS.has(key) && values.indexOf(key) === index,
-  );
-  if (planKeys.length !== 2 || !PLAN_ORDER.every((key) => planKeys.includes(key))) return null;
+  if (
+    response.planKeys.length !== 2 ||
+    response.planKeys.some((key) => !PRO_PLAN_KEYS.has(key)) ||
+    new Set(response.planKeys).size !== 2 ||
+    !PLAN_ORDER.every((key) => response.planKeys.includes(key))
+  ) {
+    return null;
+  }
 
   return { available: true, planKeys: PLAN_ORDER };
 }
@@ -118,7 +122,15 @@ export function normalizeStripeCheckoutUrl(response) {
 
   try {
     const url = new URL(value);
-    if (url.protocol !== 'https:' || url.hostname !== 'checkout.stripe.com') return null;
+    if (
+      url.protocol !== 'https:' ||
+      url.hostname !== 'checkout.stripe.com' ||
+      url.port ||
+      url.username ||
+      url.password
+    ) {
+      return null;
+    }
     return url.toString();
   } catch {
     return null;
@@ -169,6 +181,7 @@ function checkoutReturnState() {
  */
 export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabel }) {
   const sequenceRef = useRef(0);
+  const purchaseSequenceRef = useRef(0);
   const [state, setState] = useState(
     /** @type {{status:string, access:any|null}} */ ({ status: 'loading', access: null }),
   );
@@ -182,12 +195,15 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
   const [returnState, setReturnState] = useState(null);
 
   const loadPurchaseOptions = useCallback(async () => {
+    purchaseSequenceRef.current += 1;
+    const sequence = purchaseSequenceRef.current;
     setPurchase({ status: 'loading', plans: [], selected: null });
 
     try {
       const availability = normalizeCheckoutAvailability(
         await apiClient.getStripeCheckoutAvailability(),
       );
+      if (sequence !== purchaseSequenceRef.current) return;
       if (!availability) {
         setPurchase({ status: 'error', plans: [], selected: null });
         return;
@@ -198,12 +214,14 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       }
 
       const plans = normalizeStripePlanCatalog(await apiClient.getStripePlanCatalog());
+      if (sequence !== purchaseSequenceRef.current) return;
       setPurchase(
         plans
           ? { status: 'ready', plans, selected: null }
           : { status: 'error', plans: [], selected: null },
       );
     } catch {
+      if (sequence !== purchaseSequenceRef.current) return;
       setPurchase({ status: 'error', plans: [], selected: null });
     }
   }, []);
@@ -212,6 +230,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
     sequenceRef.current += 1;
     const sequence = sequenceRef.current;
     setState({ status: 'loading', access: null });
+    purchaseSequenceRef.current += 1;
     setPurchase({ status: 'idle', plans: [], selected: null });
 
     try {
@@ -246,6 +265,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
     return () => {
       clearTimeout(timer);
       sequenceRef.current += 1;
+      purchaseSequenceRef.current += 1;
     };
   }, [loadAccess]);
 
