@@ -13,7 +13,19 @@ const stripeCheckoutResponseSchema = z
   })
   .strict();
 
+const stripeCheckoutAvailabilityResponseSchema = z
+  .object({
+    available: z.boolean(),
+    planKeys: z.array(z.enum([PLANS.PRO_MONTHLY, PLANS.PRO_YEARLY])).max(2),
+  })
+  .strict();
+
 export const paymentsSchemas = Object.freeze({
+  stripeCheckoutAvailability: {
+    response: {
+      200: stripeCheckoutAvailabilityResponseSchema,
+    },
+  },
   stripeCheckout: {
     body: stripeCheckoutBodySchema,
     response: {
