@@ -394,7 +394,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
         </article>
       ) : null}
 
-      {state.status === 'success' && !isPro ? (
+      {state.status === 'success' && !isPro && returnState !== 'success' ? (
         <section className={styles.purchaseSection} aria-labelledby="purchase-title">
           <div>
             <span className={styles.label}>{copy.proOptionsLabel}</span>
