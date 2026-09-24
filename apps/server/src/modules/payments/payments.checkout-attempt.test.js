@@ -139,7 +139,6 @@ describe('checkout attempt service', () => {
     });
   });
 
-
   it.each(['PENDING', 'ACTIVE', 'TRIALING', 'PAST_DUE'])(
     'blocks a second checkout while an existing %s Pro subscription needs resolution',
     async (status) => {
@@ -293,7 +292,6 @@ describe('checkout attempt service', () => {
 });
 
 describe('checkout attempt repository', () => {
-
   it('finds only Pro subscription states that must be resolved before new checkout', async () => {
     const findFirst = vi.fn(async () => ({
       id: 'subscription-1',
