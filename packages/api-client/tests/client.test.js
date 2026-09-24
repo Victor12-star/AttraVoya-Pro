@@ -27,7 +27,6 @@ describe('API client', () => {
     });
   });
 
-
   it('uses no-store semantics for Stripe checkout discovery and sends only the internal plan key', async () => {
     const calls = [];
     const fetchImpl = vi.fn(async (url, options) => {
