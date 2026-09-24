@@ -295,6 +295,10 @@ export function createApiClient(options) {
       request('/api/v1/entitlements/me', {
         cache: 'no-store',
       }),
+    getStripeCheckoutAvailability: () =>
+      request('/api/v1/payments/checkout/availability', {
+        cache: 'no-store',
+      }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
     resendVerification: (email) =>
