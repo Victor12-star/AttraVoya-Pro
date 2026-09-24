@@ -212,7 +212,7 @@ The request body is strict and contains only one authoritative AttraVoya plan ch
 
 The route delegates to the existing durable CheckoutAttempt, duplicate-subscription guard, server-owned checkout policy, Stripe Checkout Session gateway, and one-time session binding. It has a dedicated low rate limit and small request-body ceiling because creating a provider checkout session is a credentialed write.
 
-Only the validated Stripe-hosted `checkoutUrl` is returned. Internal checkout-attempt IDs, Stripe session IDs, provider configuration, plan-to-Price mapping, subscription state, and entitlement state are not returned by this endpoint. The response is marked `private, no-store`.
+Only the validated Stripe-hosted `checkoutUrl` is returned. Internal checkout-attempt IDs, separate structured Stripe session identifiers, provider configuration, plan-to-Price mapping, subscription state, and entitlement state are not returned by this endpoint. The hosted URL itself necessarily identifies the provider checkout session and is therefore marked `private, no-store`.
 
 Stripe webhook raw-body parsing remains isolated to the webhook-only child Fastify scope. The authenticated checkout route therefore keeps ordinary validated JSON parsing while the webhook continues to receive exact raw bytes for signature verification.
 
