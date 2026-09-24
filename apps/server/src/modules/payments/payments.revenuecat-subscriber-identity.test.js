@@ -19,7 +19,9 @@ function bytes(fill) {
 }
 
 describe('RevenueCat subscriber identity service', () => {
-  it('creates a non-guessable provider ID without exposing the AttraVoya user ID or email', async () => {
+  it(
+    'creates a non-guessable provider ID without exposing the AttraVoya user ID or email',
+    async () => {
     const repository = {
       createOrReuseRevenueCatSubscriberIdentity: vi.fn(async ({ userId, appUserId }) => ({
         identity: identity({ userId, appUserId }),
@@ -40,11 +42,12 @@ describe('RevenueCat subscriber identity service', () => {
     expect(result.appUserId).not.toContain('@');
     expect(result.appUserId).not.toContain('/');
     expect(result.created).toBe(true);
-    expect(repository.createOrReuseRevenueCatSubscriberIdentity).toHaveBeenCalledWith({
-      userId: 'user-1',
-      appUserId: result.appUserId,
-    });
-  });
+      expect(repository.createOrReuseRevenueCatSubscriberIdentity).toHaveBeenCalledWith({
+        userId: 'user-1',
+        appUserId: result.appUserId,
+      });
+    },
+  );
 
   it('returns the concurrent winner instead of replacing an existing user mapping', async () => {
     const existing = identity();
@@ -112,7 +115,9 @@ describe('RevenueCat subscriber identity service', () => {
     expect(repository.createOrReuseRevenueCatSubscriberIdentity).toHaveBeenCalledTimes(3);
   });
 
-  it('resolves only an exact server-owned RevenueCat identity and fails closed when unknown', async () => {
+  it(
+    'resolves only an exact server-owned RevenueCat identity and fails closed when unknown',
+    async () => {
     const owned = identity();
     const repository = {
       createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
@@ -128,14 +133,17 @@ describe('RevenueCat subscriber identity service', () => {
       appUserId: owned.appUserId,
     });
 
-    await expect(
-      service.resolveOwnedUser({
-        appUserId: 'av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-      }),
-    ).rejects.toMatchObject({ statusCode: 404, code: 'NOT_FOUND' });
-  });
+      await expect(
+        service.resolveOwnedUser({
+          appUserId: 'av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+        }),
+      ).rejects.toMatchObject({ statusCode: 404, code: 'NOT_FOUND' });
+    },
+  );
 
-  it('rejects client-shaped or malformed RevenueCat identities before database lookup', async () => {
+  it(
+    'rejects client-shaped or malformed RevenueCat identities before database lookup',
+    async () => {
     const repository = {
       createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
       findRevenueCatSubscriberIdentityByAppUserId: vi.fn(),
@@ -155,8 +163,9 @@ describe('RevenueCat subscriber identity service', () => {
       });
     }
 
-    expect(repository.findRevenueCatSubscriberIdentityByAppUserId).not.toHaveBeenCalled();
-  });
+      expect(repository.findRevenueCatSubscriberIdentityByAppUserId).not.toHaveBeenCalled();
+    },
+  );
 });
 
 describe('RevenueCat subscriber identity repository', () => {
