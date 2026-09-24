@@ -1,7 +1,9 @@
 import { DEFAULT_BODY_LIMIT_BYTES, STRIPE_WEBHOOK_RATE_LIMIT } from '../../config/constants.js';
 import { paymentsService } from './payments.service.js';
 import { createPaymentsController } from './payments.controller.js';
+import { createStripeCheckoutCompletionProcessor } from './payments.stripe-checkout-completion.js';
 import { createStripeSubscriptionEventProcessor } from './payments.stripe-subscription.js';
+import { createStripeWebhookEventProcessor } from './payments.stripe-webhook.js';
 import { createStripeWebhookVerifier } from './payments.stripe-verification.js';
 import { createBillingVerificationBoundary } from './payments.verification.js';
 
@@ -20,9 +22,20 @@ function createStripeProcessor(options) {
     maxPayloadBytes: DEFAULT_BODY_LIMIT_BYTES,
   });
 
-  return createStripeSubscriptionEventProcessor({
+  const service = options.paymentsService ?? paymentsService;
+  const subscriptionProcessor = createStripeSubscriptionEventProcessor({
     verificationBoundary,
-    paymentsService: options.paymentsService ?? paymentsService,
+    paymentsService: service,
+  });
+  const checkoutCompletionProcessor = createStripeCheckoutCompletionProcessor({
+    verificationBoundary,
+    paymentsService: service,
+  });
+
+  return createStripeWebhookEventProcessor({
+    verificationBoundary,
+    subscriptionProcessor,
+    checkoutCompletionProcessor,
   });
 }
 
@@ -39,7 +52,7 @@ export async function paymentsRoutes(app, options = {}) {
 
   const processor = createStripeProcessor(options);
   const controller = createPaymentsController({
-    stripeSubscriptionProcessor: processor,
+    stripeWebhookProcessor: processor,
   });
 
   app.removeContentTypeParser('application/json');

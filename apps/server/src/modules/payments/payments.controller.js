@@ -7,9 +7,9 @@ import { ValidationError } from '../../errors/app-error.js';
  * internal trust chain has authenticated and deterministically handled an event.
  * Provider/payment state is never reflected back to the public webhook caller.
  */
-export function createPaymentsController({ stripeSubscriptionProcessor }) {
-  if (!stripeSubscriptionProcessor?.process) {
-    throw new TypeError('Stripe subscription event processor is required.');
+export function createPaymentsController({ stripeWebhookProcessor }) {
+  if (!stripeWebhookProcessor?.process) {
+    throw new TypeError('Stripe webhook event processor is required.');
   }
 
   return {
@@ -18,7 +18,7 @@ export function createPaymentsController({ stripeSubscriptionProcessor }) {
         throw new ValidationError('Stripe webhook requires exact raw request bytes.');
       }
 
-      await stripeSubscriptionProcessor.process({
+      await stripeWebhookProcessor.process({
         rawPayload: request.body,
         headers: request.headers,
       });

@@ -189,7 +189,7 @@ describe('internal Stripe subscription event processor', () => {
     expect(result).toMatchObject({ outcome: 'IGNORED', subscription: null });
   });
 
-  it('fails closed when a verified provider subscription identity is unknown', async () => {
+  it('keeps unknown provider subscription ownership retryable for out-of-order delivery', async () => {
     const deps = dependencies({
       paymentsService: {
         resolveProviderSubscription: vi.fn(async () => {
@@ -199,19 +199,15 @@ describe('internal Stripe subscription event processor', () => {
     });
     const processor = createStripeSubscriptionEventProcessor(deps);
 
-    const result = await processor.process({ rawPayload: rawStripeEvent() });
+    await expect(processor.process({ rawPayload: rawStripeEvent() })).rejects.toMatchObject({
+      statusCode: 503,
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Subscription ownership is not ready for reconciliation.',
+    });
 
-    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
-      eventId: 'billing-event-1',
-      outcome: 'FAILED',
-      failureCode: 'SUBSCRIPTION_IDENTITY_NOT_FOUND',
-    });
+    expect(deps.paymentsService.recordVerifiedEvent).toHaveBeenCalledTimes(1);
+    expect(deps.paymentsService.finalizeVerifiedEvent).not.toHaveBeenCalled();
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
-    expect(result).toMatchObject({
-      outcome: 'FAILED',
-      failureCode: 'SUBSCRIPTION_IDENTITY_NOT_FOUND',
-      subscription: null,
-    });
   });
 
   it('terminalizes malformed authenticated subscription state as a handled failure', async () => {

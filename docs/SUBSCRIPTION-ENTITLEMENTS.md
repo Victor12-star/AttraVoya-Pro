@@ -96,7 +96,7 @@ Before a verified provider event may target authoritative subscription state, th
 
 Rows without provider identity remain valid because provider linkage is nullable until a real purchase integration creates or attaches the external subscription. Once an external subscription ID is present, event processing must use the provider-scoped resolver rather than searching by customer-controlled fields, email address, plan name, or client-supplied account identifiers.
 
-Unknown provider subscription identities fail closed and do not create, upgrade, downgrade, cancel, or otherwise mutate an AttraVoya subscription. Initial provider subscription creation and ownership attachment remain later payment-flow work.
+Unknown provider subscription identities fail closed and do not create, upgrade, downgrade, cancel, or otherwise mutate an AttraVoya subscription. For verified Stripe lifecycle events, an identity that is not linked yet remains retryable rather than being terminalized, because provider event delivery order is not guaranteed and checkout completion may establish ownership on a later delivery.
 
 ### Stripe webhook verification adapter
 
@@ -142,7 +142,7 @@ Processing order is fixed: authenticate the exact raw Stripe request bytes, mint
 
 Only `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted` can enter subscription-state normalization in this slice. Other authenticated Stripe event types are retained as verified ledger evidence and terminalized as `IGNORED` without touching subscription state.
 
-Unknown provider subscription identities fail closed and are terminalized with the privacy-safe machine code `SUBSCRIPTION_IDENTITY_NOT_FOUND`. Authenticated but malformed or unsupported subscription state is terminalized as `STRIPE_SUBSCRIPTION_STATE_INVALID`. Neither case creates an account, subscription, provider customer, plan, or entitlement.
+Unknown provider subscription identities fail closed without terminalizing the verified ledger row. The webhook returns a retryable service-unavailable response so a later delivery can reconcile after verified checkout completion establishes provider ownership. Authenticated but malformed or unsupported subscription state is terminalized as `STRIPE_SUBSCRIPTION_STATE_INVALID`. Neither path creates an account, provider customer, plan, or entitlement.
 
 Stripe lifecycle statuses are compressed into AttraVoya's existing server domain only for authorization-safe state: active and trialing may grant access through the normal entitlement resolver; all mapped non-active states remain non-Pro. No client field, email address, plan name, or unverified provider metadata is used to choose subscription ownership.
 
@@ -152,7 +152,9 @@ The public Stripe callback is `POST /api/v1/payments/webhooks/stripe`, but the r
 
 The payments plugin replaces JSON parsing only inside its own Fastify scope so Stripe's exact raw request bytes reach signature verification unchanged. Ordinary application JSON routes keep the normal parser. Webhook bodies remain bounded by the server body-size ceiling and the route has a dedicated rate limit so provider retries cannot become an unbounded public ingress.
 
-After an event is authenticated and deterministically handled, the route returns only `{ "received": true }`. It does not echo plan state, provider IDs, customer IDs, subscription IDs, ledger results, payment metadata, or internal failure codes. Authenticated permanent failures that have already been terminalized in the billing ledger are acknowledged so Stripe does not retry them forever. Invalid signatures and malformed unauthenticated requests fail before acknowledgment, while unexpected database/server failures remain non-2xx so Stripe can retry transient outages.
+After the shared verification boundary authenticates the exact request, dispatch uses only the verifier-minted event type. `checkout.session.completed` is sent to the verified checkout-completion ownership bridge. Subscription lifecycle events and other authenticated event types continue through the subscription processor, where unrelated events are safely ignored. Unverified JSON never chooses the processor.
+
+After an event is authenticated and deterministically handled, the route returns only `{ "received": true }`. It does not echo plan state, provider IDs, customer IDs, subscription IDs, ledger results, payment metadata, or internal failure codes. Authenticated permanent failures that have already been terminalized in the billing ledger are acknowledged. Invalid signatures and malformed unauthenticated requests fail before acknowledgment, while transient database/server failures and verified lifecycle events whose ownership is not linked yet remain non-2xx so provider retry delivery can reconcile them later.
 
 The webhook secret, signature header, and raw payload are not written to the billing ledger. The raw body exists only long enough to verify the signature, derive privacy-minimized evidence, and process the authenticated event.
 
@@ -212,7 +214,7 @@ Checkout completion creates only a `PENDING` internal subscription. `PENDING` is
 
 Malformed authenticated completion state is terminalized with a bounded privacy-safe machine code. Unknown checkout ownership, inactive plans, conflicting provider identities, and checkout-attempt state races fail closed. Raw Stripe bodies, signature headers, card data, provider secrets, and client-selected ownership data are not stored in the resulting subscription.
 
-This bridge remains internal. Stripe Checkout Session creation is handled by the separate Phase 10CP server gateway, but neither boundary is exposed as an authenticated purchase endpoint yet. No browser/mobile success state grants entitlement; verified lifecycle reconciliation remains authoritative.
+The checkout-completion processor remains an internal trust-chain component, but Phase 10CS connects it to the existing opt-in Stripe webhook ingress only after the shared signature-verification boundary has authenticated the event type. Stripe Checkout Session creation is handled by the separate Phase 10CP server gateway, and no authenticated purchase endpoint is exposed yet. No browser/mobile success state grants entitlement; verified lifecycle reconciliation remains authoritative.
 
 ## Future billing integration
 
