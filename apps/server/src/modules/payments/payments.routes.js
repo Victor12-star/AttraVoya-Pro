@@ -52,7 +52,7 @@ export async function paymentsRoutes(app, options = {}) {
 
   const processor = createStripeProcessor(options);
   const controller = createPaymentsController({
-    stripeSubscriptionProcessor: processor,
+    stripeWebhookProcessor: processor,
   });
 
   app.removeContentTypeParser('application/json');
