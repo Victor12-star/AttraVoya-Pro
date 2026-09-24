@@ -216,6 +216,8 @@ Validated display snapshots are cached briefly in the existing bounded process-l
 
 The catalog requires authentication, is registered only when purchase mode is enabled, has its own bounded read rate, and returns `private, no-store` to browsers. A successful catalog read does not create checkout ownership, mutate a subscription, or grant an entitlement.
 
+Phase 10CW exposes the checkout capability through the shared cross-platform API client. The client can read checkout availability, read the safe Stripe display catalog, and request checkout using only `PRO_MONTHLY` or `PRO_YEARLY`. It never accepts provider Price IDs, amounts, currency, customer/subscription identities, redirect URLs, or entitlement state. This local plan-key guard is defensive ergonomics only; the server remains authoritative and independently validates every checkout request.
+
 ### Authenticated Stripe checkout entry point
 
 Phase 10CT adds `POST /api/v1/payments/checkout/stripe` as the first authenticated purchase ingress. The route is registered only when server-side Stripe purchase mode is explicitly enabled; when purchase mode is disabled, the route does not exist.
