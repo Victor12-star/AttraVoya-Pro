@@ -90,7 +90,7 @@ describe('RevenueCat Android subscription state policy', () => {
       });
 
       expect(result.action).toBe('APPLY');
-      expect(result.state.status).toBe('ACTIVE');
+      expect(result.state?.status).toBe('ACTIVE');
     }
   });
 
@@ -102,9 +102,9 @@ describe('RevenueCat Android subscription state policy', () => {
     });
 
     expect(result.action).toBe('APPLY');
-    expect(result.state.status).toBe('EXPIRED');
-    expect(result.state.currentPeriodEnd).toEqual(new Date(1_780_603_800_000));
-    expect(result.state.canceledAt).toBeNull();
+    expect(result.state?.status).toBe('EXPIRED');
+    expect(result.state?.currentPeriodEnd).toEqual(new Date(1_780_603_800_000));
+    expect(result.state?.canceledAt).toBeNull();
   });
 
   it('preserves access for cancellation, billing issues and scheduled pauses', async () => {
