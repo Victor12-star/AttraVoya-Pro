@@ -3,6 +3,8 @@ import { ApiClientError } from './errors.js';
 const DEFAULT_TIMEOUT_MS = 12_000;
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
+/** @type {Set<string>} */
+const STRIPE_PRO_PLAN_KEYS = new Set(['PRO_MONTHLY', 'PRO_YEARLY']);
 
 function joinUrl(baseUrl, path) {
   return `${String(baseUrl).replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
@@ -34,6 +36,18 @@ function normalizeOpaqueId(value, label) {
   const normalized = value.trim();
   if (!normalized || normalized.length > 128) {
     throw new TypeError(`${label} must contain 1 to 128 characters.`);
+  }
+  return normalized;
+}
+
+function normalizeStripeProPlanKey(value) {
+  if (typeof value !== 'string') {
+    throw new TypeError('Stripe checkout requires a Pro plan key.');
+  }
+
+  const normalized = value.trim();
+  if (!STRIPE_PRO_PLAN_KEYS.has(normalized)) {
+    throw new TypeError('Stripe checkout supports only PRO_MONTHLY or PRO_YEARLY.');
   }
   return normalized;
 }
@@ -298,6 +312,16 @@ export function createApiClient(options) {
     getStripeCheckoutAvailability: () =>
       request('/api/v1/payments/checkout/availability', {
         cache: 'no-store',
+      }),
+    getStripePlanCatalog: () =>
+      request('/api/v1/payments/checkout/stripe/plans', {
+        cache: 'no-store',
+      }),
+    createStripeCheckout: (planKey) =>
+      request('/api/v1/payments/checkout/stripe', {
+        method: 'POST',
+        cache: 'no-store',
+        body: { planKey: normalizeStripeProPlanKey(planKey) },
       }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
