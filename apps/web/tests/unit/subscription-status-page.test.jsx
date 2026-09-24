@@ -3,16 +3,27 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getMyEntitlements: vi.fn(),
+  getStripeCheckoutAvailability: vi.fn(),
+  getStripePlanCatalog: vi.fn(),
+  createStripeCheckout: vi.fn(),
 }));
 
 vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     getMyEntitlements: mocks.getMyEntitlements,
+    getStripeCheckoutAvailability: mocks.getStripeCheckoutAvailability,
+    getStripePlanCatalog: mocks.getStripePlanCatalog,
+    createStripeCheckout: mocks.createStripeCheckout,
   },
 }));
 
-const { SubscriptionStatusPage, normalizeSubscriptionAccess } =
-  await import('../../src/features/subscriptions/subscription-status-page.jsx');
+const {
+  SubscriptionStatusPage,
+  normalizeCheckoutAvailability,
+  normalizeStripeCheckoutUrl,
+  normalizeStripePlanCatalog,
+  normalizeSubscriptionAccess,
+} = await import('../../src/features/subscriptions/subscription-status-page.jsx');
 const { getSubscriptionStatusCopy } =
   await import('../../src/features/subscriptions/subscription-status-copy.js');
 
@@ -33,9 +44,13 @@ function renderPage(locale = 'en') {
 describe('SubscriptionStatusPage', () => {
   beforeEach(() => {
     mocks.getMyEntitlements.mockReset();
+    mocks.getStripeCheckoutAvailability.mockReset();
+    mocks.getStripePlanCatalog.mockReset();
+    mocks.createStripeCheckout.mockReset();
+    mocks.getStripeCheckoutAvailability.mockResolvedValue({ available: false, planKeys: [] });
   });
 
-  it('renders authoritative Free state without pretending checkout exists', async () => {
+  it('renders authoritative Free state and keeps checkout unavailable when the server disables it', async () => {
     mocks.getMyEntitlements.mockResolvedValue({
       access: {
         plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
@@ -49,14 +64,88 @@ describe('SubscriptionStatusPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Free', level: 2 })).toBeInTheDocument();
     expect(screen.getByText(copy.freeDetail)).toBeInTheDocument();
-    expect(screen.getByText(copy.purchaseUnavailable)).toBeInTheDocument();
+    expect(await screen.findByText(copy.purchaseUnavailable)).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /buy|subscribe|upgrade/i }),
+      screen.queryByRole('button', { name: /secure checkout/i }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /buy|subscribe|upgrade/i })).not.toBeInTheDocument();
   });
 
-  it('renders only minimal active Pro subscription state', async () => {
+  it('renders only server-validated Stripe plan pricing when checkout is available', async () => {
+    mocks.getMyEntitlements.mockResolvedValue({
+      access: {
+        plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+        entitlements: [],
+        limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+        subscription: null,
+      },
+    });
+    mocks.getStripeCheckoutAvailability.mockResolvedValue({
+      available: true,
+      planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+    });
+    mocks.getStripePlanCatalog.mockResolvedValue({
+      plans: [
+        {
+          planKey: 'PRO_MONTHLY',
+          name: 'Pro Monthly',
+          unitAmount: 9900,
+          currency: 'sek',
+          interval: 'month',
+        },
+        {
+          planKey: 'PRO_YEARLY',
+          name: 'Pro Yearly',
+          unitAmount: 99000,
+          currency: 'sek',
+          interval: 'year',
+        },
+      ],
+    });
+
+    renderPage('en');
+
+    expect(await screen.findByRole('heading', { name: 'Pro Monthly', level: 3 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pro Yearly', level: 3 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `${copy.checkoutButton}: Pro Monthly` }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `${copy.checkoutButton}: Pro Yearly` }),
+    ).toBeInTheDocument();
+  });
+
+  it('fails closed when checkout discovery returns malformed provider presentation state', async () => {
+    mocks.getMyEntitlements.mockResolvedValue({
+      access: {
+        plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+        entitlements: [],
+        limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+        subscription: null,
+      },
+    });
+    mocks.getStripeCheckoutAvailability.mockResolvedValue({
+      available: true,
+      planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+    });
+    mocks.getStripePlanCatalog.mockResolvedValue({
+      plans: [
+        {
+          planKey: 'PRO_MONTHLY',
+          name: 'Pro Monthly',
+          unitAmount: -1,
+          currency: 'sek',
+          interval: 'month',
+        },
+      ],
+    });
+
+    renderPage();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(copy.purchaseLoadError);
+    expect(screen.queryByRole('button', { name: /secure checkout/i })).not.toBeInTheDocument();
+  });
+
+  it('renders only minimal active Pro subscription state and no second-purchase surface', async () => {
     mocks.getMyEntitlements.mockResolvedValue({
       access: {
         plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
@@ -78,7 +167,8 @@ describe('SubscriptionStatusPage', () => {
     expect(screen.getByText(copy.active)).toBeInTheDocument();
     expect(screen.getByText(copy.periodEnds)).toBeInTheDocument();
     expect(screen.queryByText('must-not-render')).not.toBeInTheDocument();
-    expect(screen.queryByText(copy.purchaseUnavailable)).not.toBeInTheDocument();
+    expect(mocks.getStripeCheckoutAvailability).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /secure checkout/i })).not.toBeInTheDocument();
   });
 
   it('shows a sign-in action for an unauthenticated request without leaking backend details', async () => {
@@ -122,7 +212,7 @@ describe('SubscriptionStatusPage', () => {
   });
 });
 
-describe('normalizeSubscriptionAccess', () => {
+describe('subscription and checkout normalizers', () => {
   it('rejects unknown plans and incomplete Pro records', () => {
     expect(
       normalizeSubscriptionAccess({
@@ -139,6 +229,73 @@ describe('normalizeSubscriptionAccess', () => {
           plan: { key: 'PRO_YEARLY', tier: 'PRO', name: 'Pro Yearly' },
           subscription: { status: 'ACTIVE', currentPeriodEnd: 'not-a-date' },
         },
+      }),
+    ).toBeNull();
+  });
+
+  it('strictly normalizes capability and provider pricing', () => {
+    expect(
+      normalizeCheckoutAvailability({
+        available: true,
+        planKeys: ['PRO_YEARLY', 'PRO_MONTHLY'],
+      }),
+    ).toEqual({
+      available: true,
+      planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+    });
+    expect(
+      normalizeCheckoutAvailability({
+        available: true,
+        planKeys: ['PRO_MONTHLY'],
+      }),
+    ).toBeNull();
+
+    expect(
+      normalizeStripePlanCatalog({
+        plans: [
+          {
+            planKey: 'PRO_YEARLY',
+            name: 'Pro Yearly',
+            unitAmount: 120000,
+            currency: 'sek',
+            interval: 'year',
+          },
+          {
+            planKey: 'PRO_MONTHLY',
+            name: 'Pro Monthly',
+            unitAmount: 12000,
+            currency: 'sek',
+            interval: 'month',
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        planKey: 'PRO_MONTHLY',
+        name: 'Pro Monthly',
+        unitAmount: 12000,
+        currency: 'sek',
+        interval: 'month',
+      },
+      {
+        planKey: 'PRO_YEARLY',
+        name: 'Pro Yearly',
+        unitAmount: 120000,
+        currency: 'sek',
+        interval: 'year',
+      },
+    ]);
+  });
+
+  it('accepts only the Stripe-hosted checkout destination', () => {
+    expect(
+      normalizeStripeCheckoutUrl({
+        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_example',
+      }),
+    ).toMatch(/^https:\/\/checkout\.stripe\.com\//);
+    expect(
+      normalizeStripeCheckoutUrl({
+        checkoutUrl: 'https://evil.example/checkout',
       }),
     ).toBeNull();
   });
