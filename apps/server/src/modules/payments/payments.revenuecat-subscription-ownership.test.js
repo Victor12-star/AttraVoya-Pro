@@ -3,9 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createPaymentsRepository } from './payments.repository.js';
 import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-product-policy.js';
-import {
-  establishVerifiedRevenueCatAndroidSubscriptionOwnership,
-} from './payments.revenuecat-subscription-ownership.js';
+import { establishVerifiedRevenueCatAndroidSubscriptionOwnership } from './payments.revenuecat-subscription-ownership.js';
 import { createBillingVerificationBoundary } from './payments.verification.js';
 
 const OWNED_ID = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
