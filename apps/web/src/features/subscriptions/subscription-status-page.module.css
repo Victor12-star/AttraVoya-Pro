@@ -23,6 +23,11 @@
 .header p,
 .privacyNote p,
 .planDescription,
+.purchaseNote {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+}
+
 .returnNotice {
   padding: 0.9rem 1rem;
   border: 1px solid var(--color-border);
@@ -103,11 +108,6 @@
   color: var(--color-text-muted);
   font-size: 0.9rem;
   line-height: 1.55;
-}
-
-.purchaseNote {
-  margin: 0.4rem 0 0;
-  color: var(--color-text-muted);
 }
 
 .headerIcon {
