@@ -158,7 +158,7 @@ function formatPrice(plan, locale) {
       style: 'currency',
       currency: plan.currency.toUpperCase(),
     });
-    const fractionDigits = probe.resolvedOptions().maximumFractionDigits;
+    const fractionDigits = probe.resolvedOptions().maximumFractionDigits ?? 2;
     const amount = plan.unitAmount / 10 ** fractionDigits;
     return probe.format(amount);
   } catch {
@@ -167,7 +167,7 @@ function formatPrice(plan, locale) {
         style: 'currency',
         currency: plan.currency.toUpperCase(),
       });
-      const fractionDigits = fallback.resolvedOptions().maximumFractionDigits;
+      const fractionDigits = fallback.resolvedOptions().maximumFractionDigits ?? 2;
       return fallback.format(plan.unitAmount / 10 ** fractionDigits);
     } catch {
       return '—';
@@ -202,7 +202,9 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       selected: null,
     }),
   );
-  const [returnState, setReturnState] = useState(null);
+  const [returnState, setReturnState] = useState(
+    /** @type {'success' | 'cancelled' | null} */ (null),
+  );
 
   const loadPurchaseOptions = useCallback(async () => {
     purchaseSequenceRef.current += 1;
