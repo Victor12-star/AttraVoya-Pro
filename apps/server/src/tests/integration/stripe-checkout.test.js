@@ -61,6 +61,62 @@ async function checkoutApp(create) {
 }
 
 describe('authenticated Stripe checkout ingress', () => {
+
+  it('reports checkout unavailable without exposing provider configuration when purchase mode is disabled', async () => {
+    const app = await buildApp({
+      logger: false,
+      authRepository: authorizationRepository(),
+      stripeWebhookEnabled: false,
+      stripePurchaseEnabled: false,
+    });
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/checkout/availability',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['cache-control']).toBe('private, no-store');
+    expect(response.json()).toEqual({
+      available: false,
+      planKeys: [],
+    });
+    expect(JSON.stringify(response.json())).not.toContain('price_');
+    expect(JSON.stringify(response.json())).not.toContain('secret');
+  });
+
+  it('reports only supported internal Pro plan keys when Stripe purchase mode is enabled', async () => {
+    const app = await checkoutApp(vi.fn());
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/checkout/availability',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['cache-control']).toBe('private, no-store');
+    expect(response.json()).toEqual({
+      available: true,
+      planKeys: [PLANS.PRO_MONTHLY, PLANS.PRO_YEARLY],
+    });
+    expect(JSON.stringify(response.json())).not.toContain('price_monthly_server_owned');
+    expect(JSON.stringify(response.json())).not.toContain('price_yearly_server_owned');
+  });
+
+  it('requires authentication before checkout availability is disclosed', async () => {
+    const app = await checkoutApp(vi.fn());
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/checkout/availability',
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
+
   it('does not expose checkout while Stripe purchase mode is disabled', async () => {
     const app = await buildApp({
       logger: false,
