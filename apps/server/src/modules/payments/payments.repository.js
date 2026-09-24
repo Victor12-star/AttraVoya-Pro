@@ -193,6 +193,78 @@ export function createPaymentsRepository(prismaClient = prisma) {
       });
     },
 
+    async createOrReuseProviderSubscriptionOwnership({
+      userId,
+      planKey,
+      provider,
+      externalSubscriptionId,
+    }) {
+      const plan = await prismaClient.plan.findUnique({
+        where: { key: planKey },
+        select: { id: true, key: true, isActive: true },
+      });
+
+      if (!plan?.isActive) {
+        return { outcome: 'PLAN_NOT_ACTIVE', subscription: null, created: false };
+      }
+
+      const providerIdentity = {
+        provider,
+        externalSubscriptionId,
+      };
+      const existing = await prismaClient.subscription.findUnique({
+        where: {
+          provider_externalSubscriptionId: providerIdentity,
+        },
+        select: SUBSCRIPTION_SELECT,
+      });
+
+      if (existing) {
+        const matchesOwner = existing.userId === userId && existing.planId === plan.id;
+        return {
+          outcome: matchesOwner ? 'EXISTING' : 'PROVIDER_IDENTITY_CONFLICT',
+          subscription: existing,
+          created: false,
+        };
+      }
+
+      try {
+        const subscription = await prismaClient.subscription.create({
+          data: {
+            userId,
+            planId: plan.id,
+            status: 'PENDING',
+            provider,
+            externalSubscriptionId,
+          },
+          select: SUBSCRIPTION_SELECT,
+        });
+
+        return { outcome: 'CREATED', subscription, created: true };
+      } catch (error) {
+        if (error?.code !== 'P2002') throw error;
+
+        // The compound provider identity is the final concurrency barrier.
+        // A competing worker may have linked the same verified provider
+        // subscription first; reuse only an identical owner/plan mapping.
+        const concurrent = await prismaClient.subscription.findUnique({
+          where: {
+            provider_externalSubscriptionId: providerIdentity,
+          },
+          select: SUBSCRIPTION_SELECT,
+        });
+
+        if (!concurrent) throw error;
+
+        const matchesOwner = concurrent.userId === userId && concurrent.planId === plan.id;
+        return {
+          outcome: matchesOwner ? 'EXISTING' : 'PROVIDER_IDENTITY_CONFLICT',
+          subscription: concurrent,
+          created: false,
+        };
+      }
+    },
+
     async findRevenueCatSubscriberIdentityByAppUserId({ appUserId }) {
       return prismaClient.revenueCatSubscriberIdentity.findUnique({
         where: { appUserId },
