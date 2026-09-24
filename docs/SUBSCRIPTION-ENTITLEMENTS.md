@@ -286,6 +286,20 @@ The mapping is deliberately one-way for authorization: a verified provider produ
 
 This phase still does not register a RevenueCat webhook route, resolve subscriber ownership, process lifecycle events, mutate subscription state, add the RevenueCat mobile SDK, purchase or restore subscriptions, or expose provider product identifiers to clients.
 
+### Verified RevenueCat Android lifecycle normalization
+
+Phase 10DD adds an internal normalizer for already-verified RevenueCat Google Play lifecycle events. It rechecks the exact raw-payload SHA-256 against verifier-minted evidence before reading lifecycle fields, requires `PLAY_STORE`, maps only server-owned Phase 10DB products, and derives provider subscription identity from verified `original_transaction_id`.
+
+The normalizer deliberately excludes App User IDs, aliases, entitlement names, purchase tokens and client purchase state from its trusted output. Cancellation is preserved as provider lifecycle information rather than being converted into immediate entitlement loss; authoritative state/revocation semantics remain a later slice.
+
+### Server-owned RevenueCat subscriber identity
+
+Phase 10DE establishes a one-to-one server-owned RevenueCat customer identity for authenticated AttraVoya accounts. Each identity uses a cryptographically random opaque App User ID with the `av_rc_` prefix. PostgreSQL uniquely constrains both `userId` and `appUserId`, so one provider identity cannot be reassigned to another account and one account cannot silently receive multiple provider identities.
+
+The generated identifier is intentionally non-guessable and contains neither email nor the AttraVoya user ID. Internal create/reuse logic is concurrency-safe and boundedly retries the extremely unlikely random-identifier collision case. Exact-format provider identity lookup fails closed for unknown IDs.
+
+Phase 10DE still does not expose the identity through an HTTP route, trust a mobile-supplied App User ID, process RevenueCat aliases, create subscriptions, mutate authoritative subscription state, grant Pro, restore purchases, or add mobile purchase UI. Those remain separately reviewed slices.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
