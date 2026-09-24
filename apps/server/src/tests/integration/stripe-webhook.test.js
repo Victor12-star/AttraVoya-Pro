@@ -115,6 +115,7 @@ describe('Stripe webhook ingress', () => {
         event: { id: 'billing-event-1', processingStatus: 'APPLIED' },
         subscription: { id: 'subscription-1', status: 'ACTIVE' },
       })),
+      applyVerifiedCheckoutCompletion: vi.fn(),
     };
     const app = await buildApp({
       logger: false,
@@ -152,6 +153,146 @@ describe('Stripe webhook ingress', () => {
     );
   });
 
+  it('routes a signed checkout completion through verified ownership reconciliation', async () => {
+    const webhookSecret = 'whsec_test_secret_checkout_123456';
+    const now = new Date('2026-09-24T10:10:00.000Z');
+    const timestamp = Math.floor(now.getTime() / 1000);
+    const rawPayload = JSON.stringify({
+      id: 'evt_checkout_signed_123',
+      type: 'checkout.session.completed',
+      created: timestamp,
+      data: {
+        object: {
+          id: 'cs_test_checkout_123',
+          mode: 'subscription',
+          subscription: 'sub_checkout_123',
+        },
+      },
+    });
+    const signature = createHmac('sha256', webhookSecret)
+      .update(`${timestamp}.${rawPayload}`)
+      .digest('hex');
+
+    const paymentsService = {
+      recordVerifiedEvent: vi.fn(async () => ({
+        event: { id: 'billing-event-checkout', processingStatus: 'PENDING' },
+        duplicate: false,
+      })),
+      finalizeVerifiedEvent: vi.fn(),
+      resolveProviderSubscription: vi.fn(),
+      applyVerifiedSubscriptionState: vi.fn(),
+      applyVerifiedCheckoutCompletion: vi.fn(async () => ({
+        applied: true,
+        duplicate: false,
+        event: {
+          id: 'billing-event-checkout',
+          processingStatus: 'APPLIED',
+          subscriptionId: 'subscription-pending',
+        },
+        subscription: {
+          id: 'subscription-pending',
+          status: 'PENDING',
+          provider: 'stripe',
+          externalSubscriptionId: 'sub_checkout_123',
+        },
+      })),
+    };
+    const app = await buildApp({
+      logger: false,
+      stripeWebhookEnabled: true,
+      stripeWebhookSecret: webhookSecret,
+      stripeWebhookNow: () => now,
+      paymentsService,
+    });
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/payments/webhooks/stripe',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': `t=${timestamp},v1=${signature}`,
+      },
+      payload: rawPayload,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ received: true });
+    expect(paymentsService.applyVerifiedCheckoutCompletion).toHaveBeenCalledWith({
+      eventId: 'billing-event-checkout',
+      provider: 'stripe',
+      externalCheckoutSessionId: 'cs_test_checkout_123',
+      externalSubscriptionId: 'sub_checkout_123',
+    });
+    expect(paymentsService.resolveProviderSubscription).not.toHaveBeenCalled();
+    expect(paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
+  it('returns a retryable response when subscription lifecycle arrives before ownership', async () => {
+    const webhookSecret = 'whsec_test_secret_ordering_123456';
+    const now = new Date('2026-09-24T10:20:00.000Z');
+    const timestamp = Math.floor(now.getTime() / 1000);
+    const rawPayload = JSON.stringify({
+      id: 'evt_subscription_first',
+      type: 'customer.subscription.created',
+      created: timestamp,
+      data: {
+        object: {
+          id: 'sub_not_linked_yet',
+          status: 'active',
+          current_period_end: timestamp + 30 * 24 * 60 * 60,
+          canceled_at: null,
+        },
+      },
+    });
+    const signature = createHmac('sha256', webhookSecret)
+      .update(`${timestamp}.${rawPayload}`)
+      .digest('hex');
+
+    const notFound = Object.assign(new Error('provider subscription not found'), {
+      code: 'NOT_FOUND',
+    });
+    const paymentsService = {
+      recordVerifiedEvent: vi.fn(async () => ({
+        event: { id: 'billing-event-ordering', processingStatus: 'PENDING' },
+        duplicate: false,
+      })),
+      finalizeVerifiedEvent: vi.fn(),
+      resolveProviderSubscription: vi.fn(async () => {
+        throw notFound;
+      }),
+      applyVerifiedSubscriptionState: vi.fn(),
+      applyVerifiedCheckoutCompletion: vi.fn(),
+    };
+    const app = await buildApp({
+      logger: false,
+      stripeWebhookEnabled: true,
+      stripeWebhookSecret: webhookSecret,
+      stripeWebhookNow: () => now,
+      paymentsService,
+    });
+    apps.push(app);
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/payments/webhooks/stripe',
+      headers: {
+        'content-type': 'application/json',
+        'stripe-signature': `t=${timestamp},v1=${signature}`,
+      },
+      payload: rawPayload,
+    });
+
+    expect(response.statusCode).toBe(503);
+    expect(response.json().error).toMatchObject({
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Subscription ownership is not ready for reconciliation.',
+    });
+    expect(paymentsService.recordVerifiedEvent).toHaveBeenCalledTimes(1);
+    expect(paymentsService.finalizeVerifiedEvent).not.toHaveBeenCalled();
+    expect(paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
   it('rejects an invalid Stripe signature before billing evidence is recorded', async () => {
     const now = new Date('2026-09-23T17:45:00.000Z');
     const timestamp = Math.floor(now.getTime() / 1000);
@@ -160,6 +301,7 @@ describe('Stripe webhook ingress', () => {
       finalizeVerifiedEvent: vi.fn(),
       resolveProviderSubscription: vi.fn(),
       applyVerifiedSubscriptionState: vi.fn(),
+      applyVerifiedCheckoutCompletion: vi.fn(),
     };
     const app = await buildApp({
       logger: false,
