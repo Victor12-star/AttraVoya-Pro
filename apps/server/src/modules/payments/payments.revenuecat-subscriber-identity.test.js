@@ -86,7 +86,10 @@ describe('RevenueCat subscriber identity service', () => {
     };
     let generation = 0;
     const service = createRevenueCatSubscriberIdentityService(repository, {
-      randomBytesFn: () => bytes((generation += 1)),
+      randomBytesFn: () => {
+        generation += 1;
+        return bytes(generation);
+      },
     });
 
     const result = await service.getOrCreateForUser({ userId: 'user-1' });
