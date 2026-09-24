@@ -264,6 +264,18 @@ Malformed authenticated completion state is terminalized with a bounded privacy-
 
 The checkout-completion processor remains an internal trust-chain component, but Phase 10CS connects it to the existing opt-in Stripe webhook ingress only after the shared signature-verification boundary has authenticated the event type. Stripe Checkout Session creation is handled by the separate Phase 10CP server gateway, and no authenticated purchase endpoint is exposed yet. No browser/mobile success state grants entitlement; verified lifecycle reconciliation remains authoritative.
 
+### Internal RevenueCat webhook verification
+
+Phase 10DA starts the Android/iOS store-billing trust path with an internal RevenueCat webhook verifier. It is intentionally not registered as an HTTP route and does not enable mobile purchases.
+
+The verifier authenticates RevenueCat HMAC-SHA256 signing against the exact raw request bytes using the provider timestamp and `X-RevenueCat-Webhook-Signature` metadata. Signature comparison is timing-safe, the provider timestamp is checked against a bounded replay-tolerance window, and JSON parsing happens only after authentication succeeds. Only the currently supported RevenueCat webhook API version is accepted.
+
+After authentication, the adapter returns only the unique RevenueCat event ID, event type and event timestamp to the existing provider-neutral verification boundary. Subscriber/App User IDs, aliases, product identifiers, store data, entitlement identifiers, transaction identifiers, authorization metadata, raw payloads and signing secrets are not copied into verification evidence.
+
+The provider-neutral boundary then computes the SHA-256 payload digest itself, assigns the server verification time and mints the same opaque evidence used by the verified billing-event ledger. Repeated RevenueCat deliveries therefore fit the existing provider-plus-event-ID idempotency contract.
+
+This phase does not resolve RevenueCat subscriber ownership, map Google Play products to AttraVoya plans, register a RevenueCat webhook endpoint, add the RevenueCat mobile SDK, purchase or restore subscriptions, or mutate authoritative subscription state. Those remain separately gated slices so no mobile client or unverified provider field can grant Pro.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.
