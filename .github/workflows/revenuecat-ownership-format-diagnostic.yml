@@ -1,0 +1,33 @@
+name: Temporary RevenueCat ownership formatting diagnostic
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  revenuecat-ownership-format-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Print exact Prettier rewrite
+        run: |
+          pnpm exec prettier --write apps/server/src/modules/payments/payments.revenuecat-subscription-ownership.test.js
+          git diff -- apps/server/src/modules/payments/payments.revenuecat-subscription-ownership.test.js
+          test -z "$(git status --short -- apps/server/src/modules/payments/payments.revenuecat-subscription-ownership.test.js)"
