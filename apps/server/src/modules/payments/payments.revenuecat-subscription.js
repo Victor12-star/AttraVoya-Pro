@@ -12,7 +12,13 @@ const SUPPORTED_EVENT_TYPES = new Set([
   'SUBSCRIPTION_EXTENDED',
 ]);
 
-const PERIOD_TYPES = new Set(['TRIAL', 'INTRO', 'NORMAL', 'PROMOTIONAL', 'PREPAID']);
+const PERIOD_TYPES = new Set([
+  'TRIAL',
+  'INTRO',
+  'NORMAL',
+  'PROMOTIONAL',
+  'PREPAID',
+]);
 const ENVIRONMENTS = new Set(['SANDBOX', 'PRODUCTION']);
 const MAX_PROVIDER_ID_LENGTH = 255;
 
@@ -47,11 +53,15 @@ function millisecondsDate(value, name, { nullable = false } = {}) {
 
 function parseVerifiedRevenueCatEvent(rawPayload, evidence) {
   if (!Buffer.isBuffer(rawPayload)) {
-    throw new ValidationError('RevenueCat normalization requires exact raw request bytes.');
+    throw new ValidationError(
+      'RevenueCat normalization requires exact raw request bytes.',
+    );
   }
 
   if (!isVerifiedBillingEvidence(evidence) || evidence.provider !== 'revenuecat') {
-    throw new ValidationError('RevenueCat normalization requires verified billing evidence.');
+    throw new ValidationError(
+      'RevenueCat normalization requires verified billing evidence.',
+    );
   }
 
   let payload;
@@ -121,12 +131,20 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     throw new ValidationError('RevenueCat lifecycle event is not from Google Play.');
   }
 
-  const environment = requiredText(event.environment, 'RevenueCat environment', 20);
+  const environment = requiredText(
+    event.environment,
+    'RevenueCat environment',
+    20,
+  );
   if (!ENVIRONMENTS.has(environment)) {
     throw new ValidationError('RevenueCat environment is unsupported.');
   }
 
-  const productId = requiredText(event.product_id, 'RevenueCat product identifier', 200);
+  const productId = requiredText(
+    event.product_id,
+    'RevenueCat product identifier',
+    200,
+  );
   const planKey = productPolicy.resolvePlanKey(productId);
 
   const externalSubscriptionId = requiredText(
@@ -134,15 +152,26 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     'RevenueCat original transaction identity',
   );
 
-  const periodType = requiredText(event.period_type, 'RevenueCat period type', 30);
+  const periodType = requiredText(
+    event.period_type,
+    'RevenueCat period type',
+    30,
+  );
   if (!PERIOD_TYPES.has(periodType)) {
     throw new ValidationError('RevenueCat period type is unsupported.');
   }
 
-  const purchasedAt = millisecondsDate(event.purchased_at_ms, 'RevenueCat purchase time');
-  const expiresAt = millisecondsDate(event.expiration_at_ms, 'RevenueCat expiration time', {
-    nullable: true,
-  });
+  const purchasedAt = millisecondsDate(
+    event.purchased_at_ms,
+    'RevenueCat purchase time',
+  );
+  const expiresAt = millisecondsDate(
+    event.expiration_at_ms,
+    'RevenueCat expiration time',
+    {
+      nullable: true,
+    },
+  );
 
   if (!evidence.occurredAt) {
     throw new ValidationError('RevenueCat lifecycle event time is required.');
