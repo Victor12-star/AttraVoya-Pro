@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document defines the server-authoritative Free/Pro access model. The backend now contains a narrowly scoped, opt-in Stripe webhook ingestion path for verified subscription lifecycle events, but it still does not enable checkout, customer creation, new subscription purchases, Google Play Billing, Apple In-App Purchase, RevenueCat purchase flows, advertising, or paid-provider purchases.
+This document defines the server-authoritative Free/Pro access model. The backend now contains an opt-in verified Stripe webhook path and an authenticated server-owned Stripe Checkout path. Phase 10CW adds the first web purchase surface, but it appears only when the server says purchase mode is available and returns a valid provider-backed plan catalog. Google Play Billing, Apple In-App Purchase, RevenueCat purchase flows, advertising, refunds, and customer-management UI remain separate work.
 
 A client must never become Pro by sending a flag such as `isPro: true`. Clients may display the access state returned by the API, but protected server operations must evaluate the authenticated user's authoritative entitlement state on the server.
 
@@ -50,7 +50,7 @@ The response contains:
 
 The endpoint is intended for client rendering and feature discovery. It does not replace server-side authorization on future gated operations.
 
-The web `/premium` route may present this authoritative state to the signed-in traveller. It must treat malformed responses as unavailable, never expose provider/payment identifiers, and never show purchase or upgrade actions until a verified billing integration actually exists.
+The web `/premium` route presents this authoritative state to the signed-in traveller. For Free accounts, Phase 10CW may also present purchase actions only after the authenticated checkout-availability endpoint confirms purchase mode and the server-authoritative Stripe plan catalog validates both Pro plans. Malformed access, capability, catalog, or checkout responses fail closed.
 
 The protected mobile `/premium` route follows the same display-only rule. It reads the existing authenticated mobile API boundary, strictly normalizes Free and Pro state, provides safe loading/offline/retry handling, and must not expose purchase, upgrade, provider, customer, or payment-token controls until verified mobile billing exists.
 
@@ -216,6 +216,18 @@ Validated display snapshots are cached briefly in the existing bounded process-l
 
 The catalog requires authentication, is registered only when purchase mode is enabled, has its own bounded read rate, and returns `private, no-store` to browsers. A successful catalog read does not create checkout ownership, mutate a subscription, or grant an entitlement.
 
+### Web Stripe purchase surface
+
+Phase 10CW connects the signed-in web `/premium` page to the existing server-authoritative checkout capability, plan catalog and checkout entry point. The page does not hard-code prices or Stripe Price IDs. It first loads the authoritative entitlement state; existing Pro accounts receive status only and are not offered another subscription purchase.
+
+For a Free account, the browser asks the authenticated checkout-availability endpoint whether purchase mode is currently enabled. Only when the server advertises exactly `PRO_MONTHLY` and `PRO_YEARLY` does the browser load the provider-backed display catalog. The client strictly validates the safe projection of plan key, display name, positive minor-unit amount, three-letter currency and expected month/year interval before rendering it.
+
+The checkout action sends only the internal AttraVoya plan key. It cannot submit a Stripe Price ID, amount, currency, billing interval, customer ID, subscription ID, user ownership, redirect destination, idempotency key or entitlement claim. The response is accepted for navigation only when it is an HTTPS URL on the exact `checkout.stripe.com` host without embedded credentials or a custom port.
+
+The browser's return query string is informational only. `checkout=success` never grants or implies Pro access; the page reloads server entitlement state and tells the traveller that verified billing confirmation is still required. A canceled return likewise changes no authoritative subscription state.
+
+If checkout is disabled, provider pricing cannot be loaded, a response is malformed, or secure checkout cannot be started, the page remains on the current plan and exposes a recoverable, privacy-safe state. Existing server-side duplicate-subscription protection, verified webhook reconciliation and entitlement resolution remain authoritative.
+
 ### Authenticated Stripe checkout entry point
 
 Phase 10CT adds `POST /api/v1/payments/checkout/stripe` as the first authenticated purchase ingress. The route is registered only when server-side Stripe purchase mode is explicitly enabled; when purchase mode is disabled, the route does not exist.
@@ -262,7 +274,7 @@ The intended evidence path is:
 
 Provider callbacks or purchase tokens must be verified server-side before they can create or change authoritative subscription state. Required future controls include signature/token verification, idempotency, replay protection, ownership checks, refund/revocation handling, database transactions, rate limiting, server-only secrets and privacy-safe audit events.
 
-The Stripe webhook trust chain, durable checkout ownership, internal Stripe Checkout Session creation, and authenticated server checkout endpoint now exist. No buy/upgrade UI is enabled yet, and Android/iOS store purchase integrations remain separate work. Until those client-facing purchase surfaces are separately implemented and verified, AttraVoya must not claim that users can purchase new subscriptions from the visible product UI.
+The Stripe webhook trust chain, durable checkout ownership, internal Stripe Checkout Session creation, authenticated server checkout endpoint, server-authoritative plan catalog and guarded web purchase surface now exist. The web surface must remain hidden whenever server purchase mode is unavailable. Android/iOS store purchase integrations remain separate work and must not be implied by the web Stripe flow.
 
 ## Security boundary
 
