@@ -104,6 +104,9 @@ export function createStripePlanCatalogService({
       throw new TypeError('Stripe Price configuration is invalid.');
     }
   }
+  if (configured[PLANS.PRO_MONTHLY] === configured[PLANS.PRO_YEARLY]) {
+    throw new TypeError('Stripe Price configuration must use distinct plan identities.');
+  }
 
   const client =
     httpClient ??
