@@ -218,6 +218,14 @@ Stripe webhook raw-body parsing remains isolated to the webhook-only child Fasti
 
 A successful API response means only that a hosted checkout session is available. It does not grant Pro, create authoritative active access, or prove payment completion. Checkout completion can create only non-entitling `PENDING` ownership, and later verified Stripe lifecycle state must still move that subscription to `ACTIVE` or `TRIALING` before the entitlement resolver can expose Pro.
 
+### Authenticated checkout availability
+
+Phase 10CU adds `GET /api/v1/payments/checkout/availability` as a read-only authenticated capability signal for the traveller web client. The route always exists, even when Stripe purchase creation is disabled, so the visible product can distinguish "checkout is unavailable" from an accidental missing route without guessing deployment state.
+
+The response is deliberately privacy-minimized and marked `private, no-store`. It contains only an `available` boolean plus the supported internal AttraVoya Pro plan keys. When purchase mode is disabled, `available` is false and the plan list is empty. When purchase mode is enabled, the only advertised plan keys are `PRO_MONTHLY` and `PRO_YEARLY`.
+
+The capability response never includes Stripe Price IDs, secret keys, webhook configuration, customer IDs, checkout-session IDs, subscription IDs, provider metadata, amounts, currencies, billing intervals, redirect URLs, entitlement state, or internal checkout-attempt identifiers. It does not create a checkout session or grant Pro; it only gives the authenticated client a truthful server-owned signal that a later user-facing purchase surface may rely on.
+
 ### Verified checkout-completion ownership bridge
 
 A separately verified Stripe `checkout.session.completed` event may connect the external Stripe subscription identity to the exact server-owned `CheckoutAttempt` identified by its already-bound `cs_...` Checkout Session ID. The processor rechecks that the verified Stripe event ID and type match the exact authenticated payload, requires `mode=subscription`, and accepts only Stripe-shaped `cs_...` and `sub_...` identities.
