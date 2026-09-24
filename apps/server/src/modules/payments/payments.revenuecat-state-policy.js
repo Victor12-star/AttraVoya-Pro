@@ -8,11 +8,7 @@ const ACCESS_STATE_EVENTS = new Set([
   'SUBSCRIPTION_EXTENDED',
 ]);
 
-const ACCESS_PRESERVING_EVENTS = new Set([
-  'CANCELLATION',
-  'BILLING_ISSUE',
-  'SUBSCRIPTION_PAUSED',
-]);
+const ACCESS_PRESERVING_EVENTS = new Set(['CANCELLATION', 'BILLING_ISSUE', 'SUBSCRIPTION_PAUSED']);
 
 function requireSubscriptionExpiration(lifecycle) {
   const { expiresAt, providerStateUpdatedAt } = lifecycle;
