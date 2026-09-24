@@ -194,6 +194,9 @@ export async function buildApp(options = {}) {
     stripeCheckoutReturnUrls:
       options.stripeCheckoutReturnUrls ?? stripeCheckoutReturnUrlsFromEnvironment(env),
     stripeCheckoutSessionService: options.stripeCheckoutSessionService,
+    stripePlanCatalogService: options.stripePlanCatalogService,
+    stripePlanCatalogHttpClient: options.stripePlanCatalogHttpClient,
+    stripePlanCatalogCache: options.stripePlanCatalogCache,
     stripeCheckoutPolicy: options.stripeCheckoutPolicy,
     stripeCheckoutGateway: options.stripeCheckoutGateway,
     checkoutAttemptService: options.checkoutAttemptService,
