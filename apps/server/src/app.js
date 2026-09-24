@@ -9,7 +9,12 @@ import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 
 import { API_PREFIX, DEFAULT_BODY_LIMIT_BYTES, DEFAULT_RATE_LIMIT } from './config/constants.js';
-import { env, providerRequestBudgetPoliciesFromEnvironment } from './config/env.js';
+import {
+  env,
+  providerRequestBudgetPoliciesFromEnvironment,
+  stripeCheckoutReturnUrlsFromEnvironment,
+  stripePurchasePriceIdsFromEnvironment,
+} from './config/env.js';
 import {
   AlignedLocalRateLimitStore,
   createReplicaRateLimitRouteNormalizer,
@@ -182,6 +187,18 @@ export async function buildApp(options = {}) {
     stripeWebhookProcessor: options.stripeWebhookProcessor,
     paymentsService: options.paymentsService,
     now: options.stripeWebhookNow,
+    stripePurchaseEnabled: options.stripePurchaseEnabled ?? env.STRIPE_PURCHASE_ENABLED,
+    stripeSecretKey: options.stripeSecretKey ?? env.STRIPE_SECRET_KEY,
+    stripePurchasePriceIds:
+      options.stripePurchasePriceIds ?? stripePurchasePriceIdsFromEnvironment(env),
+    stripeCheckoutReturnUrls:
+      options.stripeCheckoutReturnUrls ?? stripeCheckoutReturnUrlsFromEnvironment(env),
+    stripeCheckoutSessionService: options.stripeCheckoutSessionService,
+    stripeCheckoutPolicy: options.stripeCheckoutPolicy,
+    stripeCheckoutGateway: options.stripeCheckoutGateway,
+    checkoutAttemptService: options.checkoutAttemptService,
+    paymentsRepository: options.paymentsRepository,
+    checkoutNow: options.stripeCheckoutNow,
   });
 
   await app.register(healthRoutes, {
