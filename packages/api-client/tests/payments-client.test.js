@@ -78,7 +78,7 @@ describe('payments API client', () => {
     const fetchImpl = vi.fn();
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
-    await expect(client.createStripeCheckout('FREE')).rejects.toThrow(
+    expect(() => client.createStripeCheckout('FREE')).toThrow(
       'Stripe checkout supports only PRO_MONTHLY or PRO_YEARLY.',
     );
     expect(fetchImpl).not.toHaveBeenCalled();
