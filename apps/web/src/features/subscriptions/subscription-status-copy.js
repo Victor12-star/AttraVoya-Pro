@@ -293,7 +293,6 @@ const COPY = Object.freeze({
   },
 });
 
-
 const PURCHASE_COPY = Object.freeze({
   en: {
     proOptionsLabel: 'AttraVoya Pro',
