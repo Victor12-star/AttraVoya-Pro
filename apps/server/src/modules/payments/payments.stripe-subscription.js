@@ -1,4 +1,4 @@
-import { ValidationError } from '../../errors/app-error.js';
+import { ServiceUnavailableError, ValidationError } from '../../errors/app-error.js';
 
 const STRIPE_SUBSCRIPTION_EVENT_TYPES = new Set([
   'customer.subscription.created',
@@ -126,97 +126,105 @@ export function createStripeSubscriptionEventProcessor({ verificationBoundary, p
     throw new TypeError('Payments service is required.');
   }
 
-  return {
-    /**
-     * @param {{ rawPayload: Buffer, headers?: object }} input
-     */
-    async process({ rawPayload, headers = {} }) {
-      // Authentication happens before any provider data is trusted or parsed
-      // into subscription state.
-      const evidence = await verificationBoundary.verifyEvent({ rawPayload, headers });
-      const recorded = await paymentsService.recordVerifiedEvent(evidence);
-      const eventId = recorded.event.id;
+  async function processVerified({ rawPayload, evidence }) {
+    const recorded = await paymentsService.recordVerifiedEvent(evidence);
+    const eventId = recorded.event.id;
 
-      if (!STRIPE_SUBSCRIPTION_EVENT_TYPES.has(evidence.eventType)) {
-        const finalized = await paymentsService.finalizeVerifiedEvent({
-          eventId,
-          outcome: 'IGNORED',
-        });
-
-        return {
-          outcome: 'IGNORED',
-          duplicate: recorded.duplicate || finalized.duplicate,
-          event: finalized.event,
-          subscription: null,
-        };
-      }
-
-      let state;
-      try {
-        state = normalizeSubscriptionState(rawPayload, evidence);
-      } catch (error) {
-        // A mismatch between verifier-minted identity and the exact payload is a
-        // trust-chain invariant breach, not ordinary malformed subscription
-        // state. Do not acknowledge or terminalize it as a handled provider
-        // event; fail closed so the delivery can be investigated/retried.
-        if (error instanceof StripeVerifiedIdentityMismatchError) throw error;
-
-        const finalized = await paymentsService.finalizeVerifiedEvent({
-          eventId,
-          outcome: 'FAILED',
-          failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
-        });
-
-        return {
-          outcome: 'FAILED',
-          duplicate: recorded.duplicate || finalized.duplicate,
-          failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
-          event: finalized.event,
-          subscription: null,
-        };
-      }
-
-      let subscription;
-      try {
-        subscription = await paymentsService.resolveProviderSubscription({
-          provider: 'stripe',
-          externalSubscriptionId: state.externalSubscriptionId,
-        });
-      } catch (error) {
-        if (error?.code === 'NOT_FOUND') {
-          const finalized = await paymentsService.finalizeVerifiedEvent({
-            eventId,
-            outcome: 'FAILED',
-            failureCode: 'SUBSCRIPTION_IDENTITY_NOT_FOUND',
-          });
-
-          return {
-            outcome: 'FAILED',
-            duplicate: recorded.duplicate || finalized.duplicate,
-            failureCode: 'SUBSCRIPTION_IDENTITY_NOT_FOUND',
-            event: finalized.event,
-            subscription: null,
-          };
-        }
-        throw error;
-      }
-
-      const applied = await paymentsService.applyVerifiedSubscriptionState({
+    if (!STRIPE_SUBSCRIPTION_EVENT_TYPES.has(evidence.eventType)) {
+      const finalized = await paymentsService.finalizeVerifiedEvent({
         eventId,
-        subscriptionId: subscription.id,
-        provider: 'stripe',
-        status: state.status,
-        currentPeriodEnd: state.currentPeriodEnd,
-        canceledAt: state.canceledAt,
-        providerStateUpdatedAt: state.providerStateUpdatedAt,
+        outcome: 'IGNORED',
       });
 
       return {
-        outcome: applied.stale ? 'IGNORED' : applied.applied ? 'APPLIED' : 'DUPLICATE',
-        duplicate: recorded.duplicate || applied.duplicate,
-        event: applied.event,
-        subscription: applied.subscription,
+        outcome: 'IGNORED',
+        duplicate: recorded.duplicate || finalized.duplicate,
+        event: finalized.event,
+        subscription: null,
       };
+    }
+
+    let state;
+    try {
+      state = normalizeSubscriptionState(rawPayload, evidence);
+    } catch (error) {
+      // A mismatch between verifier-minted identity and the exact payload is a
+      // trust-chain invariant breach, not ordinary malformed subscription
+      // state. Do not acknowledge or terminalize it as a handled provider
+      // event; fail closed so the delivery can be investigated/retried.
+      if (error instanceof StripeVerifiedIdentityMismatchError) throw error;
+
+      const finalized = await paymentsService.finalizeVerifiedEvent({
+        eventId,
+        outcome: 'FAILED',
+        failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
+      });
+
+      return {
+        outcome: 'FAILED',
+        duplicate: recorded.duplicate || finalized.duplicate,
+        failureCode: 'STRIPE_SUBSCRIPTION_STATE_INVALID',
+        event: finalized.event,
+        subscription: null,
+      };
+    }
+
+    let subscription;
+    try {
+      subscription = await paymentsService.resolveProviderSubscription({
+        provider: 'stripe',
+        externalSubscriptionId: state.externalSubscriptionId,
+      });
+    } catch (error) {
+      if (error?.code === 'NOT_FOUND') {
+        // Stripe does not guarantee webhook event ordering. A lifecycle event
+        // can legitimately arrive before checkout.session.completed has linked
+        // provider ownership. Keep the verified ledger row PENDING and return a
+        // retryable error so a later provider retry can reconcile safely.
+        throw new ServiceUnavailableError(
+          'Subscription ownership is not ready for reconciliation.',
+        );
+      }
+      throw error;
+    }
+
+    const applied = await paymentsService.applyVerifiedSubscriptionState({
+      eventId,
+      subscriptionId: subscription.id,
+      provider: 'stripe',
+      status: state.status,
+      currentPeriodEnd: state.currentPeriodEnd,
+      canceledAt: state.canceledAt,
+      providerStateUpdatedAt: state.providerStateUpdatedAt,
+    });
+
+    return {
+      outcome: applied.stale ? 'IGNORED' : applied.applied ? 'APPLIED' : 'DUPLICATE',
+      duplicate: recorded.duplicate || applied.duplicate,
+      event: applied.event,
+      subscription: applied.subscription,
+    };
+  }
+
+  return Object.freeze({
+    /**
+     * Verify the exact provider request before any event-type dispatch or
+     * subscription-state parsing occurs.
+     *
+     * @param {{ rawPayload: Buffer, headers?: object }} input
+     */
+    async process({ rawPayload, headers = {} }) {
+      const evidence = await verificationBoundary.verifyEvent({ rawPayload, headers });
+      return processVerified({ rawPayload, evidence });
     },
-  };
+
+    /**
+     * Continue processing evidence already minted by the shared Stripe
+     * verification boundary. The payments service still rejects forged plain
+     * objects before they can enter the verified-event ledger.
+     *
+     * @param {{ rawPayload: Buffer, evidence: any }} input
+     */
+    processVerified,
+  });
 }
