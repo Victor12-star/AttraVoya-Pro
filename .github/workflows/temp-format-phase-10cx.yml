@@ -1,0 +1,57 @@
+name: Temporary Phase 10CX formatter
+
+on:
+  push:
+    branches:
+      - phase-10cx-web-stripe-purchase-surface
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format failing files with pinned Prettier
+        run: |
+          pnpm exec prettier --write \
+            apps/web/src/features/subscriptions/subscription-status-copy.js \
+            apps/web/src/features/subscriptions/subscription-status-page.jsx \
+            apps/web/tests/unit/subscription-status-page.test.jsx
+
+      - name: Commit formatting
+        run: |
+          if git diff --quiet -- \
+            apps/web/src/features/subscriptions/subscription-status-copy.js \
+            apps/web/src/features/subscriptions/subscription-status-page.jsx \
+            apps/web/tests/unit/subscription-status-page.test.jsx; then
+            echo "No formatting changes needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            apps/web/src/features/subscriptions/subscription-status-copy.js \
+            apps/web/src/features/subscriptions/subscription-status-page.jsx \
+            apps/web/tests/unit/subscription-status-page.test.jsx
+          git commit -m "chore: format Phase 10CX web subscription files"
+          git push origin HEAD:phase-10cx-web-stripe-purchase-surface
