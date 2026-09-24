@@ -356,6 +356,45 @@ describe('provider subscription ownership repository', () => {
     expect(result).toMatchObject({ outcome: 'EXISTING', created: false });
   });
 
+  it('fails closed when a concurrent winner belongs to a different user', async () => {
+    const duplicate = Object.assign(new Error('unique conflict'), { code: 'P2002' });
+    const conflictingWinner = pendingSubscription({ userId: 'user-2' });
+    const findUnique = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(conflictingWinner);
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        plan: {
+          findUnique: vi.fn(async () => ({
+            id: 'plan-pro-monthly',
+            key: PLANS.PRO_MONTHLY,
+            isActive: true,
+          })),
+        },
+        subscription: {
+          findUnique,
+          create: vi.fn(async () => {
+            throw duplicate;
+          }),
+        },
+      }),
+    );
+
+    const result = await repository.createOrReuseProviderSubscriptionOwnership({
+      userId: 'user-1',
+      planKey: PLANS.PRO_MONTHLY,
+      provider: 'revenuecat',
+      externalSubscriptionId: conflictingWinner.externalSubscriptionId,
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'PROVIDER_IDENTITY_CONFLICT',
+      subscription: conflictingWinner,
+      created: false,
+    });
+  });
+
   it('does not create ownership for an inactive or missing internal plan', async () => {
     const subscriptionCreate = vi.fn();
     const repository = createPaymentsRepository(
