@@ -2,10 +2,12 @@ import {
   DEFAULT_BODY_LIMIT_BYTES,
   STRIPE_CHECKOUT_BODY_LIMIT_BYTES,
   STRIPE_CHECKOUT_RATE_LIMIT,
+  STRIPE_PLAN_CATALOG_RATE_LIMIT,
   STRIPE_WEBHOOK_RATE_LIMIT,
 } from '../../config/constants.js';
 import { createCheckoutAttemptService } from './payments.checkout-attempt.js';
 import { createStripeCheckoutController } from './payments.checkout-controller.js';
+import { createStripePlanCatalogController } from './payments.plan-catalog-controller.js';
 import { paymentsRepository } from './payments.repository.js';
 import { paymentsSchemas } from './payments.schema.js';
 import { paymentsService } from './payments.service.js';
@@ -16,6 +18,7 @@ import {
   createStripeCheckoutGateway,
   createStripeCheckoutSessionService,
 } from './payments.stripe-checkout-session.js';
+import { createStripePlanCatalogService } from './payments.stripe-plan-catalog.js';
 import { createStripeSubscriptionEventProcessor } from './payments.stripe-subscription.js';
 import { createStripeWebhookEventProcessor } from './payments.stripe-webhook.js';
 import { createStripeWebhookVerifier } from './payments.stripe-verification.js';
@@ -87,6 +90,20 @@ function createStripeCheckoutService(options) {
   });
 }
 
+
+function createStripeCatalogService(options) {
+  if (options.stripePlanCatalogService) {
+    return options.stripePlanCatalogService;
+  }
+
+  return createStripePlanCatalogService({
+    secretKey: options.stripeSecretKey,
+    priceIds: options.stripePurchasePriceIds,
+    httpClient: options.stripePlanCatalogHttpClient,
+    cache: options.stripePlanCatalogCache,
+  });
+}
+
 /**
  * Register payment-provider HTTP ingress.
  *
@@ -104,6 +121,16 @@ export async function paymentsRoutes(app, options = {}) {
 
     const checkoutController = createStripeCheckoutController({
       stripeCheckoutSessionService: createStripeCheckoutService(options),
+    });
+    const catalogController = createStripePlanCatalogController({
+      stripePlanCatalogService: createStripeCatalogService(options),
+    });
+
+    app.get('/checkout/stripe/plans', {
+      onRequest: [protectedApp.authenticate],
+      config: { rateLimit: STRIPE_PLAN_CATALOG_RATE_LIMIT },
+      schema: paymentsSchemas.stripePlanCatalog,
+      handler: catalogController.list,
     });
 
     app.post('/checkout/stripe', {
