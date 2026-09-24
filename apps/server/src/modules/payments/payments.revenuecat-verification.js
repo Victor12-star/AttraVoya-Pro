@@ -96,10 +96,7 @@ function parseRevenueCatEvent(rawPayload) {
 
   let occurredAt = null;
   if (event.event_timestamp_ms != null) {
-    if (
-      !Number.isSafeInteger(event.event_timestamp_ms) ||
-      event.event_timestamp_ms <= 0
-    ) {
+    if (!Number.isSafeInteger(event.event_timestamp_ms) || event.event_timestamp_ms <= 0) {
       throw new ValidationError('RevenueCat event timestamp is invalid.');
     }
 
@@ -163,9 +160,7 @@ export function createRevenueCatWebhookVerifier({
     const ageSeconds = Math.abs(Math.floor(currentTime.getTime() / 1000) - timestamp);
 
     if (ageSeconds > toleranceSeconds) {
-      throw new ValidationError(
-        'RevenueCat signature timestamp is outside the allowed tolerance.',
-      );
+      throw new ValidationError('RevenueCat signature timestamp is outside the allowed tolerance.');
     }
 
     const signedPayload = Buffer.concat([
