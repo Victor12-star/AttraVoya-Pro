@@ -6,7 +6,12 @@ const MAX_IDENTITY_LENGTH = 255;
 const MAX_ALIASES = 100;
 
 function requiredIdentity(value, name) {
-  if (typeof value !== 'string' || value !== value.trim() || !value || value.length > MAX_IDENTITY_LENGTH) {
+  if (
+    typeof value !== 'string' ||
+    value !== value.trim() ||
+    !value ||
+    value.length > MAX_IDENTITY_LENGTH
+  ) {
     throw new ValidationError(`${name} is invalid.`);
   }
   return value;
