@@ -82,8 +82,7 @@ describe('RevenueCat Android product environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
-          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID:
-            'attravoya_pro_v1:monthly-autorenewing',
+          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
           REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: 'attravoya_pro_v1:Yearly',
         }),
       ),
