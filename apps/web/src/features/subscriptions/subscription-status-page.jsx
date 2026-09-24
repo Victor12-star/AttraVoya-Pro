@@ -202,9 +202,7 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       selected: null,
     }),
   );
-  const [returnState, setReturnState] = useState(
-    /** @type {'success' | 'cancelled' | null} */ (null),
-  );
+  const [returnState] = useState(() => checkoutReturnState());
 
   const loadPurchaseOptions = useCallback(async () => {
     purchaseSequenceRef.current += 1;
@@ -270,7 +268,6 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
   }, [loadPurchaseOptions]);
 
   useEffect(() => {
-    setReturnState(checkoutReturnState());
     const timer = setTimeout(() => {
       void loadAccess();
     }, 0);
