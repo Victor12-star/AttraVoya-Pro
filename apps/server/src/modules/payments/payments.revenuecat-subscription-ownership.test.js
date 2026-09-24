@@ -359,10 +359,7 @@ describe('provider subscription ownership repository', () => {
   it('fails closed when a concurrent winner belongs to a different user', async () => {
     const duplicate = Object.assign(new Error('unique conflict'), { code: 'P2002' });
     const conflictingWinner = pendingSubscription({ userId: 'user-2' });
-    const findUnique = vi
-      .fn()
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(conflictingWinner);
+    const findUnique = vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(conflictingWinner);
     const repository = createPaymentsRepository(
       /** @type {any} */ ({
         plan: {
