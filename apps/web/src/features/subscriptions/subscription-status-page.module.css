@@ -23,6 +23,88 @@
 .header p,
 .privacyNote p,
 .planDescription,
+.returnNotice {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+.purchaseSection {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.15rem, 3vw, 1.6rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.purchaseSection h2,
+.optionCard h3 {
+  margin: 0;
+}
+
+.purchaseSection > div > p {
+  margin: 0.4rem 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.planOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.optionCard {
+  display: grid;
+  gap: 1rem;
+  align-content: space-between;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-subtle);
+}
+
+.optionCard button {
+  width: 100%;
+  min-height: 2.85rem;
+}
+
+.optionCard button:focus-visible {
+  outline: 3px solid var(--color-focus, currentColor);
+  outline-offset: 3px;
+}
+
+.optionCard button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.price {
+  margin: 0.45rem 0 0;
+  color: var(--color-text);
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 800;
+}
+
+.price span {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.purchaseSafety {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 .purchaseNote {
   margin: 0.4rem 0 0;
   color: var(--color-text-muted);
@@ -193,6 +275,10 @@
 
   .planHeading {
     display: grid;
+  }
+
+  .planOptions {
+    grid-template-columns: 1fr;
   }
 
   .metadata > div {
