@@ -276,6 +276,16 @@ The provider-neutral boundary then computes the SHA-256 payload digest itself, a
 
 This phase does not resolve RevenueCat subscriber ownership, map Google Play products to AttraVoya plans, register a RevenueCat webhook endpoint, add the RevenueCat mobile SDK, purchase or restore subscriptions, or mutate authoritative subscription state. Those remain separately gated slices so no mobile client or unverified provider field can grant Pro.
 
+### Server-owned RevenueCat / Google Play product mapping
+
+Phase 10DB adds the next internal Android billing trust boundary: a server-owned mapping from the two configured RevenueCat Google Play subscription identifiers to the existing AttraVoya `PRO_MONTHLY` and `PRO_YEARLY` plans.
+
+The configuration accepts only current Google Play subscription/base-plan identifiers in RevenueCat's `subscription_id:base-plan-id` form. Both Pro identifiers must be configured together, must be distinct, and remain server-only. Unknown, malformed or unconfigured provider products fail closed instead of being treated as a plan.
+
+The mapping is deliberately one-way for authorization: a verified provider product may resolve to an internal AttraVoya plan, but the provider product identifier never becomes the entitlement authority. Client-supplied plan names, RevenueCat App User IDs, local SDK entitlement state and purchase-success UI state remain untrusted.
+
+This phase still does not register a RevenueCat webhook route, resolve subscriber ownership, process lifecycle events, mutate subscription state, add the RevenueCat mobile SDK, purchase or restore subscriptions, or expose provider product identifiers to clients.
+
 ## Future billing integration
 
 Billing providers will be added in later, separate CI-gated slices.

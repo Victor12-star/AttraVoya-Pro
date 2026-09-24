@@ -35,6 +35,20 @@ const optionalStripePriceId = z.preprocess(
     .optional(),
 );
 
+const optionalRevenueCatAndroidProductId = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z
+    .string()
+    .trim()
+    .min(3)
+    .max(200)
+    .regex(
+      /^(?!android\.test)[a-z0-9][a-z0-9._]{0,39}:[a-z0-9][a-z0-9-]*$/,
+      'Use a RevenueCat Google Play subscription identifier in subscription_id:base-plan-id form',
+    )
+    .optional(),
+);
+
 const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_HOST: z.string().trim().min(1).default('0.0.0.0'),
@@ -70,6 +84,11 @@ const environmentSchema = z.object({
   STRIPE_SECRET_KEY: optionalSecret(16, 512),
   STRIPE_PRO_MONTHLY_PRICE_ID: optionalStripePriceId,
   STRIPE_PRO_YEARLY_PRICE_ID: optionalStripePriceId,
+
+  // RevenueCat/Google Play product mapping is server-owned configuration only.
+  // These identifiers do not enable purchases and are never entitlement proof.
+  REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: optionalRevenueCatAndroidProductId,
+  REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: optionalRevenueCatAndroidProductId,
 
   // Provider selection is environment-driven so development providers can be
   // replaced for public/commercial launch without rewriting application code.
@@ -251,6 +270,24 @@ function validateStripePurchaseConfiguration(environment) {
   }
 }
 
+function validateRevenueCatAndroidProductConfiguration(environment) {
+  const monthly = environment.REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID;
+  const yearly = environment.REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID;
+  const configuredCount = Number(Boolean(monthly)) + Number(Boolean(yearly));
+
+  if (configuredCount === 1) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nREVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID and REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID must be configured together.',
+    );
+  }
+
+  if (configuredCount === 2 && monthly === yearly) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nREVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID and REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID must be different.',
+    );
+  }
+}
+
 function validateProductionEmailConfiguration(environment) {
   if (environment.NODE_ENV !== 'production') return;
 
@@ -270,6 +307,18 @@ function validateProductionEmailConfiguration(environment) {
       `Invalid AttraVoya Pro server environment:\n${missing.join(', ')}: required in production for transactional authentication email.`,
     );
   }
+}
+
+export function revenueCatAndroidProductIdsFromEnvironment(environment) {
+  const monthly = environment.REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID;
+  const yearly = environment.REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID;
+
+  if (!monthly && !yearly) return Object.freeze({});
+
+  return Object.freeze({
+    [PLANS.PRO_MONTHLY]: monthly,
+    [PLANS.PRO_YEARLY]: yearly,
+  });
 }
 
 export function stripePurchasePriceIdsFromEnvironment(environment) {
@@ -330,6 +379,7 @@ export function loadEnvironment(source = process.env) {
   validateProviderBudgetPairs(result.data);
   validateStripeWebhookConfiguration(result.data);
   validateStripePurchaseConfiguration(result.data);
+  validateRevenueCatAndroidProductConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);
