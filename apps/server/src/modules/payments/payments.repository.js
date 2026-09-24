@@ -204,10 +204,6 @@ export function createPaymentsRepository(prismaClient = prisma) {
         select: { id: true, key: true, isActive: true },
       });
 
-      if (!plan?.isActive) {
-        return { outcome: 'PLAN_NOT_ACTIVE', subscription: null, created: false };
-      }
-
       const providerIdentity = {
         provider,
         externalSubscriptionId,
@@ -220,12 +216,20 @@ export function createPaymentsRepository(prismaClient = prisma) {
       });
 
       if (existing) {
+        if (!plan) {
+          return { outcome: 'PLAN_NOT_ACTIVE', subscription: null, created: false };
+        }
+
         const matchesOwner = existing.userId === userId && existing.planId === plan.id;
         return {
           outcome: matchesOwner ? 'EXISTING' : 'PROVIDER_IDENTITY_CONFLICT',
           subscription: existing,
           created: false,
         };
+      }
+
+      if (!plan?.isActive) {
+        return { outcome: 'PLAN_NOT_ACTIVE', subscription: null, created: false };
       }
 
       try {
