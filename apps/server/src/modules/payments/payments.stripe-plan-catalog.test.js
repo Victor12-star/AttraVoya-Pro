@@ -30,13 +30,13 @@ function priceIds() {
 describe('Stripe plan catalog', () => {
   it('returns only safe display pricing for the configured monthly and yearly plans', async () => {
     const requestJson = vi.fn(async (url, options) => {
-      expect(options.headers.Authorization).toBe('Bearer sk_test_server_secret');
+      expect(options.headers.Authorization).toBe('Bearer stripe-secret-placeholder-123456');
       return url.endsWith('price_monthly_server')
         ? stripePrice({ id: 'price_monthly_server', interval: 'month', amount: 12900 })
         : stripePrice({ id: 'price_yearly_server', interval: 'year', amount: 129000 });
     });
     const service = createStripePlanCatalogService({
-      secretKey: 'sk_test_server_secret',
+      secretKey: 'stripe-secret-placeholder-123456',
       priceIds: priceIds(),
       httpClient: { requestJson },
     });
@@ -62,7 +62,7 @@ describe('Stripe plan catalog', () => {
       ],
     });
     expect(JSON.stringify(result)).not.toContain('price_monthly_server');
-    expect(JSON.stringify(result)).not.toContain('sk_test_server_secret');
+    expect(JSON.stringify(result)).not.toContain('stripe-secret-placeholder-123456');
   });
 
   it('briefly caches validated Stripe price snapshots and coalesces repeated reads', async () => {
@@ -72,7 +72,7 @@ describe('Stripe plan catalog', () => {
         : stripePrice({ id: 'price_yearly_server', interval: 'year', amount: 129000 }),
     );
     const service = createStripePlanCatalogService({
-      secretKey: 'sk_test_server_secret',
+      secretKey: 'stripe-secret-placeholder-123456',
       priceIds: priceIds(),
       httpClient: { requestJson },
     });
@@ -101,7 +101,7 @@ describe('Stripe plan catalog', () => {
       return stripePrice({ id: 'price_yearly_server', interval: 'year', amount: 129000 });
     });
     const service = createStripePlanCatalogService({
-      secretKey: 'sk_test_server_secret',
+      secretKey: 'stripe-secret-placeholder-123456',
       priceIds: priceIds(),
       httpClient: { requestJson },
     });
@@ -115,7 +115,7 @@ describe('Stripe plan catalog', () => {
   it('rejects incomplete or non-Stripe server Price configuration before provider work', () => {
     expect(() =>
       createStripePlanCatalogService({
-        secretKey: 'sk_test_server_secret',
+        secretKey: 'stripe-secret-placeholder-123456',
         priceIds: {
           [PLANS.PRO_MONTHLY]: 'not-a-price',
           [PLANS.PRO_YEARLY]: 'price_yearly_server',
