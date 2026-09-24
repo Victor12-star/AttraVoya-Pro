@@ -90,7 +90,6 @@ function createStripeCheckoutService(options) {
   });
 }
 
-
 function createStripeCatalogService(options) {
   if (options.stripePlanCatalogService) {
     return options.stripePlanCatalogService;
