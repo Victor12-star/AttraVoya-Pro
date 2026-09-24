@@ -17,12 +17,8 @@ describe('RevenueCat Android product policy', () => {
       productIds: productIds(),
     });
 
-    expect(policy.resolvePlanKey('attravoya_pro_v1:monthly-autorenewing')).toBe(
-      PLANS.PRO_MONTHLY,
-    );
-    expect(policy.resolvePlanKey('attravoya_pro_v1:yearly-autorenewing')).toBe(
-      PLANS.PRO_YEARLY,
-    );
+    expect(policy.resolvePlanKey('attravoya_pro_v1:monthly-autorenewing')).toBe(PLANS.PRO_MONTHLY);
+    expect(policy.resolvePlanKey('attravoya_pro_v1:yearly-autorenewing')).toBe(PLANS.PRO_YEARLY);
     expect(Object.isFrozen(policy)).toBe(true);
   });
 
@@ -37,9 +33,7 @@ describe('RevenueCat Android product policy', () => {
     expect(() => policy.resolvePlanKey(' PRO_MONTHLY ')).toThrow(
       'RevenueCat product identifier is invalid.',
     );
-    expect(() => policy.resolvePlanKey(null)).toThrow(
-      'RevenueCat product identifier is invalid.',
-    );
+    expect(() => policy.resolvePlanKey(null)).toThrow('RevenueCat product identifier is invalid.');
   });
 
   it('rejects malformed Google Play subscription/base-plan configuration', () => {
