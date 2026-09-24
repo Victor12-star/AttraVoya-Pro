@@ -48,6 +48,14 @@ const SUBSCRIPTION_SELECT = Object.freeze({
   canceledAt: true,
 });
 
+const REVENUECAT_SUBSCRIBER_SELECT = Object.freeze({
+  id: true,
+  userId: true,
+  appUserId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export function createPaymentsRepository(prismaClient = prisma) {
   return {
     async findCheckoutBlockingSubscription({ userId }) {
@@ -183,6 +191,49 @@ export function createPaymentsRepository(prismaClient = prisma) {
         },
         select: SUBSCRIPTION_SELECT,
       });
+    },
+
+    async findRevenueCatSubscriberIdentityByAppUserId({ appUserId }) {
+      return prismaClient.revenueCatSubscriberIdentity.findUnique({
+        where: { appUserId },
+        select: REVENUECAT_SUBSCRIBER_SELECT,
+      });
+    },
+
+    async createOrReuseRevenueCatSubscriberIdentity({ userId, appUserId }) {
+      const existing = await prismaClient.revenueCatSubscriberIdentity.findUnique({
+        where: { userId },
+        select: REVENUECAT_SUBSCRIBER_SELECT,
+      });
+
+      if (existing) {
+        return { identity: existing, created: false, collision: false };
+      }
+
+      try {
+        const identity = await prismaClient.revenueCatSubscriberIdentity.create({
+          data: { userId, appUserId },
+          select: REVENUECAT_SUBSCRIBER_SELECT,
+        });
+
+        return { identity, created: true, collision: false };
+      } catch (error) {
+        if (error?.code !== 'P2002') throw error;
+
+        // Concurrent requests for the same authenticated user return the winner.
+        // If no user row exists after a unique conflict, the generated opaque
+        // App User ID collided and the service must generate a fresh value.
+        const concurrent = await prismaClient.revenueCatSubscriberIdentity.findUnique({
+          where: { userId },
+          select: REVENUECAT_SUBSCRIBER_SELECT,
+        });
+
+        if (concurrent) {
+          return { identity: concurrent, created: false, collision: false };
+        }
+
+        return { identity: null, created: false, collision: true };
+      }
     },
 
     async applyVerifiedCheckoutCompletion({
