@@ -9,21 +9,23 @@ Continue `Victor12-star/AttraVoya-Pro` from the exact live repository state. Do 
 3. Verify all five canonical jobs individually rather than relying on workflow-level success.
 4. Re-read `docs/CURRENT-WORK.md` and this file from that exact SHA.
 5. Inspect open pull requests, Issue `#40`, and the relevant live code before choosing any new slice.
-6. Do not restart completed production-readiness work through Phase 10BX.
+6. Do not restart completed production-readiness or subscription work through Phase 10CX.
 
 ## Current fully verified release
 
-Phase 10CK — opt-in Stripe webhook ingress — is complete.
+Phase 10CX — guarded web Stripe purchase surface — is complete.
 
-- PR: `#183`
-- Final PR head: `ea62a33a7ec93299a6bd3d55d5e63edd0eb2a03b`
-- Final PR CI run: `35899831282`
+- PR: `#198`
+- Final PR head: `e6606bd38fc2461bfae00dc10e57847bd889de12`
+- Final PR CI run: `36021718501`
 - All five canonical jobs passed
-- Exact squash-merged `develop`: `ef0550e3dcb60f3d17f720dba256f7e7e1c18a31`
-- Post-merge push CI run: `35904007095`
+- Exact squash-merged `develop`: `cd50487cb289d78cb9de8f3484c2219823952441`
+- Post-merge push CI run: `36022413032`
 - All five canonical jobs passed
 
-The newest sequence extends the verified foundation from reliability hardening and secure mobile/account controls into a server-authoritative Free/Pro subscription trust chain. Stripe webhook ingestion now exists as a disabled-by-default, server-configured route that verifies exact raw bytes, records only privacy-minimized verified evidence, resolves provider-owned subscription identity and applies state transactionally. New subscription purchases, checkout, customer creation, refunds, restore-purchase flows, Google Play Billing, RevenueCat purchase flows, Apple In-App Purchase, advertising and payment UI are still not enabled.
+The verified subscription sequence now extends from authoritative Free/Pro entitlement state through the Stripe webhook trust chain and into a guarded signed-in web purchase surface. A Free web user can see only server-advertised Pro plans and provider-backed display pricing, then request a Stripe-hosted Checkout Session using only an internal AttraVoya plan key. Checkout/browser success remains non-authoritative: verified provider lifecycle state must still become current `ACTIVE` or `TRIALING` server subscription state before Pro is granted.
+
+Refunds, customer billing-portal/self-service management, provider-side cancellation controls, Android Google Play Billing/RevenueCat purchase flows and future Apple In-App Purchase remain separate work. The web Stripe purchase path must not be reused as mobile store billing.
 
 ## Completed production-readiness sequence
 
@@ -126,8 +128,21 @@ The live repository has already completed these Issue #40 slices:
 - Phase 10CI — enforce provider subscription identity — PR `#181`
 - Phase 10CJ — process verified Stripe subscription events internally — PR `#182`
 - Phase 10CK — add opt-in Stripe webhook ingress — PR `#183`
+- Phase 10CL — synchronize subscription handoff through Phase 10CK — PR `#184`
+- Phase 10CM — establish Stripe purchase configuration — PR `#185`
+- Phase 10CN — define server-owned Stripe checkout policy — PR `#186`
+- Phase 10CO — add server-owned checkout attempt idempotency — PR `#187`
+- Phase 10CP — add internal Stripe Checkout Session creation — PR `#189`
+- Phase 10CQ — bridge verified checkout completion to pending ownership — PR `#190`
+- Phase 10CR — block duplicate subscription checkout — PR `#191`
+- Phase 10CS — make Stripe webhook dispatch order-safe — PR `#192`
+- Phase 10CT — expose authenticated Stripe checkout entry — PR `#193`
+- Phase 10CU — expose truthful Stripe checkout availability — PR `#194`
+- Phase 10CV — add server-authoritative Stripe plan catalog — PR `#196`
+- Phase 10CW — add shared Stripe checkout client methods — PR `#197`
+- Phase 10CX — add guarded web Stripe purchase surface — PR `#198`
 
-PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged.
+PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsolete Phase 9U PR `#79` must also never be merged. Stripe checkout-completion PR `#188` is superseded by Phase 10CQ PR `#190`, and stale Stripe plan-catalog PR `#195` is superseded by Phase 10CV PR `#196`; never revive or merge those superseded branches.
 
 ## What the newest slices prove
 
@@ -154,8 +169,9 @@ PR `#91` is obsolete and superseded by Phase 10F PR `#93`; never merge it. Obsol
 - Phases 10BM through 10BT establish secure mobile credentials/session rotation and connect authentication, registration, recovery, verification, identity restoration and Profile behavior.
 - Phases 10BU and 10BV provide mobile and public-web account deletion surfaces backed by authoritative server deletion.
 - Phases 10BW and 10BX publish the public privacy policy and Terms of Service while keeping future subscriptions explicitly disabled until billing is actually implemented.
-- Phases 10BY through 10CK establish the subscription trust chain: authoritative Free/Pro plans and entitlements, centralized server-side premium authorization, truthful read-only web/mobile plan status, a privacy-minimized verified billing-event ledger, replay-safe and concurrency-safe processing, transactional provider-state application, opaque verifier-minted evidence, Stripe signature verification, provider-scoped subscription identity, internal verified Stripe lifecycle processing, and finally a disabled-by-default public Stripe webhook ingress with dedicated limits.
-- Phase 10CK does not create a purchase path. No buy/subscribe button, Stripe Checkout call, customer creation, new subscription creation, refund flow, restore-purchase flow, Google Play Billing, RevenueCat purchase flow, Apple In-App Purchase, advertising or payment UI is enabled yet.
+- Phases 10BY through 10CK establish the subscription trust chain: authoritative Free/Pro plans and entitlements, centralized server-side premium authorization, truthful read-only web/mobile plan status, a privacy-minimized verified billing-event ledger, replay-safe and concurrency-safe processing, transactional provider-state application, opaque verifier-minted evidence, Stripe signature verification, provider-scoped subscription identity, internal verified Stripe lifecycle processing, and a disabled-by-default public Stripe webhook ingress with dedicated limits.
+- Phase 10CL synchronizes that trust-chain handoff. Phases 10CM through 10CX add the guarded web purchase path: server-only Stripe purchase configuration, server-owned checkout policy, durable attempt/idempotency ownership, internal Checkout Session creation, verified completion-to-`PENDING` ownership, duplicate-subscription protection, order-safe webhook dispatch, authenticated checkout ingress, truthful availability, provider-backed display pricing, shared checkout client methods, and the signed-in web purchase UI.
+- Phase 10CX still does not trust checkout/browser success as entitlement. Only verified current `ACTIVE`/`TRIALING` lifecycle state grants Pro. Refunds, billing-portal/customer self-service, provider-side cancellation management, Android Google Play Billing/RevenueCat, future Apple In-App Purchase and advertising remain separate work.
 
 ## Existing protections that should not be reimplemented
 
@@ -239,11 +255,11 @@ Never weaken CI, security, privacy, provider-honesty, accessibility, performance
 
 ## Next-work status
 
-The exact Phase 10CK `develop` SHA is fully verified. Before starting another slice, re-fetch live `develop`, verify its exact push CI and inspect open PRs because repository state wins over this handoff.
+The exact Phase 10CX `develop` SHA is fully verified. Before starting another slice, re-fetch live `develop`, verify its exact push CI and inspect open PRs because repository state wins over this handoff.
 
-For subscription work, do not jump directly from webhook ingress to a public buy button. A real purchase-creation slice must first define and test server-only Stripe API credential configuration, canonical server-owned price IDs for `PRO_MONTHLY` and `PRO_YEARLY`, authenticated account ownership, idempotent checkout creation, safe success/cancel return URLs, duplicate-click/retry handling, webhook reconciliation, customer/subscription linkage, and truthful failure/cancellation behavior. Do not trust client-provided plan prices, Stripe customer IDs, subscription IDs, account IDs or success claims.
+For web subscriptions, the guarded Stripe purchase path now exists and must not be duplicated. Browser checkout success is still informational only. Candidate future web-billing lifecycle work includes customer self-service/cancellation and refund/revocation semantics, but each must preserve server-authoritative provider verification, ownership, idempotency and entitlement rules.
 
-Android Google Play Billing plus RevenueCat and future iOS Apple In-App Purchase plus RevenueCat remain separate provider-specific purchase integrations. Do not reuse the Stripe web purchase path as mobile store billing.
+Android Google Play Billing plus RevenueCat is a separate provider-specific purchase integration and must not reuse the Stripe web purchase endpoint or UI. Start Android billing from server-owned product/configuration and verified store/RevenueCat evidence boundaries, then add ownership, replay/idempotency, refund/revocation and restore semantics before any mobile buy/restore surface can claim a subscription. Future iOS Apple In-App Purchase plus RevenueCat remains separate again.
 
 Issue `#40` remains the broad production-readiness program. Candidate genuine gaps still include dependency timeout/recovery behavior beyond existing provider-isolation tests, database N+1 or hot-path evidence outside the verified planner-list path, deployment-platform edge/load-balancer/WAF requirements once a concrete public target exists, route-specific partial/degraded-mode UX gaps, and external metrics-collector integration only after a concrete multi-replica target exists. Treat these as candidates only; do not add Redis, queues, read replicas, distributed tracing, monitoring vendors, or other shared infrastructure without measured need.
 
