@@ -50,3 +50,8 @@ export const STRIPE_CHECKOUT_RATE_LIMIT = Object.freeze({
 });
 
 export const STRIPE_CHECKOUT_BODY_LIMIT_BYTES = 8 * 1024;
+
+export const STRIPE_PLAN_CATALOG_RATE_LIMIT = Object.freeze({
+  max: 30,
+  timeWindow: '1 minute',
+});
