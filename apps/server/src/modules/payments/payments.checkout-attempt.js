@@ -36,6 +36,7 @@ function validNow(value) {
  *
  * @param {{
  *   repository: {
+ *     findCheckoutBlockingSubscription?: (input: any) => Promise<any>,
  *     createOrReuseCheckoutAttempt: (input: any) => Promise<any>,
  *     bindCheckoutSession: (input: any) => Promise<any>,
  *   },
@@ -77,6 +78,22 @@ export function createCheckoutAttemptService({
       // Policy resolution proves purchase mode/configuration is currently valid.
       // Price IDs and redirects remain internal and are not persisted here.
       checkoutPolicy.resolve(normalizedPlanKey);
+
+      if (!repository.findCheckoutBlockingSubscription) {
+        throw new TypeError('Checkout eligibility repository is required.');
+      }
+
+      // Prevent accidental duplicate billing before creating or reusing checkout
+      // ownership. Existing pending/current/recoverable Pro subscription state
+      // must be resolved instead of starting another provider subscription.
+      const blockingSubscription = await repository.findCheckoutBlockingSubscription({
+        userId: normalizedUserId,
+      });
+      if (blockingSubscription) {
+        throw new ConflictError(
+          'An existing subscription must be resolved before starting a new checkout.',
+        );
+      }
 
       const currentTime = validNow(now());
       const expiresAt = new Date(currentTime.getTime() + attemptTtlMs);
