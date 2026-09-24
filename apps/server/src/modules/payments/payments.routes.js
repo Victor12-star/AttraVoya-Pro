@@ -1,3 +1,4 @@
+import { PLANS } from '@attravoya/constants';
 import {
   DEFAULT_BODY_LIMIT_BYTES,
   STRIPE_CHECKOUT_BODY_LIMIT_BYTES,
@@ -96,6 +97,19 @@ function createStripeCheckoutService(options) {
  */
 export async function paymentsRoutes(app, options = {}) {
   const protectedApp = /** @type {any} */ (app);
+
+  app.get('/checkout/availability', {
+    onRequest: [protectedApp.authenticate],
+    schema: paymentsSchemas.stripeCheckoutAvailability,
+    handler: async (_request, reply) => {
+      const available = Boolean(options.stripePurchaseEnabled);
+      reply.header('Cache-Control', 'private, no-store');
+      return reply.code(200).send({
+        available,
+        planKeys: available ? [PLANS.PRO_MONTHLY, PLANS.PRO_YEARLY] : [],
+      });
+    },
+  });
 
   if (options.stripePurchaseEnabled) {
     if (!options.stripeWebhookEnabled) {
