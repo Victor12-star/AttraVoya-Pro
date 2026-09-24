@@ -22,26 +22,26 @@ describe('RevenueCat subscriber identity service', () => {
   it(
     'creates a non-guessable provider ID without exposing the AttraVoya user ID or email',
     async () => {
-    const repository = {
-      createOrReuseRevenueCatSubscriberIdentity: vi.fn(async ({ userId, appUserId }) => ({
-        identity: identity({ userId, appUserId }),
-        created: true,
-        collision: false,
-      })),
-      findRevenueCatSubscriberIdentityByAppUserId: vi.fn(),
-    };
-    const service = createRevenueCatSubscriberIdentityService(repository, {
-      randomBytesFn: () => bytes(7),
-    });
+      const repository = {
+        createOrReuseRevenueCatSubscriberIdentity: vi.fn(async ({ userId, appUserId }) => ({
+          identity: identity({ userId, appUserId }),
+          created: true,
+          collision: false,
+        })),
+        findRevenueCatSubscriberIdentityByAppUserId: vi.fn(),
+      };
+      const service = createRevenueCatSubscriberIdentityService(repository, {
+        randomBytesFn: () => bytes(7),
+      });
 
-    const result = await service.getOrCreateForUser({ userId: ' user-1 ' });
+      const result = await service.getOrCreateForUser({ userId: ' user-1 ' });
 
-    expect(result.userId).toBe('user-1');
-    expect(result.appUserId).toMatch(/^av_rc_[A-Za-z0-9_-]{32}$/);
-    expect(result.appUserId).not.toContain('user-1');
-    expect(result.appUserId).not.toContain('@');
-    expect(result.appUserId).not.toContain('/');
-    expect(result.created).toBe(true);
+      expect(result.userId).toBe('user-1');
+      expect(result.appUserId).toMatch(/^av_rc_[A-Za-z0-9_-]{32}$/);
+      expect(result.appUserId).not.toContain('user-1');
+      expect(result.appUserId).not.toContain('@');
+      expect(result.appUserId).not.toContain('/');
+      expect(result.created).toBe(true);
       expect(repository.createOrReuseRevenueCatSubscriberIdentity).toHaveBeenCalledWith({
         userId: 'user-1',
         appUserId: result.appUserId,
@@ -118,20 +118,20 @@ describe('RevenueCat subscriber identity service', () => {
   it(
     'resolves only an exact server-owned RevenueCat identity and fails closed when unknown',
     async () => {
-    const owned = identity();
-    const repository = {
-      createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
-      findRevenueCatSubscriberIdentityByAppUserId: vi
-        .fn()
-        .mockResolvedValueOnce(owned)
-        .mockResolvedValueOnce(null),
-    };
-    const service = createRevenueCatSubscriberIdentityService(repository);
+      const owned = identity();
+      const repository = {
+        createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
+        findRevenueCatSubscriberIdentityByAppUserId: vi
+          .fn()
+          .mockResolvedValueOnce(owned)
+          .mockResolvedValueOnce(null),
+      };
+      const service = createRevenueCatSubscriberIdentityService(repository);
 
-    await expect(service.resolveOwnedUser({ appUserId: owned.appUserId })).resolves.toEqual({
-      userId: owned.userId,
-      appUserId: owned.appUserId,
-    });
+      await expect(service.resolveOwnedUser({ appUserId: owned.appUserId })).resolves.toEqual({
+        userId: owned.userId,
+        appUserId: owned.appUserId,
+      });
 
       await expect(
         service.resolveOwnedUser({
@@ -144,24 +144,24 @@ describe('RevenueCat subscriber identity service', () => {
   it(
     'rejects client-shaped or malformed RevenueCat identities before database lookup',
     async () => {
-    const repository = {
-      createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
-      findRevenueCatSubscriberIdentityByAppUserId: vi.fn(),
-    };
-    const service = createRevenueCatSubscriberIdentityService(repository);
+      const repository = {
+        createOrReuseRevenueCatSubscriberIdentity: vi.fn(),
+        findRevenueCatSubscriberIdentityByAppUserId: vi.fn(),
+      };
+      const service = createRevenueCatSubscriberIdentityService(repository);
 
-    for (const value of [
-      'user-1',
-      'victor@example.test',
-      '$RCAnonymousID:123',
-      ' av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ',
-      'av_rc_invalid/value',
-    ]) {
-      await expect(service.resolveOwnedUser({ appUserId: value })).rejects.toMatchObject({
-        statusCode: 400,
-        code: 'VALIDATION_ERROR',
-      });
-    }
+      for (const value of [
+        'user-1',
+        'victor@example.test',
+        '$RCAnonymousID:123',
+        ' av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ',
+        'av_rc_invalid/value',
+      ]) {
+        await expect(service.resolveOwnedUser({ appUserId: value })).rejects.toMatchObject({
+          statusCode: 400,
+          code: 'VALIDATION_ERROR',
+        });
+      }
 
       expect(repository.findRevenueCatSubscriberIdentityByAppUserId).not.toHaveBeenCalled();
     },
@@ -217,10 +217,7 @@ describe('RevenueCat subscriber identity repository', () => {
   it('returns the concurrent winner after a user uniqueness race', async () => {
     const duplicate = Object.assign(new Error('unique conflict'), { code: 'P2002' });
     const existing = identity();
-    const findUnique = vi
-      .fn()
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(existing);
+    const findUnique = vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(existing);
     const create = vi.fn(async () => {
       throw duplicate;
     });
