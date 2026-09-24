@@ -40,3 +40,13 @@ export const STRIPE_WEBHOOK_RATE_LIMIT = Object.freeze({
   max: 60,
   timeWindow: '1 minute',
 });
+
+// Creating a hosted checkout session is a credentialed provider write. Keep it
+// deliberately tighter than ordinary API traffic; duplicate clicks remain
+// idempotent through the server-owned CheckoutAttempt and Stripe key.
+export const STRIPE_CHECKOUT_RATE_LIMIT = Object.freeze({
+  max: 6,
+  timeWindow: '1 minute',
+});
+
+export const STRIPE_CHECKOUT_BODY_LIMIT_BYTES = 8 * 1024;

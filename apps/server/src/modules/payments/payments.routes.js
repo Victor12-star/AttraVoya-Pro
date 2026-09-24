@@ -1,7 +1,21 @@
-import { DEFAULT_BODY_LIMIT_BYTES, STRIPE_WEBHOOK_RATE_LIMIT } from '../../config/constants.js';
+import {
+  DEFAULT_BODY_LIMIT_BYTES,
+  STRIPE_CHECKOUT_BODY_LIMIT_BYTES,
+  STRIPE_CHECKOUT_RATE_LIMIT,
+  STRIPE_WEBHOOK_RATE_LIMIT,
+} from '../../config/constants.js';
+import { createCheckoutAttemptService } from './payments.checkout-attempt.js';
+import { createStripeCheckoutController } from './payments.checkout-controller.js';
+import { paymentsRepository } from './payments.repository.js';
+import { paymentsSchemas } from './payments.schema.js';
 import { paymentsService } from './payments.service.js';
 import { createPaymentsController } from './payments.controller.js';
 import { createStripeCheckoutCompletionProcessor } from './payments.stripe-checkout-completion.js';
+import { createStripeCheckoutPolicy } from './payments.stripe-checkout-policy.js';
+import {
+  createStripeCheckoutGateway,
+  createStripeCheckoutSessionService,
+} from './payments.stripe-checkout-session.js';
 import { createStripeSubscriptionEventProcessor } from './payments.stripe-subscription.js';
 import { createStripeWebhookEventProcessor } from './payments.stripe-webhook.js';
 import { createStripeWebhookVerifier } from './payments.stripe-verification.js';
@@ -39,15 +53,68 @@ function createStripeProcessor(options) {
   });
 }
 
+function createStripeCheckoutService(options) {
+  if (options.stripeCheckoutSessionService) {
+    return options.stripeCheckoutSessionService;
+  }
+
+  const checkoutPolicy =
+    options.stripeCheckoutPolicy ??
+    createStripeCheckoutPolicy({
+      enabled: options.stripePurchaseEnabled,
+      priceIds: options.stripePurchasePriceIds,
+      returnUrls: options.stripeCheckoutReturnUrls,
+    });
+
+  const checkoutAttemptService =
+    options.checkoutAttemptService ??
+    createCheckoutAttemptService({
+      repository: options.paymentsRepository ?? paymentsRepository,
+      checkoutPolicy,
+      now: options.checkoutNow,
+    });
+
+  const stripeGateway =
+    options.stripeCheckoutGateway ??
+    createStripeCheckoutGateway({
+      secretKey: options.stripeSecretKey,
+    });
+
+  return createStripeCheckoutSessionService({
+    checkoutAttemptService,
+    checkoutPolicy,
+    stripeGateway,
+  });
+}
+
 /**
  * Register payment-provider HTTP ingress.
  *
- * Stripe is opt-in. When disabled, no webhook route or raw-body parser is
- * installed. When enabled, JSON parsing is replaced only inside this
- * encapsulated plugin so the exact provider bytes reach signature verification
- * without changing ordinary API JSON parsing.
+ * Stripe webhook parsing is isolated to a child Fastify scope so exact raw
+ * provider bytes reach signature verification without changing normal JSON
+ * parsing for authenticated checkout or the rest of the application.
  */
 export async function paymentsRoutes(app, options = {}) {
+  const protectedApp = /** @type {any} */ (app);
+
+  if (options.stripePurchaseEnabled) {
+    if (!options.stripeWebhookEnabled) {
+      throw new TypeError('Stripe purchase requires verified webhook ingress.');
+    }
+
+    const checkoutController = createStripeCheckoutController({
+      stripeCheckoutSessionService: createStripeCheckoutService(options),
+    });
+
+    app.post('/checkout/stripe', {
+      onRequest: [protectedApp.authenticate],
+      bodyLimit: STRIPE_CHECKOUT_BODY_LIMIT_BYTES,
+      config: { rateLimit: STRIPE_CHECKOUT_RATE_LIMIT },
+      schema: paymentsSchemas.stripeCheckout,
+      handler: checkoutController.create,
+    });
+  }
+
   if (!options.stripeWebhookEnabled) return;
 
   const processor = createStripeProcessor(options);
@@ -55,19 +122,21 @@ export async function paymentsRoutes(app, options = {}) {
     stripeWebhookProcessor: processor,
   });
 
-  app.removeContentTypeParser('application/json');
-  app.addContentTypeParser(
-    'application/json',
-    {
-      parseAs: 'buffer',
-      bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
-    },
-    (_request, body, done) => done(null, body),
-  );
+  await app.register(async function stripeWebhookIngress(webhookApp) {
+    webhookApp.removeContentTypeParser('application/json');
+    webhookApp.addContentTypeParser(
+      'application/json',
+      {
+        parseAs: 'buffer',
+        bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+      },
+      (_request, body, done) => done(null, body),
+    );
 
-  app.post('/webhooks/stripe', {
-    bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
-    config: { rateLimit: STRIPE_WEBHOOK_RATE_LIMIT },
-    handler: controller.stripeWebhook,
+    webhookApp.post('/webhooks/stripe', {
+      bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+      config: { rateLimit: STRIPE_WEBHOOK_RATE_LIMIT },
+      handler: controller.stripeWebhook,
+    });
   });
 }
