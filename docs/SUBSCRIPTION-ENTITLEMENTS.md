@@ -184,6 +184,10 @@ The server-created attempt ID is the future provider idempotency anchor: `attrav
 
 This boundary remains internal. It does not call Stripe, create a Checkout Session, create a customer, create or attach an external subscription, expose a purchase endpoint, render payment UI, or grant Pro. Verified webhook reconciliation remains the only path that may ultimately update authoritative subscription state.
 
+Before creating or reusing checkout ownership, the server also checks authoritative Pro subscription state for the authenticated user. Any existing `PENDING`, `ACTIVE`, `TRIALING`, or `PAST_DUE` Pro subscription blocks a new checkout attempt with a conflict response. This prevents accidental double billing when checkout completion is still awaiting lifecycle confirmation, when access is already current, or when an existing provider subscription is recoverable and should be resolved rather than replaced.
+
+The duplicate-subscription guard is provider-neutral at the account level: an existing qualifying Pro subscription blocks another Stripe checkout even if that subscription was created by a different billing provider. Terminal `CANCELED` and `EXPIRED` subscriptions are not part of the blocking query, so a later verified product flow may allow a genuinely ended subscription to start again without weakening current/recoverable ownership protection.
+
 ### Internal Stripe Checkout Session creation
 
 Phase 10CP adds the internal server-side Stripe Checkout Session boundary, but it is still not registered as an HTTP purchase route. The service first obtains the durable server-owned checkout attempt, resolves the trusted persisted plan through the server-owned checkout policy, then submits a subscription-mode Checkout Session request to Stripe.

@@ -1,3 +1,4 @@
+import { PRO_PLAN_KEYS } from '@attravoya/constants';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createPaymentsRepository } from './payments.repository.js';
@@ -41,6 +42,7 @@ function checkoutPolicy() {
 describe('checkout attempt service', () => {
   it('creates a server-owned attempt and derives the future Stripe idempotency key', async () => {
     const repository = {
+      findCheckoutBlockingSubscription: vi.fn(async () => null),
       createOrReuseCheckoutAttempt: vi.fn(async () => ({
         outcome: 'CREATED',
         attempt: attempt(),
@@ -82,6 +84,7 @@ describe('checkout attempt service', () => {
 
   it('reuses the same-plan active attempt for duplicate clicks', async () => {
     const repository = {
+      findCheckoutBlockingSubscription: vi.fn(async () => null),
       createOrReuseCheckoutAttempt: vi.fn(async () => ({
         outcome: 'EXISTING',
         attempt: attempt(),
@@ -109,6 +112,7 @@ describe('checkout attempt service', () => {
 
   it('fails closed when another plan already owns the active attempt', async () => {
     const repository = {
+      findCheckoutBlockingSubscription: vi.fn(async () => null),
       createOrReuseCheckoutAttempt: vi.fn(async () => ({
         outcome: 'EXISTING',
         attempt: attempt({
@@ -134,6 +138,43 @@ describe('checkout attempt service', () => {
       code: 'CONFLICT',
     });
   });
+
+  it.each(['PENDING', 'ACTIVE', 'TRIALING', 'PAST_DUE'])(
+    'blocks a second checkout while an existing %s Pro subscription needs resolution',
+    async (status) => {
+      const repository = {
+        findCheckoutBlockingSubscription: vi.fn(async () => ({
+          id: 'subscription-1',
+          status,
+          provider: 'stripe',
+          externalSubscriptionId: 'sub_existing',
+          plan: { key: 'PRO_MONTHLY' },
+        })),
+        createOrReuseCheckoutAttempt: vi.fn(),
+        bindCheckoutSession: vi.fn(),
+      };
+      const service = createCheckoutAttemptService({
+        repository,
+        checkoutPolicy: checkoutPolicy(),
+        now: () => NOW,
+      });
+
+      await expect(
+        service.createOrReuse({
+          userId: 'user-1',
+          planKey: 'PRO_YEARLY',
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 409,
+        code: 'CONFLICT',
+      });
+
+      expect(repository.findCheckoutBlockingSubscription).toHaveBeenCalledWith({
+        userId: 'user-1',
+      });
+      expect(repository.createOrReuseCheckoutAttempt).not.toHaveBeenCalled();
+    },
+  );
 
   it('checks server purchase policy before creating checkout ownership', async () => {
     const repository = {
@@ -251,6 +292,53 @@ describe('checkout attempt service', () => {
 });
 
 describe('checkout attempt repository', () => {
+  it('finds only Pro subscription states that must be resolved before new checkout', async () => {
+    const findFirst = vi.fn(async () => ({
+      id: 'subscription-1',
+      status: 'PAST_DUE',
+      provider: 'stripe',
+      externalSubscriptionId: 'sub_existing',
+      plan: { key: 'PRO_MONTHLY' },
+    }));
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        subscription: { findFirst },
+      }),
+    );
+
+    const result = await repository.findCheckoutBlockingSubscription({
+      userId: 'user-1',
+    });
+
+    expect(findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-1',
+        status: { in: ['PENDING', 'ACTIVE', 'TRIALING', 'PAST_DUE'] },
+        plan: {
+          is: {
+            key: { in: [...PRO_PLAN_KEYS] },
+          },
+        },
+      },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+      select: {
+        id: true,
+        status: true,
+        provider: true,
+        externalSubscriptionId: true,
+        plan: {
+          select: {
+            key: true,
+          },
+        },
+      },
+    });
+    expect(result).toMatchObject({
+      status: 'PAST_DUE',
+      plan: { key: 'PRO_MONTHLY' },
+    });
+  });
+
   it('expires an old active attempt before creating a new one', async () => {
     const planFindUnique = vi.fn(async () => ({
       id: 'plan-1',

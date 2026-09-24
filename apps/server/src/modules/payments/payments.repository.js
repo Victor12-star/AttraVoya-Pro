@@ -1,3 +1,4 @@
+import { PRO_PLAN_KEYS } from '@attravoya/constants';
 import { prisma } from '@attravoya/database';
 
 const EVENT_SELECT = Object.freeze({
@@ -49,6 +50,32 @@ const SUBSCRIPTION_SELECT = Object.freeze({
 
 export function createPaymentsRepository(prismaClient = prisma) {
   return {
+    async findCheckoutBlockingSubscription({ userId }) {
+      return prismaClient.subscription.findFirst({
+        where: {
+          userId,
+          status: { in: ['PENDING', 'ACTIVE', 'TRIALING', 'PAST_DUE'] },
+          plan: {
+            is: {
+              key: { in: [...PRO_PLAN_KEYS] },
+            },
+          },
+        },
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+        select: {
+          id: true,
+          status: true,
+          provider: true,
+          externalSubscriptionId: true,
+          plan: {
+            select: {
+              key: true,
+            },
+          },
+        },
+      });
+    },
+
     async createOrReuseCheckoutAttempt({ userId, planKey, provider, now, expiresAt }) {
       const plan = await prismaClient.plan.findUnique({
         where: { key: planKey },
