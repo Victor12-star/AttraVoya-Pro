@@ -297,7 +297,8 @@ const PURCHASE_COPY = Object.freeze({
   en: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Choose your Pro plan',
-    purchaseIntro: 'Prices are loaded from the payment provider and verified by the AttraVoya server.',
+    purchaseIntro:
+      'Prices are loaded from the payment provider and verified by the AttraVoya server.',
     loadingPlans: 'Loading current subscription options…',
     purchaseLoadError: 'Subscription options could not be loaded right now.',
     checkoutError: 'Secure checkout could not be started. Please try again.',
@@ -305,8 +306,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Opening secure checkout…',
     month: 'month',
     year: 'year',
-    purchaseSafety: 'Payment is completed on Stripe. Pro access appears only after verified billing confirmation.',
-    checkoutReturned: 'Payment return received. AttraVoya is verifying your subscription before Pro access is updated.',
+    purchaseSafety:
+      'Payment is completed on Stripe. Pro access appears only after verified billing confirmation.',
+    checkoutReturned:
+      'Payment return received. AttraVoya is verifying your subscription before Pro access is updated.',
     checkoutCancelled: 'Checkout was cancelled. Your current plan has not changed.',
   },
   sv: {
@@ -320,14 +323,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Öppnar säker betalning…',
     month: 'månad',
     year: 'år',
-    purchaseSafety: 'Betalningen genomförs hos Stripe. Pro-åtkomst visas först efter verifierad betalningsbekräftelse.',
-    checkoutReturned: 'Betalningsreturen har tagits emot. AttraVoya verifierar prenumerationen innan Pro-åtkomst uppdateras.',
+    purchaseSafety:
+      'Betalningen genomförs hos Stripe. Pro-åtkomst visas först efter verifierad betalningsbekräftelse.',
+    checkoutReturned:
+      'Betalningsreturen har tagits emot. AttraVoya verifierar prenumerationen innan Pro-åtkomst uppdateras.',
     checkoutCancelled: 'Betalningen avbröts. Din nuvarande plan har inte ändrats.',
   },
   es: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Elige tu plan Pro',
-    purchaseIntro: 'Los precios se cargan desde el proveedor de pagos y el servidor de AttraVoya los verifica.',
+    purchaseIntro:
+      'Los precios se cargan desde el proveedor de pagos y el servidor de AttraVoya los verifica.',
     loadingPlans: 'Cargando las opciones de suscripción actuales…',
     purchaseLoadError: 'No se pudieron cargar las opciones de suscripción.',
     checkoutError: 'No se pudo iniciar el pago seguro. Inténtalo de nuevo.',
@@ -335,14 +341,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Abriendo el pago seguro…',
     month: 'mes',
     year: 'año',
-    purchaseSafety: 'El pago se completa en Stripe. El acceso Pro aparece solo tras la confirmación verificada del pago.',
-    checkoutReturned: 'Se recibió el retorno del pago. AttraVoya está verificando tu suscripción antes de actualizar el acceso Pro.',
+    purchaseSafety:
+      'El pago se completa en Stripe. El acceso Pro aparece solo tras la confirmación verificada del pago.',
+    checkoutReturned:
+      'Se recibió el retorno del pago. AttraVoya está verificando tu suscripción antes de actualizar el acceso Pro.',
     checkoutCancelled: 'El pago fue cancelado. Tu plan actual no ha cambiado.',
   },
   fr: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Choisissez votre forfait Pro',
-    purchaseIntro: 'Les prix sont chargés depuis le prestataire de paiement et vérifiés par le serveur AttraVoya.',
+    purchaseIntro:
+      'Les prix sont chargés depuis le prestataire de paiement et vérifiés par le serveur AttraVoya.',
     loadingPlans: 'Chargement des options d’abonnement actuelles…',
     purchaseLoadError: 'Impossible de charger les options d’abonnement pour le moment.',
     checkoutError: 'Le paiement sécurisé n’a pas pu démarrer. Réessayez.',
@@ -350,8 +359,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Ouverture du paiement sécurisé…',
     month: 'mois',
     year: 'an',
-    purchaseSafety: 'Le paiement est effectué sur Stripe. L’accès Pro apparaît uniquement après confirmation de facturation vérifiée.',
-    checkoutReturned: 'Retour de paiement reçu. AttraVoya vérifie votre abonnement avant de mettre à jour l’accès Pro.',
+    purchaseSafety:
+      'Le paiement est effectué sur Stripe. L’accès Pro apparaît uniquement après confirmation de facturation vérifiée.',
+    checkoutReturned:
+      'Retour de paiement reçu. AttraVoya vérifie votre abonnement avant de mettre à jour l’accès Pro.',
     checkoutCancelled: 'Le paiement a été annulé. Votre forfait actuel n’a pas changé.',
   },
   de: {
@@ -365,14 +376,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Sicherer Checkout wird geöffnet…',
     month: 'Monat',
     year: 'Jahr',
-    purchaseSafety: 'Die Zahlung erfolgt bei Stripe. Pro-Zugriff erscheint erst nach verifizierter Zahlungsbestätigung.',
-    checkoutReturned: 'Die Zahlungsrückkehr wurde empfangen. AttraVoya prüft dein Abonnement, bevor Pro-Zugriff aktualisiert wird.',
+    purchaseSafety:
+      'Die Zahlung erfolgt bei Stripe. Pro-Zugriff erscheint erst nach verifizierter Zahlungsbestätigung.',
+    checkoutReturned:
+      'Die Zahlungsrückkehr wurde empfangen. AttraVoya prüft dein Abonnement, bevor Pro-Zugriff aktualisiert wird.',
     checkoutCancelled: 'Der Checkout wurde abgebrochen. Dein aktueller Tarif wurde nicht geändert.',
   },
   it: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Scegli il tuo piano Pro',
-    purchaseIntro: 'I prezzi vengono caricati dal provider di pagamento e verificati dal server AttraVoya.',
+    purchaseIntro:
+      'I prezzi vengono caricati dal provider di pagamento e verificati dal server AttraVoya.',
     loadingPlans: 'Caricamento delle opzioni di abbonamento attuali…',
     purchaseLoadError: 'Impossibile caricare le opzioni di abbonamento.',
     checkoutError: 'Impossibile avviare il pagamento sicuro. Riprova.',
@@ -380,14 +394,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Apertura del pagamento sicuro…',
     month: 'mese',
     year: 'anno',
-    purchaseSafety: 'Il pagamento viene completato su Stripe. L’accesso Pro appare solo dopo la conferma di fatturazione verificata.',
-    checkoutReturned: 'Ritorno dal pagamento ricevuto. AttraVoya sta verificando l’abbonamento prima di aggiornare l’accesso Pro.',
+    purchaseSafety:
+      'Il pagamento viene completato su Stripe. L’accesso Pro appare solo dopo la conferma di fatturazione verificata.',
+    checkoutReturned:
+      'Ritorno dal pagamento ricevuto. AttraVoya sta verificando l’abbonamento prima di aggiornare l’accesso Pro.',
     checkoutCancelled: 'Il pagamento è stato annullato. Il tuo piano attuale non è cambiato.',
   },
   pt: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Escolha o seu plano Pro',
-    purchaseIntro: 'Os preços são carregados do fornecedor de pagamentos e verificados pelo servidor AttraVoya.',
+    purchaseIntro:
+      'Os preços são carregados do fornecedor de pagamentos e verificados pelo servidor AttraVoya.',
     loadingPlans: 'A carregar as opções de subscrição atuais…',
     purchaseLoadError: 'Não foi possível carregar as opções de subscrição.',
     checkoutError: 'Não foi possível iniciar o pagamento seguro. Tente novamente.',
@@ -395,14 +412,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'A abrir o pagamento seguro…',
     month: 'mês',
     year: 'ano',
-    purchaseSafety: 'O pagamento é concluído na Stripe. O acesso Pro aparece apenas após confirmação de faturação verificada.',
-    checkoutReturned: 'O retorno do pagamento foi recebido. A AttraVoya está a verificar a subscrição antes de atualizar o acesso Pro.',
+    purchaseSafety:
+      'O pagamento é concluído na Stripe. O acesso Pro aparece apenas após confirmação de faturação verificada.',
+    checkoutReturned:
+      'O retorno do pagamento foi recebido. A AttraVoya está a verificar a subscrição antes de atualizar o acesso Pro.',
     checkoutCancelled: 'O pagamento foi cancelado. O seu plano atual não mudou.',
   },
   pl: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Wybierz plan Pro',
-    purchaseIntro: 'Ceny są pobierane od operatora płatności i weryfikowane przez serwer AttraVoya.',
+    purchaseIntro:
+      'Ceny są pobierane od operatora płatności i weryfikowane przez serwer AttraVoya.',
     loadingPlans: 'Ładowanie aktualnych opcji subskrypcji…',
     purchaseLoadError: 'Nie udało się teraz wczytać opcji subskrypcji.',
     checkoutError: 'Nie udało się rozpocząć bezpiecznej płatności. Spróbuj ponownie.',
@@ -410,14 +430,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Otwieranie bezpiecznej płatności…',
     month: 'miesiąc',
     year: 'rok',
-    purchaseSafety: 'Płatność jest realizowana w Stripe. Dostęp Pro pojawi się dopiero po zweryfikowanym potwierdzeniu płatności.',
-    checkoutReturned: 'Otrzymano powrót z płatności. AttraVoya weryfikuje subskrypcję przed aktualizacją dostępu Pro.',
+    purchaseSafety:
+      'Płatność jest realizowana w Stripe. Dostęp Pro pojawi się dopiero po zweryfikowanym potwierdzeniu płatności.',
+    checkoutReturned:
+      'Otrzymano powrót z płatności. AttraVoya weryfikuje subskrypcję przed aktualizacją dostępu Pro.',
     checkoutCancelled: 'Płatność została anulowana. Twój obecny plan nie został zmieniony.',
   },
   nl: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Kies je Pro-abonnement',
-    purchaseIntro: 'Prijzen worden geladen bij de betaalprovider en door de AttraVoya-server gecontroleerd.',
+    purchaseIntro:
+      'Prijzen worden geladen bij de betaalprovider en door de AttraVoya-server gecontroleerd.',
     loadingPlans: 'Huidige abonnementsopties laden…',
     purchaseLoadError: 'De abonnementsopties konden niet worden geladen.',
     checkoutError: 'De beveiligde betaling kon niet worden gestart. Probeer opnieuw.',
@@ -425,8 +448,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Beveiligde betaling openen…',
     month: 'maand',
     year: 'jaar',
-    purchaseSafety: 'De betaling wordt voltooid bij Stripe. Pro-toegang verschijnt pas na geverifieerde betalingsbevestiging.',
-    checkoutReturned: 'Terugkeer van betaling ontvangen. AttraVoya verifieert je abonnement voordat Pro-toegang wordt bijgewerkt.',
+    purchaseSafety:
+      'De betaling wordt voltooid bij Stripe. Pro-toegang verschijnt pas na geverifieerde betalingsbevestiging.',
+    checkoutReturned:
+      'Terugkeer van betaling ontvangen. AttraVoya verifieert je abonnement voordat Pro-toegang wordt bijgewerkt.',
     checkoutCancelled: 'De betaling is geannuleerd. Je huidige abonnement is niet gewijzigd.',
   },
   no: {
@@ -440,8 +465,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Åpner sikker betaling…',
     month: 'måned',
     year: 'år',
-    purchaseSafety: 'Betalingen fullføres hos Stripe. Pro-tilgang vises først etter verifisert betalingsbekreftelse.',
-    checkoutReturned: 'Betalingsretur mottatt. AttraVoya verifiserer abonnementet før Pro-tilgang oppdateres.',
+    purchaseSafety:
+      'Betalingen fullføres hos Stripe. Pro-tilgang vises først etter verifisert betalingsbekreftelse.',
+    checkoutReturned:
+      'Betalingsretur mottatt. AttraVoya verifiserer abonnementet før Pro-tilgang oppdateres.',
     checkoutCancelled: 'Betalingen ble avbrutt. Gjeldende plan er ikke endret.',
   },
   da: {
@@ -455,8 +482,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Åbner sikker betaling…',
     month: 'måned',
     year: 'år',
-    purchaseSafety: 'Betalingen gennemføres hos Stripe. Pro-adgang vises først efter verificeret betalingsbekræftelse.',
-    checkoutReturned: 'Betalingsretur modtaget. AttraVoya verificerer abonnementet, før Pro-adgangen opdateres.',
+    purchaseSafety:
+      'Betalingen gennemføres hos Stripe. Pro-adgang vises først efter verificeret betalingsbekræftelse.',
+    checkoutReturned:
+      'Betalingsretur modtaget. AttraVoya verificerer abonnementet, før Pro-adgangen opdateres.',
     checkoutCancelled: 'Betalingen blev annulleret. Din nuværende plan er ikke ændret.',
   },
   fi: {
@@ -470,14 +499,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Avataan turvallista maksua…',
     month: 'kuukausi',
     year: 'vuosi',
-    purchaseSafety: 'Maksu suoritetaan Stripessä. Pro-oikeus näkyy vasta vahvistetun laskutusvahvistuksen jälkeen.',
-    checkoutReturned: 'Maksupaluu vastaanotettu. AttraVoya vahvistaa tilauksen ennen Pro-oikeuden päivittämistä.',
+    purchaseSafety:
+      'Maksu suoritetaan Stripessä. Pro-oikeus näkyy vasta vahvistetun laskutusvahvistuksen jälkeen.',
+    checkoutReturned:
+      'Maksupaluu vastaanotettu. AttraVoya vahvistaa tilauksen ennen Pro-oikeuden päivittämistä.',
     checkoutCancelled: 'Maksu peruttiin. Nykyinen tilauksesi ei muuttunut.',
   },
   tr: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'Pro planınızı seçin',
-    purchaseIntro: 'Fiyatlar ödeme sağlayıcısından yüklenir ve AttraVoya sunucusu tarafından doğrulanır.',
+    purchaseIntro:
+      'Fiyatlar ödeme sağlayıcısından yüklenir ve AttraVoya sunucusu tarafından doğrulanır.',
     loadingPlans: 'Mevcut abonelik seçenekleri yükleniyor…',
     purchaseLoadError: 'Abonelik seçenekleri şu anda yüklenemedi.',
     checkoutError: 'Güvenli ödeme başlatılamadı. Lütfen tekrar deneyin.',
@@ -485,8 +517,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'Güvenli ödeme açılıyor…',
     month: 'ay',
     year: 'yıl',
-    purchaseSafety: 'Ödeme Stripe üzerinde tamamlanır. Pro erişimi yalnızca doğrulanmış ödeme onayından sonra görünür.',
-    checkoutReturned: 'Ödeme dönüşü alındı. AttraVoya, Pro erişimini güncellemeden önce aboneliğinizi doğruluyor.',
+    purchaseSafety:
+      'Ödeme Stripe üzerinde tamamlanır. Pro erişimi yalnızca doğrulanmış ödeme onayından sonra görünür.',
+    checkoutReturned:
+      'Ödeme dönüşü alındı. AttraVoya, Pro erişimini güncellemeden önce aboneliğinizi doğruluyor.',
     checkoutCancelled: 'Ödeme iptal edildi. Mevcut planınız değişmedi.',
   },
   ar: {
@@ -530,8 +564,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: '安全な決済を開いています…',
     month: '月',
     year: '年',
-    purchaseSafety: '支払いは Stripe で完了します。Pro アクセスは検証済みの請求確認後にのみ反映されます。',
-    checkoutReturned: '支払いから戻りました。AttraVoya がサブスクリプションを検証してから Pro アクセスを更新します。',
+    purchaseSafety:
+      '支払いは Stripe で完了します。Pro アクセスは検証済みの請求確認後にのみ反映されます。',
+    checkoutReturned:
+      '支払いから戻りました。AttraVoya がサブスクリプションを検証してから Pro アクセスを更新します。',
     checkoutCancelled: '決済はキャンセルされました。現在のプランは変更されていません。',
   },
   ko: {
@@ -545,14 +581,17 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: '안전한 결제를 여는 중…',
     month: '월',
     year: '년',
-    purchaseSafety: '결제는 Stripe에서 완료됩니다. Pro 접근 권한은 검증된 결제 확인 후에만 표시됩니다.',
-    checkoutReturned: '결제에서 돌아왔습니다. AttraVoya가 구독을 검증한 후 Pro 접근 권한을 업데이트합니다.',
+    purchaseSafety:
+      '결제는 Stripe에서 완료됩니다. Pro 접근 권한은 검증된 결제 확인 후에만 표시됩니다.',
+    checkoutReturned:
+      '결제에서 돌아왔습니다. AttraVoya가 구독을 검증한 후 Pro 접근 권한을 업데이트합니다.',
     checkoutCancelled: '결제가 취소되었습니다. 현재 요금제는 변경되지 않았습니다.',
   },
   hi: {
     proOptionsLabel: 'AttraVoya Pro',
     purchaseTitle: 'अपना Pro प्लान चुनें',
-    purchaseIntro: 'कीमतें भुगतान प्रदाता से लोड होती हैं और AttraVoya सर्वर द्वारा सत्यापित की जाती हैं।',
+    purchaseIntro:
+      'कीमतें भुगतान प्रदाता से लोड होती हैं और AttraVoya सर्वर द्वारा सत्यापित की जाती हैं।',
     loadingPlans: 'वर्तमान सदस्यता विकल्प लोड हो रहे हैं…',
     purchaseLoadError: 'सदस्यता विकल्प अभी लोड नहीं हो सके।',
     checkoutError: 'सुरक्षित भुगतान शुरू नहीं हो सका। फिर से प्रयास करें।',
@@ -560,8 +599,10 @@ const PURCHASE_COPY = Object.freeze({
     checkoutRedirecting: 'सुरक्षित भुगतान खुल रहा है…',
     month: 'महीना',
     year: 'वर्ष',
-    purchaseSafety: 'भुगतान Stripe पर पूरा होता है। Pro पहुँच केवल सत्यापित बिलिंग पुष्टि के बाद दिखाई देती है।',
-    checkoutReturned: 'भुगतान से वापसी प्राप्त हुई। Pro पहुँच अपडेट करने से पहले AttraVoya आपकी सदस्यता सत्यापित कर रहा है।',
+    purchaseSafety:
+      'भुगतान Stripe पर पूरा होता है। Pro पहुँच केवल सत्यापित बिलिंग पुष्टि के बाद दिखाई देती है।',
+    checkoutReturned:
+      'भुगतान से वापसी प्राप्त हुई। Pro पहुँच अपडेट करने से पहले AttraVoya आपकी सदस्यता सत्यापित कर रहा है।',
     checkoutCancelled: 'भुगतान रद्द किया गया। आपका वर्तमान प्लान नहीं बदला है।',
   },
 });

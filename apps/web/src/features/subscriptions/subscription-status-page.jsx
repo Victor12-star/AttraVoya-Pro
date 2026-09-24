@@ -107,7 +107,8 @@ export function normalizeStripePlanCatalog(response) {
     }
 
     const expectedInterval = planKey === 'PRO_MONTHLY' ? 'month' : 'year';
-    if (interval !== expectedInterval || plans.some((item) => item.planKey === planKey)) return null;
+    if (interval !== expectedInterval || plans.some((item) => item.planKey === planKey))
+      return null;
 
     plans.push({ planKey, name, unitAmount, currency, interval });
   }
@@ -293,7 +294,9 @@ export function SubscriptionStatusPage({ locale = 'en', copy, common, signInLabe
       setPurchase((current) => ({ ...current, status: 'redirecting', selected: planKey }));
 
       try {
-        const checkoutUrl = normalizeStripeCheckoutUrl(await apiClient.createStripeCheckout(planKey));
+        const checkoutUrl = normalizeStripeCheckoutUrl(
+          await apiClient.createStripeCheckout(planKey),
+        );
         if (!checkoutUrl || typeof globalThis.location?.assign !== 'function') {
           throw new Error('Invalid checkout destination');
         }

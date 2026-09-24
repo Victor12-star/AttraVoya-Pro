@@ -65,9 +65,7 @@ describe('SubscriptionStatusPage', () => {
     expect(await screen.findByRole('heading', { name: 'Free', level: 2 })).toBeInTheDocument();
     expect(screen.getByText(copy.freeDetail)).toBeInTheDocument();
     expect(await screen.findByText(copy.purchaseUnavailable)).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /secure checkout/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /secure checkout/i })).not.toBeInTheDocument();
   });
 
   it('renders only server-validated Stripe plan pricing when checkout is available', async () => {
@@ -104,7 +102,9 @@ describe('SubscriptionStatusPage', () => {
 
     renderPage('en');
 
-    expect(await screen.findByRole('heading', { name: 'Pro Monthly', level: 3 })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Pro Monthly', level: 3 }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Pro Yearly', level: 3 })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: `${copy.checkoutButton}: Pro Monthly` }),
