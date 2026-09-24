@@ -16,18 +16,13 @@ describe('payments API client', () => {
       planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
     };
     const fetchImpl = vi.fn(async (url, options) => {
-      expect(String(url)).toBe(
-        'http://localhost:5000/api/v1/payments/checkout/availability',
-      );
+      expect(String(url)).toBe('http://localhost:5000/api/v1/payments/checkout/availability');
       expect(options.method).toBe('GET');
       expect(options.credentials).toBe('include');
       expect(options.cache).toBe('no-store');
       return jsonResponse(payload);
     });
-    const client = createApiClient({
-      baseUrl: 'http://localhost:5000',
-      fetchImpl,
-    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
     await expect(client.getStripeCheckoutAvailability()).resolves.toEqual(payload);
   });
