@@ -124,4 +124,17 @@ describe('Stripe plan catalog', () => {
       }),
     ).toThrow('Stripe Price configuration is invalid.');
   });
+
+  it('rejects one Stripe Price identity being reused for both plans', () => {
+    expect(() =>
+      createStripePlanCatalogService({
+        secretKey: 'stripe-secret-placeholder-123456',
+        priceIds: {
+          [PLANS.PRO_MONTHLY]: 'price_shared_server',
+          [PLANS.PRO_YEARLY]: 'price_shared_server',
+        },
+        httpClient: { requestJson: vi.fn() },
+      }),
+    ).toThrow('Stripe Price configuration must use distinct plan identities.');
+  });
 });
