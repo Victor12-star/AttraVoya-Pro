@@ -3,7 +3,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createPaymentsRepository } from './payments.repository.js';
 import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-product-policy.js';
-import { establishVerifiedRevenueCatAndroidSubscriptionOwnership } from './payments.revenuecat-subscription-ownership.js';
+import {
+  establishVerifiedRevenueCatAndroidSubscriptionOwnership,
+} from './payments.revenuecat-subscription-ownership.js';
 import { createBillingVerificationBoundary } from './payments.verification.js';
 
 const OWNED_ID = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
@@ -286,6 +288,38 @@ describe('provider subscription ownership repository', () => {
 
     expect(conflicting).toMatchObject({
       outcome: 'PROVIDER_IDENTITY_CONFLICT',
+      created: false,
+    });
+  });
+
+  it('reuses exact existing ownership even when the internal plan is later inactive', async () => {
+    const existing = pendingSubscription({ status: 'ACTIVE' });
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        plan: {
+          findUnique: vi.fn(async () => ({
+            id: 'plan-pro-monthly',
+            key: PLANS.PRO_MONTHLY,
+            isActive: false,
+          })),
+        },
+        subscription: {
+          findUnique: vi.fn(async () => existing),
+          create: vi.fn(),
+        },
+      }),
+    );
+
+    const result = await repository.createOrReuseProviderSubscriptionOwnership({
+      userId: 'user-1',
+      planKey: PLANS.PRO_MONTHLY,
+      provider: 'revenuecat',
+      externalSubscriptionId: existing.externalSubscriptionId,
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'EXISTING',
+      subscription: existing,
       created: false,
     });
   });
