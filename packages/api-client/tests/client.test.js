@@ -27,6 +27,48 @@ describe('API client', () => {
     });
   });
 
+
+  it('uses no-store semantics for Stripe checkout discovery and sends only the internal plan key', async () => {
+    const calls = [];
+    const fetchImpl = vi.fn(async (url, options) => {
+      calls.push({ url: String(url), options });
+      return new Response(
+        JSON.stringify(
+          String(url).endsWith('/availability')
+            ? { available: true, planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'] }
+            : String(url).endsWith('/plans')
+              ? { plans: [] }
+              : { checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_example' },
+        ),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    await client.getStripeCheckoutAvailability();
+    await client.getStripePlanCatalog();
+    await client.createStripeCheckout('PRO_MONTHLY');
+
+    expect(calls[0].url).toBe('http://localhost:5000/api/v1/payments/checkout/availability');
+    expect(calls[0].options.cache).toBe('no-store');
+    expect(calls[1].url).toBe('http://localhost:5000/api/v1/payments/checkout/stripe/plans');
+    expect(calls[1].options.cache).toBe('no-store');
+    expect(calls[2].url).toBe('http://localhost:5000/api/v1/payments/checkout/stripe');
+    expect(calls[2].options.method).toBe('POST');
+    expect(calls[2].options.cache).toBe('no-store');
+    expect(JSON.parse(calls[2].options.body)).toEqual({ planKey: 'PRO_MONTHLY' });
+  });
+
+  it('rejects unknown Stripe checkout plan keys before making a network request', async () => {
+    const fetchImpl = vi.fn();
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    expect(() => client.createStripeCheckout('FREE')).toThrow(
+      'Checkout plan must be PRO_MONTHLY or PRO_YEARLY.',
+    );
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
   it('adds a mobile Bearer token only when supplied by the caller', async () => {
     const fetchImpl = vi.fn(async (_url, options) => {
       expect(options.headers.get('authorization')).toBe('Bearer mobile-token');
