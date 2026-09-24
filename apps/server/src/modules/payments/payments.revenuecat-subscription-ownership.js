@@ -55,10 +55,7 @@ export async function establishVerifiedRevenueCatAndroidSubscriptionOwnership({
     throw new ConflictError('RevenueCat subscription ownership conflicts with existing state.');
   }
 
-  if (
-    (result.outcome !== 'CREATED' && result.outcome !== 'EXISTING') ||
-    !result.subscription
-  ) {
+  if ((result.outcome !== 'CREATED' && result.outcome !== 'EXISTING') || !result.subscription) {
     throw new ConflictError('RevenueCat subscription ownership could not be established safely.');
   }
 
