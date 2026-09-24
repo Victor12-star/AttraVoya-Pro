@@ -40,7 +40,7 @@
     "api:restart:check": "node scripts/api-restart-recovery-check.js",
     "api:database-outage:check": "node scripts/api-database-outage-recovery-check.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write . && git diff --exit-code",
     "clean": "turbo run clean",
     "db:generate": "pnpm --filter @attravoya/database generate",
     "db:migrate": "pnpm --filter @attravoya/database migrate:dev",
