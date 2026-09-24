@@ -75,6 +75,14 @@ function safeStripePrice(response, definition, expectedPriceId) {
 /**
  * Server-authoritative display catalog for configured Stripe subscription
  * prices. Price IDs and the Stripe secret never leave this boundary.
+ *
+ * @param {{
+ *   secretKey: string,
+ *   priceIds: Record<string, string | undefined>,
+ *   httpClient?: { requestJson: (url: string, options?: any) => Promise<any> },
+ *   cache?: any,
+ *   cacheTtlSeconds?: number,
+ * }} options
  */
 export function createStripePlanCatalogService({
   secretKey,
