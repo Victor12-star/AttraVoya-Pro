@@ -42,7 +42,7 @@ describe('mobile profile screen', () => {
   });
 
   it('discloses deletion consequences before collecting confirmation', () => {
-    const result = await render(
+    const result = render(
       <ProfileContent
         onDeleteAccount={jest.fn()}
         onLogout={jest.fn()}
