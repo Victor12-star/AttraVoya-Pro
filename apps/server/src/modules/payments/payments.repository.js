@@ -40,6 +40,8 @@ const SUBSCRIPTION_SELECT = Object.freeze({
   planId: true,
   status: true,
   provider: true,
+  externalCustomerId: true,
+  externalSubscriptionId: true,
   currentPeriodEnd: true,
   providerStateUpdatedAt: true,
   canceledAt: true,
@@ -154,6 +156,167 @@ export function createPaymentsRepository(prismaClient = prisma) {
         },
         select: SUBSCRIPTION_SELECT,
       });
+    },
+
+    async applyVerifiedCheckoutCompletion({
+      eventId,
+      provider,
+      externalCheckoutSessionId,
+      externalSubscriptionId,
+      processedAt,
+    }) {
+      try {
+        return await prismaClient.$transaction(async (tx) => {
+          const event = await tx.billingEvent.findUnique({
+            where: { id: eventId },
+            select: EVENT_SELECT,
+          });
+
+          if (!event) return { outcome: 'EVENT_NOT_FOUND' };
+          if (event.provider !== provider) return { outcome: 'PROVIDER_MISMATCH', event };
+          if (event.processingStatus !== 'PENDING') {
+            return { outcome: 'ALREADY_PROCESSED', event };
+          }
+
+          const attempt = await tx.checkoutAttempt.findUnique({
+            where: {
+              provider_externalCheckoutSessionId: {
+                provider,
+                externalCheckoutSessionId,
+              },
+            },
+            select: CHECKOUT_ATTEMPT_SELECT,
+          });
+
+          if (!attempt) return { outcome: 'CHECKOUT_ATTEMPT_NOT_FOUND', event };
+          if (!attempt.plan?.isActive) {
+            return { outcome: 'PLAN_NOT_ACTIVE', event, attempt };
+          }
+
+          const existingSubscription = await tx.subscription.findUnique({
+            where: {
+              provider_externalSubscriptionId: {
+                provider,
+                externalSubscriptionId,
+              },
+            },
+            select: SUBSCRIPTION_SELECT,
+          });
+
+          if (
+            existingSubscription &&
+            (existingSubscription.userId !== attempt.userId ||
+              existingSubscription.planId !== attempt.plan.id)
+          ) {
+            return {
+              outcome: 'PROVIDER_IDENTITY_CONFLICT',
+              event,
+              attempt,
+              subscription: existingSubscription,
+            };
+          }
+
+          const isFreshOwnedAttempt =
+            attempt.status === 'SESSION_CREATED' && attempt.activeUserKey === attempt.userId;
+          const isAlreadyLinked =
+            attempt.status === 'COMPLETED' &&
+            attempt.activeUserKey === null &&
+            Boolean(existingSubscription);
+
+          if (!isFreshOwnedAttempt && !isAlreadyLinked) {
+            return {
+              outcome: 'CHECKOUT_ATTEMPT_STATE_CONFLICT',
+              event,
+              attempt,
+              subscription: existingSubscription,
+            };
+          }
+
+          const claimed = await tx.billingEvent.updateMany({
+            where: { id: eventId, processingStatus: 'PENDING' },
+            data: {
+              processingStatus: 'APPLIED',
+              processedAt,
+              failureCode: null,
+            },
+          });
+
+          if (claimed.count !== 1) {
+            const currentEvent = await tx.billingEvent.findUnique({
+              where: { id: eventId },
+              select: EVENT_SELECT,
+            });
+            return { outcome: 'ALREADY_PROCESSED', event: currentEvent };
+          }
+
+          let subscription = existingSubscription;
+          if (!subscription) {
+            subscription = await tx.subscription.create({
+              data: {
+                userId: attempt.userId,
+                planId: attempt.plan.id,
+                status: 'PENDING',
+                provider,
+                externalSubscriptionId,
+              },
+              select: SUBSCRIPTION_SELECT,
+            });
+          }
+
+          const completed = await tx.checkoutAttempt.updateMany({
+            where: {
+              id: attempt.id,
+              userId: attempt.userId,
+              provider,
+              status: 'SESSION_CREATED',
+              activeUserKey: attempt.userId,
+              externalCheckoutSessionId,
+            },
+            data: {
+              status: 'COMPLETED',
+              activeUserKey: null,
+            },
+          });
+
+          if (completed.count !== 1) {
+            const currentAttempt = await tx.checkoutAttempt.findUnique({
+              where: { id: attempt.id },
+              select: CHECKOUT_ATTEMPT_SELECT,
+            });
+
+            if (
+              currentAttempt?.status !== 'COMPLETED' ||
+              currentAttempt.userId !== attempt.userId ||
+              currentAttempt.plan?.id !== attempt.plan.id
+            ) {
+              throw Object.assign(new Error('Checkout attempt changed during completion.'), {
+                code: 'CHECKOUT_ATTEMPT_STATE_CONFLICT',
+              });
+            }
+          }
+
+          const appliedEvent = await tx.billingEvent.update({
+            where: { id: eventId },
+            data: { subscriptionId: subscription.id },
+            select: EVENT_SELECT,
+          });
+
+          return {
+            outcome: existingSubscription ? 'ALREADY_LINKED' : 'APPLIED',
+            event: appliedEvent,
+            attempt,
+            subscription,
+          };
+        });
+      } catch (error) {
+        if (error?.code === 'P2002') {
+          return { outcome: 'PROVIDER_IDENTITY_CONFLICT' };
+        }
+        if (error?.code === 'CHECKOUT_ATTEMPT_STATE_CONFLICT') {
+          return { outcome: 'CHECKOUT_ATTEMPT_STATE_CONFLICT' };
+        }
+        throw error;
+      }
     },
 
     async finalizePendingEvent({ eventId, status, failureCode, processedAt }) {
