@@ -61,7 +61,6 @@ async function checkoutApp(create) {
 }
 
 describe('authenticated Stripe checkout ingress', () => {
-
   it('reports checkout unavailable without exposing provider configuration when purchase mode is disabled', async () => {
     const app = await buildApp({
       logger: false,
