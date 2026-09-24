@@ -204,6 +204,18 @@ Checkout attempts now default to 35 minutes and reject configured TTLs below 31 
 
 Phase 10CT exposes the existing server-owned Checkout Session orchestration through a narrow authenticated API entry point described below. This internal gateway still does not create an AttraVoya Subscription row from browser success or grant Pro from checkout success; verified provider reconciliation remains authoritative for subscription state.
 
+### Server-authoritative Stripe display pricing
+
+Phase 10CU adds authenticated `GET /api/v1/payments/checkout/stripe/plans` when Stripe purchase mode is enabled. The endpoint exists so web purchase UI can display provider-authoritative pricing instead of hard-coding or inventing subscription amounts.
+
+The server reads only the two configured Stripe Price identities with its server-only secret. Each provider response must match the configured Price ID, be active, use recurring per-unit licensed billing, contain a positive integer unit amount and three-letter currency, and match the expected one-month or one-year interval. Invalid or mismatched provider state fails closed rather than being shown to the user.
+
+The public projection contains only `planKey`, server-owned display name, `unitAmount` in the provider currency's minor unit, `currency`, and `interval`. Stripe Price IDs, authorization headers, product/provider internals, and the Stripe secret are never returned. The client can localize the safe amount/currency for display without becoming authoritative for checkout pricing.
+
+Validated display snapshots are cached briefly in the existing bounded process-local provider cache and concurrent misses are coalesced. This cache is presentation-only and never decides what Stripe charges: Checkout Session creation continues to use the separately configured server-owned Price ID.
+
+The catalog requires authentication, is registered only when purchase mode is enabled, has its own bounded read rate, and returns `private, no-store` to browsers. A successful catalog read does not create checkout ownership, mutate a subscription, or grant an entitlement.
+
 ### Authenticated Stripe checkout entry point
 
 Phase 10CT adds `POST /api/v1/payments/checkout/stripe` as the first authenticated purchase ingress. The route is registered only when server-side Stripe purchase mode is explicitly enabled; when purchase mode is disabled, the route does not exist.
