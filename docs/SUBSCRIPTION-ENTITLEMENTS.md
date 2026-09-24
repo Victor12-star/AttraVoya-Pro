@@ -202,7 +202,21 @@ The Stripe response is accepted only when it represents a subscription-mode `cs_
 
 Checkout attempts now default to 35 minutes and reject configured TTLs below 31 minutes, preserving a buffer above Stripe's 30-minute minimum explicit Session expiry. The provider `expires_at` is derived from the durable attempt expiry so provider and local ownership lifetimes stay aligned.
 
-This phase still does not expose an authenticated purchase endpoint, return a Checkout URL to a web/mobile client, create an AttraVoya Subscription row from a first purchase, enable a buy button, or grant Pro from checkout success. Those remain separately gated work, and verified provider reconciliation remains authoritative for subscription state.
+Phase 10CT exposes the existing server-owned Checkout Session orchestration through a narrow authenticated API entry point described below. This internal gateway still does not create an AttraVoya Subscription row from browser success or grant Pro from checkout success; verified provider reconciliation remains authoritative for subscription state.
+
+### Authenticated Stripe checkout entry point
+
+Phase 10CT adds `POST /api/v1/payments/checkout/stripe` as the first authenticated purchase ingress. The route is registered only when server-side Stripe purchase mode is explicitly enabled; when purchase mode is disabled, the route does not exist.
+
+The request body is strict and contains only one authoritative AttraVoya plan choice: `PRO_MONTHLY` or `PRO_YEARLY`. Authentication supplies the account identity. The client cannot submit Stripe Price IDs, amounts, currencies, billing intervals, customer IDs, subscription IDs, checkout-session IDs, success/cancel redirects, provider metadata, user ownership, idempotency keys, or entitlement claims.
+
+The route delegates to the existing durable CheckoutAttempt, duplicate-subscription guard, server-owned checkout policy, Stripe Checkout Session gateway, and one-time session binding. It has a dedicated low rate limit and small request-body ceiling because creating a provider checkout session is a credentialed write.
+
+Only the validated Stripe-hosted `checkoutUrl` is returned. Internal checkout-attempt IDs, Stripe session IDs, provider configuration, plan-to-Price mapping, subscription state, and entitlement state are not returned by this endpoint. The response is marked `private, no-store`.
+
+Stripe webhook raw-body parsing remains isolated to the webhook-only child Fastify scope. The authenticated checkout route therefore keeps ordinary validated JSON parsing while the webhook continues to receive exact raw bytes for signature verification.
+
+A successful API response means only that a hosted checkout session is available. It does not grant Pro, create authoritative active access, or prove payment completion. Checkout completion can create only non-entitling `PENDING` ownership, and later verified Stripe lifecycle state must still move that subscription to `ACTIVE` or `TRIALING` before the entitlement resolver can expose Pro.
 
 ### Verified checkout-completion ownership bridge
 
@@ -228,7 +242,7 @@ The intended evidence path is:
 
 Provider callbacks or purchase tokens must be verified server-side before they can create or change authoritative subscription state. Required future controls include signature/token verification, idempotency, replay protection, ownership checks, refund/revocation handling, database transactions, rate limiting, server-only secrets and privacy-safe audit events.
 
-The Stripe webhook trust chain, durable checkout ownership, and internal Stripe Checkout Session creation now exist, but no authenticated public purchase endpoint or buy UI is enabled yet. Until those client-facing purchase surfaces and mobile-store purchase integrations are separately implemented and verified, AttraVoya must not claim that users can purchase new subscriptions from the product.
+The Stripe webhook trust chain, durable checkout ownership, internal Stripe Checkout Session creation, and authenticated server checkout endpoint now exist. No buy/upgrade UI is enabled yet, and Android/iOS store purchase integrations remain separate work. Until those client-facing purchase surfaces are separately implemented and verified, AttraVoya must not claim that users can purchase new subscriptions from the visible product UI.
 
 ## Security boundary
 
