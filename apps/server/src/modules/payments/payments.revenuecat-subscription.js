@@ -61,7 +61,12 @@ function parseVerifiedRevenueCatEvent(rawPayload, evidence) {
     throw new ValidationError('RevenueCat lifecycle payload is invalid.');
   }
 
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload) || payload.api_version !== '1.0') {
+  if (
+    !payload ||
+    typeof payload !== 'object' ||
+    Array.isArray(payload) ||
+    payload.api_version !== '1.0'
+  ) {
     throw new ValidationError('RevenueCat lifecycle payload is invalid.');
   }
 
