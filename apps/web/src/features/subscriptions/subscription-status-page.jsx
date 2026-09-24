@@ -107,8 +107,9 @@ export function normalizeStripePlanCatalog(response) {
     }
 
     const expectedInterval = planKey === 'PRO_MONTHLY' ? 'month' : 'year';
-    if (interval !== expectedInterval || plans.some((item) => item.planKey === planKey))
+    if (interval !== expectedInterval || plans.some((item) => item.planKey === planKey)) {
       return null;
+    }
 
     plans.push({ planKey, name, unitAmount, currency, interval });
   }
