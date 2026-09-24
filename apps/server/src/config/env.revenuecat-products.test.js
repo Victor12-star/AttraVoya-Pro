@@ -50,8 +50,7 @@ describe('RevenueCat Android product environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
-          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID:
-            'attravoya_pro_v1:monthly-autorenewing',
+          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
         }),
       ),
     ).toThrow(
@@ -61,10 +60,8 @@ describe('RevenueCat Android product environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
-          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID:
-            'attravoya_pro_v1:monthly-autorenewing',
-          REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID:
-            'attravoya_pro_v1:monthly-autorenewing',
+          REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
+          REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
         }),
       ),
     ).toThrow(
@@ -77,8 +74,7 @@ describe('RevenueCat Android product environment contract', () => {
       loadEnvironment(
         baseEnvironment({
           REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'AttravoyaPro:monthly',
-          REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID:
-            'attravoya_pro_v1:yearly-autorenewing',
+          REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: 'attravoya_pro_v1:yearly-autorenewing',
         }),
       ),
     ).toThrow(/REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID/);
@@ -97,10 +93,8 @@ describe('RevenueCat Android product environment contract', () => {
   it('maps only the configured products to the two authoritative internal Pro plans', () => {
     const environment = loadEnvironment(
       baseEnvironment({
-        REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID:
-          'attravoya_pro_v1:monthly-autorenewing',
-        REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID:
-          'attravoya_pro_v1:yearly-autorenewing',
+        REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
+        REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: 'attravoya_pro_v1:yearly-autorenewing',
       }),
     );
 
