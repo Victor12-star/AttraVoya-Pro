@@ -3,6 +3,7 @@ import { ApiClientError } from './errors.js';
 const DEFAULT_TIMEOUT_MS = 12_000;
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
+const PRO_PLAN_KEYS = new Set(['PRO_MONTHLY', 'PRO_YEARLY']);
 
 function joinUrl(baseUrl, path) {
   return `${String(baseUrl).replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
@@ -27,6 +28,13 @@ function normalizeIdempotencyKey(value) {
     throw new TypeError('The planner idempotency key must contain 8 to 128 safe ASCII characters.');
   }
   return normalized;
+}
+
+function normalizeProPlanKey(value) {
+  if (typeof value !== 'string' || !PRO_PLAN_KEYS.has(value)) {
+    throw new TypeError('Checkout plan must be PRO_MONTHLY or PRO_YEARLY.');
+  }
+  return value;
 }
 
 function normalizeOpaqueId(value, label) {
@@ -298,6 +306,16 @@ export function createApiClient(options) {
     getStripeCheckoutAvailability: () =>
       request('/api/v1/payments/checkout/availability', {
         cache: 'no-store',
+      }),
+    getStripePlanCatalog: () =>
+      request('/api/v1/payments/checkout/stripe/plans', {
+        cache: 'no-store',
+      }),
+    createStripeCheckout: (planKey) =>
+      request('/api/v1/payments/checkout/stripe', {
+        method: 'POST',
+        cache: 'no-store',
+        body: { planKey: normalizeProPlanKey(planKey) },
       }),
     verifyEmail: (token) =>
       request('/api/v1/auth/verify-email', { method: 'POST', body: { token } }),
