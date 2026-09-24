@@ -82,88 +82,100 @@ export function createStripeCheckoutCompletionProcessor({ verificationBoundary, 
     throw new TypeError('Payments service is required.');
   }
 
+  async function processVerified({ rawPayload, evidence }) {
+    const recorded = await paymentsService.recordVerifiedEvent(evidence);
+    const eventId = recorded.event.id;
+
+    if (evidence.eventType !== EVENT_TYPE) {
+      const finalized = await paymentsService.finalizeVerifiedEvent({
+        eventId,
+        outcome: 'IGNORED',
+      });
+
+      return {
+        outcome: 'IGNORED',
+        duplicate: recorded.duplicate || finalized.duplicate,
+        event: finalized.event,
+        subscription: null,
+      };
+    }
+
+    let completion;
+    try {
+      completion = parseVerifiedCheckoutCompletion(rawPayload, evidence);
+    } catch (error) {
+      if (error instanceof StripeVerifiedCheckoutIdentityMismatchError) throw error;
+
+      const finalized = await paymentsService.finalizeVerifiedEvent({
+        eventId,
+        outcome: 'FAILED',
+        failureCode: 'STRIPE_CHECKOUT_COMPLETION_INVALID',
+      });
+
+      return {
+        outcome: 'FAILED',
+        duplicate: recorded.duplicate || finalized.duplicate,
+        failureCode: 'STRIPE_CHECKOUT_COMPLETION_INVALID',
+        event: finalized.event,
+        subscription: null,
+      };
+    }
+
+    try {
+      const applied = await paymentsService.applyVerifiedCheckoutCompletion({
+        eventId,
+        provider: 'stripe',
+        externalCheckoutSessionId: completion.externalCheckoutSessionId,
+        externalSubscriptionId: completion.externalSubscriptionId,
+      });
+
+      return {
+        outcome: applied.applied ? 'APPLIED' : 'DUPLICATE',
+        duplicate: recorded.duplicate || applied.duplicate,
+        event: applied.event,
+        subscription: applied.subscription,
+      };
+    } catch (error) {
+      let failureCode = null;
+      if (error?.code === 'NOT_FOUND') {
+        failureCode = 'CHECKOUT_ATTEMPT_NOT_FOUND';
+      } else if (error?.code === 'CONFLICT') {
+        failureCode = 'CHECKOUT_COMPLETION_CONFLICT';
+      }
+
+      if (!failureCode) throw error;
+
+      const finalized = await paymentsService.finalizeVerifiedEvent({
+        eventId,
+        outcome: 'FAILED',
+        failureCode,
+      });
+
+      return {
+        outcome: 'FAILED',
+        duplicate: recorded.duplicate || finalized.duplicate,
+        failureCode,
+        event: finalized.event,
+        subscription: null,
+      };
+    }
+  }
+
   return Object.freeze({
     /**
      * @param {{ rawPayload: Buffer, headers?: object }} input
      */
     async process({ rawPayload, headers = {} }) {
       const evidence = await verificationBoundary.verifyEvent({ rawPayload, headers });
-      const recorded = await paymentsService.recordVerifiedEvent(evidence);
-      const eventId = recorded.event.id;
-
-      if (evidence.eventType !== EVENT_TYPE) {
-        const finalized = await paymentsService.finalizeVerifiedEvent({
-          eventId,
-          outcome: 'IGNORED',
-        });
-
-        return {
-          outcome: 'IGNORED',
-          duplicate: recorded.duplicate || finalized.duplicate,
-          event: finalized.event,
-          subscription: null,
-        };
-      }
-
-      let completion;
-      try {
-        completion = parseVerifiedCheckoutCompletion(rawPayload, evidence);
-      } catch (error) {
-        if (error instanceof StripeVerifiedCheckoutIdentityMismatchError) throw error;
-
-        const finalized = await paymentsService.finalizeVerifiedEvent({
-          eventId,
-          outcome: 'FAILED',
-          failureCode: 'STRIPE_CHECKOUT_COMPLETION_INVALID',
-        });
-
-        return {
-          outcome: 'FAILED',
-          duplicate: recorded.duplicate || finalized.duplicate,
-          failureCode: 'STRIPE_CHECKOUT_COMPLETION_INVALID',
-          event: finalized.event,
-          subscription: null,
-        };
-      }
-
-      try {
-        const applied = await paymentsService.applyVerifiedCheckoutCompletion({
-          eventId,
-          provider: 'stripe',
-          externalCheckoutSessionId: completion.externalCheckoutSessionId,
-          externalSubscriptionId: completion.externalSubscriptionId,
-        });
-
-        return {
-          outcome: applied.applied ? 'APPLIED' : 'DUPLICATE',
-          duplicate: recorded.duplicate || applied.duplicate,
-          event: applied.event,
-          subscription: applied.subscription,
-        };
-      } catch (error) {
-        let failureCode = null;
-        if (error?.code === 'NOT_FOUND') {
-          failureCode = 'CHECKOUT_ATTEMPT_NOT_FOUND';
-        } else if (error?.code === 'CONFLICT') {
-          failureCode = 'CHECKOUT_COMPLETION_CONFLICT';
-        }
-
-        if (!failureCode) throw error;
-
-        const finalized = await paymentsService.finalizeVerifiedEvent({
-          eventId,
-          outcome: 'FAILED',
-          failureCode,
-        });
-
-        return {
-          outcome: 'FAILED',
-          duplicate: recorded.duplicate || finalized.duplicate,
-          failureCode,
-          event: finalized.event,
-          subscription: null,
-        };
-      }
+      return processVerified({ rawPayload, evidence });
     },
+
+    /**
+     * Continue from evidence already authenticated by the shared Stripe webhook
+     * verification boundary.
+     *
+     * @param {{ rawPayload: Buffer, evidence: any }} input
+     */
+    processVerified,
   });
 }
