@@ -110,7 +110,9 @@ describe('RevenueCat webhook ingress', () => {
     const input = process.mock.calls[0][0];
     expect(Buffer.isBuffer(input.rawPayload)).toBe(true);
     expect(input.rawPayload.equals(Buffer.from(rawPayload))).toBe(true);
-    expect(input.headers['x-revenuecat-webhook-signature']).toBe('t=123,v1=signature-placeholder');
+    expect(input.headers['x-revenuecat-webhook-signature']).toBe(
+      't=123,v1=signature-placeholder',
+    );
     expect(JSON.stringify(response.json())).not.toContain('must-not-leak');
   });
 
@@ -185,7 +187,9 @@ describe('RevenueCat webhook ingress', () => {
     expect(subscriberIdentityService.resolveOwnedUser).toHaveBeenCalledWith({
       appUserId: OWNED_ID,
     });
-    expect(paymentsRepository.createOrReuseProviderSubscriptionOwnership).toHaveBeenCalledWith({
+    expect(
+      paymentsRepository.createOrReuseProviderSubscriptionOwnership,
+    ).toHaveBeenCalledWith({
       userId: 'user-1',
       planKey: PLANS.PRO_MONTHLY,
       provider: 'revenuecat',
