@@ -203,8 +203,7 @@ export async function buildApp(options = {}) {
     checkoutAttemptService: options.checkoutAttemptService,
     paymentsRepository: options.paymentsRepository,
     checkoutNow: options.stripeCheckoutNow,
-    revenueCatWebhookEnabled:
-      options.revenueCatWebhookEnabled ?? env.REVENUECAT_WEBHOOK_ENABLED,
+    revenueCatWebhookEnabled: options.revenueCatWebhookEnabled ?? env.REVENUECAT_WEBHOOK_ENABLED,
     revenueCatWebhookSigningSecret:
       options.revenueCatWebhookSigningSecret ?? env.REVENUECAT_WEBHOOK_SIGNING_SECRET,
     revenueCatWebhookToleranceSeconds:
