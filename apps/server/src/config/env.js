@@ -78,6 +78,12 @@ const environmentSchema = z.object({
   STRIPE_WEBHOOK_SECRET: optionalSecret(16, 512),
   STRIPE_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
 
+  // RevenueCat webhook ingress is independently opt-in. The signing secret is
+  // server-only and authenticates exact raw webhook bytes before any JSON trust.
+  REVENUECAT_WEBHOOK_ENABLED: strictBoolean,
+  REVENUECAT_WEBHOOK_SIGNING_SECRET: optionalSecret(32, 512),
+  REVENUECAT_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
+
   // Purchase creation remains opt-in and disabled by default. These values are
   // server-only configuration; clients must never choose Stripe prices directly.
   STRIPE_PURCHASE_ENABLED: strictBoolean,
@@ -270,6 +276,25 @@ function validateStripePurchaseConfiguration(environment) {
   }
 }
 
+function validateRevenueCatWebhookConfiguration(environment) {
+  if (!environment.REVENUECAT_WEBHOOK_ENABLED) return;
+
+  if (!environment.REVENUECAT_WEBHOOK_SIGNING_SECRET?.trim()) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nREVENUECAT_WEBHOOK_SIGNING_SECRET: required when REVENUECAT_WEBHOOK_ENABLED=true.',
+    );
+  }
+
+  if (
+    !environment.REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID ||
+    !environment.REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID
+  ) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nRevenueCat Android product mapping is required when REVENUECAT_WEBHOOK_ENABLED=true.',
+    );
+  }
+}
+
 function validateRevenueCatAndroidProductConfiguration(environment) {
   const monthly = environment.REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID;
   const yearly = environment.REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID;
@@ -380,6 +405,7 @@ export function loadEnvironment(source = process.env) {
   validateStripeWebhookConfiguration(result.data);
   validateStripePurchaseConfiguration(result.data);
   validateRevenueCatAndroidProductConfiguration(result.data);
+  validateRevenueCatWebhookConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);
