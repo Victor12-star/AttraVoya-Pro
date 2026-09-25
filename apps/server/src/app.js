@@ -12,6 +12,7 @@ import { API_PREFIX, DEFAULT_BODY_LIMIT_BYTES, DEFAULT_RATE_LIMIT } from './conf
 import {
   env,
   providerRequestBudgetPoliciesFromEnvironment,
+  revenueCatAndroidProductIdsFromEnvironment,
   stripeCheckoutReturnUrlsFromEnvironment,
   stripePurchasePriceIdsFromEnvironment,
 } from './config/env.js';
@@ -202,6 +203,17 @@ export async function buildApp(options = {}) {
     checkoutAttemptService: options.checkoutAttemptService,
     paymentsRepository: options.paymentsRepository,
     checkoutNow: options.stripeCheckoutNow,
+    revenueCatWebhookEnabled: options.revenueCatWebhookEnabled ?? env.REVENUECAT_WEBHOOK_ENABLED,
+    revenueCatWebhookSigningSecret:
+      options.revenueCatWebhookSigningSecret ?? env.REVENUECAT_WEBHOOK_SIGNING_SECRET,
+    revenueCatWebhookToleranceSeconds:
+      options.revenueCatWebhookToleranceSeconds ?? env.REVENUECAT_WEBHOOK_TOLERANCE_SECONDS,
+    revenueCatWebhookNow: options.revenueCatWebhookNow,
+    revenueCatWebhookProcessor: options.revenueCatWebhookProcessor,
+    revenueCatAndroidProductIds:
+      options.revenueCatAndroidProductIds ?? revenueCatAndroidProductIdsFromEnvironment(env),
+    revenueCatProductPolicy: options.revenueCatProductPolicy,
+    revenueCatSubscriberIdentityService: options.revenueCatSubscriberIdentityService,
   });
 
   await app.register(healthRoutes, {

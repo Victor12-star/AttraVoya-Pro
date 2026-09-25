@@ -3,6 +3,7 @@ import {
   DEFAULT_BODY_LIMIT_BYTES,
   STRIPE_CHECKOUT_BODY_LIMIT_BYTES,
   STRIPE_CHECKOUT_RATE_LIMIT,
+  REVENUECAT_WEBHOOK_RATE_LIMIT,
   STRIPE_PLAN_CATALOG_RATE_LIMIT,
   STRIPE_WEBHOOK_RATE_LIMIT,
 } from '../../config/constants.js';
@@ -12,7 +13,14 @@ import { createStripePlanCatalogController } from './payments.plan-catalog-contr
 import { paymentsRepository } from './payments.repository.js';
 import { paymentsSchemas } from './payments.schema.js';
 import { paymentsService } from './payments.service.js';
-import { createPaymentsController } from './payments.controller.js';
+import {
+  createPaymentsController,
+  createRevenueCatWebhookController,
+} from './payments.controller.js';
+import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-product-policy.js';
+import { createRevenueCatSubscriptionEventProcessor } from './payments.revenuecat-processor.js';
+import { revenueCatSubscriberIdentityService } from './payments.revenuecat-subscriber-identity.js';
+import { createRevenueCatWebhookVerifier } from './payments.revenuecat-verification.js';
 import { createStripeCheckoutCompletionProcessor } from './payments.stripe-checkout-completion.js';
 import { createStripeCheckoutPolicy } from './payments.stripe-checkout-policy.js';
 import {
@@ -54,6 +62,36 @@ function createStripeProcessor(options) {
     verificationBoundary,
     subscriptionProcessor,
     checkoutCompletionProcessor,
+  });
+}
+
+function createRevenueCatProcessor(options) {
+  if (options.revenueCatWebhookProcessor) return options.revenueCatWebhookProcessor;
+
+  const verifyRevenueCatWebhook = createRevenueCatWebhookVerifier({
+    webhookSigningSecret: options.revenueCatWebhookSigningSecret,
+    toleranceSeconds: options.revenueCatWebhookToleranceSeconds,
+    now: options.revenueCatWebhookNow,
+  });
+  const verificationBoundary = createBillingVerificationBoundary({
+    provider: 'revenuecat',
+    verify: verifyRevenueCatWebhook,
+    now: options.revenueCatWebhookNow,
+    maxPayloadBytes: DEFAULT_BODY_LIMIT_BYTES,
+  });
+  const productPolicy =
+    options.revenueCatProductPolicy ??
+    createRevenueCatAndroidProductPolicy({
+      productIds: options.revenueCatAndroidProductIds,
+    });
+
+  return createRevenueCatSubscriptionEventProcessor({
+    verificationBoundary,
+    paymentsService: options.paymentsService ?? paymentsService,
+    productPolicy,
+    subscriberIdentityService:
+      options.revenueCatSubscriberIdentityService ?? revenueCatSubscriberIdentityService,
+    ownershipRepository: options.paymentsRepository ?? paymentsRepository,
   });
 }
 
@@ -155,28 +193,53 @@ export async function paymentsRoutes(app, options = {}) {
     });
   }
 
-  if (!options.stripeWebhookEnabled) return;
-
-  const processor = createStripeProcessor(options);
-  const controller = createPaymentsController({
-    stripeWebhookProcessor: processor,
-  });
-
-  await app.register(async function stripeWebhookIngress(webhookApp) {
-    webhookApp.removeContentTypeParser('application/json');
-    webhookApp.addContentTypeParser(
-      'application/json',
-      {
-        parseAs: 'buffer',
-        bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
-      },
-      (_request, body, done) => done(null, body),
-    );
-
-    webhookApp.post('/webhooks/stripe', {
-      bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
-      config: { rateLimit: STRIPE_WEBHOOK_RATE_LIMIT },
-      handler: controller.stripeWebhook,
+  if (options.stripeWebhookEnabled) {
+    const processor = createStripeProcessor(options);
+    const controller = createPaymentsController({
+      stripeWebhookProcessor: processor,
     });
-  });
+
+    await app.register(async function stripeWebhookIngress(webhookApp) {
+      webhookApp.removeContentTypeParser('application/json');
+      webhookApp.addContentTypeParser(
+        'application/json',
+        {
+          parseAs: 'buffer',
+          bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+        },
+        (_request, body, done) => done(null, body),
+      );
+
+      webhookApp.post('/webhooks/stripe', {
+        bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+        config: { rateLimit: STRIPE_WEBHOOK_RATE_LIMIT },
+        handler: controller.stripeWebhook,
+      });
+    });
+  }
+
+  if (options.revenueCatWebhookEnabled) {
+    const processor = createRevenueCatProcessor(options);
+    const controller = createRevenueCatWebhookController({
+      revenueCatWebhookProcessor: processor,
+    });
+
+    await app.register(async function revenueCatWebhookIngress(webhookApp) {
+      webhookApp.removeContentTypeParser('application/json');
+      webhookApp.addContentTypeParser(
+        'application/json',
+        {
+          parseAs: 'buffer',
+          bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+        },
+        (_request, body, done) => done(null, body),
+      );
+
+      webhookApp.post('/webhooks/revenuecat', {
+        bodyLimit: DEFAULT_BODY_LIMIT_BYTES,
+        config: { rateLimit: REVENUECAT_WEBHOOK_RATE_LIMIT },
+        handler: controller.revenueCatWebhook,
+      });
+    });
+  }
 }

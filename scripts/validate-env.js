@@ -60,6 +60,16 @@ if (stripeWebhookEnabled === 'true') {
   requireValue('STRIPE_WEBHOOK_SECRET', 16);
 }
 
+const revenueCatWebhookEnabled = env.REVENUECAT_WEBHOOK_ENABLED?.trim().toLowerCase();
+if (revenueCatWebhookEnabled && !['true', 'false'].includes(revenueCatWebhookEnabled)) {
+  errors.push('REVENUECAT_WEBHOOK_ENABLED must be either true or false.');
+}
+if (revenueCatWebhookEnabled === 'true') {
+  requireValue('REVENUECAT_WEBHOOK_SIGNING_SECRET', 32);
+  requireValue('REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID', 3);
+  requireValue('REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID', 3);
+}
+
 const stripePurchaseEnabled = env.STRIPE_PURCHASE_ENABLED?.trim().toLowerCase();
 if (stripePurchaseEnabled && !['true', 'false'].includes(stripePurchaseEnabled)) {
   errors.push('STRIPE_PURCHASE_ENABLED must be either true or false.');

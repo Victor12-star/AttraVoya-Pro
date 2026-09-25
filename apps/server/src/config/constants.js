@@ -41,6 +41,13 @@ export const STRIPE_WEBHOOK_RATE_LIMIT = Object.freeze({
   timeWindow: '1 minute',
 });
 
+// RevenueCat can retry lifecycle deliveries and may send short bursts after a
+// store event. Keep webhook abuse isolated from ordinary API traffic.
+export const REVENUECAT_WEBHOOK_RATE_LIMIT = Object.freeze({
+  max: 60,
+  timeWindow: '1 minute',
+});
+
 // Creating a hosted checkout session is a credentialed provider write. Keep it
 // deliberately tighter than ordinary API traffic; duplicate clicks remain
 // idempotent through the server-owned CheckoutAttempt and Stripe key.
