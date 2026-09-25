@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { z } from 'zod';
 
 import { createMobileApiClient } from '../services/api-client.js';
+import { createRevenueCatAuthSynchronizer } from '../services/revenuecat-auth-synchronizer.js';
 
 const MobileAuthContext = createContext(/** @type {any} */ (null));
 
@@ -93,9 +94,16 @@ export function safeAccountDeletionMessage(error) {
   return 'We could not delete your account. Please try again.';
 }
 
-/** @param {{children: import('react').ReactNode, client?: any}} props */
-export function MobileAuthProvider({ children, client: suppliedClient }) {
+/** @param {{children: import('react').ReactNode, client?: any, revenueCatSession?: any}} props */
+export function MobileAuthProvider({
+  children,
+  client: suppliedClient,
+  revenueCatSession: suppliedRevenueCatSession,
+}) {
   const [client] = useState(() => suppliedClient ?? createMobileApiClient());
+  const [revenueCatAuth] = useState(() =>
+    createRevenueCatAuthSynchronizer(suppliedRevenueCatSession),
+  );
   const [status, setStatus] = useState('loading');
   const [user, setUser] = useState(/** @type {any} */ (null));
   const [error, setError] = useState(/** @type {string | null} */ (null));
@@ -108,11 +116,17 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
         if (!active) return;
         setUser(session?.user ?? null);
         setStatus(session?.user ? 'authenticated' : 'anonymous');
+        if (session?.user) {
+          void revenueCatAuth.onAuthenticated();
+        } else {
+          void revenueCatAuth.onAnonymous();
+        }
       },
       (restoreError) => {
         if (!active) return;
         if (restoreError?.code === 'MOBILE_SESSION_EXPIRED') {
           setStatus('anonymous');
+          void revenueCatAuth.onAnonymous();
           return;
         }
         setError(safeAuthMessage(restoreError));
@@ -122,7 +136,7 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
     return () => {
       active = false;
     };
-  }, [client, restoreAttempt]);
+  }, [client, restoreAttempt, revenueCatAuth]);
 
   const login = useCallback(
     async (credentials) => {
@@ -131,6 +145,7 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
         const session = await client.mobileLogin(credentials);
         setUser(session.user);
         setStatus('authenticated');
+        void revenueCatAuth.onAuthenticated();
         return session.user;
       } catch (loginError) {
         const message = safeAuthMessage(loginError);
@@ -138,7 +153,7 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
         throw Object.assign(new Error(message), { code: loginError?.code });
       }
     },
-    [client],
+    [client, revenueCatAuth],
   );
 
   const logout = useCallback(async () => {
@@ -148,8 +163,9 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
     } finally {
       setUser(null);
       setStatus('anonymous');
+      void revenueCatAuth.onAnonymous();
     }
-  }, [client]);
+  }, [client, revenueCatAuth]);
 
   const deleteAccount = useCallback(
     async (password) => {
@@ -171,9 +187,10 @@ export function MobileAuthProvider({ children, client: suppliedClient }) {
       } finally {
         setUser(null);
         setStatus('anonymous');
+        void revenueCatAuth.onAnonymous();
       }
     },
-    [client],
+    [client, revenueCatAuth],
   );
 
   const register = useCallback(
