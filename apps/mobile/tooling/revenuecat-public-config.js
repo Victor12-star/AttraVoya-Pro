@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 const REVENUECAT_ANDROID_PUBLIC_KEY_PATTERN = /^goog_[A-Za-z0-9_-]{4,195}$/;
 
 function configurationError(message) {
