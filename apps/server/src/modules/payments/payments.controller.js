@@ -28,7 +28,6 @@ export function createPaymentsController({ stripeWebhookProcessor }) {
   };
 }
 
-
 /**
  * HTTP boundary for RevenueCat webhook delivery.
  *
