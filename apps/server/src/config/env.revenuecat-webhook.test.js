@@ -59,9 +59,7 @@ describe('RevenueCat webhook environment contract', () => {
           REVENUECAT_WEBHOOK_ENABLED: 'true',
         }),
       ),
-    ).toThrow(
-      /REVENUECAT_WEBHOOK_SIGNING_SECRET: required when REVENUECAT_WEBHOOK_ENABLED=true/,
-    );
+    ).toThrow(/REVENUECAT_WEBHOOK_SIGNING_SECRET: required when REVENUECAT_WEBHOOK_ENABLED=true/);
   });
 
   it('fails startup when ingress is enabled without authoritative Android product mapping', () => {
