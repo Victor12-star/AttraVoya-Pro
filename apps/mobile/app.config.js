@@ -1,5 +1,8 @@
+import { readRevenueCatAndroidPublicConfig } from './tooling/revenuecat-public-config.js';
+
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
 const easProjectId = process.env.EAS_PROJECT_ID;
+const revenueCatAndroid = readRevenueCatAndroidPublicConfig();
 
 /** @type {import('expo/config').ExpoConfig} */
 const appConfig = {
@@ -45,6 +48,7 @@ const appConfig = {
     // Expo public configuration is bundled into the app. Never place provider
     // credentials, authentication secrets, or database URLs in this object.
     apiBaseUrl,
+    revenueCatAndroid,
     ...(easProjectId
       ? {
           eas: {
