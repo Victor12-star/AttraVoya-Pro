@@ -1,9 +1,7 @@
 import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
 import { paymentsRepository } from './payments.repository.js';
 import { establishVerifiedRevenueCatAndroidSubscriptionOwnership } from './payments.revenuecat-subscription-ownership.js';
-import {
-  RevenueCatVerifiedIdentityMismatchError,
-} from './payments.revenuecat-subscription.js';
+import { RevenueCatVerifiedIdentityMismatchError } from './payments.revenuecat-subscription.js';
 import { mapVerifiedRevenueCatAndroidState } from './payments.revenuecat-state-policy.js';
 
 const REVENUECAT_SUBSCRIPTION_EVENT_TYPES = new Set([
