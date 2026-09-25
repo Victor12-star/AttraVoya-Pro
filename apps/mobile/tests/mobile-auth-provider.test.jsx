@@ -21,6 +21,9 @@ function AuthProbe() {
       <Pressable accessibilityRole="button" onPress={auth.retryRestore}>
         <Text>Retry restore</Text>
       </Pressable>
+      <Pressable accessibilityRole="button" onPress={() => void auth.logout()}>
+        <Text>Logout</Text>
+      </Pressable>
     </>
   );
 }
@@ -113,6 +116,74 @@ describe('mobile authentication provider', () => {
     await act(async () => fireEvent.press(getByText('Retry restore')));
     await waitFor(() => expect(getByText('authenticated')).toBeTruthy());
     expect(restoreMobileSession).toHaveBeenCalledTimes(2);
+  });
+
+  it('synchronizes RevenueCat after an authenticated session is restored', async () => {
+    const client = createClient({
+      restoreMobileSession: jest.fn(async () => ({
+        user: { id: 'user-1', email: 'user@example.test', roles: ['USER'], emailVerified: true },
+      })),
+    });
+    const revenueCatSession = {
+      syncAuthenticatedUser: jest.fn(async () => ({ status: 'configured' })),
+      clearAuthenticatedUser: jest.fn(async () => ({ status: 'anonymous' })),
+    };
+    const { getByText } = await render(
+      <MobileAuthProvider client={client} revenueCatSession={revenueCatSession}>
+        <AuthProbe />
+      </MobileAuthProvider>,
+    );
+
+    await waitFor(() => expect(getByText('authenticated')).toBeTruthy());
+    await waitFor(() => expect(revenueCatSession.syncAuthenticatedUser).toHaveBeenCalledTimes(1));
+    expect(revenueCatSession.clearAuthenticatedUser).not.toHaveBeenCalled();
+  });
+
+  it('keeps server authentication active when RevenueCat synchronization fails', async () => {
+    const client = createClient({
+      restoreMobileSession: jest.fn(async () => ({
+        user: { id: 'user-1', email: 'user@example.test', roles: ['USER'], emailVerified: true },
+      })),
+    });
+    const revenueCatSession = {
+      syncAuthenticatedUser: jest.fn(async () => {
+        throw new Error('provider unavailable');
+      }),
+      clearAuthenticatedUser: jest.fn(async () => ({ status: 'anonymous' })),
+    };
+    const { getByText, queryByText } = await render(
+      <MobileAuthProvider client={client} revenueCatSession={revenueCatSession}>
+        <AuthProbe />
+      </MobileAuthProvider>,
+    );
+
+    await waitFor(() => expect(getByText('authenticated')).toBeTruthy());
+    await waitFor(() => expect(revenueCatSession.syncAuthenticatedUser).toHaveBeenCalledTimes(1));
+    expect(queryByText(/provider unavailable/i)).toBeNull();
+  });
+
+  it('clears the RevenueCat identity when the application signs out', async () => {
+    const client = createClient({
+      restoreMobileSession: jest.fn(async () => ({
+        user: { id: 'user-1', email: 'user@example.test', roles: ['USER'], emailVerified: true },
+      })),
+    });
+    const revenueCatSession = {
+      syncAuthenticatedUser: jest.fn(async () => ({ status: 'configured' })),
+      clearAuthenticatedUser: jest.fn(async () => ({ status: 'anonymous' })),
+    };
+    const { getByText } = await render(
+      <MobileAuthProvider client={client} revenueCatSession={revenueCatSession}>
+        <AuthProbe />
+      </MobileAuthProvider>,
+    );
+
+    await waitFor(() => expect(getByText('authenticated')).toBeTruthy());
+    await act(async () => fireEvent.press(getByText('Logout')));
+
+    await waitFor(() => expect(getByText('anonymous')).toBeTruthy());
+    await waitFor(() => expect(revenueCatSession.clearAuthenticatedUser).toHaveBeenCalledTimes(1));
+    expect(client.mobileLogout).toHaveBeenCalledTimes(1);
   });
 
   it('validates registration responses before exposing them to the screen', () => {
