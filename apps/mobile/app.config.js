@@ -46,7 +46,7 @@ const appConfig = {
   ],
   extra: {
     // Expo public configuration is bundled into the app. Never place provider
-    // credentials, authentication secrets, or database URLs in this object.
+    // provider secrets, authentication secrets, or database URLs in this object.
     apiBaseUrl,
     revenueCatAndroid,
     ...(easProjectId
