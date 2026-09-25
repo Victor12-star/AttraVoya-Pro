@@ -34,9 +34,7 @@ export function createPaymentsController({ stripeWebhookProcessor }) {
  * The opaque App User ID is customer identity only. It is not entitlement
  * proof, purchase ownership proof, a provider secret, or an authorization token.
  */
-export function createRevenueCatAndroidIdentityController({
-  revenueCatSubscriberIdentityService,
-}) {
+export function createRevenueCatAndroidIdentityController({ revenueCatSubscriberIdentityService }) {
   if (!revenueCatSubscriberIdentityService?.getOrCreateForUser) {
     throw new TypeError('RevenueCat subscriber identity service is required.');
   }
