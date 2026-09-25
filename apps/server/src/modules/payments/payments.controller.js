@@ -28,7 +28,6 @@ export function createPaymentsController({ stripeWebhookProcessor }) {
   };
 }
 
-
 /**
  * Authenticated handoff for the current account's server-owned RevenueCat ID.
  *
