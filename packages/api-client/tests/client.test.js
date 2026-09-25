@@ -50,9 +50,7 @@ describe('API client', () => {
     async () => {
       const appUserId = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
       const fetchImpl = vi.fn(async (url, options) => {
-        expect(String(url)).toBe(
-          'http://localhost:5000/api/v1/payments/revenuecat/android/identity',
-        );
+        expect(String(url)).toBe('http://localhost:5000/api/v1/payments/revenuecat/android/identity');
         expect(options.method).toBe('GET');
         expect(options.cache).toBe('no-store');
         expect(options.body).toBeUndefined();
