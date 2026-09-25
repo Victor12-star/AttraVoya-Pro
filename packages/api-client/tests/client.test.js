@@ -45,6 +45,24 @@ describe('API client', () => {
     await expect(client.request('/api/v1/example')).resolves.toEqual({ ok: true });
   });
 
+  it('requests the current RevenueCat Android identity through a private no-store boundary', async () => {
+    const appUserId = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const fetchImpl = vi.fn(async (url, options) => {
+      expect(String(url)).toBe('http://localhost:5000/api/v1/payments/revenuecat/android/identity');
+      expect(options.method).toBe('GET');
+      expect(options.cache).toBe('no-store');
+      expect(options.body).toBeUndefined();
+      return new Response(JSON.stringify({ appUserId }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    await expect(client.getRevenueCatAndroidIdentity()).resolves.toEqual({ appUserId });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('forwards cancellation to cached country reference requests', async () => {
     const callerController = new AbortController();
     const fetchImpl = vi.fn(

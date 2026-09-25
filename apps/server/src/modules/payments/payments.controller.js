@@ -29,6 +29,29 @@ export function createPaymentsController({ stripeWebhookProcessor }) {
 }
 
 /**
+ * Authenticated handoff for the current account's server-owned RevenueCat ID.
+ *
+ * The opaque App User ID is customer identity only. It is not entitlement
+ * proof, purchase ownership proof, a provider secret, or an authorization token.
+ */
+export function createRevenueCatAndroidIdentityController({ revenueCatSubscriberIdentityService }) {
+  if (!revenueCatSubscriberIdentityService?.getOrCreateForUser) {
+    throw new TypeError('RevenueCat subscriber identity service is required.');
+  }
+
+  return {
+    async getCurrentIdentity(request, reply) {
+      const identity = await revenueCatSubscriberIdentityService.getOrCreateForUser({
+        userId: request.auth.id,
+      });
+
+      reply.header('Cache-Control', 'private, no-store');
+      return reply.code(200).send({ appUserId: identity.appUserId });
+    },
+  };
+}
+
+/**
  * HTTP boundary for RevenueCat webhook delivery.
  *
  * The processor owns HMAC verification, replay-safe event recording, subscriber

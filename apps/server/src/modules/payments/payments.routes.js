@@ -15,6 +15,7 @@ import { paymentsSchemas } from './payments.schema.js';
 import { paymentsService } from './payments.service.js';
 import {
   createPaymentsController,
+  createRevenueCatAndroidIdentityController,
   createRevenueCatWebhookController,
 } from './payments.controller.js';
 import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-product-policy.js';
@@ -151,6 +152,17 @@ function createStripeCatalogService(options) {
  */
 export async function paymentsRoutes(app, options = {}) {
   const protectedApp = /** @type {any} */ (app);
+
+  const revenueCatIdentityController = createRevenueCatAndroidIdentityController({
+    revenueCatSubscriberIdentityService:
+      options.revenueCatSubscriberIdentityService ?? revenueCatSubscriberIdentityService,
+  });
+
+  app.get('/revenuecat/android/identity', {
+    onRequest: [protectedApp.authenticate],
+    schema: paymentsSchemas.revenueCatAndroidIdentity,
+    handler: revenueCatIdentityController.getCurrentIdentity,
+  });
 
   app.get('/checkout/availability', {
     onRequest: [protectedApp.authenticate],
