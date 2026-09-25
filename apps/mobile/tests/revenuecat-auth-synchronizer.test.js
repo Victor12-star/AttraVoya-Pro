@@ -12,7 +12,9 @@ describe('RevenueCat authentication synchronizer', () => {
 
   it('rejects an incomplete billing session during composition', () => {
     expect(() =>
-      createRevenueCatAuthSynchronizer({ syncAuthenticatedUser: jest.fn() }),
+      createRevenueCatAuthSynchronizer({
+        syncAuthenticatedUser: jest.fn(),
+      }),
     ).toThrow('RevenueCat authentication session is invalid.');
   });
 
