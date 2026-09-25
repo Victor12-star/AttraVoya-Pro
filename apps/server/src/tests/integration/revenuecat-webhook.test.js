@@ -149,6 +149,7 @@ describe('RevenueCat webhook ingress', () => {
       })),
     };
     const subscriberIdentityService = {
+      getOrCreateForUser: vi.fn(),
       resolveOwnedUser: vi.fn(async ({ appUserId }) => ({
         userId: 'user-1',
         appUserId,
@@ -220,6 +221,7 @@ describe('RevenueCat webhook ingress', () => {
       revenueCatWebhookNow: () => now,
       revenueCatAndroidProductIds: productIds,
       revenueCatSubscriberIdentityService: {
+        getOrCreateForUser: vi.fn(),
         resolveOwnedUser: vi.fn(),
       },
       paymentsRepository: {
