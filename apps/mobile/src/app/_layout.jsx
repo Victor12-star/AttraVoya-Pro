@@ -1,10 +1,13 @@
 import { lightTheme, spacing } from '@attravoya/design-tokens';
 import { Stack } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import ContentState from '../components/feedback/content-state.jsx';
 import AppQueryProvider from '../providers/app-query-provider.jsx';
 import { MobileAuthProvider, useMobileAuth } from '../providers/mobile-auth-provider.jsx';
+import { createMobileApiClient } from '../services/api-client.js';
+import { createRevenueCatAndroidRuntime } from '../services/revenuecat-android-runtime.js';
 
 /**
  * Keep route failures local and recoverable without exposing private diagnostic
@@ -76,9 +79,20 @@ function SessionNavigator() {
 }
 
 export default function RootLayout() {
+  const [mobileServices] = useState(() => {
+    const client = createMobileApiClient();
+    return Object.freeze({
+      client,
+      revenueCatSession: createRevenueCatAndroidRuntime({ client }),
+    });
+  });
+
   return (
     <AppQueryProvider>
-      <MobileAuthProvider>
+      <MobileAuthProvider
+        client={mobileServices.client}
+        revenueCatSession={mobileServices.revenueCatSession}
+      >
         <SessionNavigator />
       </MobileAuthProvider>
     </AppQueryProvider>
