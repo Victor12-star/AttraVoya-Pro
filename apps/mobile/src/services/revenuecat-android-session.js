@@ -3,7 +3,9 @@ import { getRevenueCatAndroidConfiguration } from './revenuecat-config.js';
 const REVENUECAT_APP_USER_ID_PATTERN = /^av_rc_[A-Za-z0-9_-]{32}$/;
 
 function invalidIdentity() {
-  const error = new Error('The RevenueCat mobile identity response is invalid.');
+  const error = /** @type {Error & { code: string }} */ (
+    new Error('The RevenueCat mobile identity response is invalid.')
+  );
   error.code = 'INVALID_REVENUECAT_IDENTITY';
   return error;
 }
