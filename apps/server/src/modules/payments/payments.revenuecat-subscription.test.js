@@ -71,6 +71,7 @@ describe('RevenueCat Android lifecycle normalization', () => {
       planKey: PLANS.PRO_MONTHLY,
       eventType: 'INITIAL_PURCHASE',
       periodType: 'TRIAL',
+      cancellationReason: null,
       purchasedAt: new Date(1_779_999_000_000),
       expiresAt: new Date(1_780_603_800_000),
       providerStateUpdatedAt: new Date(1_780_000_000_000),
@@ -80,6 +81,38 @@ describe('RevenueCat Android lifecycle normalization', () => {
     expect(normalized).not.toHaveProperty('aliases');
     expect(normalized).not.toHaveProperty('entitlementIds');
     expect(normalized).not.toHaveProperty('transactionId');
+  });
+
+  it('normalizes only allowlisted Google Play cancellation reasons', async () => {
+    const rawPayload = payload({
+      type: 'CANCELLATION',
+      period_type: 'NORMAL',
+      cancel_reason: 'CUSTOMER_SUPPORT',
+    });
+    const evidence = await verifiedEvidence(rawPayload);
+
+    const normalized = normalizeVerifiedRevenueCatAndroidLifecycle({
+      rawPayload,
+      evidence,
+      productPolicy: productPolicy(),
+    });
+
+    expect(normalized.cancellationReason).toBe('CUSTOMER_SUPPORT');
+
+    const unsupported = payload({
+      type: 'CANCELLATION',
+      period_type: 'NORMAL',
+      cancel_reason: 'UNEXPECTED_REASON',
+    });
+    const unsupportedEvidence = await verifiedEvidence(unsupported);
+
+    expect(() =>
+      normalizeVerifiedRevenueCatAndroidLifecycle({
+        rawPayload: unsupported,
+        evidence: unsupportedEvidence,
+        productPolicy: productPolicy(),
+      }),
+    ).toThrow('RevenueCat cancellation reason is unsupported.');
   });
 
   it('rejects plain evidence even when its fields look verified', () => {
@@ -161,7 +194,11 @@ describe('RevenueCat Android lifecycle normalization', () => {
       'SUBSCRIPTION_PAUSED',
       'SUBSCRIPTION_EXTENDED',
     ]) {
-      const rawPayload = payload({ type: eventType, period_type: 'NORMAL' });
+      const rawPayload = payload({
+        type: eventType,
+        period_type: 'NORMAL',
+        ...(eventType === 'CANCELLATION' ? { cancel_reason: 'UNSUBSCRIBE' } : {}),
+      });
       const evidence = await verifiedEvidence(rawPayload);
 
       const normalized = normalizeVerifiedRevenueCatAndroidLifecycle({
