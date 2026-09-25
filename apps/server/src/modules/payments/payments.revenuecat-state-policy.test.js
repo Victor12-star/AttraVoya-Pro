@@ -107,8 +107,20 @@ describe('RevenueCat Android subscription state policy', () => {
     expect(result.state?.canceledAt).toBeNull();
   });
 
-  it('preserves access for cancellation, billing issues and scheduled pauses', async () => {
-    for (const eventType of ['CANCELLATION', 'BILLING_ISSUE', 'SUBSCRIPTION_PAUSED']) {
+  it('preserves access for ordinary cancellation, billing issues and scheduled pauses', async () => {
+    const cancellation = await decision({
+      type: 'CANCELLATION',
+      period_type: 'NORMAL',
+      cancel_reason: 'UNSUBSCRIBE',
+    });
+
+    expect(cancellation).toMatchObject({
+      action: 'IGNORE',
+      reason: 'ACCESS_REMAINS_UNTIL_EXPIRATION',
+      state: null,
+    });
+
+    for (const eventType of ['BILLING_ISSUE', 'SUBSCRIPTION_PAUSED']) {
       const result = await decision({
         type: eventType,
         period_type: 'NORMAL',
@@ -120,6 +132,25 @@ describe('RevenueCat Android subscription state policy', () => {
         state: null,
       });
     }
+  });
+
+  it('revokes access immediately for a verified Google Play refund cancellation', async () => {
+    const result = await decision({
+      type: 'CANCELLATION',
+      period_type: 'NORMAL',
+      cancel_reason: 'CUSTOMER_SUPPORT',
+    });
+
+    expect(result.action).toBe('APPLY');
+    expect(result.reason).toBeNull();
+    expect(result.state).toEqual({
+      provider: 'revenuecat',
+      externalSubscriptionId: 'GPA.1111-2222-3333-44444',
+      status: 'CANCELED',
+      currentPeriodEnd: new Date(1_780_603_800_000),
+      canceledAt: new Date(1_780_000_000_000),
+      providerStateUpdatedAt: new Date(1_780_000_000_000),
+    });
   });
 
   it('never grants authoritative access from sandbox lifecycle events', async () => {
