@@ -1,6 +1,7 @@
 import { PLANS } from '@attravoya/constants';
 import { describe, expect, it, vi } from 'vitest';
 
+import { NotFoundError } from '../../errors/app-error.js';
 import { createRevenueCatSubscriptionEventProcessor } from './payments.revenuecat-processor.js';
 import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-product-policy.js';
 import { createBillingVerificationBoundary } from './payments.verification.js';
@@ -248,16 +249,22 @@ describe('RevenueCat subscription event processor', () => {
     const { instance, deps } = processor({
       subscriberIdentityService: {
         resolveOwnedUser: vi.fn(async () => {
-          const error = new Error('not found');
-          error.code = 'NOT_FOUND';
-          throw error;
+          throw new NotFoundError('RevenueCat subscriber identity was not found.');
         }),
       },
     });
 
-    const result = await instance.process({ rawPayload: payload() }).catch((error) => error);
+    const result = await instance.process({ rawPayload: payload() });
 
-    expect(result).toBeInstanceOf(Error);
+    expect(result).toMatchObject({
+      outcome: 'FAILED',
+      failureCode: 'REVENUECAT_OWNERSHIP_UNRESOLVED',
+    });
+    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      outcome: 'FAILED',
+      failureCode: 'REVENUECAT_OWNERSHIP_UNRESOLVED',
+    });
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
