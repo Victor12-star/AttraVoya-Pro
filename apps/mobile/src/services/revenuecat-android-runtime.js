@@ -55,6 +55,12 @@ export function createLazyRevenueCatPurchasesAdapter({
  * Compose the authenticated API client with RevenueCat's native Android SDK.
  * The session contract remains responsible for platform/config gating and uses
  * only the server-owned opaque RevenueCat App User ID.
+ *
+ * @param {{
+ *   client: any,
+ *   loadModule?: () => Promise<any>,
+ *   getConfiguration?: () => any
+ * }} options
  */
 export function createRevenueCatAndroidRuntime({
   client,
