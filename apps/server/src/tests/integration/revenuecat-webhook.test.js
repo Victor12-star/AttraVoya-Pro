@@ -86,7 +86,7 @@ describe('RevenueCat webhook ingress', () => {
   });
 
   it('passes exact raw JSON bytes and headers to an injected verified processor', async () => {
-    const process = vi.fn(async () => ({
+    const process = vi.fn(async (/** @type {any} */ _input) => ({
       outcome: 'APPLIED',
       subscription: { id: 'must-not-leak' },
     }));
@@ -107,12 +107,10 @@ describe('RevenueCat webhook ingress', () => {
     expect(response.json()).toEqual({ received: true });
     expect(process).toHaveBeenCalledTimes(1);
 
-    expect(process).toHaveBeenCalledWith({
-      rawPayload: Buffer.from(rawPayload),
-      headers: expect.objectContaining({
-        'x-revenuecat-webhook-signature': 't=123,v1=signature-placeholder',
-      }),
-    });
+    const input = process.mock.calls[0][0];
+    expect(Buffer.isBuffer(input.rawPayload)).toBe(true);
+    expect(input.rawPayload.equals(Buffer.from(rawPayload))).toBe(true);
+    expect(input.headers['x-revenuecat-webhook-signature']).toBe('t=123,v1=signature-placeholder');
     expect(JSON.stringify(response.json())).not.toContain('must-not-leak');
   });
 
