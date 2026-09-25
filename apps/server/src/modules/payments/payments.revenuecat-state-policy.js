@@ -8,7 +8,7 @@ const ACCESS_STATE_EVENTS = new Set([
   'SUBSCRIPTION_EXTENDED',
 ]);
 
-const ACCESS_PRESERVING_EVENTS = new Set(['CANCELLATION', 'BILLING_ISSUE', 'SUBSCRIPTION_PAUSED']);
+const ACCESS_PRESERVING_EVENTS = new Set(['BILLING_ISSUE', 'SUBSCRIPTION_PAUSED']);
 
 function requireSubscriptionExpiration(lifecycle) {
   const { expiresAt, providerStateUpdatedAt } = lifecycle;
@@ -28,9 +28,10 @@ function requireSubscriptionExpiration(lifecycle) {
  * Map an already verified RevenueCat Google Play lifecycle event to a safe
  * AttraVoya subscription-state decision.
  *
- * Cancellation, billing issues and scheduled pauses do not revoke access.
- * RevenueCat removes access on EXPIRATION, so those earlier events deliberately
- * produce no authoritative subscription mutation.
+ * Ordinary cancellation, billing issues and scheduled pauses do not revoke
+ * access. A Google Play refund reported as CUSTOMER_SUPPORT is different:
+ * RevenueCat documents that it immediately removes entitlement access, so that
+ * verified cancellation is applied as CANCELED without waiting for EXPIRATION.
  *
  * Sandbox events are also non-entitling. Production access may be granted only
  * from verified production-store lifecycle evidence.
@@ -54,6 +55,31 @@ export function mapVerifiedRevenueCatAndroidState({ rawPayload, evidence, produc
       reason: 'NON_PRODUCTION',
       lifecycle,
       state: null,
+    });
+  }
+
+  if (lifecycle.eventType === 'CANCELLATION') {
+    if (lifecycle.cancellationReason !== 'CUSTOMER_SUPPORT') {
+      return Object.freeze({
+        action: 'IGNORE',
+        reason: 'ACCESS_REMAINS_UNTIL_EXPIRATION',
+        lifecycle,
+        state: null,
+      });
+    }
+
+    return Object.freeze({
+      action: 'APPLY',
+      reason: null,
+      lifecycle,
+      state: Object.freeze({
+        provider: 'revenuecat',
+        externalSubscriptionId: lifecycle.externalSubscriptionId,
+        status: 'CANCELED',
+        currentPeriodEnd: requireSubscriptionExpiration(lifecycle),
+        canceledAt: lifecycle.providerStateUpdatedAt,
+        providerStateUpdatedAt: lifecycle.providerStateUpdatedAt,
+      }),
     });
   }
 
