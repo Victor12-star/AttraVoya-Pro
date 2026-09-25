@@ -62,11 +62,7 @@ export function createLazyRevenueCatPurchasesAdapter({
  *   getConfiguration?: () => any
  * }} options
  */
-export function createRevenueCatAndroidRuntime({
-  client,
-  loadModule,
-  getConfiguration,
-}) {
+export function createRevenueCatAndroidRuntime({ client, loadModule, getConfiguration }) {
   return createRevenueCatAndroidSession({
     client,
     purchases: createLazyRevenueCatPurchasesAdapter({
