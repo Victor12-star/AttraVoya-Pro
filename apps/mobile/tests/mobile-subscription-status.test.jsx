@@ -91,7 +91,7 @@ describe('mobile subscription status', () => {
     const result = await renderContent(client);
 
     expect(await result.findByText('Plan status unavailable')).toBeTruthy();
-    fireEvent.press(result.getByText('Try again'));
+    await fireEvent.press(result.getByText('Try again'));
 
     expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
