@@ -4,9 +4,7 @@ import {
   readRevenueCatAndroidPublicConfig,
   REVENUECAT_ANDROID_PUBLIC_KEY_PATTERN,
 } from '../tooling/revenuecat-public-config.js';
-import {
-  normalizeRevenueCatAndroidConfiguration,
-} from '../src/services/revenuecat-config.js';
+import { normalizeRevenueCatAndroidConfiguration } from '../src/services/revenuecat-config.js';
 
 describe('RevenueCat Android public mobile configuration', () => {
   it('stays disabled by default without bundling an API key', () => {
