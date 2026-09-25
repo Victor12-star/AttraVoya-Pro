@@ -36,7 +36,18 @@ const stripeCheckoutAvailabilityResponseSchema = z
   })
   .strict();
 
+const revenueCatAndroidIdentityResponseSchema = z
+  .object({
+    appUserId: z.string().regex(/^av_rc_[A-Za-z0-9_-]{32}$/),
+  })
+  .strict();
+
 export const paymentsSchemas = Object.freeze({
+  revenueCatAndroidIdentity: {
+    response: {
+      200: revenueCatAndroidIdentityResponseSchema,
+    },
+  },
   stripeCheckoutAvailability: {
     response: {
       200: stripeCheckoutAvailabilityResponseSchema,
