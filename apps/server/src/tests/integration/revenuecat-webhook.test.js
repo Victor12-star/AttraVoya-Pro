@@ -56,9 +56,7 @@ function signedPayload({ secret, now, overrides = {} }) {
     ...overrides,
   };
   const rawPayload = JSON.stringify({ api_version: '1.0', event });
-  const signature = createHmac('sha256', secret)
-    .update(`${timestamp}.${rawPayload}`)
-    .digest('hex');
+  const signature = createHmac('sha256', secret).update(`${timestamp}.${rawPayload}`).digest('hex');
 
   return {
     rawPayload,
@@ -110,9 +108,7 @@ describe('RevenueCat webhook ingress', () => {
     const input = process.mock.calls[0][0];
     expect(Buffer.isBuffer(input.rawPayload)).toBe(true);
     expect(input.rawPayload.equals(Buffer.from(rawPayload))).toBe(true);
-    expect(input.headers['x-revenuecat-webhook-signature']).toBe(
-      't=123,v1=signature-placeholder',
-    );
+    expect(input.headers['x-revenuecat-webhook-signature']).toBe('t=123,v1=signature-placeholder');
     expect(JSON.stringify(response.json())).not.toContain('must-not-leak');
   });
 
