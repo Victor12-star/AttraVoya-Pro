@@ -185,9 +185,7 @@ describe('RevenueCat webhook ingress', () => {
     expect(subscriberIdentityService.resolveOwnedUser).toHaveBeenCalledWith({
       appUserId: OWNED_ID,
     });
-    expect(
-      paymentsRepository.createOrReuseProviderSubscriptionOwnership,
-    ).toHaveBeenCalledWith({
+    expect(paymentsRepository.createOrReuseProviderSubscriptionOwnership).toHaveBeenCalledWith({
       userId: 'user-1',
       planKey: PLANS.PRO_MONTHLY,
       provider: 'revenuecat',
