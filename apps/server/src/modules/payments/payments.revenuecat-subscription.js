@@ -16,6 +16,13 @@ const SUPPORTED_EVENT_TYPES = new Set([
 
 const PERIOD_TYPES = new Set(['TRIAL', 'INTRO', 'NORMAL', 'PROMOTIONAL', 'PREPAID']);
 const ENVIRONMENTS = new Set(['SANDBOX', 'PRODUCTION']);
+const CANCELLATION_REASONS = new Set([
+  'UNSUBSCRIBE',
+  'BILLING_ERROR',
+  'DEVELOPER_INITIATED',
+  'PRICE_INCREASE',
+  'CUSTOMER_SUPPORT',
+]);
 const MAX_PROVIDER_ID_LENGTH = 255;
 
 class RevenueCatVerifiedIdentityMismatchError extends ValidationError {}
@@ -45,6 +52,17 @@ function millisecondsDate(value, name, { nullable = false } = {}) {
   }
 
   return date;
+}
+
+function cancellationReason(event, eventType) {
+  if (eventType !== 'CANCELLATION') return null;
+
+  const reason = requiredText(event.cancel_reason, 'RevenueCat cancellation reason', 40);
+  if (!CANCELLATION_REASONS.has(reason)) {
+    throw new ValidationError('RevenueCat cancellation reason is unsupported.');
+  }
+
+  return reason;
 }
 
 function parseVerifiedRevenueCatEvent(rawPayload, evidence) {
@@ -152,6 +170,7 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
   const expiresAt = millisecondsDate(event.expiration_at_ms, 'RevenueCat expiration time', {
     nullable: true,
   });
+  const normalizedCancellationReason = cancellationReason(event, eventType);
 
   if (!evidence.occurredAt) {
     throw new ValidationError('RevenueCat lifecycle event time is required.');
@@ -165,6 +184,7 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     planKey,
     eventType,
     periodType,
+    cancellationReason: normalizedCancellationReason,
     purchasedAt,
     expiresAt,
     providerStateUpdatedAt: new Date(evidence.occurredAt),
