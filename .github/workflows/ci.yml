@@ -74,6 +74,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Show RevenueCat Prettier diff
+        run: |
+          set -euo pipefail
+          target="apps/server/src/tests/integration/revenuecat-webhook.test.js"
+          cp "$target" /tmp/revenuecat-webhook.before.js
+          pnpm exec prettier --write "$target"
+          diff -u /tmp/revenuecat-webhook.before.js "$target" || true
+          git checkout -- "$target"
+
       - name: Validate environment contract
         run: pnpm env:check
 
@@ -114,15 +123,6 @@ jobs:
         env:
           NODE_ENV: development
         run: pnpm --filter @attravoya/web test:e2e:ci
-
-      - name: Show RevenueCat Prettier diff
-        run: |
-          set -euo pipefail
-          target="apps/server/src/tests/integration/revenuecat-webhook.test.js"
-          cp "$target" /tmp/revenuecat-webhook.before.js
-          pnpm exec prettier --write "$target"
-          diff -u /tmp/revenuecat-webhook.before.js "$target" || true
-          git checkout -- "$target"
 
       - name: Check formatting
         run: pnpm format:check
