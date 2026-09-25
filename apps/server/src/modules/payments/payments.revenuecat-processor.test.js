@@ -183,7 +183,13 @@ describe('RevenueCat subscription event processor', () => {
       duplicate: false,
       stale: false,
       event: { id: 'billing-event-1', processingStatus: 'APPLIED' },
-      subscription: { id: 'subscription-1', status: 'CANCELED' },
+      subscription: {
+        id: 'subscription-1',
+        userId: 'user-1',
+        status: 'CANCELED',
+        provider: 'revenuecat',
+        externalSubscriptionId: 'GPA.1111-2222-3333-44444',
+      },
     });
 
     const result = await instance.process({
