@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-import { REVENUECAT_ANDROID_PUBLIC_KEY_PATTERN } from '../../tooling/revenuecat-public-config.js';
+const REVENUECAT_ANDROID_PUBLIC_KEY_PATTERN = /^goog_[A-Za-z0-9_-]{4,195}$/;
 
 const DISABLED_REVENUECAT_ANDROID_CONFIG = Object.freeze({ enabled: false });
 
