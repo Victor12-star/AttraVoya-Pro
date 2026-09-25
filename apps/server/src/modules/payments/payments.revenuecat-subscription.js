@@ -25,7 +25,7 @@ const CANCELLATION_REASONS = new Set([
 ]);
 const MAX_PROVIDER_ID_LENGTH = 255;
 
-class RevenueCatVerifiedIdentityMismatchError extends ValidationError {}
+export class RevenueCatVerifiedIdentityMismatchError extends ValidationError {}
 
 function requiredText(value, name, maxLength = MAX_PROVIDER_ID_LENGTH) {
   if (typeof value !== 'string') {
