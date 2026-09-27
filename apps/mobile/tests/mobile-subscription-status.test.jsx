@@ -40,7 +40,9 @@ describe('mobile subscription status', () => {
 
     expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
     expect(
-      result.getByText('Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.'),
+      result.getByText(
+        'Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.',
+      ),
     ).toBeTruthy();
     expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
   });
@@ -69,7 +71,9 @@ describe('mobile subscription status', () => {
     expect(result.getByText('Monthly')).toBeTruthy();
     expect(result.getByText('Yearly')).toBeTruthy();
     expect(
-      result.getByText('Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.'),
+      result.getByText(
+        'Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.',
+      ),
     ).toBeTruthy();
     expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
     expect(loadOfferingCatalog).toHaveBeenCalledTimes(1);
@@ -194,7 +198,9 @@ describe('mobile subscription status', () => {
     ).toBeTruthy();
     expect(result.queryByText('private RevenueCat diagnostic')).toBeNull();
     expect(
-      result.getByText('Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.'),
+      result.getByText(
+        'Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.',
+      ),
     ).toBeTruthy();
   });
 
@@ -221,7 +227,9 @@ describe('mobile subscription status', () => {
     expect(result.getByText('Current period ends')).toBeTruthy();
     expect(result.queryByText('must-not-render')).toBeNull();
     expect(
-      result.queryByText('Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.'),
+      result.queryByText(
+        'Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.',
+      ),
     ).toBeNull();
   });
 
