@@ -103,9 +103,9 @@ describe('mobile subscription status', () => {
           },
         }),
     };
-    const loadOfferingCatalog = jest.fn().mockResolvedValue([
-      { period: 'monthly', price: 'SEK 49.00' },
-    ]);
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'monthly', price: 'SEK 49.00' }]);
     const purchasePlan = jest.fn().mockResolvedValue({ status: 'completed' });
 
     const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
@@ -129,9 +129,9 @@ describe('mobile subscription status', () => {
         },
       }),
     };
-    const loadOfferingCatalog = jest.fn().mockResolvedValue([
-      { period: 'yearly', price: 'SEK 399.00' },
-    ]);
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'yearly', price: 'SEK 399.00' }]);
     const purchasePlan = jest.fn().mockResolvedValue({ status: 'cancelled' });
 
     const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
@@ -157,9 +157,9 @@ describe('mobile subscription status', () => {
         },
       }),
     };
-    const loadOfferingCatalog = jest.fn().mockResolvedValue([
-      { period: 'monthly', price: 'SEK 49.00' },
-    ]);
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'monthly', price: 'SEK 49.00' }]);
     const purchasePlan = jest.fn().mockRejectedValue(new Error('private store diagnostic'));
 
     const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
