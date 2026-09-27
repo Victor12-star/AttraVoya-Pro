@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 
 import { normalizeDeletionConfirmation, ProfileContent } from '../src/app/(tabs)/profile.jsx';
 
@@ -56,8 +56,10 @@ describe('mobile profile screen', () => {
     );
 
     expect(result.queryByText(/This permanently deletes your trips/)).toBeNull();
-    fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
-    expect(await result.findByText(/This permanently deletes your trips/)).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
+    });
+    expect(result.getByText(/This permanently deletes your trips/)).toBeTruthy();
     expect(result.getByTestId('delete-account-password')).toBeTruthy();
     expect(result.getByTestId('delete-account-confirmation')).toBeTruthy();
   });
