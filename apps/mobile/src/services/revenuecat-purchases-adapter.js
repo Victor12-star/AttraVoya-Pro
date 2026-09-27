@@ -5,7 +5,8 @@ function resolvePurchasesModule(moduleValue) {
     typeof purchases?.configure !== 'function' ||
     typeof purchases?.logIn !== 'function' ||
     typeof purchases?.logOut !== 'function' ||
-    typeof purchases?.getOfferings !== 'function'
+    typeof purchases?.getOfferings !== 'function' ||
+    typeof purchases?.purchasePackage !== 'function'
   ) {
     throw new TypeError('RevenueCat Purchases native module is unavailable.');
   }
@@ -39,6 +40,10 @@ export function createRevenueCatPurchasesAdapter(moduleValue) {
 
     async getOfferings() {
       return purchases.getOfferings();
+    },
+
+    async purchasePackage(packageValue) {
+      await purchases.purchasePackage(packageValue);
     },
   });
 }
