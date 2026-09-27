@@ -5,7 +5,7 @@ import {
   normalizeMobileSubscriptionAccess,
 } from '../src/features/subscriptions/subscription-status-screen.jsx';
 
-function renderContent(client) {
+function renderContent(client, loadOfferingCatalog) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: 0 },
@@ -14,7 +14,10 @@ function renderContent(client) {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MobileSubscriptionStatusContent client={client} />
+      <MobileSubscriptionStatusContent
+        client={client}
+        loadOfferingCatalog={loadOfferingCatalog}
+      />
     </QueryClientProvider>,
   );
 }
@@ -39,6 +42,63 @@ describe('mobile subscription status', () => {
       result.getByText('New subscription purchases are not available in this build yet.'),
     ).toBeTruthy();
     expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
+  });
+
+  it('shows read-only monthly and yearly Google Play prices for Free users', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([
+      { period: 'monthly', price: 'SEK 49.00' },
+      { period: 'yearly', price: 'SEK 399.00' },
+    ]);
+
+    const result = await renderContent(client, loadOfferingCatalog);
+
+    expect(await result.findByText('Google Play prices')).toBeTruthy();
+    expect(await result.findByText('SEK 49.00')).toBeTruthy();
+    expect(result.getByText('SEK 399.00')).toBeTruthy();
+    expect(result.getByText('Monthly')).toBeTruthy();
+    expect(result.getByText('Yearly')).toBeTruthy();
+    expect(
+      result.getByText('New subscription purchases are not available in this build yet.'),
+    ).toBeTruthy();
+    expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
+    expect(loadOfferingCatalog).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps provider failures private while leaving server-verified Free state usable', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockRejectedValue(new Error('private RevenueCat diagnostic'));
+
+    const result = await renderContent(client, loadOfferingCatalog);
+
+    expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(
+      await result.findByText('Live Google Play prices are unavailable right now.'),
+    ).toBeTruthy();
+    expect(result.queryByText('private RevenueCat diagnostic')).toBeNull();
+    expect(
+      result.getByText('New subscription purchases are not available in this build yet.'),
+    ).toBeTruthy();
   });
 
   it('renders only minimal active Pro state and never exposes provider identifiers', async () => {
