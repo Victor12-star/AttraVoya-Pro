@@ -48,6 +48,10 @@ export function createLazyRevenueCatPurchasesAdapter({
       const adapter = await getAdapter();
       return adapter.logOut();
     },
+    async getOfferings() {
+      const adapter = await getAdapter();
+      return adapter.getOfferings();
+    },
   });
 }
 
