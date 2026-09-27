@@ -106,7 +106,8 @@ export function MobileSubscriptionStatusContent({
   const shouldLoadOfferings = query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
   const offeringQuery = useQuery({
     queryKey: ['subscription-offerings'],
-    queryFn: () => loadOfferingCatalog(),
+    queryFn: () =>
+      typeof loadOfferingCatalog === 'function' ? loadOfferingCatalog() : Promise.resolve([]),
     enabled: shouldLoadOfferings,
     retry: false,
   });
