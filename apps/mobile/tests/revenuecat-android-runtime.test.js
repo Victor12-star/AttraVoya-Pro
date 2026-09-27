@@ -14,6 +14,7 @@ function createNativeModule() {
       logIn: jest.fn(async () => ({ customerInfo: { ignored: true } })),
       logOut: jest.fn(async () => ({ customerInfo: { ignored: true } })),
       getOfferings: jest.fn(async () => ({ current: null, all: {} })),
+      purchasePackage: jest.fn(async () => ({ customerInfo: { ignored: true } })),
     },
   };
 }
@@ -91,7 +92,29 @@ describe('RevenueCat Android native runtime', () => {
 
     expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
+    expect(moduleValue.default.purchasePackage).toHaveBeenCalledTimes(1);
     expect(loadModule).toHaveBeenCalledTimes(1);
+  });
+
+  it('executes a monthly purchase command through the identified runtime without granting access', async () => {
+    const moduleValue = createNativeModule();
+    const monthlyPackage = { identifier: '$rc_monthly', packageType: 'MONTHLY' };
+    moduleValue.default.getOfferings.mockResolvedValueOnce({
+      current: { monthly: monthlyPackage, annual: null },
+      all: {},
+    });
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule: jest.fn(async () => moduleValue),
+      getConfiguration: () => ({ enabled: true, apiKey: 'goog_public123' }),
+    });
+
+    await expect(runtime.purchasePlan('monthly')).resolves.toEqual({ status: 'completed' });
+
+    expect(moduleValue.default.purchasePackage).toHaveBeenCalledWith(monthlyPackage);
   });
 
   it('does not load the native SDK when catalog access is disabled', async () => {
@@ -146,6 +169,7 @@ describe('RevenueCat Android native runtime', () => {
     await adapter.logIn('av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
     await adapter.logOut();
     await adapter.getOfferings();
+    await adapter.purchasePackage({ identifier: '$rc_monthly' });
 
     expect(loadModule).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logIn).toHaveBeenCalledTimes(1);
