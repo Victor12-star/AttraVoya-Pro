@@ -12,9 +12,9 @@ function defaultPurchasesModuleLoader() {
  * A failed import is not cached permanently so a later authenticated retry can
  * recover after a transient native-module startup failure.
  */
-export function createLazyRevenueCatPurchasesAdapter({
-  loadModule = defaultPurchasesModuleLoader,
-} = {}) {
+export function createLazyRevenueCatPurchasesAdapter(
+  { loadModule = defaultPurchasesModuleLoader } = {},
+) {
   if (typeof loadModule !== 'function') {
     throw new TypeError('RevenueCat Purchases module loader is required.');
   }
