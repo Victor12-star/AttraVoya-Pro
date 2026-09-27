@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 process.env.NODE_ENV = 'test';
 process.env.API_HOST = '127.0.0.1';
@@ -17,7 +17,10 @@ const { PROVIDER_DISCOVERY_RATE_LIMIT, PROVIDER_SEARCH_RATE_LIMIT } =
   await import('../../config/constants.js');
 const apps = [];
 
-afterEach(async () => Promise.all(apps.splice(0).map((app) => app.close())));
+afterEach(async () => {
+  await Promise.all(apps.splice(0).map((app) => app.close()));
+  vi.restoreAllMocks();
+});
 
 function baseOptions() {
   return {
@@ -187,6 +190,9 @@ describe('real-provider API contracts', () => {
   });
 
   it('rate-limits provider-backed search before an extra provider call', async () => {
+    // The production limiter uses wall-clock-aligned windows. Pin Date.now so
+    // this integration test cannot cross a minute boundary mid-request burst.
+    vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
     let providerCalls = 0;
     const options = baseOptions();
     options.destinationsProvider = {
@@ -233,6 +239,8 @@ describe('real-provider API contracts', () => {
   });
 
   it('rate-limits heavier nearby discovery before an extra provider call', async () => {
+    // Keep the entire burst inside one aligned production-style window.
+    vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
     let providerCalls = 0;
     const options = baseOptions();
     options.placesProvider = {
