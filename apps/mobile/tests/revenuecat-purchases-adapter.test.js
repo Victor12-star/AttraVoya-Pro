@@ -11,6 +11,7 @@ function createNativePurchases() {
     logIn: jest.fn(async () => ({ customerInfo: { entitlements: { active: { pro: {} } } } })),
     logOut: jest.fn(async () => ({ customerInfo: { ignored: true } })),
     getOfferings: jest.fn(async () => ({ current: null, all: {} })),
+    purchasePackage: jest.fn(async () => ({ customerInfo: { ignored: true } })),
   };
 }
 
@@ -35,7 +36,7 @@ describe('RevenueCat Purchases adapter boundary', () => {
     }
   });
 
-  it('forwards lifecycle calls and read-only offerings without exposing CustomerInfo', async () => {
+  it('forwards lifecycle, offerings and purchase commands without exposing CustomerInfo', async () => {
     const purchases = createNativePurchases();
     const adapter = createRevenueCatPurchasesAdapter({ default: purchases });
     const configuration = {
@@ -47,11 +48,13 @@ describe('RevenueCat Purchases adapter boundary', () => {
     await expect(adapter.logIn(configuration.appUserID)).resolves.toBeUndefined();
     await expect(adapter.logOut()).resolves.toBeUndefined();
     await expect(adapter.getOfferings()).resolves.toEqual({ current: null, all: {} });
+    await expect(adapter.purchasePackage({ identifier: '$rc_monthly' })).resolves.toBeUndefined();
 
     expect(purchases.configure).toHaveBeenCalledWith(configuration);
     expect(purchases.logIn).toHaveBeenCalledWith(configuration.appUserID);
     expect(purchases.logOut).toHaveBeenCalledTimes(1);
     expect(purchases.getOfferings).toHaveBeenCalledTimes(1);
+    expect(purchases.purchasePackage).toHaveBeenCalledWith({ identifier: '$rc_monthly' });
   });
 
   it('propagates native lifecycle failures so the session layer can fail closed', async () => {
