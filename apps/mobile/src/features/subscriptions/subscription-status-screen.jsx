@@ -12,6 +12,7 @@ import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ContentState from '../../components/feedback/content-state.jsx';
+import { useMobileBilling } from '../../providers/mobile-billing-provider.jsx';
 import { createMobileApiClient } from '../../services/api-client.js';
 
 const PLAN_KEYS = new Set(['FREE', 'PRO_MONTHLY', 'PRO_YEARLY']);
@@ -82,8 +83,11 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any}} props */
-export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>}} props */
+export function MobileSubscriptionStatusContent({
+  client: suppliedClient,
+  loadOfferingCatalog,
+}) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
   const query = useQuery({
     queryKey: ['subscription-status'],
@@ -97,6 +101,14 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
       }
       return access;
     },
+  });
+
+  const shouldLoadOfferings = query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
+  const offeringQuery = useQuery({
+    queryKey: ['subscription-offerings'],
+    queryFn: () => loadOfferingCatalog(),
+    enabled: shouldLoadOfferings,
+    retry: false,
   });
 
   if (query.isPending) {
@@ -156,11 +168,45 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
             <Text style={styles.metadataValue}>{formatPeriodEnd(access.currentPeriodEnd)}</Text>
           </View>
         ) : (
-          <View style={styles.purchaseNotice}>
-            <Text style={styles.purchaseText}>
-              New subscription purchases are not available in this build yet.
-            </Text>
-          </View>
+          <>
+            <View style={styles.purchaseNotice}>
+              <Text style={styles.purchaseText}>
+                New subscription purchases are not available in this build yet.
+              </Text>
+            </View>
+
+            {shouldLoadOfferings ? (
+              <View style={styles.offeringSection}>
+                <Text style={styles.offeringTitle}>Google Play prices</Text>
+                {offeringQuery.isPending ? (
+                  <Text style={styles.offeringStatus}>Checking current prices…</Text>
+                ) : offeringQuery.isError ? (
+                  <Text style={styles.offeringStatus}>
+                    Live Google Play prices are unavailable right now.
+                  </Text>
+                ) : offeringQuery.data?.length ? (
+                  <View style={styles.offeringList}>
+                    {offeringQuery.data.map((plan) => (
+                      <View key={plan.period} style={styles.offeringRow}>
+                        <Text style={styles.offeringPeriod}>
+                          {plan.period === 'monthly' ? 'Monthly' : 'Yearly'}
+                        </Text>
+                        <Text style={styles.offeringPrice}>{plan.price}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.offeringStatus}>
+                    Google Play subscription prices are not available in this build.
+                  </Text>
+                )}
+                <Text style={styles.offeringNote}>
+                  Prices come from Google Play through RevenueCat. Your AttraVoya account still
+                  controls whether Pro access is active.
+                </Text>
+              </View>
+            ) : null}
+          </>
         )}
 
         <Pressable
@@ -186,6 +232,7 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient }) {
 export default function MobileSubscriptionStatusScreen() {
   const { width } = useWindowDimensions();
   const pageGutter = getPageGutter(width);
+  const billing = useMobileBilling();
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -202,7 +249,7 @@ export default function MobileSubscriptionStatusScreen() {
             Review the Free or Pro access currently recognized by your AttraVoya account.
           </Text>
           <View style={styles.statusContent}>
-            <MobileSubscriptionStatusContent />
+            <MobileSubscriptionStatusContent loadOfferingCatalog={billing.loadOfferingCatalog} />
           </View>
         </View>
       </ScrollView>
@@ -314,6 +361,24 @@ const styles = StyleSheet.create({
     padding: spacing[4],
   },
   purchaseText: { color: lightTheme.textSecondary, fontSize: 15, lineHeight: 22 },
+  offeringSection: {
+    gap: spacing[3],
+    borderTopColor: lightTheme.borderSubtle,
+    borderTopWidth: 1,
+    paddingTop: spacing[4],
+  },
+  offeringTitle: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  offeringStatus: { color: lightTheme.textSecondary, fontSize: 15, lineHeight: 22 },
+  offeringList: { gap: spacing[2] },
+  offeringRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing[4],
+  },
+  offeringPeriod: { color: lightTheme.textSecondary, fontSize: 15, fontWeight: '600' },
+  offeringPrice: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  offeringNote: { color: lightTheme.textSecondary, fontSize: 13, lineHeight: 20 },
   refreshButton: {
     minHeight: interaction.comfortableControlHeight,
     alignItems: 'center',
