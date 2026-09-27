@@ -7,7 +7,7 @@ import {
   spacing,
 } from '@attravoya/design-tokens';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -83,9 +83,14 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>}} props */
-export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOfferingCatalog }) {
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>}} props */
+export function MobileSubscriptionStatusContent({
+  client: suppliedClient,
+  loadOfferingCatalog,
+  purchasePlan,
+}) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
+  const [purchaseState, setPurchaseState] = useState({ status: 'idle', message: null });
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -129,6 +134,53 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOf
 
   const access = query.data;
   const isPro = access.tier === 'PRO';
+  const purchasePending = purchaseState.status === 'pending';
+
+  async function handlePurchase(period) {
+    if (typeof purchasePlan !== 'function' || purchasePending) return;
+
+    setPurchaseState({ status: 'pending', message: null });
+    const result = await purchasePlan(period);
+
+    if (result?.status === 'cancelled') {
+      setPurchaseState({
+        status: 'cancelled',
+        message: 'Purchase cancelled. No changes were made to your AttraVoya plan.',
+      });
+      return;
+    }
+
+    if (result?.status === 'unavailable') {
+      setPurchaseState({
+        status: 'unavailable',
+        message: 'Google Play purchasing is unavailable right now. Please try again later.',
+      });
+      return;
+    }
+
+    if (result?.status !== 'completed') {
+      setPurchaseState({
+        status: 'failed',
+        message: 'The purchase could not be completed safely. Please try again.',
+      });
+      return;
+    }
+
+    const refreshed = await query.refetch();
+    if (refreshed.data?.tier === 'PRO') {
+      setPurchaseState({
+        status: 'verified',
+        message: 'Your purchase has been verified by AttraVoya.',
+      });
+      return;
+    }
+
+    setPurchaseState({
+      status: 'pending-verification',
+      message:
+        'Google Play completed the purchase. AttraVoya is still verifying Pro access. Refresh status shortly.',
+    });
+  }
 
   return (
     <>
@@ -170,7 +222,8 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOf
           <>
             <View style={styles.purchaseNotice}>
               <Text style={styles.purchaseText}>
-                New subscription purchases are not available in this build yet.
+                Google Play handles the payment. AttraVoya enables Pro only after your server
+                verified plan status confirms it.
               </Text>
             </View>
 
@@ -187,10 +240,29 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOf
                   <View style={styles.offeringList}>
                     {offeringQuery.data.map((plan) => (
                       <View key={plan.period} style={styles.offeringRow}>
-                        <Text style={styles.offeringPeriod}>
-                          {plan.period === 'monthly' ? 'Monthly' : 'Yearly'}
-                        </Text>
-                        <Text style={styles.offeringPrice}>{plan.price}</Text>
+                        <View style={styles.offeringPlan}>
+                          <Text style={styles.offeringPeriod}>
+                            {plan.period === 'monthly' ? 'Monthly' : 'Yearly'}
+                          </Text>
+                          <Text style={styles.offeringPrice}>{plan.price}</Text>
+                        </View>
+                        {typeof purchasePlan === 'function' ? (
+                          <Pressable
+                            accessibilityHint={`Starts the ${plan.period} Google Play subscription purchase`}
+                            accessibilityRole="button"
+                            disabled={purchasePending}
+                            onPress={() => void handlePurchase(plan.period)}
+                            style={({ pressed }) => [
+                              styles.purchaseButton,
+                              pressed && styles.buttonPressed,
+                              purchasePending && styles.buttonDisabled,
+                            ]}
+                          >
+                            <Text style={styles.purchaseButtonLabel}>
+                              {purchasePending ? 'Processing…' : `Choose ${plan.period}`}
+                            </Text>
+                          </Pressable>
+                        ) : null}
                       </View>
                     ))}
                   </View>
@@ -203,6 +275,11 @@ export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOf
                   Prices come from Google Play through RevenueCat. Your AttraVoya account still
                   controls whether Pro access is active.
                 </Text>
+                {purchaseState.message ? (
+                  <Text accessibilityLiveRegion="polite" style={styles.purchaseStatus}>
+                    {purchaseState.message}
+                  </Text>
+                ) : null}
               </View>
             ) : null}
           </>
@@ -248,7 +325,10 @@ export default function MobileSubscriptionStatusScreen() {
             Review the Free or Pro access currently recognized by your AttraVoya account.
           </Text>
           <View style={styles.statusContent}>
-            <MobileSubscriptionStatusContent loadOfferingCatalog={billing.loadOfferingCatalog} />
+            <MobileSubscriptionStatusContent
+              loadOfferingCatalog={billing.loadOfferingCatalog}
+              purchasePlan={billing.purchasePlan}
+            />
           </View>
         </View>
       </ScrollView>
@@ -371,13 +451,25 @@ const styles = StyleSheet.create({
   offeringList: { gap: spacing[2] },
   offeringRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing[4],
   },
+  offeringPlan: { gap: spacing[1] },
   offeringPeriod: { color: lightTheme.textSecondary, fontSize: 15, fontWeight: '600' },
   offeringPrice: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
   offeringNote: { color: lightTheme.textSecondary, fontSize: 13, lineHeight: 20 },
+  purchaseStatus: { color: lightTheme.textPrimary, fontSize: 14, lineHeight: 21 },
+  purchaseButton: {
+    minHeight: interaction.minimumTargetSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: lightTheme.brandPrimary,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing[4],
+  },
+  purchaseButtonLabel: { color: lightTheme.surface, fontSize: 14, fontWeight: '700' },
   refreshButton: {
     minHeight: interaction.comfortableControlHeight,
     alignItems: 'center',
