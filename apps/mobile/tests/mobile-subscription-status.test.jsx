@@ -5,7 +5,7 @@ import {
   normalizeMobileSubscriptionAccess,
 } from '../src/features/subscriptions/subscription-status-screen.jsx';
 
-function renderContent(client, loadOfferingCatalog, purchasePlan) {
+function renderContent(client, loadOfferingCatalog, purchasePlan, restorePurchases) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: 0 },
@@ -18,6 +18,7 @@ function renderContent(client, loadOfferingCatalog, purchasePlan) {
         client={client}
         loadOfferingCatalog={loadOfferingCatalog}
         purchasePlan={purchasePlan}
+        restorePurchases={restorePurchases}
       />
     </QueryClientProvider>,
   );
@@ -171,6 +172,102 @@ describe('mobile subscription status', () => {
       await result.findByText('The purchase could not be completed safely. Please try again.'),
     ).toBeTruthy();
     expect(result.queryByText('private store diagnostic')).toBeNull();
+    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
+  });
+
+  it('never grants Pro locally after restore and waits for server verification', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([]);
+    const restorePurchases = jest.fn().mockResolvedValue({ status: 'completed' });
+
+    const result = await renderContent(client, loadOfferingCatalog, undefined, restorePurchases);
+
+    expect(await result.findByText('Restore purchases')).toBeTruthy();
+    await fireEvent.press(result.getByText('Restore purchases'));
+
+    expect(restorePurchases).toHaveBeenCalledTimes(1);
+    expect(
+      await result.findByText(
+        'Google Play restore completed. AttraVoya has not verified Pro access yet. Refresh status shortly.',
+      ),
+    ).toBeTruthy();
+    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows restored Pro only after the server confirms it', async () => {
+    const client = {
+      getMyEntitlements: jest
+        .fn()
+        .mockResolvedValueOnce({
+          access: {
+            plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+            entitlements: [],
+            limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+            subscription: null,
+          },
+        })
+        .mockResolvedValueOnce({
+          access: {
+            plan: { key: 'PRO_YEARLY', tier: 'PRO', name: 'Pro Yearly' },
+            entitlements: ['offline_maps'],
+            limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+            subscription: {
+              status: 'ACTIVE',
+              currentPeriodEnd: '2027-09-27T17:00:00.000Z',
+            },
+          },
+        }),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([]);
+    const restorePurchases = jest.fn().mockResolvedValue({ status: 'completed' });
+
+    const result = await renderContent(client, loadOfferingCatalog, undefined, restorePurchases);
+
+    expect(await result.findByText('Restore purchases')).toBeTruthy();
+    await fireEvent.press(result.getByText('Restore purchases'));
+
+    expect(await result.findByText('Pro Yearly')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps restore failures private and leaves the server-verified plan unchanged', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([]);
+    const restorePurchases = jest
+      .fn()
+      .mockRejectedValue(new Error('private RevenueCat restore diagnostic'));
+
+    const result = await renderContent(client, loadOfferingCatalog, undefined, restorePurchases);
+
+    expect(await result.findByText('Restore purchases')).toBeTruthy();
+    await fireEvent.press(result.getByText('Restore purchases'));
+
+    expect(
+      await result.findByText(
+        'Previous Google Play purchases could not be restored safely. Please try again.',
+      ),
+    ).toBeTruthy();
+    expect(result.queryByText('private RevenueCat restore diagnostic')).toBeNull();
     expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
   });
