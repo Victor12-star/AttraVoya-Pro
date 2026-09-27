@@ -41,8 +41,8 @@ describe('mobile profile screen', () => {
     expect(normalizeDeletionConfirmation('password1', 'DELETE')).toBe('password1');
   });
 
-  it('discloses deletion consequences before collecting confirmation', () => {
-    const result = render(
+  it('discloses deletion consequences before collecting confirmation', async () => {
+    const result = await render(
       <ProfileContent
         onDeleteAccount={jest.fn()}
         onLogout={jest.fn()}
