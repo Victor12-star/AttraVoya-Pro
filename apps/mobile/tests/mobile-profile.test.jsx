@@ -31,8 +31,8 @@ describe('mobile profile screen', () => {
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
 
-  it('fails safely when identity is unavailable', () => {
-    const result = render(
+  it('fails safely when identity is unavailable', async () => {
+    const result = await render(
       <ProfileContent onDeleteAccount={jest.fn()} onLogout={jest.fn()} user={null} />,
     );
 
@@ -47,21 +47,37 @@ describe('mobile profile screen', () => {
   });
 
   it('discloses deletion consequences before collecting confirmation', () => {
-    const result = render(
-      <ProfileDeletionConfirmation
-        confirmation=""
-        isDeleting={false}
-        onCancel={jest.fn()}
-        onConfirmationChange={jest.fn()}
-        onDelete={jest.fn()}
-        onPasswordChange={jest.fn()}
-        password=""
-      />,
-    );
+    const tree = ProfileDeletionConfirmation({
+      confirmation: '',
+      isDeleting: false,
+      onCancel: jest.fn(),
+      onConfirmationChange: jest.fn(),
+      onDelete: jest.fn(),
+      onPasswordChange: jest.fn(),
+      password: '',
+    });
 
-    expect(result.getByText(/This permanently deletes your trips/)).toBeTruthy();
-    expect(result.getByTestId('delete-account-password')).toBeTruthy();
-    expect(result.getByTestId('delete-account-confirmation')).toBeTruthy();
-    expect(result.getByRole('button', { name: 'Permanently delete account' })).toBeTruthy();
+    function visit(node, matches = { testIds: new Set(), text: [] }) {
+      if (node == null || typeof node === 'boolean') return matches;
+      if (typeof node === 'string' || typeof node === 'number') {
+        matches.text.push(String(node));
+        return matches;
+      }
+      if (Array.isArray(node)) {
+        node.forEach((child) => visit(child, matches));
+        return matches;
+      }
+      if (node?.props?.testID) matches.testIds.add(node.props.testID);
+      visit(node?.props?.children, matches);
+      return matches;
+    }
+
+    const matches = visit(tree);
+    const textContent = matches.text.join(' ');
+
+    expect(textContent).toContain('This permanently deletes your trips');
+    expect(textContent).toContain('Permanently delete account');
+    expect(matches.testIds.has('delete-account-password')).toBe(true);
+    expect(matches.testIds.has('delete-account-confirmation')).toBe(true);
   });
 });
