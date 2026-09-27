@@ -56,7 +56,7 @@ describe('mobile profile screen', () => {
     );
 
     expect(result.queryByText(/This permanently deletes your trips/)).toBeNull();
-    await act(async () => {
+    await act(() => {
       fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
     });
     expect(result.getByText(/This permanently deletes your trips/)).toBeTruthy();
