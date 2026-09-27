@@ -83,14 +83,18 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>}} props */
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>}} props */
 export function MobileSubscriptionStatusContent({
   client: suppliedClient,
   loadOfferingCatalog,
   purchasePlan,
+  restorePurchases,
 }) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
   const [purchaseState, setPurchaseState] = useState(
+    /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
+  );
+  const [restoreState, setRestoreState] = useState(
     /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
   );
   const query = useQuery({
@@ -137,9 +141,11 @@ export function MobileSubscriptionStatusContent({
   const access = query.data;
   const isPro = access.tier === 'PRO';
   const purchasePending = purchaseState.status === 'pending';
+  const restorePending = restoreState.status === 'pending';
+  const billingPending = purchasePending || restorePending;
 
   async function handlePurchase(period) {
-    if (typeof purchasePlan !== 'function' || purchasePending) return;
+    if (typeof purchasePlan !== 'function' || billingPending) return;
 
     setPurchaseState({ status: 'pending', message: null });
     let result;
@@ -190,6 +196,53 @@ export function MobileSubscriptionStatusContent({
       status: 'pending-verification',
       message:
         'Google Play completed the purchase. AttraVoya is still verifying Pro access. Refresh status shortly.',
+    });
+  }
+
+  async function handleRestore() {
+    if (typeof restorePurchases !== 'function' || billingPending) return;
+
+    setRestoreState({ status: 'pending', message: null });
+    let result;
+    try {
+      result = await restorePurchases();
+    } catch {
+      setRestoreState({
+        status: 'failed',
+        message: 'Previous Google Play purchases could not be restored safely. Please try again.',
+      });
+      return;
+    }
+
+    if (result?.status === 'unavailable') {
+      setRestoreState({
+        status: 'unavailable',
+        message: 'Google Play restore is unavailable right now. Please try again later.',
+      });
+      return;
+    }
+
+    if (result?.status !== 'completed') {
+      setRestoreState({
+        status: 'failed',
+        message: 'Previous Google Play purchases could not be restored safely. Please try again.',
+      });
+      return;
+    }
+
+    const refreshed = await query.refetch();
+    if (refreshed.data?.tier === 'PRO') {
+      setRestoreState({
+        status: 'verified',
+        message: 'Your restored purchase has been verified by AttraVoya.',
+      });
+      return;
+    }
+
+    setRestoreState({
+      status: 'pending-verification',
+      message:
+        'Google Play restore completed. AttraVoya has not verified Pro access yet. Refresh status shortly.',
     });
   }
 
@@ -261,12 +314,12 @@ export function MobileSubscriptionStatusContent({
                           <Pressable
                             accessibilityHint={`Starts the ${plan.period} Google Play subscription purchase`}
                             accessibilityRole="button"
-                            disabled={purchasePending}
+                            disabled={billingPending}
                             onPress={() => void handlePurchase(plan.period)}
                             style={({ pressed }) => [
                               styles.purchaseButton,
                               pressed && styles.buttonPressed,
-                              purchasePending && styles.buttonDisabled,
+                              billingPending && styles.buttonDisabled,
                             ]}
                           >
                             <Text style={styles.purchaseButtonLabel}>
@@ -289,6 +342,36 @@ export function MobileSubscriptionStatusContent({
                 {purchaseState.message ? (
                   <Text accessibilityLiveRegion="polite" style={styles.purchaseStatus}>
                     {purchaseState.message}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
+
+            {typeof restorePurchases === 'function' ? (
+              <View style={styles.restoreSection}>
+                <Text style={styles.restoreTitle}>Already subscribed before?</Text>
+                <Text style={styles.restoreText}>
+                  Restore previous Google Play purchases on this account. Pro access is enabled only
+                  after AttraVoya verifies your server plan status.
+                </Text>
+                <Pressable
+                  accessibilityHint="Restores previous Google Play purchases and rechecks your server verified plan"
+                  accessibilityRole="button"
+                  disabled={billingPending}
+                  onPress={() => void handleRestore()}
+                  style={({ pressed }) => [
+                    styles.restoreButton,
+                    pressed && styles.buttonPressed,
+                    billingPending && styles.buttonDisabled,
+                  ]}
+                >
+                  <Text style={styles.restoreButtonLabel}>
+                    {restorePending ? 'Restoring…' : 'Restore purchases'}
+                  </Text>
+                </Pressable>
+                {restoreState.message ? (
+                  <Text accessibilityLiveRegion="polite" style={styles.purchaseStatus}>
+                    {restoreState.message}
                   </Text>
                 ) : null}
               </View>
@@ -339,6 +422,7 @@ export default function MobileSubscriptionStatusScreen() {
             <MobileSubscriptionStatusContent
               loadOfferingCatalog={billing.loadOfferingCatalog}
               purchasePlan={billing.purchasePlan}
+              restorePurchases={billing.restorePurchases}
             />
           </View>
         </View>
@@ -481,6 +565,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
   },
   purchaseButtonLabel: { color: lightTheme.surface, fontSize: 14, fontWeight: '700' },
+  restoreSection: {
+    gap: spacing[3],
+    borderTopColor: lightTheme.borderSubtle,
+    borderTopWidth: 1,
+    paddingTop: spacing[4],
+  },
+  restoreTitle: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  restoreText: { color: lightTheme.textSecondary, fontSize: 14, lineHeight: 21 },
+  restoreButton: {
+    minHeight: interaction.minimumTargetSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: lightTheme.borderStrong,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing[4],
+  },
+  restoreButtonLabel: { color: lightTheme.textPrimary, fontSize: 14, fontWeight: '700' },
   refreshButton: {
     minHeight: interaction.comfortableControlHeight,
     alignItems: 'center',
