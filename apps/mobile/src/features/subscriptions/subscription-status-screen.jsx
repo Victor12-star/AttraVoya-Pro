@@ -140,7 +140,16 @@ export function MobileSubscriptionStatusContent({
     if (typeof purchasePlan !== 'function' || purchasePending) return;
 
     setPurchaseState({ status: 'pending', message: null });
-    const result = await purchasePlan(period);
+    let result;
+    try {
+      result = await purchasePlan(period);
+    } catch {
+      setPurchaseState({
+        status: 'failed',
+        message: 'The purchase could not be completed safely. Please try again.',
+      });
+      return;
+    }
 
     if (result?.status === 'cancelled') {
       setPurchaseState({
