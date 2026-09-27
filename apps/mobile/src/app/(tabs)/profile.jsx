@@ -27,7 +27,6 @@ export function normalizeDeletionConfirmation(password, confirmation) {
   return parsed.success ? parsed.data : null;
 }
 
-
 export function ProfileDeletionConfirmation({
   confirmation,
   isDeleting,
@@ -40,8 +39,8 @@ export function ProfileDeletionConfirmation({
   return (
     <>
       <Text style={styles.dangerWarning}>
-        This permanently deletes your trips, plans, favourites, searches, subscription records, and
-        profile information. This cannot be undone.
+        This permanently deletes your trips, plans, favourites, searches, subscription records,
+        and profile information. This cannot be undone.
       </Text>
       <View style={styles.fieldGroup}>
         <Text nativeID="delete-password-label" style={styles.label}>
