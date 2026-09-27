@@ -11,7 +11,8 @@ const MobileBillingContext = createContext(/** @type {any} */ (null));
 export function MobileBillingProvider({ children, revenueCatRuntime }) {
   if (
     typeof revenueCatRuntime?.loadOfferingCatalog !== 'function' ||
-    typeof revenueCatRuntime?.purchasePlan !== 'function'
+    typeof revenueCatRuntime?.purchasePlan !== 'function' ||
+    typeof revenueCatRuntime?.restorePurchases !== 'function'
   ) {
     throw new TypeError('RevenueCat mobile billing runtime is invalid.');
   }
