@@ -1,0 +1,52 @@
+name: Temporary RevenueCat purchase formatter
+
+on:
+  push:
+    branches:
+      - phase-10dv-revenuecat-purchase-command
+    paths:
+      - apps/mobile/src/services/revenuecat-purchase-command.js
+      - .github/workflows/revenuecat-purchase-format.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: phase-10dv-revenuecat-purchase-command
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format purchase command
+        run: pnpm exec prettier --write apps/mobile/src/services/revenuecat-purchase-command.js
+
+      - name: Commit formatted file
+        run: |
+          if git diff --quiet -- apps/mobile/src/services/revenuecat-purchase-command.js; then
+            echo "Already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/src/services/revenuecat-purchase-command.js
+          git commit -m "style: format RevenueCat purchase command"
+          git push origin HEAD:phase-10dv-revenuecat-purchase-command
