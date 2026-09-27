@@ -92,7 +92,6 @@ describe('RevenueCat Android native runtime', () => {
 
     expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
-    expect(moduleValue.default.purchasePackage).toHaveBeenCalledTimes(1);
     expect(loadModule).toHaveBeenCalledTimes(1);
   });
 
@@ -175,5 +174,6 @@ describe('RevenueCat Android native runtime', () => {
     expect(moduleValue.default.logIn).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logOut).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
+    expect(moduleValue.default.purchasePackage).toHaveBeenCalledTimes(1);
   });
 });
