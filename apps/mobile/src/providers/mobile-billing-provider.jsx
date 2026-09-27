@@ -9,7 +9,10 @@ const MobileBillingContext = createContext(/** @type {any} */ (null));
  * @param {{children: import('react').ReactNode, revenueCatRuntime: any}} props
  */
 export function MobileBillingProvider({ children, revenueCatRuntime }) {
-  if (typeof revenueCatRuntime?.loadOfferingCatalog !== 'function') {
+  if (
+    typeof revenueCatRuntime?.loadOfferingCatalog !== 'function' ||
+    typeof revenueCatRuntime?.purchasePlan !== 'function'
+  ) {
     throw new TypeError('RevenueCat mobile billing runtime is invalid.');
   }
 
