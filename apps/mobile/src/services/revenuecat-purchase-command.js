@@ -11,7 +11,7 @@ const RESULT = Object.freeze({
 function selectPackage(offerings, period) {
   const current = offerings?.current;
   if (!current) return null;
-  return period === 'monthly' ? current.monthly ?? null : current.annual ?? null;
+  return period === 'monthly' ? (current.monthly ?? null) : (current.annual ?? null);
 }
 
 function isCancelledPurchase(error) {
