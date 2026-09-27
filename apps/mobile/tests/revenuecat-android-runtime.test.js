@@ -59,6 +59,58 @@ describe('RevenueCat Android native runtime', () => {
     expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
   });
 
+  it('loads the normalized catalog through the same identified runtime', async () => {
+    const moduleValue = createNativeModule();
+    moduleValue.default.getOfferings.mockResolvedValueOnce({
+      current: {
+        monthly: {
+          packageType: 'MONTHLY',
+          product: { priceString: 'SEK 49.00' },
+        },
+        annual: {
+          packageType: 'ANNUAL',
+          product: { priceString: 'SEK 399.00' },
+        },
+      },
+      all: {},
+    });
+    const loadModule = jest.fn(async () => moduleValue);
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule,
+      getConfiguration: () => ({ enabled: true, apiKey: 'goog_public123' }),
+    });
+
+    await expect(runtime.loadOfferingCatalog()).resolves.toEqual([
+      { period: 'monthly', price: 'SEK 49.00' },
+      { period: 'yearly', price: 'SEK 399.00' },
+    ]);
+
+    expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
+    expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
+    expect(loadModule).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not load the native SDK when catalog access is disabled', async () => {
+    const loadModule = jest.fn(async () => createNativeModule());
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule,
+      getConfiguration: () => ({ enabled: false }),
+    });
+
+    await expect(runtime.loadOfferingCatalog()).resolves.toEqual([]);
+
+    expect(loadModule).not.toHaveBeenCalled();
+    expect(client.getRevenueCatAndroidIdentity).not.toHaveBeenCalled();
+  });
+
   it('allows a clean native module import retry after startup failure', async () => {
     const moduleValue = createNativeModule();
     const loadModule = jest

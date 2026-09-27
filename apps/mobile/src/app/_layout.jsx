@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import ContentState from '../components/feedback/content-state.jsx';
 import AppQueryProvider from '../providers/app-query-provider.jsx';
+import { MobileBillingProvider } from '../providers/mobile-billing-provider.jsx';
 import { MobileAuthProvider, useMobileAuth } from '../providers/mobile-auth-provider.jsx';
 import { createMobileApiClient } from '../services/api-client.js';
 import { createRevenueCatAndroidRuntime } from '../services/revenuecat-android-runtime.js';
@@ -83,7 +84,7 @@ export default function RootLayout() {
     const client = createMobileApiClient();
     return Object.freeze({
       client,
-      revenueCatSession: createRevenueCatAndroidRuntime({ client }),
+      revenueCatRuntime: createRevenueCatAndroidRuntime({ client }),
     });
   });
 
@@ -91,9 +92,11 @@ export default function RootLayout() {
     <AppQueryProvider>
       <MobileAuthProvider
         client={mobileServices.client}
-        revenueCatSession={mobileServices.revenueCatSession}
+        revenueCatSession={mobileServices.revenueCatRuntime}
       >
-        <SessionNavigator />
+        <MobileBillingProvider revenueCatRuntime={mobileServices.revenueCatRuntime}>
+          <SessionNavigator />
+        </MobileBillingProvider>
       </MobileAuthProvider>
     </AppQueryProvider>
   );
