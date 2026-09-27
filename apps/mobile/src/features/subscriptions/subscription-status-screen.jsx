@@ -84,10 +84,7 @@ function safeLoadMessage(error) {
 }
 
 /** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>}} props */
-export function MobileSubscriptionStatusContent({
-  client: suppliedClient,
-  loadOfferingCatalog,
-}) {
+export function MobileSubscriptionStatusContent({ client: suppliedClient, loadOfferingCatalog }) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
   const query = useQuery({
     queryKey: ['subscription-status'],
@@ -103,7 +100,8 @@ export function MobileSubscriptionStatusContent({
     },
   });
 
-  const shouldLoadOfferings = query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
+  const shouldLoadOfferings =
+    query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
   const offeringQuery = useQuery({
     queryKey: ['subscription-offerings'],
     queryFn: () =>

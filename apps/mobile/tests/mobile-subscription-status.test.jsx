@@ -14,10 +14,7 @@ function renderContent(client, loadOfferingCatalog) {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MobileSubscriptionStatusContent
-        client={client}
-        loadOfferingCatalog={loadOfferingCatalog}
-      />
+      <MobileSubscriptionStatusContent client={client} loadOfferingCatalog={loadOfferingCatalog} />
     </QueryClientProvider>,
   );
 }
