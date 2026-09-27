@@ -142,6 +142,35 @@ describe('mobile subscription status', () => {
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
   });
 
+  it('contains an unexpected purchase command error without exposing diagnostics', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([
+      { period: 'monthly', price: 'SEK 49.00' },
+    ]);
+    const purchasePlan = jest.fn().mockRejectedValue(new Error('private store diagnostic'));
+
+    const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
+
+    expect(await result.findByText('SEK 49.00')).toBeTruthy();
+    await fireEvent.press(result.getByText('Choose monthly'));
+
+    expect(
+      await result.findByText('The purchase could not be completed safely. Please try again.'),
+    ).toBeTruthy();
+    expect(result.queryByText('private store diagnostic')).toBeNull();
+    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps provider failures private while leaving server-verified Free state usable', async () => {
     const client = {
       getMyEntitlements: jest.fn().mockResolvedValue({
