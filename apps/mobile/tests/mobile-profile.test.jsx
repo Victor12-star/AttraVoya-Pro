@@ -31,8 +31,8 @@ describe('mobile profile screen', () => {
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
 
-  it('fails safely when identity is unavailable', async () => {
-    const result = await render(
+  it('fails safely when identity is unavailable', () => {
+    const result = render(
       <ProfileContent onDeleteAccount={jest.fn()} onLogout={jest.fn()} user={null} />,
     );
 
@@ -46,8 +46,8 @@ describe('mobile profile screen', () => {
     expect(normalizeDeletionConfirmation('password1', 'DELETE')).toBe('password1');
   });
 
-  it('discloses deletion consequences before collecting confirmation', async () => {
-    const result = await render(
+  it('discloses deletion consequences before collecting confirmation', () => {
+    const result = render(
       <ProfileDeletionConfirmation
         confirmation=""
         isDeleting={false}
