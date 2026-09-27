@@ -13,6 +13,7 @@ function createNativeModule() {
       configure: jest.fn(() => undefined),
       logIn: jest.fn(async () => ({ customerInfo: { ignored: true } })),
       logOut: jest.fn(async () => ({ customerInfo: { ignored: true } })),
+      getOfferings: jest.fn(async () => ({ current: null, all: {} })),
     },
   };
 }
@@ -92,9 +93,11 @@ describe('RevenueCat Android native runtime', () => {
     await adapter.configure({ apiKey: 'goog_public123', appUserID: APP_USER_ID });
     await adapter.logIn('av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
     await adapter.logOut();
+    await adapter.getOfferings();
 
     expect(loadModule).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logIn).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logOut).toHaveBeenCalledTimes(1);
+    expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
   });
 });

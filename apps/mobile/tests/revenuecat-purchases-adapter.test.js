@@ -10,6 +10,7 @@ function createNativePurchases() {
     configure: jest.fn(() => undefined),
     logIn: jest.fn(async () => ({ customerInfo: { entitlements: { active: { pro: {} } } } })),
     logOut: jest.fn(async () => ({ customerInfo: { ignored: true } })),
+    getOfferings: jest.fn(async () => ({ current: null, all: {} })),
   };
 }
 
@@ -34,7 +35,7 @@ describe('RevenueCat Purchases adapter boundary', () => {
     }
   });
 
-  it('forwards configure, logIn and logOut without exposing CustomerInfo', async () => {
+  it('forwards lifecycle calls and read-only offerings without exposing CustomerInfo', async () => {
     const purchases = createNativePurchases();
     const adapter = createRevenueCatPurchasesAdapter({ default: purchases });
     const configuration = {
@@ -45,10 +46,12 @@ describe('RevenueCat Purchases adapter boundary', () => {
     await expect(adapter.configure(configuration)).resolves.toBeUndefined();
     await expect(adapter.logIn(configuration.appUserID)).resolves.toBeUndefined();
     await expect(adapter.logOut()).resolves.toBeUndefined();
+    await expect(adapter.getOfferings()).resolves.toEqual({ current: null, all: {} });
 
     expect(purchases.configure).toHaveBeenCalledWith(configuration);
     expect(purchases.logIn).toHaveBeenCalledWith(configuration.appUserID);
     expect(purchases.logOut).toHaveBeenCalledTimes(1);
+    expect(purchases.getOfferings).toHaveBeenCalledTimes(1);
   });
 
   it('propagates native lifecycle failures so the session layer can fail closed', async () => {
