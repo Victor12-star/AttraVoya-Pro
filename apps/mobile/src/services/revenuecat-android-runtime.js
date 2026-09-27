@@ -9,8 +9,9 @@ function defaultPurchasesModuleLoader() {
  * Load the native RevenueCat SDK only when the Android session actually needs
  * it. Disabled Android, iOS and web paths never evaluate the native module.
  *
- * A failed import is not cached permanently so a later authenticated retry can
- * recover after a transient native-module startup failure.
+ * The loader stays deferred until an enabled Android session needs it. A failed
+ * import is not cached permanently, so a later authenticated retry can recover
+ * after a transient native-module startup failure.
  */
 export function createLazyRevenueCatPurchasesAdapter(
   { loadModule = defaultPurchasesModuleLoader } = {},
