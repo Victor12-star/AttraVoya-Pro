@@ -27,6 +27,86 @@ export function normalizeDeletionConfirmation(password, confirmation) {
   return parsed.success ? parsed.data : null;
 }
 
+
+export function ProfileDeletionConfirmation({
+  confirmation,
+  isDeleting,
+  onCancel,
+  onConfirmationChange,
+  onDelete,
+  onPasswordChange,
+  password,
+}) {
+  return (
+    <>
+      <Text style={styles.dangerWarning}>
+        This permanently deletes your trips, plans, favourites, searches, subscription records, and
+        profile information. This cannot be undone.
+      </Text>
+      <View style={styles.fieldGroup}>
+        <Text nativeID="delete-password-label" style={styles.label}>
+          Current password
+        </Text>
+        <TextInput
+          accessibilityLabel="Current password"
+          accessibilityLabelledBy="delete-password-label"
+          autoComplete="current-password"
+          editable={!isDeleting}
+          onChangeText={onPasswordChange}
+          secureTextEntry
+          style={styles.input}
+          testID="delete-account-password"
+          textContentType="password"
+          value={password}
+        />
+      </View>
+      <View style={styles.fieldGroup}>
+        <Text nativeID="delete-confirmation-label" style={styles.label}>
+          Type DELETE to confirm
+        </Text>
+        <TextInput
+          accessibilityLabel="Type DELETE to confirm"
+          accessibilityLabelledBy="delete-confirmation-label"
+          autoCapitalize="characters"
+          autoCorrect={false}
+          editable={!isDeleting}
+          onChangeText={onConfirmationChange}
+          style={styles.input}
+          testID="delete-account-confirmation"
+          value={confirmation}
+        />
+      </View>
+      <Pressable
+        accessibilityHint="Permanently deletes your account and associated data."
+        accessibilityRole="button"
+        disabled={isDeleting}
+        onPress={onDelete}
+        style={({ pressed }) => [
+          styles.dangerButton,
+          pressed && styles.buttonPressed,
+          isDeleting && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={styles.dangerFilledLabel}>
+          {isDeleting ? 'Deleting account…' : 'Permanently delete account'}
+        </Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        disabled={isDeleting}
+        onPress={onCancel}
+        style={({ pressed }) => [
+          styles.cancelButton,
+          pressed && styles.buttonPressed,
+          isDeleting && styles.buttonDisabled,
+        ]}
+      >
+        <Text style={styles.cancelLabel}>Cancel</Text>
+      </Pressable>
+    </>
+  );
+}
+
 export function ProfileContent({ onDeleteAccount, onLogout, user }) {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -180,72 +260,15 @@ export function ProfileContent({ onDeleteAccount, onLogout, user }) {
             </Pressable>
           </>
         ) : (
-          <>
-            <Text style={styles.dangerWarning}>
-              This permanently deletes your trips, plans, favourites, searches, subscription
-              records, and profile information. This cannot be undone.
-            </Text>
-            <View style={styles.fieldGroup}>
-              <Text nativeID="delete-password-label" style={styles.label}>
-                Current password
-              </Text>
-              <TextInput
-                accessibilityLabel="Current password"
-                accessibilityLabelledBy="delete-password-label"
-                autoComplete="current-password"
-                editable={!isDeleting}
-                onChangeText={setPassword}
-                secureTextEntry
-                style={styles.input}
-                testID="delete-account-password"
-                textContentType="password"
-                value={password}
-              />
-            </View>
-            <View style={styles.fieldGroup}>
-              <Text nativeID="delete-confirmation-label" style={styles.label}>
-                Type DELETE to confirm
-              </Text>
-              <TextInput
-                accessibilityLabel="Type DELETE to confirm"
-                accessibilityLabelledBy="delete-confirmation-label"
-                autoCapitalize="characters"
-                autoCorrect={false}
-                editable={!isDeleting}
-                onChangeText={setConfirmation}
-                style={styles.input}
-                testID="delete-account-confirmation"
-                value={confirmation}
-              />
-            </View>
-            <Pressable
-              accessibilityHint="Permanently deletes your account and associated data."
-              accessibilityRole="button"
-              disabled={isDeleting}
-              onPress={deleteAccount}
-              style={({ pressed }) => [
-                styles.dangerButton,
-                pressed && styles.buttonPressed,
-                isDeleting && styles.buttonDisabled,
-              ]}
-            >
-              <Text style={styles.dangerFilledLabel}>
-                {isDeleting ? 'Deleting account…' : 'Permanently delete account'}
-              </Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              disabled={isDeleting}
-              onPress={cancelDeletion}
-              style={({ pressed }) => [
-                styles.cancelButton,
-                pressed && styles.buttonPressed,
-                isDeleting && styles.buttonDisabled,
-              ]}
-            >
-              <Text style={styles.cancelLabel}>Cancel</Text>
-            </Pressable>
-          </>
+          <ProfileDeletionConfirmation
+            confirmation={confirmation}
+            isDeleting={isDeleting}
+            onCancel={cancelDeletion}
+            onConfirmationChange={setConfirmation}
+            onDelete={deleteAccount}
+            onPasswordChange={setPassword}
+            password={password}
+          />
         )}
       </View>
     </>
