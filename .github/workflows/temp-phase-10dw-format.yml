@@ -1,0 +1,51 @@
+name: Temporary Phase 10DW profile formatter
+
+on:
+  push:
+    branches:
+      - phase-10dw-mobile-purchase-action
+    paths:
+      - .github/workflows/temp-phase-10dw-format.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format-profile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v5
+        with:
+          ref: phase-10dw-mobile-purchase-action
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format profile file
+        run: pnpm exec prettier --write 'apps/mobile/src/app/(tabs)/profile.jsx'
+
+      - name: Commit exact formatter output
+        run: |
+          if git diff --quiet -- 'apps/mobile/src/app/(tabs)/profile.jsx'; then
+            echo "Profile file already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'apps/mobile/src/app/(tabs)/profile.jsx'
+          git commit -m "style: apply repository Prettier to profile disclosure"
+          git push origin HEAD:phase-10dw-mobile-purchase-action
