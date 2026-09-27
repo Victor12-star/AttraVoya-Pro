@@ -90,7 +90,9 @@ export function MobileSubscriptionStatusContent({
   purchasePlan,
 }) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
-  const [purchaseState, setPurchaseState] = useState({ status: 'idle', message: null });
+  const [purchaseState, setPurchaseState] = useState(
+    /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
+  );
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
