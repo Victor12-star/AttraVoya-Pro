@@ -15,6 +15,7 @@ function createNativeModule() {
       logOut: jest.fn(async () => ({ customerInfo: { ignored: true } })),
       getOfferings: jest.fn(async () => ({ current: null, all: {} })),
       purchasePackage: jest.fn(async () => ({ customerInfo: { ignored: true } })),
+      restorePurchases: jest.fn(async () => ({ customerInfo: { ignored: true } })),
     },
   };
 }
@@ -116,6 +117,22 @@ describe('RevenueCat Android native runtime', () => {
     expect(moduleValue.default.purchasePackage).toHaveBeenCalledWith(monthlyPackage);
   });
 
+  it('executes restore through the identified runtime without trusting CustomerInfo', async () => {
+    const moduleValue = createNativeModule();
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule: jest.fn(async () => moduleValue),
+      getConfiguration: () => ({ enabled: true, apiKey: 'goog_public123' }),
+    });
+
+    await expect(runtime.restorePurchases()).resolves.toEqual({ status: 'completed' });
+
+    expect(moduleValue.default.restorePurchases).toHaveBeenCalledTimes(1);
+  });
+
   it('does not load the native SDK when catalog access is disabled', async () => {
     const loadModule = jest.fn(async () => createNativeModule());
     const client = {
@@ -128,6 +145,23 @@ describe('RevenueCat Android native runtime', () => {
     });
 
     await expect(runtime.loadOfferingCatalog()).resolves.toEqual([]);
+
+    expect(loadModule).not.toHaveBeenCalled();
+    expect(client.getRevenueCatAndroidIdentity).not.toHaveBeenCalled();
+  });
+
+  it('keeps restore inert when RevenueCat Android is disabled', async () => {
+    const loadModule = jest.fn(async () => createNativeModule());
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule,
+      getConfiguration: () => ({ enabled: false }),
+    });
+
+    await expect(runtime.restorePurchases()).resolves.toEqual({ status: 'unavailable' });
 
     expect(loadModule).not.toHaveBeenCalled();
     expect(client.getRevenueCatAndroidIdentity).not.toHaveBeenCalled();
@@ -159,7 +193,7 @@ describe('RevenueCat Android native runtime', () => {
     expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
   });
 
-  it('shares one lazy native adapter across configure, login and logout', async () => {
+  it('shares one lazy native adapter across configure, login and billing commands', async () => {
     const moduleValue = createNativeModule();
     const loadModule = jest.fn(async () => moduleValue);
     const adapter = createLazyRevenueCatPurchasesAdapter({ loadModule });
@@ -169,11 +203,13 @@ describe('RevenueCat Android native runtime', () => {
     await adapter.logOut();
     await adapter.getOfferings();
     await adapter.purchasePackage({ identifier: '$rc_monthly' });
+    await adapter.restorePurchases();
 
     expect(loadModule).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logIn).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.logOut).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.getOfferings).toHaveBeenCalledTimes(1);
     expect(moduleValue.default.purchasePackage).toHaveBeenCalledTimes(1);
+    expect(moduleValue.default.restorePurchases).toHaveBeenCalledTimes(1);
   });
 });
