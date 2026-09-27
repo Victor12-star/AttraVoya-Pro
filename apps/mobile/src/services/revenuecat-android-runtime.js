@@ -2,6 +2,7 @@ import { createRevenueCatAndroidSession } from './revenuecat-android-session.js'
 import { loadRevenueCatOfferingCatalog } from './revenuecat-offering-catalog.js';
 import { executeRevenueCatPurchase } from './revenuecat-purchase-command.js';
 import { createRevenueCatPurchasesAdapter } from './revenuecat-purchases-adapter.js';
+import { executeRevenueCatRestore } from './revenuecat-restore-command.js';
 
 function defaultPurchasesModuleLoader() {
   return import('react-native-purchases');
@@ -58,6 +59,10 @@ export function createLazyRevenueCatPurchasesAdapter({
       const adapter = await getAdapter();
       return adapter.purchasePackage(packageValue);
     },
+    async restorePurchases() {
+      const adapter = await getAdapter();
+      return adapter.restorePurchases();
+    },
   });
 }
 
@@ -94,6 +99,9 @@ export function createRevenueCatAndroidRuntime({ client, loadModule, getConfigur
     },
     purchasePlan(period) {
       return executeRevenueCatPurchase({ period, session, purchases });
+    },
+    restorePurchases() {
+      return executeRevenueCatRestore({ session, purchases });
     },
   });
 }
