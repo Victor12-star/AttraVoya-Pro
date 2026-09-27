@@ -6,7 +6,8 @@ function resolvePurchasesModule(moduleValue) {
     typeof purchases?.logIn !== 'function' ||
     typeof purchases?.logOut !== 'function' ||
     typeof purchases?.getOfferings !== 'function' ||
-    typeof purchases?.purchasePackage !== 'function'
+    typeof purchases?.purchasePackage !== 'function' ||
+    typeof purchases?.restorePurchases !== 'function'
   ) {
     throw new TypeError('RevenueCat Purchases native module is unavailable.');
   }
@@ -17,7 +18,7 @@ function resolvePurchasesModule(moduleValue) {
 /**
  * Keep the rest of the mobile application independent from RevenueCat's module
  * shape. This adapter intentionally exposes only the identified-user lifecycle
- * required by the server-owned session contract.
+ * and explicit billing commands required by AttraVoya.
  *
  * CustomerInfo returned by RevenueCat is discarded here because local provider
  * state must never become the authorization source for AttraVoya Pro.
@@ -44,6 +45,10 @@ export function createRevenueCatPurchasesAdapter(moduleValue) {
 
     async purchasePackage(packageValue) {
       await purchases.purchasePackage(packageValue);
+    },
+
+    async restorePurchases() {
+      await purchases.restorePurchases();
     },
   });
 }
