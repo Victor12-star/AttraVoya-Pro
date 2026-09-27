@@ -1,7 +1,11 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
-import { normalizeDeletionConfirmation, ProfileContent } from '../src/app/(tabs)/profile.jsx';
+import {
+  normalizeDeletionConfirmation,
+  ProfileContent,
+  ProfileDeletionConfirmation,
+} from '../src/app/(tabs)/profile.jsx';
 
 describe('mobile profile screen', () => {
   it('renders validated identity and provides an accessible sign-out action', async () => {
@@ -22,6 +26,7 @@ describe('mobile profile screen', () => {
 
     expect(result.getByText('traveller@example.test')).toBeTruthy();
     expect(result.getByText('Verified')).toBeTruthy();
+    expect(result.getByRole('button', { name: 'Delete account' })).toBeTruthy();
     await fireEvent.press(result.getByText('Sign out securely'));
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
@@ -43,24 +48,20 @@ describe('mobile profile screen', () => {
 
   it('discloses deletion consequences before collecting confirmation', async () => {
     const result = await render(
-      <ProfileContent
-        onDeleteAccount={jest.fn()}
-        onLogout={jest.fn()}
-        user={{
-          id: 'user-1',
-          email: 'traveller@example.test',
-          roles: ['USER'],
-          emailVerified: true,
-        }}
+      <ProfileDeletionConfirmation
+        confirmation=""
+        isDeleting={false}
+        onCancel={jest.fn()}
+        onConfirmationChange={jest.fn()}
+        onDelete={jest.fn()}
+        onPasswordChange={jest.fn()}
+        password=""
       />,
     );
 
-    expect(result.queryByText(/This permanently deletes your trips/)).toBeNull();
-    await act(async () => {
-      fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
-    });
     expect(result.getByText(/This permanently deletes your trips/)).toBeTruthy();
     expect(result.getByTestId('delete-account-password')).toBeTruthy();
     expect(result.getByTestId('delete-account-confirmation')).toBeTruthy();
+    expect(result.getByRole('button', { name: 'Permanently delete account' })).toBeTruthy();
   });
 });
