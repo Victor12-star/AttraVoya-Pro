@@ -5,7 +5,13 @@ import {
   normalizeMobileSubscriptionAccess,
 } from '../src/features/subscriptions/subscription-status-screen.jsx';
 
-function renderContent(client, loadOfferingCatalog, purchasePlan, restorePurchases) {
+function renderContent(
+  client,
+  loadOfferingCatalog,
+  purchasePlan,
+  restorePurchases,
+  openSubscriptionManagement,
+) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: 0 },
@@ -17,6 +23,7 @@ function renderContent(client, loadOfferingCatalog, purchasePlan, restorePurchas
       <MobileSubscriptionStatusContent
         client={client}
         loadOfferingCatalog={loadOfferingCatalog}
+        openSubscriptionManagement={openSubscriptionManagement}
         purchasePlan={purchasePlan}
         restorePurchases={restorePurchases}
       />
@@ -301,6 +308,106 @@ describe('mobile subscription status', () => {
     ).toBeTruthy();
   });
 
+  it('opens Google Play management only when the server authorizes that channel', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+          entitlements: ['offline_maps'],
+          limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+          subscription: {
+            status: 'ACTIVE',
+            currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            management: { channel: 'GOOGLE_PLAY' },
+          },
+        },
+      }),
+    };
+    const openSubscriptionManagement = jest.fn().mockResolvedValue(undefined);
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+    );
+
+    expect(await result.findByText('Manage in Google Play')).toBeTruthy();
+    await fireEvent.press(result.getByText('Manage in Google Play'));
+
+    expect(openSubscriptionManagement).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not expose a management action for unknown or absent management channels', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+          entitlements: ['offline_maps'],
+          limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+          subscription: {
+            status: 'ACTIVE',
+            currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            management: { channel: 'UNKNOWN_PROVIDER' },
+          },
+        },
+      }),
+    };
+    const openSubscriptionManagement = jest.fn().mockResolvedValue(undefined);
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+    );
+
+    expect(await result.findByText('Pro Monthly')).toBeTruthy();
+    expect(result.queryByText('Manage in Google Play')).toBeNull();
+    expect(openSubscriptionManagement).not.toHaveBeenCalled();
+  });
+
+  it('keeps management launch failures private without changing authoritative Pro access', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+          entitlements: ['offline_maps'],
+          limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+          subscription: {
+            status: 'ACTIVE',
+            currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            management: { channel: 'GOOGLE_PLAY' },
+          },
+        },
+      }),
+    };
+    const openSubscriptionManagement = jest
+      .fn()
+      .mockRejectedValue(new Error('private native linking diagnostic'));
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+    );
+
+    expect(await result.findByText('Manage in Google Play')).toBeTruthy();
+    await fireEvent.press(result.getByText('Manage in Google Play'));
+
+    expect(
+      await result.findByText(
+        'Google Play subscription management could not be opened. Please try again.',
+      ),
+    ).toBeTruthy();
+    expect(result.queryByText('private native linking diagnostic')).toBeNull();
+    expect(result.getByText('Your account currently has AttraVoya Pro access.')).toBeTruthy();
+  });
+
   it('renders only minimal active Pro state and never exposes provider identifiers', async () => {
     const client = {
       getMyEntitlements: jest.fn().mockResolvedValue({
@@ -415,6 +522,7 @@ describe('normalizeMobileSubscriptionAccess', () => {
       name: 'Pro Yearly',
       status: 'TRIALING',
       currentPeriodEnd: '2026-11-22T17:00:00.000Z',
+      managementChannel: null,
     });
   });
 });

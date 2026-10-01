@@ -8,7 +8,15 @@ import {
 } from '@attravoya/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ContentState from '../../components/feedback/content-state.jsx';
@@ -17,6 +25,7 @@ import { createMobileApiClient } from '../../services/api-client.js';
 
 const PLAN_KEYS = new Set(['FREE', 'PRO_MONTHLY', 'PRO_YEARLY']);
 const PRO_STATUSES = new Set(['ACTIVE', 'TRIALING']);
+const GOOGLE_PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';
 
 function safeText(value, maximumLength) {
   if (typeof value !== 'string') return null;
@@ -28,6 +37,10 @@ function safeIsoDate(value) {
   if (typeof value !== 'string') return null;
   const date = new Date(value);
   return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
+function safeManagementChannel(value) {
+  return value?.channel === 'GOOGLE_PLAY' ? 'GOOGLE_PLAY' : null;
 }
 
 export function normalizeMobileSubscriptionAccess(response) {
@@ -46,11 +59,13 @@ export function normalizeMobileSubscriptionAccess(response) {
       name,
       status: null,
       currentPeriodEnd: null,
+      managementChannel: null,
     });
   }
 
   const status = safeText(access?.subscription?.status, 20);
   const currentPeriodEnd = safeIsoDate(access?.subscription?.currentPeriodEnd);
+  const managementChannel = safeManagementChannel(access?.subscription?.management);
   if (tier !== 'PRO' || !status || !PRO_STATUSES.has(status) || !currentPeriodEnd) return null;
 
   return Object.freeze({
@@ -59,6 +74,7 @@ export function normalizeMobileSubscriptionAccess(response) {
     name,
     status,
     currentPeriodEnd,
+    managementChannel,
   });
 }
 
@@ -83,10 +99,11 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>}} props */
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>}} props */
 export function MobileSubscriptionStatusContent({
   client: suppliedClient,
   loadOfferingCatalog,
+  openSubscriptionManagement,
   purchasePlan,
   restorePurchases,
 }) {
@@ -97,6 +114,7 @@ export function MobileSubscriptionStatusContent({
   const [restoreState, setRestoreState] = useState(
     /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
   );
+  const [managementMessage, setManagementMessage] = useState(/** @type {string | null} */ (null));
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -199,6 +217,24 @@ export function MobileSubscriptionStatusContent({
     });
   }
 
+  async function handleSubscriptionManagement() {
+    if (
+      access.managementChannel !== 'GOOGLE_PLAY' ||
+      typeof openSubscriptionManagement !== 'function'
+    ) {
+      return;
+    }
+
+    setManagementMessage(null);
+    try {
+      await openSubscriptionManagement();
+    } catch {
+      setManagementMessage(
+        'Google Play subscription management could not be opened. Please try again.',
+      );
+    }
+  }
+
   async function handleRestore() {
     if (typeof restorePurchases !== 'function' || billingPending) return;
 
@@ -278,10 +314,38 @@ export function MobileSubscriptionStatusContent({
         </Text>
 
         {isPro && access.currentPeriodEnd ? (
-          <View style={styles.metadata}>
-            <Text style={styles.metadataLabel}>Current period ends</Text>
-            <Text style={styles.metadataValue}>{formatPeriodEnd(access.currentPeriodEnd)}</Text>
-          </View>
+          <>
+            <View style={styles.metadata}>
+              <Text style={styles.metadataLabel}>Current period ends</Text>
+              <Text style={styles.metadataValue}>{formatPeriodEnd(access.currentPeriodEnd)}</Text>
+            </View>
+
+            {access.managementChannel === 'GOOGLE_PLAY' &&
+            typeof openSubscriptionManagement === 'function' ? (
+              <View style={styles.managementSection}>
+                <Text style={styles.managementTitle}>Manage subscription</Text>
+                <Text style={styles.managementText}>
+                  Billing changes and cancellation for this subscription are handled by Google Play.
+                </Text>
+                <Pressable
+                  accessibilityHint="Opens Google Play subscription management"
+                  accessibilityRole="button"
+                  onPress={() => void handleSubscriptionManagement()}
+                  style={({ pressed }) => [
+                    styles.managementButton,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <Text style={styles.managementButtonLabel}>Manage in Google Play</Text>
+                </Pressable>
+                {managementMessage ? (
+                  <Text accessibilityLiveRegion="polite" style={styles.purchaseStatus}>
+                    {managementMessage}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
+          </>
         ) : (
           <>
             <View style={styles.purchaseNotice}>
@@ -404,6 +468,10 @@ export default function MobileSubscriptionStatusScreen() {
   const pageGutter = getPageGutter(width);
   const billing = useMobileBilling();
 
+  async function openSubscriptionManagement() {
+    await Linking.openURL(GOOGLE_PLAY_SUBSCRIPTIONS_URL);
+  }
+
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView
@@ -421,6 +489,7 @@ export default function MobileSubscriptionStatusScreen() {
           <View style={styles.statusContent}>
             <MobileSubscriptionStatusContent
               loadOfferingCatalog={billing.loadOfferingCatalog}
+              openSubscriptionManagement={openSubscriptionManagement}
               purchasePlan={billing.purchasePlan}
               restorePurchases={billing.restorePurchases}
             />
@@ -529,6 +598,24 @@ const styles = StyleSheet.create({
   },
   metadataLabel: { color: lightTheme.textSecondary, fontSize: 14, fontWeight: '600' },
   metadataValue: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  managementSection: {
+    gap: spacing[3],
+    borderTopColor: lightTheme.borderSubtle,
+    borderTopWidth: 1,
+    paddingTop: spacing[4],
+  },
+  managementTitle: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  managementText: { color: lightTheme.textSecondary, fontSize: 14, lineHeight: 21 },
+  managementButton: {
+    minHeight: interaction.minimumTargetSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: lightTheme.brandPrimary,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing[4],
+  },
+  managementButtonLabel: { color: lightTheme.brandPrimary, fontSize: 14, fontWeight: '700' },
   purchaseNotice: {
     backgroundColor: lightTheme.surfaceMuted,
     borderRadius: radius.md,
