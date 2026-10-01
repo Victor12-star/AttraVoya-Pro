@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { URL } from 'node:url';
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 
