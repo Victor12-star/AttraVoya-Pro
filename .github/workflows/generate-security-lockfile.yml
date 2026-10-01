@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - phase-10dza-security-dependency-refresh
+    paths:
+      - apps/server/package.json
+      - apps/web/package.json
+      - apps/admin/package.json
+      - pnpm-workspace.yaml
+      - .github/workflows/generate-security-lockfile.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   lockfile:
@@ -30,10 +36,14 @@ jobs:
       - name: Generate lockfile
         run: pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts
 
-      - name: Upload lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-lockfile
-          path: pnpm-lock.yaml
-          if-no-files-found: error
-          retention-days: 1
+      - name: Commit generated lockfile
+        run: |
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "pnpm-lock.yaml is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "security: regenerate dependency lockfile"
+          git push origin HEAD:${GITHUB_REF_NAME}
