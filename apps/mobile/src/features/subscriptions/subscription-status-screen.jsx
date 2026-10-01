@@ -321,12 +321,11 @@ export function MobileSubscriptionStatusContent({
             </View>
 
             {access.managementChannel === 'GOOGLE_PLAY' &&
-              typeof openSubscriptionManagement === 'function' ? (
+            typeof openSubscriptionManagement === 'function' ? (
               <View style={styles.managementSection}>
                 <Text style={styles.managementTitle}>Manage subscription</Text>
                 <Text style={styles.managementText}>
-                  Billing changes and cancellation for this subscription are handled by Google
-                  Play.
+                  Billing changes and cancellation for this subscription are handled by Google Play.
                 </Text>
                 <Pressable
                   accessibilityHint="Opens Google Play subscription management"
