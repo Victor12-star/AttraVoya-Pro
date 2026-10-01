@@ -1,0 +1,39 @@
+name: Generate security lockfile
+
+on:
+  push:
+    branches:
+      - phase-10dza-security-dependency-refresh
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Generate lockfile
+        run: pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts
+
+      - name: Upload lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error
+          retention-days: 1
