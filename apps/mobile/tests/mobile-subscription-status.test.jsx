@@ -12,6 +12,7 @@ function renderContent(
   restorePurchases,
   openSubscriptionManagement,
   subscribeToAppState,
+  billingAvailable = true,
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -22,6 +23,7 @@ function renderContent(
   return render(
     <QueryClientProvider client={queryClient}>
       <MobileSubscriptionStatusContent
+        billingAvailable={billingAvailable}
         client={client}
         loadOfferingCatalog={loadOfferingCatalog}
         openSubscriptionManagement={openSubscriptionManagement}
@@ -55,6 +57,47 @@ describe('mobile subscription status', () => {
       ),
     ).toBeTruthy();
     expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
+  });
+
+  it('hides Google Play billing surfaces when Android billing is unavailable', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+    };
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'monthly', price: 'SEK 49.00' }]);
+    const purchasePlan = jest.fn().mockResolvedValue({ status: 'completed' });
+    const restorePurchases = jest.fn().mockResolvedValue({ status: 'completed' });
+
+    const result = await renderContent(
+      client,
+      loadOfferingCatalog,
+      purchasePlan,
+      restorePurchases,
+      undefined,
+      undefined,
+      false,
+    );
+
+    expect(await result.findByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(result.queryByText('Google Play prices')).toBeNull();
+    expect(result.queryByText('SEK 49.00')).toBeNull();
+    expect(result.queryByText('Restore purchases')).toBeNull();
+    expect(
+      result.queryByText(
+        'Google Play handles the payment. AttraVoya enables Pro only after your server verified plan status confirms it.',
+      ),
+    ).toBeNull();
+    expect(loadOfferingCatalog).not.toHaveBeenCalled();
+    expect(purchasePlan).not.toHaveBeenCalled();
+    expect(restorePurchases).not.toHaveBeenCalled();
   });
 
   it('shows read-only monthly and yearly Google Play prices for Free users', async () => {
