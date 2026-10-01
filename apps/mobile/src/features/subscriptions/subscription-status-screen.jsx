@@ -105,8 +105,9 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void)}} props */
+/** @param {{billingAvailable?: boolean, client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void)}} props */
 export function MobileSubscriptionStatusContent({
+  billingAvailable = false,
   client: suppliedClient,
   loadOfferingCatalog,
   openSubscriptionManagement,
@@ -138,7 +139,7 @@ export function MobileSubscriptionStatusContent({
   });
 
   const shouldLoadOfferings =
-    query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
+    billingAvailable && query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
   const offeringQuery = useQuery({
     queryKey: ['subscription-offerings'],
     queryFn: () =>
@@ -182,7 +183,7 @@ export function MobileSubscriptionStatusContent({
   const billingPending = purchasePending || restorePending;
 
   async function handlePurchase(period) {
-    if (typeof purchasePlan !== 'function' || billingPending) return;
+    if (!billingAvailable || typeof purchasePlan !== 'function' || billingPending) return;
 
     setPurchaseState({ status: 'pending', message: null });
     let result;
@@ -257,7 +258,7 @@ export function MobileSubscriptionStatusContent({
   }
 
   async function handleRestore() {
-    if (typeof restorePurchases !== 'function' || billingPending) return;
+    if (!billingAvailable || typeof restorePurchases !== 'function' || billingPending) return;
 
     setRestoreState({ status: 'pending', message: null });
     let result;
@@ -369,12 +370,14 @@ export function MobileSubscriptionStatusContent({
           </>
         ) : (
           <>
-            <View style={styles.purchaseNotice}>
-              <Text style={styles.purchaseText}>
-                Google Play handles the payment. AttraVoya enables Pro only after your server
-                verified plan status confirms it.
-              </Text>
-            </View>
+            {billingAvailable ? (
+              <View style={styles.purchaseNotice}>
+                <Text style={styles.purchaseText}>
+                  Google Play handles the payment. AttraVoya enables Pro only after your server
+                  verified plan status confirms it.
+                </Text>
+              </View>
+            ) : null}
 
             {shouldLoadOfferings ? (
               <View style={styles.offeringSection}>
@@ -432,7 +435,7 @@ export function MobileSubscriptionStatusContent({
               </View>
             ) : null}
 
-            {typeof restorePurchases === 'function' ? (
+            {billingAvailable && typeof restorePurchases === 'function' ? (
               <View style={styles.restoreSection}>
                 <Text style={styles.restoreTitle}>Already subscribed before?</Text>
                 <Text style={styles.restoreText}>
@@ -509,6 +512,7 @@ export default function MobileSubscriptionStatusScreen() {
           </Text>
           <View style={styles.statusContent}>
             <MobileSubscriptionStatusContent
+              billingAvailable={billing.isAvailable()}
               loadOfferingCatalog={billing.loadOfferingCatalog}
               openSubscriptionManagement={openSubscriptionManagement}
               purchasePlan={billing.purchasePlan}
