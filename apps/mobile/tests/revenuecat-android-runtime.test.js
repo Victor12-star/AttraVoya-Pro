@@ -32,6 +32,7 @@ describe('RevenueCat Android native runtime', () => {
       getConfiguration: () => ({ enabled: false }),
     });
 
+    expect(session.isAvailable()).toBe(false);
     await expect(session.syncAuthenticatedUser()).resolves.toEqual({ status: 'disabled' });
 
     expect(loadModule).not.toHaveBeenCalled();
@@ -50,6 +51,8 @@ describe('RevenueCat Android native runtime', () => {
       getConfiguration: () => ({ enabled: true, apiKey: 'goog_public123' }),
     });
 
+    expect(session.isAvailable()).toBe(true);
+    expect(loadModule).not.toHaveBeenCalled();
     await expect(session.syncAuthenticatedUser()).resolves.toEqual({ status: 'configured' });
     await expect(session.syncAuthenticatedUser()).resolves.toEqual({ status: 'ready' });
 
@@ -59,6 +62,24 @@ describe('RevenueCat Android native runtime', () => {
       appUserID: APP_USER_ID,
     });
     expect(moduleValue.default.configure).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails closed for UI availability when configuration reading fails', () => {
+    const loadModule = jest.fn(async () => createNativeModule());
+    const client = {
+      getRevenueCatAndroidIdentity: jest.fn(async () => ({ appUserId: APP_USER_ID })),
+    };
+    const runtime = createRevenueCatAndroidRuntime({
+      client,
+      loadModule,
+      getConfiguration: () => {
+        throw new Error('invalid bundled configuration');
+      },
+    });
+
+    expect(runtime.isAvailable()).toBe(false);
+    expect(loadModule).not.toHaveBeenCalled();
+    expect(client.getRevenueCatAndroidIdentity).not.toHaveBeenCalled();
   });
 
   it('loads the normalized catalog through the same identified runtime', async () => {
