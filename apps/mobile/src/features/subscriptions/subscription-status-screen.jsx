@@ -114,9 +114,7 @@ export function MobileSubscriptionStatusContent({
   const [restoreState, setRestoreState] = useState(
     /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
   );
-  const [managementMessage, setManagementMessage] = useState(
-    /** @type {string | null} */ (null),
-  );
+  const [managementMessage, setManagementMessage] = useState(/** @type {string | null} */ (null));
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
