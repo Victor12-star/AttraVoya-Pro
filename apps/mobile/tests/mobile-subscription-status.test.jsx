@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   MobileSubscriptionStatusContent,
@@ -11,6 +11,7 @@ function renderContent(
   purchasePlan,
   restorePurchases,
   openSubscriptionManagement,
+  subscribeToAppState,
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -26,6 +27,7 @@ function renderContent(
         openSubscriptionManagement={openSubscriptionManagement}
         purchasePlan={purchasePlan}
         restorePurchases={restorePurchases}
+        subscribeToAppState={subscribeToAppState}
       />
     </QueryClientProvider>,
   );
@@ -337,6 +339,104 @@ describe('mobile subscription status', () => {
     await fireEvent.press(result.getByText('Manage in Google Play'));
 
     expect(openSubscriptionManagement).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshes authoritative plan status once when returning from Google Play management', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+          entitlements: ['offline_maps'],
+          limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+          subscription: {
+            status: 'ACTIVE',
+            currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            management: { channel: 'GOOGLE_PLAY' },
+          },
+        },
+      }),
+    };
+    const openSubscriptionManagement = jest.fn().mockResolvedValue(undefined);
+    let appStateListener = null;
+    const subscribeToAppState = jest.fn((listener) => {
+      appStateListener = listener;
+      return jest.fn();
+    });
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+      subscribeToAppState,
+    );
+
+    expect(await result.findByText('Manage in Google Play')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
+
+    await fireEvent.press(result.getByText('Manage in Google Play'));
+    expect(openSubscriptionManagement).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      appStateListener?.('background');
+      appStateListener?.('active');
+    });
+
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      appStateListener?.('active');
+    });
+
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not schedule a foreground refresh when Google Play management fails to open', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+          entitlements: ['offline_maps'],
+          limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+          subscription: {
+            status: 'ACTIVE',
+            currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            management: { channel: 'GOOGLE_PLAY' },
+          },
+        },
+      }),
+    };
+    const openSubscriptionManagement = jest.fn().mockRejectedValue(new Error('private failure'));
+    let appStateListener = null;
+    const subscribeToAppState = jest.fn((listener) => {
+      appStateListener = listener;
+      return jest.fn();
+    });
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+      subscribeToAppState,
+    );
+
+    expect(await result.findByText('Manage in Google Play')).toBeTruthy();
+    await fireEvent.press(result.getByText('Manage in Google Play'));
+
+    expect(
+      await result.findByText(
+        'Google Play subscription management could not be opened. Please try again.',
+      ),
+    ).toBeTruthy();
+
+    await act(async () => {
+      appStateListener?.('active');
+    });
+
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(1);
   });
 
   it('does not expose a management action for unknown or absent management channels', async () => {
