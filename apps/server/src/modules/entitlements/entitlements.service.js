@@ -37,6 +37,12 @@ function freeAccess() {
   };
 }
 
+function subscriptionManagement(record) {
+  return record?.provider === 'revenuecat'
+    ? Object.freeze({ channel: 'GOOGLE_PLAY' })
+    : null;
+}
+
 function entitlementKeys(record) {
   const present = new Set(
     Array.isArray(record?.plan?.entitlements)
@@ -91,6 +97,7 @@ export function createEntitlementsService(repository, options = {}) {
       subscription: {
         status,
         currentPeriodEnd: currentPeriodEnd.toISOString(),
+        management: subscriptionManagement(subscription),
       },
     };
   }
