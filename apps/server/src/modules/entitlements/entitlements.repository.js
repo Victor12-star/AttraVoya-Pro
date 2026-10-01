@@ -21,6 +21,7 @@ export function createEntitlementsRepository(prismaClient = prisma) {
         select: {
           status: true,
           currentPeriodEnd: true,
+          provider: true,
           plan: {
             select: {
               key: true,
