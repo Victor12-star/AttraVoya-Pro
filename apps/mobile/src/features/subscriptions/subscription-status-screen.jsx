@@ -7,8 +7,9 @@ import {
   spacing,
 } from '@attravoya/design-tokens';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AppState,
   Linking,
   Pressable,
   ScrollView,
@@ -26,6 +27,11 @@ import { createMobileApiClient } from '../../services/api-client.js';
 const PLAN_KEYS = new Set(['FREE', 'PRO_MONTHLY', 'PRO_YEARLY']);
 const PRO_STATUSES = new Set(['ACTIVE', 'TRIALING']);
 const GOOGLE_PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';
+
+function subscribeToNativeAppState(listener) {
+  const subscription = AppState.addEventListener('change', listener);
+  return () => subscription.remove();
+}
 
 function safeText(value, maximumLength) {
   if (typeof value !== 'string') return null;
@@ -99,13 +105,14 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>}} props */
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void)}} props */
 export function MobileSubscriptionStatusContent({
   client: suppliedClient,
   loadOfferingCatalog,
   openSubscriptionManagement,
   purchasePlan,
   restorePurchases,
+  subscribeToAppState = subscribeToNativeAppState,
 }) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
   const [purchaseState, setPurchaseState] = useState(
@@ -115,6 +122,7 @@ export function MobileSubscriptionStatusContent({
     /** @type {{status: string, message: string | null}} */ ({ status: 'idle', message: null }),
   );
   const [managementMessage, setManagementMessage] = useState(/** @type {string | null} */ (null));
+  const managementRefreshPendingRef = useRef(false);
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -138,6 +146,16 @@ export function MobileSubscriptionStatusContent({
     enabled: shouldLoadOfferings,
     retry: false,
   });
+
+  useEffect(() => {
+    if (typeof subscribeToAppState !== 'function') return undefined;
+
+    return subscribeToAppState((nextState) => {
+      if (nextState !== 'active' || !managementRefreshPendingRef.current) return;
+      managementRefreshPendingRef.current = false;
+      void query.refetch();
+    });
+  }, [query.refetch, subscribeToAppState]);
 
   if (query.isPending) {
     return <ContentState kind="loading" message="Checking your current AttraVoya plan…" />;
@@ -226,9 +244,11 @@ export function MobileSubscriptionStatusContent({
     }
 
     setManagementMessage(null);
+    managementRefreshPendingRef.current = true;
     try {
       await openSubscriptionManagement();
     } catch {
+      managementRefreshPendingRef.current = false;
       setManagementMessage(
         'Google Play subscription management could not be opened. Please try again.',
       );
