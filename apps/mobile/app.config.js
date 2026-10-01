@@ -1,8 +1,11 @@
+import { assertAndroidProductionBuildConfiguration } from './tooling/android-production-config.js';
 import { readRevenueCatAndroidPublicConfig } from './tooling/revenuecat-public-config.js';
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
 const easProjectId = process.env.EAS_PROJECT_ID;
 const revenueCatAndroid = readRevenueCatAndroidPublicConfig();
+
+assertAndroidProductionBuildConfiguration({ apiBaseUrl, revenueCatAndroid });
 
 /** @type {import('expo/config').ExpoConfig} */
 const appConfig = {
