@@ -1,4 +1,5 @@
 import { createRevenueCatAndroidSession } from './revenuecat-android-session.js';
+import { getRevenueCatAndroidConfiguration } from './revenuecat-config.js';
 import { loadRevenueCatOfferingCatalog } from './revenuecat-offering-catalog.js';
 import { executeRevenueCatPurchase } from './revenuecat-purchase-command.js';
 import { createRevenueCatPurchasesAdapter } from './revenuecat-purchases-adapter.js';
@@ -78,16 +79,24 @@ export function createLazyRevenueCatPurchasesAdapter({
  * }} options
  */
 export function createRevenueCatAndroidRuntime({ client, loadModule, getConfiguration }) {
+  const configurationReader = getConfiguration ?? getRevenueCatAndroidConfiguration;
   const purchases = createLazyRevenueCatPurchasesAdapter({
     ...(loadModule ? { loadModule } : {}),
   });
   const session = createRevenueCatAndroidSession({
     client,
     purchases,
-    ...(getConfiguration ? { getConfiguration } : {}),
+    getConfiguration: configurationReader,
   });
 
   return Object.freeze({
+    isAvailable() {
+      try {
+        return configurationReader()?.enabled === true;
+      } catch {
+        return false;
+      }
+    },
     syncAuthenticatedUser() {
       return session.syncAuthenticatedUser();
     },
