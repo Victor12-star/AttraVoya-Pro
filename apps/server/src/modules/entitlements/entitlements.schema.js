@@ -27,6 +27,12 @@ const accessSchema = z
       .object({
         status: z.enum(['ACTIVE', 'TRIALING']),
         currentPeriodEnd: z.string(),
+        management: z
+          .object({
+            channel: z.literal('GOOGLE_PLAY'),
+          })
+          .strict()
+          .nullable(),
       })
       .strict()
       .nullable(),
