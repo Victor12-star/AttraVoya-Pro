@@ -38,9 +38,7 @@ function freeAccess() {
 }
 
 function subscriptionManagement(record) {
-  return record?.provider === 'revenuecat'
-    ? Object.freeze({ channel: 'GOOGLE_PLAY' })
-    : null;
+  return record?.provider === 'revenuecat' ? Object.freeze({ channel: 'GOOGLE_PLAY' }) : null;
 }
 
 function entitlementKeys(record) {
