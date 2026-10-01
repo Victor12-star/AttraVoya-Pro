@@ -78,6 +78,7 @@ function proSubscription(planKey = PLANS.PRO_MONTHLY) {
   return {
     status: 'ACTIVE',
     currentPeriodEnd: new Date('2026-10-22T17:00:00.000Z'),
+    provider: 'revenuecat',
     externalCustomerId: 'must-not-leak',
     externalSubscriptionId: 'must-not-leak',
     plan: {
@@ -146,10 +147,31 @@ describe('authoritative entitlement endpoint', () => {
         subscription: {
           status: 'ACTIVE',
           currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+          management: { channel: 'GOOGLE_PLAY' },
         },
       },
     });
     expect(JSON.stringify(response.json())).not.toContain('must-not-leak');
+  });
+
+  it('does not invent a Google Play management channel for non-RevenueCat Pro access', async () => {
+    const record = proSubscription();
+    record.provider = 'stripe';
+    const repository = entitlementRepository(record);
+    const app = await createApp(repository);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/entitlements/me',
+      headers: bearer(app),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().access.subscription).toEqual({
+      status: 'ACTIVE',
+      currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+      management: null,
+    });
   });
 
   it('fails closed to Free for the legacy generic Premium plan', async () => {
@@ -280,6 +302,7 @@ describe('entitlements repository', () => {
       select: {
         status: true,
         currentPeriodEnd: true,
+        provider: true,
         plan: {
           select: {
             key: true,
