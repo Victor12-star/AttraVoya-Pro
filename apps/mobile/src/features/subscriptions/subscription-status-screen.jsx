@@ -30,15 +30,7 @@ const GOOGLE_PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/sub
 
 function subscribeToNativeAppState(listener) {
   const subscription = AppState.addEventListener('change', listener);
-  return () => {
-    if (typeof subscription?.remove === 'function') {
-      subscription.remove();
-      return;
-    }
-    if (typeof AppState.removeEventListener === 'function') {
-      AppState.removeEventListener('change', listener);
-    }
-  };
+  return () => subscription?.remove?.();
 }
 
 function safeText(value, maximumLength) {
