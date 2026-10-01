@@ -10,6 +10,7 @@ const MobileBillingContext = createContext(/** @type {any} */ (null));
  */
 export function MobileBillingProvider({ children, revenueCatRuntime }) {
   if (
+    typeof revenueCatRuntime?.isAvailable !== 'function' ||
     typeof revenueCatRuntime?.loadOfferingCatalog !== 'function' ||
     typeof revenueCatRuntime?.purchasePlan !== 'function' ||
     typeof revenueCatRuntime?.restorePurchases !== 'function'
