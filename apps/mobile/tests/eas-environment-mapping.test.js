@@ -1,9 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 async function readEasConfiguration() {
-  const url = new URL('../eas.json', import.meta.url);
-  return JSON.parse(await readFile(url, 'utf8'));
+  const filePath = path.join(process.cwd(), 'eas.json');
+  return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
 describe('mobile EAS environment mapping', () => {
