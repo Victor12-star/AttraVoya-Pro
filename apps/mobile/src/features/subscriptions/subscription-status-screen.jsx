@@ -146,6 +146,7 @@ export function MobileSubscriptionStatusContent({
     enabled: shouldLoadOfferings,
     retry: false,
   });
+  const refetchSubscriptionStatus = query.refetch;
 
   useEffect(() => {
     if (typeof subscribeToAppState !== 'function') return undefined;
@@ -153,9 +154,9 @@ export function MobileSubscriptionStatusContent({
     return subscribeToAppState((nextState) => {
       if (nextState !== 'active' || !managementRefreshPendingRef.current) return;
       managementRefreshPendingRef.current = false;
-      void query.refetch();
+      void refetchSubscriptionStatus();
     });
-  }, [query.refetch, subscribeToAppState]);
+  }, [refetchSubscriptionStatus, subscribeToAppState]);
 
   if (query.isPending) {
     return <ContentState kind="loading" message="Checking your current AttraVoya plan…" />;
