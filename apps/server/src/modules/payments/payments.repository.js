@@ -555,12 +555,9 @@ export function createPaymentsRepository(prismaClient = prisma) {
     /**
      * @param {{
      *   eventId: string,
-     *   subscriptionId: string,
      *   provider: string,
-     *   planKey?: string | null,
-     *   status: 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED',
-     *   currentPeriodEnd: Date | null,
-     *   canceledAt: Date | null,
+     *   fromUserId: string,
+     *   toUserId: string,
      *   providerStateUpdatedAt: Date,
      *   processedAt: Date
      * }} input
@@ -673,6 +670,19 @@ export function createPaymentsRepository(prismaClient = prisma) {
       });
     },
 
+    /**
+     * @param {{
+     *   eventId: string,
+     *   subscriptionId: string,
+     *   provider: string,
+     *   planKey?: string | null,
+     *   status: 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED',
+     *   currentPeriodEnd: Date | null,
+     *   canceledAt: Date | null,
+     *   providerStateUpdatedAt: Date,
+     *   processedAt: Date
+     * }} input
+     */
     async applyVerifiedSubscriptionState({
       eventId,
       subscriptionId,
