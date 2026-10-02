@@ -75,10 +75,7 @@ describe('RevenueCat Android transfer ownership', () => {
 
   it('fails closed for ambiguous server-owned identities', async () => {
     const rawPayload = payload({
-      transferred_from: [
-        FROM_APP_USER_ID,
-        'av_rc_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
-      ],
+      transferred_from: [FROM_APP_USER_ID, 'av_rc_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'],
     });
     const evidence = await evidenceFor(rawPayload);
 
