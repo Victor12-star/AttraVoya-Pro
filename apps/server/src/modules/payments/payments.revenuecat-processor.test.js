@@ -441,6 +441,50 @@ describe('RevenueCat subscription event processor', () => {
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
+  it('keeps verified transfer identity mismatches pending for investigation', async () => {
+    const { instance, deps } = processor();
+    const original = payload({
+      id: 'evt_rc_processor_transfer_mismatch',
+      type: 'TRANSFER',
+      product_id: undefined,
+      period_type: undefined,
+      purchased_at_ms: undefined,
+      expiration_at_ms: undefined,
+      original_transaction_id: undefined,
+      app_user_id: undefined,
+      original_app_user_id: undefined,
+      aliases: undefined,
+      transferred_from: [OWNED_ID],
+      transferred_to: ['av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'],
+    });
+    const evidence = await evidenceFor(original);
+    const changed = payload({
+      id: 'evt_rc_processor_transfer_mismatch',
+      type: 'TRANSFER',
+      product_id: undefined,
+      period_type: undefined,
+      purchased_at_ms: undefined,
+      expiration_at_ms: undefined,
+      original_transaction_id: undefined,
+      app_user_id: undefined,
+      original_app_user_id: undefined,
+      aliases: undefined,
+      transferred_from: [OWNED_ID],
+      transferred_to: ['av_rc_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'],
+    });
+
+    await expect(
+      instance.processVerified({
+        rawPayload: changed,
+        evidence,
+      }),
+    ).rejects.toThrow('RevenueCat verified transfer does not match exact request bytes.');
+
+    expect(deps.paymentsService.recordVerifiedEvent).toHaveBeenCalledTimes(1);
+    expect(deps.paymentsService.finalizeVerifiedEvent).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedRevenueCatOwnershipTransfer).not.toHaveBeenCalled();
+  });
+
   it('keeps exact-byte identity mismatches pending for investigation instead of terminalizing them', async () => {
     const { instance, deps } = processor();
     const original = payload();

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { ConflictError, NotFoundError, ValidationError } from '../../errors/app-error.js';
+import { RevenueCatVerifiedIdentityMismatchError } from './payments.revenuecat-subscription.js';
 import { isVerifiedBillingEvidence } from './payments.verification.js';
 
 const SERVER_APP_USER_ID = /^av_rc_[A-Za-z0-9_-]{32}$/;
@@ -37,7 +38,9 @@ function parseVerifiedTransfer({ rawPayload, evidence, expectedAppId }) {
 
   const payloadHash = createHash('sha256').update(rawPayload).digest('hex');
   if (payloadHash !== evidence.payloadHash) {
-    throw new ValidationError('RevenueCat verified transfer does not match exact request bytes.');
+    throw new RevenueCatVerifiedIdentityMismatchError(
+      'RevenueCat verified transfer does not match exact request bytes.',
+    );
   }
 
   let payload;
@@ -52,12 +55,19 @@ function parseVerifiedTransfer({ rawPayload, evidence, expectedAppId }) {
     payload?.api_version !== '1.0' ||
     !event ||
     typeof event !== 'object' ||
-    Array.isArray(event) ||
+    Array.isArray(event)
+  ) {
+    throw new ValidationError('RevenueCat transfer payload is invalid.');
+  }
+
+  if (
     event.id !== evidence.externalEventId ||
     event.type !== 'TRANSFER' ||
     evidence.eventType !== 'TRANSFER'
   ) {
-    throw new ValidationError('RevenueCat transfer payload is invalid.');
+    throw new RevenueCatVerifiedIdentityMismatchError(
+      'RevenueCat verified transfer identity does not match payload.',
+    );
   }
 
   if (typeof expectedAppId !== 'string' || !expectedAppId.trim()) {
@@ -85,7 +95,9 @@ function parseVerifiedTransfer({ rawPayload, evidence, expectedAppId }) {
     throw new ValidationError('RevenueCat transfer event timestamp is invalid.');
   }
   if (payloadEventTime.getTime() !== evidence.occurredAt.getTime()) {
-    throw new ValidationError('RevenueCat verified transfer event time does not match payload.');
+    throw new RevenueCatVerifiedIdentityMismatchError(
+      'RevenueCat verified transfer event time does not match payload.',
+    );
   }
 
   const from = requiredIdentityList(event.transferred_from, 'RevenueCat transferred_from');
