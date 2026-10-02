@@ -18,3 +18,5 @@ packages/database/prisma/migrations/
 pnpm-lock.yaml
 *.min.js
 *.snap
+
+packages/node-forge-patched/
