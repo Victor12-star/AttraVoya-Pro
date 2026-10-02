@@ -290,6 +290,38 @@ describe('provider subscription ownership repository', () => {
     });
   });
 
+  it('recognizes a verified active-plan change for the same provider owner', async () => {
+    const existing = pendingSubscription({ status: 'ACTIVE' });
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        plan: {
+          findUnique: vi.fn(async () => ({
+            id: 'plan-pro-yearly',
+            key: PLANS.PRO_YEARLY,
+            isActive: true,
+          })),
+        },
+        subscription: {
+          findUnique: vi.fn(async () => existing),
+          create: vi.fn(),
+        },
+      }),
+    );
+
+    const result = await repository.createOrReuseProviderSubscriptionOwnership({
+      userId: 'user-1',
+      planKey: PLANS.PRO_YEARLY,
+      provider: 'revenuecat',
+      externalSubscriptionId: existing.externalSubscriptionId,
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'PLAN_CHANGE',
+      subscription: existing,
+      created: false,
+    });
+  });
+
   it('reuses exact existing ownership even when the internal plan is later inactive', async () => {
     const existing = pendingSubscription({ status: 'ACTIVE' });
     const repository = createPaymentsRepository(
