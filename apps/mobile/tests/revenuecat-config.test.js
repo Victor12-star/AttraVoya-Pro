@@ -61,9 +61,7 @@ describe('RevenueCat Android public mobile configuration', () => {
   it('disables real billing inside Expo Go preview mode', () => {
     const config = { enabled: true, apiKey: 'goog_public123' };
 
-    expect(
-      normalizeRevenueCatAndroidConfiguration(config, 'android', 'storeClient'),
-    ).toEqual({
+    expect(normalizeRevenueCatAndroidConfiguration(config, 'android', 'storeClient')).toEqual({
       enabled: false,
     });
   });
@@ -74,9 +72,7 @@ describe('RevenueCat Android public mobile configuration', () => {
     expect(
       normalizeRevenueCatAndroidConfiguration(config, 'android', 'standalone'),
     ).toEqual(config);
-    expect(
-      normalizeRevenueCatAndroidConfiguration(config, 'android', 'bare'),
-    ).toEqual(config);
+    expect(normalizeRevenueCatAndroidConfiguration(config, 'android', 'bare')).toEqual(config);
   });
 
   it('fails closed when bundled enabled configuration is malformed', () => {
