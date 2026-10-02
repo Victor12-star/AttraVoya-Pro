@@ -129,12 +129,14 @@ function parseVerifiedRevenueCatEvent(rawPayload, evidence) {
  * @param {{
  *   rawPayload: Buffer,
  *   evidence: object,
+ *   expectedAppId?: string,
  *   productPolicy: { resolvePlanKey: (productId: string) => string }
  * }} input
  */
 export function normalizeVerifiedRevenueCatAndroidLifecycle({
   rawPayload,
   evidence,
+  expectedAppId,
   productPolicy,
 }) {
   if (!productPolicy?.resolvePlanKey) {
@@ -142,6 +144,17 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
   }
 
   const { event, eventType } = parseVerifiedRevenueCatEvent(rawPayload, evidence);
+
+  if (expectedAppId !== undefined) {
+    if (typeof expectedAppId !== 'string' || !expectedAppId.trim()) {
+      throw new TypeError('RevenueCat expected app identity is required.');
+    }
+
+    const appId = requiredText(event.app_id, 'RevenueCat app identity', 255);
+    if (appId !== expectedAppId.trim()) {
+      throw new ValidationError('RevenueCat lifecycle event is for an unexpected app.');
+    }
+  }
 
   const store = requiredText(event.store, 'RevenueCat store', 40);
   if (store !== 'PLAY_STORE') {

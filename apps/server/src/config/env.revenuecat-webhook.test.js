@@ -25,6 +25,8 @@ function baseEnvironment(overrides = {}) {
   };
 }
 
+const revenueCatApp = { REVENUECAT_ANDROID_APP_ID: 'app_attravoya_android' };
+
 const products = {
   REVENUECAT_ANDROID_PRO_MONTHLY_PRODUCT_ID: 'attravoya_pro_v1:monthly-autorenewing',
   REVENUECAT_ANDROID_PRO_YEARLY_PRODUCT_ID: 'attravoya_pro_v1:yearly-autorenewing',
@@ -55,6 +57,7 @@ describe('RevenueCat webhook environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
+          ...revenueCatApp,
           ...products,
           REVENUECAT_WEBHOOK_ENABLED: 'true',
         }),
@@ -62,10 +65,23 @@ describe('RevenueCat webhook environment contract', () => {
     ).toThrow(/REVENUECAT_WEBHOOK_SIGNING_SECRET: required when REVENUECAT_WEBHOOK_ENABLED=true/);
   });
 
+  it('fails startup when ingress is enabled without the authoritative RevenueCat Android app ID', () => {
+    expect(() =>
+      loadEnvironment(
+        baseEnvironment({
+          ...products,
+          REVENUECAT_WEBHOOK_ENABLED: 'true',
+          REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
+        }),
+      ),
+    ).toThrow(/REVENUECAT_ANDROID_APP_ID: required when REVENUECAT_WEBHOOK_ENABLED=true/);
+  });
+
   it('fails startup when ingress is enabled without authoritative Android product mapping', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
+          ...revenueCatApp,
           REVENUECAT_WEBHOOK_ENABLED: 'true',
           REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
         }),
@@ -76,6 +92,7 @@ describe('RevenueCat webhook environment contract', () => {
   it('accepts explicitly enabled HMAC ingress with bounded tolerance', () => {
     const environment = loadEnvironment(
       baseEnvironment({
+        ...revenueCatApp,
         ...products,
         REVENUECAT_WEBHOOK_ENABLED: 'true',
         REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
@@ -86,6 +103,7 @@ describe('RevenueCat webhook environment contract', () => {
     expect(environment).toMatchObject({
       REVENUECAT_WEBHOOK_ENABLED: true,
       REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
+      REVENUECAT_ANDROID_APP_ID: 'app_attravoya_android',
       REVENUECAT_WEBHOOK_TOLERANCE_SECONDS: 120,
     });
   });
@@ -94,6 +112,7 @@ describe('RevenueCat webhook environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
+          ...revenueCatApp,
           ...products,
           REVENUECAT_WEBHOOK_ENABLED: 'true',
           REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),

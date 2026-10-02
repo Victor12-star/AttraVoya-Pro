@@ -20,6 +20,7 @@ const { DEFAULT_BODY_LIMIT_BYTES } = await import('../../config/constants.js');
 
 const apps = [];
 const OWNED_ID = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const APP_ID = 'app_attravoya_android';
 const productIds = {
   [PLANS.PRO_MONTHLY]: 'attravoya_pro_v1:monthly-autorenewing',
   [PLANS.PRO_YEARLY]: 'attravoya_pro_v1:yearly-autorenewing',
@@ -48,6 +49,7 @@ function signedPayload({ secret, now, overrides = {} }) {
     purchased_at_ms: now.getTime() - 60_000,
     expiration_at_ms: now.getTime() + 30 * 24 * 60 * 60 * 1000,
     environment: 'PRODUCTION',
+    app_id: APP_ID,
     original_transaction_id: 'GPA.1111-2222-3333-44444',
     store: 'PLAY_STORE',
     app_user_id: OWNED_ID,
@@ -161,6 +163,7 @@ describe('RevenueCat webhook ingress', () => {
       revenueCatWebhookEnabled: true,
       revenueCatWebhookSigningSecret: webhookSigningSecret,
       revenueCatWebhookNow: () => now,
+      revenueCatAndroidAppId: APP_ID,
       revenueCatAndroidProductIds: productIds,
       revenueCatSubscriberIdentityService: subscriberIdentityService,
       paymentsRepository,
@@ -219,6 +222,7 @@ describe('RevenueCat webhook ingress', () => {
       revenueCatWebhookEnabled: true,
       revenueCatWebhookSigningSecret: webhookSigningSecret,
       revenueCatWebhookNow: () => now,
+      revenueCatAndroidAppId: APP_ID,
       revenueCatAndroidProductIds: productIds,
       revenueCatSubscriberIdentityService: {
         getOrCreateForUser: vi.fn(),
