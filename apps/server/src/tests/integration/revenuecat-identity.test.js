@@ -87,7 +87,6 @@ describe('authenticated RevenueCat Android identity handoff', () => {
   });
 });
 
-
 describe('authenticated RevenueCat Android purchase availability', () => {
   it('requires authentication before exposing purchase availability', async () => {
     const app = await identityApp(vi.fn());

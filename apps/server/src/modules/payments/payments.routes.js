@@ -171,9 +171,9 @@ export async function paymentsRoutes(app, options = {}) {
       const productIds = options.revenueCatAndroidProductIds ?? {};
       const available = Boolean(
         options.revenueCatWebhookEnabled &&
-          productIds[PLANS.PRO_MONTHLY] &&
-          productIds[PLANS.PRO_YEARLY] &&
-          productIds[PLANS.PRO_MONTHLY] !== productIds[PLANS.PRO_YEARLY],
+        productIds[PLANS.PRO_MONTHLY] &&
+        productIds[PLANS.PRO_YEARLY] &&
+        productIds[PLANS.PRO_MONTHLY] !== productIds[PLANS.PRO_YEARLY],
       );
 
       reply.header('Cache-Control', 'private, no-store');
