@@ -552,6 +552,19 @@ export function createPaymentsRepository(prismaClient = prisma) {
       }
     },
 
+    /**
+     * @param {{
+     *   eventId: string,
+     *   subscriptionId: string,
+     *   provider: string,
+     *   planKey?: string | null,
+     *   status: string,
+     *   currentPeriodEnd: Date | null,
+     *   canceledAt: Date | null,
+     *   providerStateUpdatedAt: Date,
+     *   processedAt: Date
+     * }} input
+     */
     async applyVerifiedSubscriptionState({
       eventId,
       subscriptionId,
