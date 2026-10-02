@@ -565,6 +565,114 @@ export function createPaymentsRepository(prismaClient = prisma) {
      *   processedAt: Date
      * }} input
      */
+    async applyVerifiedRevenueCatOwnershipTransfer({
+      eventId,
+      provider,
+      fromUserId,
+      toUserId,
+      providerStateUpdatedAt,
+      processedAt,
+    }) {
+      return prismaClient.$transaction(async (tx) => {
+        const event = await tx.billingEvent.findUnique({
+          where: { id: eventId },
+          select: EVENT_SELECT,
+        });
+
+        if (!event) return { outcome: 'EVENT_NOT_FOUND' };
+        if (event.provider !== provider) return { outcome: 'PROVIDER_MISMATCH', event };
+        if (event.processingStatus !== 'PENDING') {
+          return { outcome: 'ALREADY_PROCESSED', event };
+        }
+
+        const subscriptions = await tx.subscription.findMany({
+          where: {
+            userId: fromUserId,
+            provider,
+          },
+          select: SUBSCRIPTION_SELECT,
+        });
+
+        if (subscriptions.length === 0) {
+          return { outcome: 'SOURCE_NOT_FOUND', event };
+        }
+
+        if (
+          subscriptions.some(
+            (subscription) =>
+              subscription.providerStateUpdatedAt &&
+              subscription.providerStateUpdatedAt >= providerStateUpdatedAt,
+          )
+        ) {
+          const ignoredEvent = await tx.billingEvent.update({
+            where: { id: eventId },
+            data: {
+              processingStatus: 'IGNORED',
+              processedAt,
+              failureCode: 'STALE_PROVIDER_STATE',
+            },
+            select: EVENT_SELECT,
+          });
+
+          return {
+            outcome: 'STALE',
+            event: ignoredEvent,
+            subscriptions,
+          };
+        }
+
+        const claimed = await tx.billingEvent.updateMany({
+          where: { id: eventId, processingStatus: 'PENDING' },
+          data: {
+            processingStatus: 'APPLIED',
+            processedAt,
+            failureCode: null,
+          },
+        });
+
+        if (claimed.count !== 1) {
+          const currentEvent = await tx.billingEvent.findUnique({
+            where: { id: eventId },
+            select: EVENT_SELECT,
+          });
+          return { outcome: 'ALREADY_PROCESSED', event: currentEvent };
+        }
+
+        const subscriptionIds = subscriptions.map((subscription) => subscription.id);
+        const moved = await tx.subscription.updateMany({
+          where: {
+            id: { in: subscriptionIds },
+            userId: fromUserId,
+            provider,
+          },
+          data: {
+            userId: toUserId,
+            providerStateUpdatedAt,
+          },
+        });
+
+        if (moved.count !== subscriptions.length) {
+          throw Object.assign(new Error('RevenueCat transfer ownership changed during update.'), {
+            code: 'REVENUECAT_TRANSFER_CONFLICT',
+          });
+        }
+
+        const transferred = await tx.subscription.findMany({
+          where: { id: { in: subscriptionIds } },
+          select: SUBSCRIPTION_SELECT,
+        });
+
+        return {
+          outcome: 'APPLIED',
+          event: await tx.billingEvent.findUnique({
+            where: { id: eventId },
+            select: EVENT_SELECT,
+          }),
+          subscriptions: transferred,
+        };
+      });
+    },
+
     async applyVerifiedSubscriptionState({
       eventId,
       subscriptionId,
