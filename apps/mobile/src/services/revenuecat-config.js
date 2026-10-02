@@ -16,8 +16,16 @@ function invalidConfiguration() {
  * phase. The public key identifies the RevenueCat app; it is never entitlement
  * proof and must never be treated as a server credential.
  */
-export function normalizeRevenueCatAndroidConfiguration(value, platform = Platform.OS) {
-  if (platform !== 'android' || value?.enabled !== true) {
+export function normalizeRevenueCatAndroidConfiguration(
+  value,
+  platform = Platform.OS,
+  executionEnvironment = Constants.executionEnvironment,
+) {
+  if (
+    platform !== 'android' ||
+    executionEnvironment === 'storeClient' ||
+    value?.enabled !== true
+  ) {
     return DISABLED_REVENUECAT_ANDROID_CONFIG;
   }
 
@@ -35,6 +43,11 @@ export function normalizeRevenueCatAndroidConfiguration(value, platform = Platfo
 export function getRevenueCatAndroidConfiguration(
   expoConfig = Constants.expoConfig,
   platform = Platform.OS,
+  executionEnvironment = Constants.executionEnvironment,
 ) {
-  return normalizeRevenueCatAndroidConfiguration(expoConfig?.extra?.revenueCatAndroid, platform);
+  return normalizeRevenueCatAndroidConfiguration(
+    expoConfig?.extra?.revenueCatAndroid,
+    platform,
+    executionEnvironment,
+  );
 }
