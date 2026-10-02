@@ -41,7 +41,8 @@ function optionalDate(value, name) {
  *   finalizePendingEvent: (input: any) => Promise<any>,
  *   findSubscriptionByProviderIdentity?: (input: any) => Promise<any>,
  *   applyVerifiedCheckoutCompletion?: (input: any) => Promise<any>,
- *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>
+ *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>,
+ *   applyVerifiedRevenueCatOwnershipTransfer?: (input: any) => Promise<any>
  * }} [repository]
  * @param {{ now?: () => Date }} [options]
  */
