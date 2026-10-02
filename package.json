@@ -60,5 +60,8 @@
     "prettier": "3.9.6",
     "turbo": "2.10.11",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "node-forge": "github:digitalbazaar/forge#ceba34402e329f0365134f23fe19898756527d65"
   }
 }
