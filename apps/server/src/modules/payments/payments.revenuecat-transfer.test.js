@@ -75,11 +75,15 @@ describe('RevenueCat Android transfer ownership', () => {
 
   it('rejects transfer event-time evidence that does not match the verified payload', async () => {
     const rawPayload = payload();
-    const evidence = await evidenceFor(rawPayload);
-    const mismatchedEvidence = {
-      ...evidence,
-      occurredAt: new Date(1_780_000_001_000),
-    };
+    const event = JSON.parse(rawPayload.toString('utf8')).event;
+    const mismatchedEvidence = await createBillingVerificationBoundary({
+      provider: 'revenuecat',
+      verify: async () => ({
+        externalEventId: event.id,
+        eventType: event.type,
+        occurredAt: new Date(1_780_000_001_000),
+      }),
+    }).verifyEvent({ rawPayload });
 
     await expect(
       resolveVerifiedRevenueCatAndroidTransfer({
