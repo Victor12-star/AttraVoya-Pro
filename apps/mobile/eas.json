@@ -11,7 +11,8 @@
       "env": {
         "APP_VARIANT": "development"
       },
-      "environment": "development"
+      "environment": "development",
+      "developmentClient": true
     },
     "preview": {
       "distribution": "internal",

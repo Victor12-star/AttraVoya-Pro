@@ -17,6 +17,12 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.environment).toBe('production');
   });
 
+  it('uses an Expo development client for native Android billing tests', async () => {
+    const configuration = await readEasConfiguration();
+
+    expect(configuration.build.development.developmentClient).toBe(true);
+  });
+
   it('keeps RevenueCat and API values out of committed EAS build configuration', async () => {
     const configuration = await readEasConfiguration();
     const serialized = JSON.stringify(configuration);
