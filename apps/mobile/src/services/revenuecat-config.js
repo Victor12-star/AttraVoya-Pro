@@ -21,11 +21,7 @@ export function normalizeRevenueCatAndroidConfiguration(
   platform = Platform.OS,
   executionEnvironment = Constants.executionEnvironment,
 ) {
-  if (
-    platform !== 'android' ||
-    executionEnvironment === 'storeClient' ||
-    value?.enabled !== true
-  ) {
+  if (platform !== 'android' || executionEnvironment === 'storeClient' || value?.enabled !== true) {
     return DISABLED_REVENUECAT_ANDROID_CONFIG;
   }
 
