@@ -90,7 +90,9 @@ describe('mobile subscription status', () => {
 
     const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
 
-    expect(await result.findByText('Google Play purchasing is unavailable right now.')).toBeTruthy();
+    expect(
+      await result.findByText('Google Play purchasing is unavailable right now.'),
+    ).toBeTruthy();
     expect(result.queryByText('SEK 49.00')).toBeNull();
     expect(result.queryByText('Choose monthly')).toBeNull();
     expect(loadOfferingCatalog).not.toHaveBeenCalled();
@@ -115,7 +117,9 @@ describe('mobile subscription status', () => {
 
     const result = await renderContent(client, loadOfferingCatalog, jest.fn());
 
-    expect(await result.findByText('Google Play purchasing is unavailable right now.')).toBeTruthy();
+    expect(
+      await result.findByText('Google Play purchasing is unavailable right now.'),
+    ).toBeTruthy();
     expect(result.queryByText('private backend readiness diagnostic')).toBeNull();
     expect(loadOfferingCatalog).not.toHaveBeenCalled();
   });

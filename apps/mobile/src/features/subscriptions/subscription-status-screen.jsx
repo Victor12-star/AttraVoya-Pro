@@ -50,7 +50,11 @@ function safeManagementChannel(value) {
 }
 
 export function normalizeAndroidPurchaseAvailability(response) {
-  if (response?.available === false && Array.isArray(response.planKeys) && response.planKeys.length === 0) {
+  if (
+    response?.available === false &&
+    Array.isArray(response.planKeys) &&
+    response.planKeys.length === 0
+  ) {
     return Object.freeze({ available: false });
   }
 
