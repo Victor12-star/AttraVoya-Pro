@@ -288,6 +288,8 @@ This phase still does not register a RevenueCat webhook route, resolve subscribe
 
 ### Verified RevenueCat Android lifecycle normalization
 
+Phase 10DZM binds verified Google Play subscription lifecycle events to the server-configured RevenueCat Android dashboard app ID. Even a correctly signed production event must match that exact app identity before it can reach ownership or authoritative subscription-state mutation. This protects project-level webhook integrations from cross-app events with overlapping product identifiers.
+
 Phase 10DD adds an internal normalizer for already-verified RevenueCat Google Play lifecycle events. It rechecks the exact raw-payload SHA-256 against verifier-minted evidence before reading lifecycle fields, requires `PLAY_STORE`, maps only server-owned Phase 10DB products, and derives provider subscription identity from verified `original_transaction_id`.
 
 The normalizer deliberately excludes App User IDs, aliases, entitlement names, purchase tokens and client purchase state from its trusted output. Cancellation is preserved as provider lifecycle information rather than being converted into immediate entitlement loss; authoritative state/revocation semantics remain a later slice.
