@@ -332,6 +332,9 @@ describe('RevenueCat subscription event processor', () => {
       'PURCHASE_REDEEMED',
       'REFUND_REVERSED',
       'INVOICE_ISSUANCE',
+      'SUBSCRIBER_ALIAS',
+      'PRICE_INCREASE_CONSENT_REQUIRED',
+      'PRICE_INCREASE_CONSENT_APPROVED',
     ]) {
       const result = await instance.process({
         rawPayload: payload({
