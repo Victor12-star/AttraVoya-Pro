@@ -94,16 +94,13 @@ function parseRevenueCatEvent(rawPayload) {
     throw new ValidationError('RevenueCat event identity is invalid.');
   }
 
-  let occurredAt = null;
-  if (event.event_timestamp_ms != null) {
-    if (!Number.isSafeInteger(event.event_timestamp_ms) || event.event_timestamp_ms <= 0) {
-      throw new ValidationError('RevenueCat event timestamp is invalid.');
-    }
+  if (!Number.isSafeInteger(event.event_timestamp_ms) || event.event_timestamp_ms <= 0) {
+    throw new ValidationError('RevenueCat event timestamp is invalid.');
+  }
 
-    occurredAt = new Date(event.event_timestamp_ms);
-    if (!Number.isFinite(occurredAt.getTime())) {
-      throw new ValidationError('RevenueCat event timestamp is invalid.');
-    }
+  const occurredAt = new Date(event.event_timestamp_ms);
+  if (!Number.isFinite(occurredAt.getTime())) {
+    throw new ValidationError('RevenueCat event timestamp is invalid.');
   }
 
   return {
