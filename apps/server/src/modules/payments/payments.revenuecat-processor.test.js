@@ -91,6 +91,22 @@ function dependencies() {
         status: 'ACTIVE',
       },
     })),
+    applyVerifiedRevenueCatOwnershipTransfer: vi.fn(async () => ({
+      applied: true,
+      duplicate: false,
+      stale: false,
+      sourceMissing: false,
+      event: {
+        ...event,
+        processingStatus: 'APPLIED',
+      },
+      subscriptions: [
+        {
+          ...subscription,
+          userId: 'user-2',
+        },
+      ],
+    })),
   };
 
   const ownershipRepository = {
@@ -245,6 +261,44 @@ describe('RevenueCat subscription event processor', () => {
     );
   });
 
+  it('moves existing RevenueCat ownership only after a verified transfer resolves both users', async () => {
+    const { instance, deps } = processor();
+    deps.subscriberIdentityService.resolveOwnedUser.mockImplementation(async ({ appUserId }) => {
+      if (appUserId === OWNED_ID) return { userId: 'user-1', appUserId };
+      if (appUserId === 'av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB') {
+        return { userId: 'user-2', appUserId };
+      }
+      throw new Error('unexpected identity');
+    });
+
+    const result = await instance.process({
+      rawPayload: payload({
+        id: 'evt_rc_processor_transfer',
+        type: 'TRANSFER',
+        product_id: undefined,
+        period_type: undefined,
+        purchased_at_ms: undefined,
+        expiration_at_ms: undefined,
+        original_transaction_id: undefined,
+        app_user_id: undefined,
+        original_app_user_id: undefined,
+        aliases: undefined,
+        transferred_from: [OWNED_ID],
+        transferred_to: ['av_rc_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'],
+      }),
+    });
+
+    expect(result.outcome).toBe('APPLIED');
+    expect(deps.paymentsService.applyVerifiedRevenueCatOwnershipTransfer).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      provider: 'revenuecat',
+      fromUserId: 'user-1',
+      toUserId: 'user-2',
+      providerStateUpdatedAt: new Date(1_780_000_000_000),
+    });
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
   it('ignores sandbox and unrelated verified RevenueCat events without ownership writes', async () => {
     const { instance, deps } = processor();
 
@@ -253,12 +307,12 @@ describe('RevenueCat subscription event processor', () => {
     });
     expect(sandbox.outcome).toBe('IGNORED');
 
-    const transferPayload = payload({
-      id: 'evt_rc_processor_transfer',
-      type: 'TRANSFER',
+    const unrelatedPayload = payload({
+      id: 'evt_rc_processor_test',
+      type: 'TEST',
     });
-    const transfer = await instance.process({ rawPayload: transferPayload });
-    expect(transfer.outcome).toBe('IGNORED');
+    const unrelated = await instance.process({ rawPayload: unrelatedPayload });
+    expect(unrelated.outcome).toBe('IGNORED');
 
     expect(
       deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,

@@ -41,7 +41,8 @@ function optionalDate(value, name) {
  *   finalizePendingEvent: (input: any) => Promise<any>,
  *   findSubscriptionByProviderIdentity?: (input: any) => Promise<any>,
  *   applyVerifiedCheckoutCompletion?: (input: any) => Promise<any>,
- *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>
+ *   applyVerifiedSubscriptionState?: (input: any) => Promise<any>,
+ *   applyVerifiedRevenueCatOwnershipTransfer?: (input: any) => Promise<any>
  * }} [repository]
  * @param {{ now?: () => Date }} [options]
  */
@@ -288,6 +289,102 @@ export function createPaymentsService(repository = paymentsRepository, options =
       return {
         event: result.event,
         duplicate: !result.created,
+      };
+    },
+
+    /**
+     * Apply an already-verified RevenueCat ownership transfer atomically.
+     * This moves existing provider-owned subscription rows only; it never
+     * creates a subscription or grants access from transfer metadata alone.
+     */
+    async applyVerifiedRevenueCatOwnershipTransfer({
+      eventId,
+      provider,
+      fromUserId,
+      toUserId,
+      providerStateUpdatedAt,
+    }) {
+      if (!repository.applyVerifiedRevenueCatOwnershipTransfer) {
+        throw new TypeError('RevenueCat transfer repository boundary is required.');
+      }
+
+      const normalizedEventId = requiredText(eventId, 'eventId', 128);
+      const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
+      const normalizedFromUserId = requiredText(fromUserId, 'fromUserId', 128);
+      const normalizedToUserId = requiredText(toUserId, 'toUserId', 128);
+      const normalizedStateTime = requiredDate(providerStateUpdatedAt, 'providerStateUpdatedAt');
+      const processedAt = requiredDate(now(), 'current time');
+
+      if (normalizedFromUserId === normalizedToUserId) {
+        throw new ValidationError('RevenueCat transfer owners must differ.');
+      }
+
+      const result = await repository.applyVerifiedRevenueCatOwnershipTransfer({
+        eventId: normalizedEventId,
+        provider: normalizedProvider,
+        fromUserId: normalizedFromUserId,
+        toUserId: normalizedToUserId,
+        providerStateUpdatedAt: normalizedStateTime,
+        processedAt,
+      });
+
+      if (result.outcome === 'EVENT_NOT_FOUND') {
+        throw new NotFoundError('Verified billing event was not found.');
+      }
+      if (result.outcome === 'PROVIDER_MISMATCH') {
+        throw new ConflictError('Verified billing provider does not match transfer state.');
+      }
+      if (result.outcome === 'SOURCE_NOT_FOUND') {
+        return {
+          applied: false,
+          duplicate: false,
+          stale: false,
+          sourceMissing: true,
+          event: result.event,
+          subscriptions: [],
+        };
+      }
+      if (result.outcome === 'ALREADY_PROCESSED') {
+        const processingStatus = result.event?.processingStatus;
+        const stale =
+          processingStatus === 'IGNORED' && result.event?.failureCode === 'STALE_PROVIDER_STATE';
+
+        if (processingStatus !== 'APPLIED' && !stale) {
+          throw new ConflictError(
+            'Verified billing event was already finalized without applying transfer state.',
+          );
+        }
+
+        return {
+          applied: false,
+          duplicate: true,
+          stale,
+          sourceMissing: false,
+          event: result.event ?? null,
+          subscriptions: [],
+        };
+      }
+      if (result.outcome === 'STALE') {
+        return {
+          applied: false,
+          duplicate: false,
+          stale: true,
+          sourceMissing: false,
+          event: result.event,
+          subscriptions: result.subscriptions ?? [],
+        };
+      }
+      if (result.outcome !== 'APPLIED') {
+        throw new ConflictError('Verified RevenueCat transfer could not be applied safely.');
+      }
+
+      return {
+        applied: true,
+        duplicate: false,
+        stale: false,
+        sourceMissing: false,
+        event: result.event,
+        subscriptions: result.subscriptions ?? [],
       };
     },
 

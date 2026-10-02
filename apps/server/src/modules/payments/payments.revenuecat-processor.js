@@ -3,6 +3,7 @@ import { paymentsRepository } from './payments.repository.js';
 import { establishVerifiedRevenueCatAndroidSubscriptionOwnership } from './payments.revenuecat-subscription-ownership.js';
 import { RevenueCatVerifiedIdentityMismatchError } from './payments.revenuecat-subscription.js';
 import { mapVerifiedRevenueCatAndroidState } from './payments.revenuecat-state-policy.js';
+import { resolveVerifiedRevenueCatAndroidTransfer } from './payments.revenuecat-transfer.js';
 
 const REVENUECAT_SUBSCRIPTION_EVENT_TYPES = new Set([
   'INITIAL_PURCHASE',
@@ -37,7 +38,8 @@ function isExpectedLifecycleFailure(error) {
  *   paymentsService: {
  *     recordVerifiedEvent: (evidence: any) => Promise<any>,
  *     finalizeVerifiedEvent: (input: any) => Promise<any>,
- *     applyVerifiedSubscriptionState: (input: any) => Promise<any>
+ *     applyVerifiedSubscriptionState: (input: any) => Promise<any>,
+ *     applyVerifiedRevenueCatOwnershipTransfer: (input: any) => Promise<any>
  *   },
  *   productPolicy: { resolvePlanKey: (productId: string) => string },
  *   subscriberIdentityService: { resolveOwnedUser: (input: any) => Promise<any> },
@@ -65,7 +67,8 @@ export function createRevenueCatSubscriptionEventProcessor({
   if (
     !paymentsService?.recordVerifiedEvent ||
     !paymentsService?.finalizeVerifiedEvent ||
-    !paymentsService?.applyVerifiedSubscriptionState
+    !paymentsService?.applyVerifiedSubscriptionState ||
+    !paymentsService?.applyVerifiedRevenueCatOwnershipTransfer
   ) {
     throw new TypeError('Payments service is required.');
   }
@@ -97,6 +100,67 @@ export function createRevenueCatSubscriptionEventProcessor({
   async function processVerified({ rawPayload, evidence }) {
     const recorded = await paymentsService.recordVerifiedEvent(evidence);
     const eventId = recorded.event.id;
+
+    if (evidence.eventType === 'TRANSFER') {
+      let transfer;
+      try {
+        transfer = await resolveVerifiedRevenueCatAndroidTransfer({
+          rawPayload,
+          evidence,
+          expectedAppId,
+          subscriberIdentityService,
+        });
+      } catch (error) {
+        if (!isExpectedLifecycleFailure(error)) throw error;
+
+        const failed = await finalizeFailure(eventId, 'REVENUECAT_TRANSFER_OWNERSHIP_UNRESOLVED');
+        return {
+          ...failed,
+          duplicate: recorded.duplicate || failed.duplicate,
+        };
+      }
+
+      if (transfer.action === 'IGNORE') {
+        const finalized = await paymentsService.finalizeVerifiedEvent({
+          eventId,
+          outcome: 'IGNORED',
+        });
+        return {
+          outcome: 'IGNORED',
+          duplicate: recorded.duplicate || finalized.duplicate,
+          event: finalized.event,
+          subscription: null,
+        };
+      }
+
+      const applied = await paymentsService.applyVerifiedRevenueCatOwnershipTransfer({
+        eventId,
+        provider: 'revenuecat',
+        fromUserId: transfer.fromUserId,
+        toUserId: transfer.toUserId,
+        providerStateUpdatedAt: transfer.providerStateUpdatedAt,
+      });
+
+      if (applied.sourceMissing) {
+        const finalized = await paymentsService.finalizeVerifiedEvent({
+          eventId,
+          outcome: 'IGNORED',
+        });
+        return {
+          outcome: 'IGNORED',
+          duplicate: recorded.duplicate || finalized.duplicate,
+          event: finalized.event,
+          subscription: null,
+        };
+      }
+
+      return {
+        outcome: applied.stale ? 'IGNORED' : applied.applied ? 'APPLIED' : 'DUPLICATE',
+        duplicate: recorded.duplicate || applied.duplicate,
+        event: applied.event,
+        subscription: applied.subscriptions?.[0] ?? null,
+      };
+    }
 
     if (!REVENUECAT_SUBSCRIPTION_EVENT_TYPES.has(evidence.eventType)) {
       const finalized = await paymentsService.finalizeVerifiedEvent({
