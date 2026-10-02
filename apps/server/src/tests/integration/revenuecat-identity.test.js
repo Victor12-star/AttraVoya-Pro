@@ -34,13 +34,14 @@ function authorizationRepository() {
   };
 }
 
-async function identityApp(getOrCreateForUser) {
+async function identityApp(getOrCreateForUser, overrides = {}) {
   const app = await buildApp({
     logger: false,
     authRepository: authorizationRepository(),
     stripeWebhookEnabled: false,
     revenueCatWebhookEnabled: false,
     revenueCatSubscriberIdentityService: { getOrCreateForUser },
+    ...overrides,
   });
   apps.push(app);
   return app;
@@ -83,5 +84,67 @@ describe('authenticated RevenueCat Android identity handoff', () => {
     expect(JSON.stringify(response.json())).not.toContain('created');
     expect(JSON.stringify(response.json())).not.toContain('entitlement');
     expect(JSON.stringify(response.json())).not.toContain('purchase');
+  });
+});
+
+
+describe('authenticated RevenueCat Android purchase availability', () => {
+  it('requires authentication before exposing purchase availability', async () => {
+    const app = await identityApp(vi.fn());
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/revenuecat/android/availability',
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('fails closed when verified webhook processing is not enabled', async () => {
+    const app = await identityApp(vi.fn(), {
+      revenueCatWebhookEnabled: false,
+      revenueCatAndroidProductIds: {
+        PRO_MONTHLY: 'attravoya_pro:monthly',
+        PRO_YEARLY: 'attravoya_pro:yearly',
+      },
+    });
+    const accessToken = app.jwt.sign({ sub: 'user-1' });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/revenuecat/android/availability',
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['cache-control']).toBe('private, no-store');
+    expect(response.json()).toEqual({ available: false, planKeys: [] });
+  });
+
+  it('reports both Pro plans only when webhook verification and product mapping are ready', async () => {
+    const app = await identityApp(vi.fn(), {
+      revenueCatWebhookEnabled: true,
+      revenueCatWebhookProcessor: { process: vi.fn() },
+      revenueCatAndroidProductIds: {
+        PRO_MONTHLY: 'attravoya_pro:monthly',
+        PRO_YEARLY: 'attravoya_pro:yearly',
+      },
+    });
+    const accessToken = app.jwt.sign({ sub: 'user-1' });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/v1/payments/revenuecat/android/availability',
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['cache-control']).toBe('private, no-store');
+    expect(response.json()).toEqual({
+      available: true,
+      planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+    });
+    expect(JSON.stringify(response.json())).not.toContain('attravoya_pro');
+    expect(JSON.stringify(response.json())).not.toContain('secret');
   });
 });
