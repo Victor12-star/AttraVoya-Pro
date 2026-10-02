@@ -53,6 +53,7 @@
     "react-native-purchases": "10.10.2"
   },
   "devDependencies": {
+    "@expo/cli": "57.0.20",
     "@attravoya/eslint-config": "workspace:*",
     "@attravoya/javascript-config": "workspace:*",
     "@jest/globals": "29.7.0",
