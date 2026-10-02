@@ -35,6 +35,11 @@ const optionalStripePriceId = z.preprocess(
     .optional(),
 );
 
+const optionalRevenueCatAppId = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+  z.string().trim().min(1).max(255).optional(),
+);
+
 const optionalRevenueCatAndroidProductId = z.preprocess(
   (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
   z
@@ -83,6 +88,7 @@ const environmentSchema = z.object({
   REVENUECAT_WEBHOOK_ENABLED: strictBoolean,
   REVENUECAT_WEBHOOK_SIGNING_SECRET: optionalSecret(32, 512),
   REVENUECAT_WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(0).max(900).default(300),
+  REVENUECAT_ANDROID_APP_ID: optionalRevenueCatAppId,
 
   // Purchase creation remains opt-in and disabled by default. These values are
   // server-only configuration; clients must never choose Stripe prices directly.
@@ -282,6 +288,12 @@ function validateRevenueCatWebhookConfiguration(environment) {
   if (!environment.REVENUECAT_WEBHOOK_SIGNING_SECRET?.trim()) {
     throw new Error(
       'Invalid AttraVoya Pro server environment:\nREVENUECAT_WEBHOOK_SIGNING_SECRET: required when REVENUECAT_WEBHOOK_ENABLED=true.',
+    );
+  }
+
+  if (!environment.REVENUECAT_ANDROID_APP_ID) {
+    throw new Error(
+      'Invalid AttraVoya Pro server environment:\nREVENUECAT_ANDROID_APP_ID: required when REVENUECAT_WEBHOOK_ENABLED=true.',
     );
   }
 
