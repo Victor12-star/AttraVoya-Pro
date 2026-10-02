@@ -69,9 +69,9 @@ describe('RevenueCat Android public mobile configuration', () => {
   it('keeps Android billing enabled in standalone and development binaries', () => {
     const config = { enabled: true, apiKey: 'goog_public123' };
 
-    expect(
-      normalizeRevenueCatAndroidConfiguration(config, 'android', 'standalone'),
-    ).toEqual(config);
+    expect(normalizeRevenueCatAndroidConfiguration(config, 'android', 'standalone')).toEqual(
+      config,
+    );
     expect(normalizeRevenueCatAndroidConfiguration(config, 'android', 'bare')).toEqual(config);
   });
 
