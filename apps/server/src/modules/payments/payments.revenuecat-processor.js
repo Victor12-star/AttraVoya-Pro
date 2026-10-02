@@ -33,6 +33,7 @@ function isExpectedLifecycleFailure(error) {
  *
  * @param {{
  *   verificationBoundary: { verifyEvent: (input: any) => Promise<any> },
+ *   expectedAppId: string,
  *   paymentsService: {
  *     recordVerifiedEvent: (evidence: any) => Promise<any>,
  *     finalizeVerifiedEvent: (input: any) => Promise<any>,
@@ -47,6 +48,7 @@ function isExpectedLifecycleFailure(error) {
  */
 export function createRevenueCatSubscriptionEventProcessor({
   verificationBoundary,
+  expectedAppId,
   paymentsService,
   productPolicy,
   subscriberIdentityService,
@@ -54,6 +56,10 @@ export function createRevenueCatSubscriptionEventProcessor({
 }) {
   if (!verificationBoundary?.verifyEvent) {
     throw new TypeError('RevenueCat billing verification boundary is required.');
+  }
+
+  if (typeof expectedAppId !== 'string' || !expectedAppId.trim()) {
+    throw new TypeError('RevenueCat expected app identity is required.');
   }
 
   if (
@@ -111,6 +117,7 @@ export function createRevenueCatSubscriptionEventProcessor({
       decision = mapVerifiedRevenueCatAndroidState({
         rawPayload,
         evidence,
+        expectedAppId,
         productPolicy,
       });
     } catch (error) {
