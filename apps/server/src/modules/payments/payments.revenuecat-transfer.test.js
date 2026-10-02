@@ -133,6 +133,28 @@ describe('RevenueCat Android transfer ownership', () => {
     expect(identities.resolveOwnedUser).not.toHaveBeenCalled();
   });
 
+  it('fails closed when verified transfer time disagrees with the exact payload', async () => {
+    const rawPayload = payload();
+    const event = JSON.parse(rawPayload.toString('utf8')).event;
+    const evidence = await createBillingVerificationBoundary({
+      provider: 'revenuecat',
+      verify: async () => ({
+        externalEventId: event.id,
+        eventType: event.type,
+        occurredAt: new Date(event.event_timestamp_ms + 1_000),
+      }),
+    }).verifyEvent({ rawPayload });
+
+    await expect(
+      resolveVerifiedRevenueCatAndroidTransfer({
+        rawPayload,
+        evidence,
+        expectedAppId: APP_ID,
+        subscriberIdentityService: subscriberIdentityService(),
+      }),
+    ).rejects.toThrow('RevenueCat verified transfer event time does not match payload.');
+  });
+
   it('requires evidence minted for the exact payload', async () => {
     const rawPayload = payload();
     const plainEvidence = {
