@@ -29,7 +29,7 @@ const stripePlanCatalogResponseSchema = z
   })
   .strict();
 
-const stripeCheckoutAvailabilityResponseSchema = z
+const purchaseAvailabilityResponseSchema = z
   .object({
     available: z.boolean(),
     planKeys: z.array(z.enum([PLANS.PRO_MONTHLY, PLANS.PRO_YEARLY])).max(2),
@@ -48,9 +48,14 @@ export const paymentsSchemas = Object.freeze({
       200: revenueCatAndroidIdentityResponseSchema,
     },
   },
+  revenueCatAndroidPurchaseAvailability: {
+    response: {
+      200: purchaseAvailabilityResponseSchema,
+    },
+  },
   stripeCheckoutAvailability: {
     response: {
-      200: stripeCheckoutAvailabilityResponseSchema,
+      200: purchaseAvailabilityResponseSchema,
     },
   },
   stripePlanCatalog: {

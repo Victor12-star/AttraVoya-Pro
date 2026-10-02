@@ -313,6 +313,10 @@ export function createApiClient(options) {
       request('/api/v1/payments/revenuecat/android/identity', {
         cache: 'no-store',
       }),
+    getRevenueCatAndroidPurchaseAvailability: () =>
+      request('/api/v1/payments/revenuecat/android/availability', {
+        cache: 'no-store',
+      }),
     getStripeCheckoutAvailability: () =>
       request('/api/v1/payments/checkout/availability', {
         cache: 'no-store',

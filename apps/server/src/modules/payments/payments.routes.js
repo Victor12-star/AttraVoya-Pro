@@ -164,6 +164,26 @@ export async function paymentsRoutes(app, options = {}) {
     handler: revenueCatIdentityController.getCurrentIdentity,
   });
 
+  app.get('/revenuecat/android/availability', {
+    onRequest: [protectedApp.authenticate],
+    schema: paymentsSchemas.revenueCatAndroidPurchaseAvailability,
+    handler: async (_request, reply) => {
+      const productIds = options.revenueCatAndroidProductIds ?? {};
+      const available = Boolean(
+        options.revenueCatWebhookEnabled &&
+        productIds[PLANS.PRO_MONTHLY] &&
+        productIds[PLANS.PRO_YEARLY] &&
+        productIds[PLANS.PRO_MONTHLY] !== productIds[PLANS.PRO_YEARLY],
+      );
+
+      reply.header('Cache-Control', 'private, no-store');
+      return reply.code(200).send({
+        available,
+        planKeys: available ? [PLANS.PRO_MONTHLY, PLANS.PRO_YEARLY] : [],
+      });
+    },
+  });
+
   app.get('/checkout/availability', {
     onRequest: [protectedApp.authenticate],
     schema: paymentsSchemas.stripeCheckoutAvailability,
