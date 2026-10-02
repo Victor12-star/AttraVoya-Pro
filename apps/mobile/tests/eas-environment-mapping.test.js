@@ -8,6 +8,11 @@ async function readEasConfiguration() {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
+async function readMobilePackage() {
+  const filePath = path.join(process.cwd(), 'package.json');
+  return JSON.parse(await readFile(filePath, 'utf8'));
+}
+
 describe('mobile EAS environment mapping', () => {
   it('pins every canonical build profile to its matching EAS environment', async () => {
     const configuration = await readEasConfiguration();
@@ -21,6 +26,14 @@ describe('mobile EAS environment mapping', () => {
     const configuration = await readEasConfiguration();
 
     expect(configuration.build.development.developmentClient).toBe(true);
+  });
+
+  it('installs the SDK-compatible Expo development client package', async () => {
+    const configuration = await readEasConfiguration();
+    const mobilePackage = await readMobilePackage();
+
+    expect(configuration.build.development.developmentClient).toBe(true);
+    expect(mobilePackage.dependencies['expo-dev-client']).toBe('~57.0.19');
   });
 
   it('keeps RevenueCat and API values out of committed EAS build configuration', async () => {
