@@ -192,10 +192,7 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     throw new ValidationError('RevenueCat lifecycle event time is required.');
   }
 
-  const payloadEventTime = millisecondsDate(
-    event.event_timestamp_ms,
-    'RevenueCat event timestamp',
-  );
+  const payloadEventTime = millisecondsDate(event.event_timestamp_ms, 'RevenueCat event timestamp');
   if (!(payloadEventTime instanceof Date)) {
     throw new ValidationError('RevenueCat event timestamp is invalid.');
   }
