@@ -126,6 +126,7 @@ export function createRevenueCatSubscriptionEventProcessor({
           subscriberIdentityService,
         });
       } catch (error) {
+        if (error instanceof RevenueCatVerifiedIdentityMismatchError) throw error;
         if (!isExpectedLifecycleFailure(error)) throw error;
 
         const failed = await finalizeFailure(eventId, 'REVENUECAT_TRANSFER_OWNERSHIP_UNRESOLVED');
