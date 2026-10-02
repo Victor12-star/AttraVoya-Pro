@@ -174,6 +174,7 @@ export function createRevenueCatSubscriptionEventProcessor({
       eventId,
       subscriptionId: established.subscription.id,
       provider: 'revenuecat',
+      planKey: established.ownership.lifecycle.planKey,
       status: state.status,
       currentPeriodEnd: state.currentPeriodEnd,
       canceledAt: state.canceledAt,

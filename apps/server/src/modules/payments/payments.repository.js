@@ -220,9 +220,15 @@ export function createPaymentsRepository(prismaClient = prisma) {
           return { outcome: 'PLAN_NOT_ACTIVE', subscription: null, created: false };
         }
 
-        const matchesOwner = existing.userId === userId && existing.planId === plan.id;
+        const matchesOwner = existing.userId === userId;
+        const matchesPlan = existing.planId === plan.id;
         return {
-          outcome: matchesOwner ? 'EXISTING' : 'PROVIDER_IDENTITY_CONFLICT',
+          outcome:
+            matchesOwner && matchesPlan
+              ? 'EXISTING'
+              : matchesOwner && plan.isActive
+                ? 'PLAN_CHANGE'
+                : 'PROVIDER_IDENTITY_CONFLICT',
           subscription: existing,
           created: false,
         };
@@ -260,9 +266,15 @@ export function createPaymentsRepository(prismaClient = prisma) {
 
         if (!concurrent) throw error;
 
-        const matchesOwner = concurrent.userId === userId && concurrent.planId === plan.id;
+        const matchesOwner = concurrent.userId === userId;
+        const matchesPlan = concurrent.planId === plan.id;
         return {
-          outcome: matchesOwner ? 'EXISTING' : 'PROVIDER_IDENTITY_CONFLICT',
+          outcome:
+            matchesOwner && matchesPlan
+              ? 'EXISTING'
+              : matchesOwner && plan.isActive
+                ? 'PLAN_CHANGE'
+                : 'PROVIDER_IDENTITY_CONFLICT',
           subscription: concurrent,
           created: false,
         };
@@ -540,10 +552,24 @@ export function createPaymentsRepository(prismaClient = prisma) {
       }
     },
 
+    /**
+     * @param {{
+     *   eventId: string,
+     *   subscriptionId: string,
+     *   provider: string,
+     *   planKey?: string | null,
+     *   status: 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED',
+     *   currentPeriodEnd: Date | null,
+     *   canceledAt: Date | null,
+     *   providerStateUpdatedAt: Date,
+     *   processedAt: Date
+     * }} input
+     */
     async applyVerifiedSubscriptionState({
       eventId,
       subscriptionId,
       provider,
+      planKey = null,
       status,
       currentPeriodEnd,
       canceledAt,
@@ -570,6 +596,18 @@ export function createPaymentsRepository(prismaClient = prisma) {
         if (!subscription) return { outcome: 'SUBSCRIPTION_NOT_FOUND', event };
         if (subscription.provider && subscription.provider !== provider) {
           return { outcome: 'SUBSCRIPTION_PROVIDER_MISMATCH', event, subscription };
+        }
+
+        let targetPlanId = null;
+        if (planKey !== null) {
+          const targetPlan = await tx.plan.findUnique({
+            where: { key: planKey },
+            select: { id: true, isActive: true },
+          });
+          if (!targetPlan?.isActive) {
+            return { outcome: 'PLAN_NOT_ACTIVE', event, subscription };
+          }
+          targetPlanId = targetPlan.id;
         }
 
         // Claim the ledger row inside the same transaction. If another worker
@@ -610,6 +648,7 @@ export function createPaymentsRepository(prismaClient = prisma) {
           },
           data: {
             provider,
+            ...(targetPlanId ? { planId: targetPlanId } : {}),
             status,
             currentPeriodEnd,
             providerStateUpdatedAt,

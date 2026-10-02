@@ -152,11 +152,45 @@ describe('RevenueCat subscription event processor', () => {
       eventId: 'billing-event-1',
       subscriptionId: 'subscription-1',
       provider: 'revenuecat',
+      planKey: PLANS.PRO_MONTHLY,
       status: 'ACTIVE',
       currentPeriodEnd: new Date(1_780_603_800_000),
       canceledAt: null,
       providerStateUpdatedAt: new Date(1_780_000_000_000),
     });
+  });
+
+  it('passes a newly verified Google Play plan through the authoritative state mutation', async () => {
+    const { instance, deps } = processor();
+    deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership.mockResolvedValueOnce({
+      outcome: 'PLAN_CHANGE',
+      subscription: {
+        id: 'subscription-1',
+        userId: 'user-1',
+        planId: 'plan-pro-monthly',
+        status: 'ACTIVE',
+        provider: 'revenuecat',
+        externalSubscriptionId: 'GPA.1111-2222-3333-44444',
+      },
+      created: false,
+    });
+
+    const result = await instance.process({
+      rawPayload: payload({
+        product_id: 'attravoya_pro_v1:yearly-autorenewing',
+        type: 'RENEWAL',
+      }),
+    });
+
+    expect(result.outcome).toBe('APPLIED');
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionId: 'subscription-1',
+        provider: 'revenuecat',
+        planKey: PLANS.PRO_YEARLY,
+        status: 'ACTIVE',
+      }),
+    );
   });
 
   it('terminalizes ordinary cancellation without mutating entitlement state', async () => {

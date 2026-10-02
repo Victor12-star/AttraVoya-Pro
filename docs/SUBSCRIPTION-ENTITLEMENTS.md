@@ -292,7 +292,9 @@ Phase 10DZM binds verified Google Play subscription lifecycle events to the serv
 
 Phase 10DD adds an internal normalizer for already-verified RevenueCat Google Play lifecycle events. It rechecks the exact raw-payload SHA-256 against verifier-minted evidence before reading lifecycle fields, requires `PLAY_STORE`, maps only server-owned Phase 10DB products, and derives provider subscription identity from verified `original_transaction_id`.
 
-The normalizer deliberately excludes App User IDs, aliases, entitlement names, purchase tokens and client purchase state from its trusted output. Cancellation is preserved as provider lifecycle information rather than being converted into immediate entitlement loss; authoritative state/revocation semantics remain a later slice.
+The normalizer deliberately excludes App User IDs, aliases, entitlement names, purchase tokens and client purchase state from its trusted output. Cancellation is preserved as provider lifecycle information rather than being converted into immediate entitlement loss; the later state policy keeps ordinary cancellation and billing issues entitling until verified expiration while applying verified refund cancellation and expiration as non-entitling server state.
+
+Phase 10DZN also makes Google Play monthly/yearly transitions safe without trusting the client or RevenueCat `PRODUCT_CHANGE` as immediate entitlement proof. A different provider product may be adopted only when a later verified access-establishing lifecycle event maps that product to an active server-owned AttraVoya plan, resolves the same server-owned subscriber and provider subscription identity, and wins the existing provider-timestamp compare-and-swap. The plan change and authoritative subscription state are written in the same database transaction; stale events cannot roll the plan backward.
 
 ### Server-owned RevenueCat subscriber identity
 
