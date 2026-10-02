@@ -58,7 +58,6 @@ describe('RevenueCat webhook environment contract', () => {
       loadEnvironment(
         baseEnvironment({
           ...revenueCatApp,
-          ...revenueCatApp,
           ...products,
           REVENUECAT_WEBHOOK_ENABLED: 'true',
         }),
@@ -104,6 +103,7 @@ describe('RevenueCat webhook environment contract', () => {
     expect(environment).toMatchObject({
       REVENUECAT_WEBHOOK_ENABLED: true,
       REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
+      REVENUECAT_ANDROID_APP_ID: 'app_attravoya_android',
       REVENUECAT_WEBHOOK_TOLERANCE_SECONDS: 120,
     });
   });
@@ -112,6 +112,7 @@ describe('RevenueCat webhook environment contract', () => {
     expect(() =>
       loadEnvironment(
         baseEnvironment({
+          ...revenueCatApp,
           ...products,
           REVENUECAT_WEBHOOK_ENABLED: 'true',
           REVENUECAT_WEBHOOK_SIGNING_SECRET: 'r'.repeat(48),
