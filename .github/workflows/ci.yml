@@ -506,6 +506,9 @@ jobs:
       - name: Scan tracked files for common secret patterns
         run: node scripts/secret-scan.js
 
+      - name: Verify node-forge CVE-2026-85393 security pin
+        run: node scripts/verify-node-forge-security-pin.js
+
       - name: Audit production dependencies
         run: |
           for attempt in 1 2 3; do
