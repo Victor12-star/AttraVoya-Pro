@@ -193,6 +193,9 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     event.event_timestamp_ms,
     'RevenueCat event timestamp',
   );
+  if (!(payloadEventTime instanceof Date)) {
+    throw new ValidationError('RevenueCat event timestamp is invalid.');
+  }
   if (payloadEventTime.getTime() !== evidence.occurredAt.getTime()) {
     throw new RevenueCatVerifiedIdentityMismatchError(
       'RevenueCat verified event time does not match payload.',
