@@ -142,6 +142,7 @@ describe('RevenueCat webhook ingress', () => {
         event: { id: 'billing-event-rc-1', processingStatus: 'APPLIED' },
         subscription: { ...subscription, status: 'ACTIVE' },
       })),
+      applyVerifiedRevenueCatOwnershipTransfer: vi.fn(),
     };
     const paymentsRepository = {
       createOrReuseProviderSubscriptionOwnership: vi.fn(async () => ({
@@ -215,6 +216,7 @@ describe('RevenueCat webhook ingress', () => {
       recordVerifiedEvent: vi.fn(),
       finalizeVerifiedEvent: vi.fn(),
       applyVerifiedSubscriptionState: vi.fn(),
+      applyVerifiedRevenueCatOwnershipTransfer: vi.fn(),
     };
     const app = await buildApp({
       logger: false,
