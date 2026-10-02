@@ -74,7 +74,9 @@ describe('RevenueCat Android public mobile configuration', () => {
     expect(
       normalizeRevenueCatAndroidConfiguration(config, 'android', 'standalone'),
     ).toEqual(config);
-    expect(normalizeRevenueCatAndroidConfiguration(config, 'android', 'bare')).toEqual(config);
+    expect(
+      normalizeRevenueCatAndroidConfiguration(config, 'android', 'bare'),
+    ).toEqual(config);
   });
 
   it('fails closed when bundled enabled configuration is malformed', () => {
