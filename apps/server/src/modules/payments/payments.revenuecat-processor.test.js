@@ -7,6 +7,7 @@ import { createRevenueCatAndroidProductPolicy } from './payments.revenuecat-prod
 import { createBillingVerificationBoundary } from './payments.verification.js';
 
 const OWNED_ID = 'av_rc_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const APP_ID = 'app_attravoya_android';
 
 function productPolicy() {
   return createRevenueCatAndroidProductPolicy({
@@ -27,6 +28,7 @@ function payload(overrides = {}) {
     purchased_at_ms: 1_779_999_000_000,
     expiration_at_ms: 1_780_603_800_000,
     environment: 'PRODUCTION',
+    app_id: APP_ID,
     original_transaction_id: 'GPA.1111-2222-3333-44444',
     store: 'PLAY_STORE',
     app_user_id: OWNED_ID,
@@ -122,6 +124,7 @@ function processor(overrides = {}) {
   const deps = dependencies();
   const instance = createRevenueCatSubscriptionEventProcessor({
     ...deps,
+    expectedAppId: APP_ID,
     productPolicy: productPolicy(),
     ...overrides,
   });
@@ -223,6 +226,23 @@ describe('RevenueCat subscription event processor', () => {
     const transfer = await instance.process({ rawPayload: transferPayload });
     expect(transfer.outcome).toBe('IGNORED');
 
+    expect(
+      deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
+    ).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
+  it('rejects a verified lifecycle event from a different RevenueCat app', async () => {
+    const { instance, deps } = processor();
+
+    const result = await instance.process({
+      rawPayload: payload({ app_id: 'app_other_product' }),
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'FAILED',
+      failureCode: 'REVENUECAT_LIFECYCLE_INVALID',
+    });
     expect(
       deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
     ).not.toHaveBeenCalled();
