@@ -132,6 +132,29 @@ describe('RevenueCat Android lifecycle normalization', () => {
     ).toThrow('RevenueCat normalization requires verified billing evidence.');
   });
 
+  it('fails closed when verified event time disagrees with the exact payload', async () => {
+    const rawPayload = payload();
+    const parsed = JSON.parse(rawPayload.toString('utf8')).event;
+    const boundary = createBillingVerificationBoundary({
+      provider: 'revenuecat',
+      now: () => new Date('2026-09-24T18:00:00.000Z'),
+      verify: async () => ({
+        externalEventId: parsed.id,
+        eventType: parsed.type,
+        occurredAt: new Date(parsed.event_timestamp_ms + 1_000),
+      }),
+    });
+    const evidence = await boundary.verifyEvent({ rawPayload, headers: {} });
+
+    expect(() =>
+      normalizeVerifiedRevenueCatAndroidLifecycle({
+        rawPayload,
+        evidence,
+        productPolicy: productPolicy(),
+      }),
+    ).toThrow('RevenueCat verified event time does not match payload.');
+  });
+
   it('fails closed when exact verified payload bytes are changed', async () => {
     const original = payload();
     const evidence = await verifiedEvidence(original);
