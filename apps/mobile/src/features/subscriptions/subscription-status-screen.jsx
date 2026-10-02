@@ -49,6 +49,30 @@ function safeManagementChannel(value) {
   return value?.channel === 'GOOGLE_PLAY' ? 'GOOGLE_PLAY' : null;
 }
 
+export function normalizeAndroidPurchaseAvailability(response) {
+  if (
+    response?.available === false &&
+    Array.isArray(response.planKeys) &&
+    response.planKeys.length === 0
+  ) {
+    return Object.freeze({ available: false });
+  }
+
+  if (response?.available !== true || !Array.isArray(response.planKeys)) return null;
+
+  const planKeys = new Set(response.planKeys);
+  if (
+    response.planKeys.length !== 2 ||
+    planKeys.size !== 2 ||
+    !planKeys.has('PRO_MONTHLY') ||
+    !planKeys.has('PRO_YEARLY')
+  ) {
+    return null;
+  }
+
+  return Object.freeze({ available: true });
+}
+
 export function normalizeMobileSubscriptionAccess(response) {
   const access = response?.access;
   const key = safeText(access?.plan?.key, 40);
@@ -137,8 +161,27 @@ export function MobileSubscriptionStatusContent({
     },
   });
 
+  const shouldCheckPurchaseAvailability =
+    query.data?.tier === 'FREE' &&
+    typeof loadOfferingCatalog === 'function' &&
+    typeof client.getRevenueCatAndroidPurchaseAvailability === 'function';
+  const purchaseAvailabilityQuery = useQuery({
+    queryKey: ['android-purchase-availability'],
+    queryFn: async () => {
+      const response = await client.getRevenueCatAndroidPurchaseAvailability();
+      const availability = normalizeAndroidPurchaseAvailability(response);
+      if (!availability) {
+        throw Object.assign(new Error('Invalid Android purchase availability response.'), {
+          code: 'INVALID_API_RESPONSE',
+        });
+      }
+      return availability;
+    },
+    enabled: shouldCheckPurchaseAvailability,
+    retry: false,
+  });
   const shouldLoadOfferings =
-    query.data?.tier === 'FREE' && typeof loadOfferingCatalog === 'function';
+    shouldCheckPurchaseAvailability && purchaseAvailabilityQuery.data?.available === true;
   const offeringQuery = useQuery({
     queryKey: ['subscription-offerings'],
     queryFn: () =>
@@ -376,10 +419,17 @@ export function MobileSubscriptionStatusContent({
               </Text>
             </View>
 
-            {shouldLoadOfferings ? (
+            {shouldCheckPurchaseAvailability ? (
               <View style={styles.offeringSection}>
                 <Text style={styles.offeringTitle}>Google Play prices</Text>
-                {offeringQuery.isPending ? (
+                {purchaseAvailabilityQuery.isPending ? (
+                  <Text style={styles.offeringStatus}>Checking purchase availability…</Text>
+                ) : purchaseAvailabilityQuery.isError ||
+                  purchaseAvailabilityQuery.data?.available !== true ? (
+                  <Text style={styles.offeringStatus}>
+                    Google Play purchasing is unavailable right now.
+                  </Text>
+                ) : offeringQuery.isPending ? (
                   <Text style={styles.offeringStatus}>Checking current prices…</Text>
                 ) : offeringQuery.isError ? (
                   <Text style={styles.offeringStatus}>

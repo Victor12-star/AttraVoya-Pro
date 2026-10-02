@@ -2,6 +2,7 @@ import { act, fireEvent, render } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   MobileSubscriptionStatusContent,
+  normalizeAndroidPurchaseAvailability,
   normalizeMobileSubscriptionAccess,
 } from '../src/features/subscriptions/subscription-status-screen.jsx';
 
@@ -18,11 +19,21 @@ function renderContent(
       queries: { retry: false, gcTime: 0 },
     },
   });
+  const effectiveClient =
+    loadOfferingCatalog && typeof client?.getRevenueCatAndroidPurchaseAvailability !== 'function'
+      ? {
+          ...client,
+          getRevenueCatAndroidPurchaseAvailability: jest.fn().mockResolvedValue({
+            available: true,
+            planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+          }),
+        }
+      : client;
 
   return render(
     <QueryClientProvider client={queryClient}>
       <MobileSubscriptionStatusContent
-        client={client}
+        client={effectiveClient}
         loadOfferingCatalog={loadOfferingCatalog}
         openSubscriptionManagement={openSubscriptionManagement}
         purchasePlan={purchasePlan}
@@ -55,6 +66,62 @@ describe('mobile subscription status', () => {
       ),
     ).toBeTruthy();
     expect(result.queryByText(/buy now|subscribe now|upgrade now/i)).toBeNull();
+  });
+
+  it('keeps Google Play offerings inert when the server says purchases are unavailable', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+      getRevenueCatAndroidPurchaseAvailability: jest.fn().mockResolvedValue({
+        available: false,
+        planKeys: [],
+      }),
+    };
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'monthly', price: 'SEK 49.00' }]);
+    const purchasePlan = jest.fn();
+
+    const result = await renderContent(client, loadOfferingCatalog, purchasePlan);
+
+    expect(
+      await result.findByText('Google Play purchasing is unavailable right now.'),
+    ).toBeTruthy();
+    expect(result.queryByText('SEK 49.00')).toBeNull();
+    expect(result.queryByText('Choose monthly')).toBeNull();
+    expect(loadOfferingCatalog).not.toHaveBeenCalled();
+    expect(purchasePlan).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when Android purchase availability cannot be verified', async () => {
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue({
+        access: {
+          plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+          entitlements: [],
+          limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+          subscription: null,
+        },
+      }),
+      getRevenueCatAndroidPurchaseAvailability: jest
+        .fn()
+        .mockRejectedValue(new Error('private backend readiness diagnostic')),
+    };
+    const loadOfferingCatalog = jest.fn();
+
+    const result = await renderContent(client, loadOfferingCatalog, jest.fn());
+
+    expect(
+      await result.findByText('Google Play purchasing is unavailable right now.'),
+    ).toBeTruthy();
+    expect(result.queryByText('private backend readiness diagnostic')).toBeNull();
+    expect(loadOfferingCatalog).not.toHaveBeenCalled();
   });
 
   it('shows read-only monthly and yearly Google Play prices for Free users', async () => {
@@ -579,6 +646,33 @@ describe('mobile subscription status', () => {
     expect(await result.findByText('Plan status unavailable')).toBeTruthy();
     expect(result.getByText('You appear to be offline. Reconnect and try again.')).toBeTruthy();
     expect(result.queryByText('private diagnostic detail')).toBeNull();
+  });
+});
+
+describe('normalizeAndroidPurchaseAvailability', () => {
+  it('accepts only the complete server-owned Android purchase readiness contract', () => {
+    expect(
+      normalizeAndroidPurchaseAvailability({
+        available: true,
+        planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+      }),
+    ).toEqual({ available: true });
+    expect(normalizeAndroidPurchaseAvailability({ available: false, planKeys: [] })).toEqual({
+      available: false,
+    });
+  });
+
+  it('rejects malformed or partial readiness claims', () => {
+    for (const value of [
+      null,
+      {},
+      { available: true, planKeys: [] },
+      { available: true, planKeys: ['PRO_MONTHLY'] },
+      { available: true, planKeys: ['PRO_MONTHLY', 'PRO_MONTHLY'] },
+      { available: false, planKeys: ['PRO_MONTHLY'] },
+    ]) {
+      expect(normalizeAndroidPurchaseAvailability(value)).toBeNull();
+    }
   });
 });
 
