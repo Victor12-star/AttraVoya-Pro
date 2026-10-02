@@ -35,9 +35,7 @@ export function setAndroidBillingSafeLaunchMode(androidManifest) {
 
 export default function withAndroidBillingLaunchMode(config) {
   return withAndroidManifest(config, (configWithManifest) => {
-    configWithManifest.modResults = setAndroidBillingSafeLaunchMode(
-      configWithManifest.modResults,
-    );
+    configWithManifest.modResults = setAndroidBillingSafeLaunchMode(configWithManifest.modResults);
     return configWithManifest;
   });
 }
