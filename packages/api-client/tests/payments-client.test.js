@@ -27,6 +27,25 @@ describe('payments API client', () => {
     await expect(client.getStripeCheckoutAvailability()).resolves.toEqual(payload);
   });
 
+  it('reads server-owned Android purchase availability without caching', async () => {
+    const payload = {
+      available: true,
+      planKeys: ['PRO_MONTHLY', 'PRO_YEARLY'],
+    };
+    const fetchImpl = vi.fn(async (url, options) => {
+      expect(String(url)).toBe(
+        'http://localhost:5000/api/v1/payments/revenuecat/android/availability',
+      );
+      expect(options.method).toBe('GET');
+      expect(options.credentials).toBe('include');
+      expect(options.cache).toBe('no-store');
+      return jsonResponse(payload);
+    });
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+
+    await expect(client.getRevenueCatAndroidPurchaseAvailability()).resolves.toEqual(payload);
+  });
+
   it('reads the server-authoritative Stripe display catalog without browser caching', async () => {
     const payload = {
       plans: [
