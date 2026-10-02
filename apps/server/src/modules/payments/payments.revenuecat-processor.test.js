@@ -307,12 +307,12 @@ describe('RevenueCat subscription event processor', () => {
     });
     expect(sandbox.outcome).toBe('IGNORED');
 
-    const transferPayload = payload({
-      id: 'evt_rc_processor_transfer',
-      type: 'TRANSFER',
+    const unrelatedPayload = payload({
+      id: 'evt_rc_processor_test',
+      type: 'TEST',
     });
-    const transfer = await instance.process({ rawPayload: transferPayload });
-    expect(transfer.outcome).toBe('IGNORED');
+    const unrelated = await instance.process({ rawPayload: unrelatedPayload });
+    expect(unrelated.outcome).toBe('IGNORED');
 
     expect(
       deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
