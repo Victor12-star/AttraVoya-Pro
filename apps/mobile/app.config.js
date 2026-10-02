@@ -36,6 +36,7 @@ const appConfig = {
     bundler: 'metro',
   },
   plugins: [
+    './plugins/with-android-billing-launch-mode.js',
     'expo-router',
     'expo-notifications',
     'expo-secure-store',
