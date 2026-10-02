@@ -558,7 +558,7 @@ export function createPaymentsRepository(prismaClient = prisma) {
      *   subscriptionId: string,
      *   provider: string,
      *   planKey?: string | null,
-     *   status: import('@prisma/client').$Enums.SubscriptionStatus,
+     *   status: 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED',
      *   currentPeriodEnd: Date | null,
      *   canceledAt: Date | null,
      *   providerStateUpdatedAt: Date,
