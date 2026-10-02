@@ -300,6 +300,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
      *   eventId: string,
      *   subscriptionId: string,
      *   provider: string,
+     *   planKey?: string | null,
      *   status: string,
      *   currentPeriodEnd?: Date | null,
      *   canceledAt?: Date | null,
@@ -310,6 +311,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
       eventId,
       subscriptionId,
       provider,
+      planKey = null,
       status,
       currentPeriodEnd = null,
       canceledAt = null,
@@ -322,6 +324,8 @@ export function createPaymentsService(repository = paymentsRepository, options =
       const normalizedEventId = requiredText(eventId, 'eventId', 128);
       const normalizedSubscriptionId = requiredText(subscriptionId, 'subscriptionId', 128);
       const normalizedProvider = requiredText(provider, 'provider', 64).toLowerCase();
+      const normalizedPlanKey =
+        planKey == null ? null : requiredText(planKey, 'planKey', 64).toUpperCase();
       const normalizedStatus = requiredText(status, 'status', 32).toUpperCase();
       const normalizedStateTime = requiredDate(providerStateUpdatedAt, 'providerStateUpdatedAt');
       const normalizedPeriodEnd = optionalDate(currentPeriodEnd, 'currentPeriodEnd');
@@ -349,6 +353,7 @@ export function createPaymentsService(repository = paymentsRepository, options =
         eventId: normalizedEventId,
         subscriptionId: normalizedSubscriptionId,
         provider: normalizedProvider,
+        planKey: normalizedPlanKey,
         status: normalizedStatus,
         currentPeriodEnd: normalizedPeriodEnd,
         canceledAt: normalizedCanceledAt,
@@ -362,6 +367,10 @@ export function createPaymentsService(repository = paymentsRepository, options =
 
       if (result.outcome === 'SUBSCRIPTION_NOT_FOUND') {
         throw new NotFoundError('Subscription was not found.');
+      }
+
+      if (result.outcome === 'PLAN_NOT_ACTIVE') {
+        throw new ConflictError('Verified subscription plan is not available.');
       }
 
       if (
