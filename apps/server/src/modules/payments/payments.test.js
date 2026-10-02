@@ -373,6 +373,7 @@ describe('verified subscription state application', () => {
       eventId: 'billing-event-1',
       subscriptionId: 'subscription-1',
       provider: 'stripe',
+      planKey: null,
       status: 'ACTIVE',
       currentPeriodEnd: periodEnd,
       canceledAt: null,
@@ -385,6 +386,42 @@ describe('verified subscription state application', () => {
       stale: false,
       subscription: { status: 'ACTIVE', provider: 'stripe' },
     });
+  });
+
+  it('normalizes an optional server-owned plan key for transactional plan changes', async () => {
+    const repository = serviceRepository({
+      applyVerifiedSubscriptionState: vi.fn(async (input) => ({
+        outcome: 'APPLIED',
+        event: storedEvent({ processingStatus: 'APPLIED' }),
+        subscription: {
+          id: input.subscriptionId,
+          provider: input.provider,
+          planId: 'plan-pro-yearly',
+          status: input.status,
+        },
+      })),
+    });
+    const service = createPaymentsService(repository, {
+      now: () => new Date('2026-09-23T14:30:00.000Z'),
+    });
+
+    await service.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-plan-change',
+      subscriptionId: 'subscription-1',
+      provider: 'revenuecat',
+      planKey: ' pro_yearly ',
+      status: 'ACTIVE',
+      currentPeriodEnd: new Date('2026-10-23T14:25:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-23T14:25:00.000Z'),
+    });
+
+    expect(repository.applyVerifiedSubscriptionState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        provider: 'revenuecat',
+        planKey: 'PRO_YEARLY',
+        status: 'ACTIVE',
+      }),
+    );
   });
 
   it('treats a previously processed event as an idempotent duplicate', async () => {
