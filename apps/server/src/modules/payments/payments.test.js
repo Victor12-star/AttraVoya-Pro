@@ -758,9 +758,10 @@ describe('verified billing event repository', () => {
       billingEvent: {
         findUnique: vi
           .fn()
-          .mockResolvedValueOnce(storedEvent())
+          .mockResolvedValueOnce(storedEvent({ provider: 'revenuecat' }))
           .mockResolvedValueOnce(
             storedEvent({
+              provider: 'revenuecat',
               processingStatus: 'APPLIED',
               processedAt,
               subscriptionId: 'subscription-1',
