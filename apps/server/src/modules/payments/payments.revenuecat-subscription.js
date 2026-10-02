@@ -185,7 +185,10 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
   });
   const normalizedCancellationReason = cancellationReason(event, eventType);
 
-  if (!(evidence.occurredAt instanceof Date) || !Number.isFinite(evidence.occurredAt.getTime())) {
+  if (
+    !(evidence.occurredAt instanceof Date) ||
+    !Number.isFinite(evidence.occurredAt.getTime())
+  ) {
     throw new ValidationError('RevenueCat lifecycle event time is required.');
   }
 
