@@ -89,6 +89,7 @@ function createRevenueCatProcessor(options) {
   return createRevenueCatSubscriptionEventProcessor({
     verificationBoundary,
     paymentsService: options.paymentsService ?? paymentsService,
+    expectedAppId: options.revenueCatAndroidAppId,
     productPolicy,
     subscriberIdentityService:
       options.revenueCatSubscriberIdentityService ?? revenueCatSubscriberIdentityService,
