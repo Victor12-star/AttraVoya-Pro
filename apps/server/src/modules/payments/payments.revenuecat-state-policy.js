@@ -39,13 +39,20 @@ function requireSubscriptionExpiration(lifecycle) {
  * @param {{
  *   rawPayload: Buffer,
  *   evidence: object,
+ *   expectedAppId?: string,
  *   productPolicy: { resolvePlanKey: (productId: string) => string }
  * }} input
  */
-export function mapVerifiedRevenueCatAndroidState({ rawPayload, evidence, productPolicy }) {
+export function mapVerifiedRevenueCatAndroidState({
+  rawPayload,
+  evidence,
+  expectedAppId,
+  productPolicy,
+}) {
   const lifecycle = normalizeVerifiedRevenueCatAndroidLifecycle({
     rawPayload,
     evidence,
+    expectedAppId,
     productPolicy,
   });
 
