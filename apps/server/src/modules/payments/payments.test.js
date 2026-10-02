@@ -729,6 +729,96 @@ describe('verified billing event repository', () => {
     ).rejects.toBe(databaseError);
   });
 
+  it('changes the plan only inside the same verified provider-state transaction', async () => {
+    const stateTime = new Date('2026-09-23T14:25:00.000Z');
+    const processedAt = new Date('2026-09-23T14:30:00.000Z');
+    const periodEnd = new Date('2026-10-23T14:25:00.000Z');
+    const existingSubscription = {
+      id: 'subscription-1',
+      userId: 'user-1',
+      planId: 'plan-pro-monthly',
+      status: 'ACTIVE',
+      provider: 'revenuecat',
+      currentPeriodEnd: new Date('2026-10-01T00:00:00.000Z'),
+      providerStateUpdatedAt: new Date('2026-09-20T00:00:00.000Z'),
+      canceledAt: null,
+    };
+    const appliedSubscription = {
+      ...existingSubscription,
+      planId: 'plan-pro-yearly',
+      currentPeriodEnd: periodEnd,
+      providerStateUpdatedAt: stateTime,
+    };
+    const subscriptionFindUnique = vi
+      .fn()
+      .mockResolvedValueOnce(existingSubscription)
+      .mockResolvedValueOnce(appliedSubscription);
+    const subscriptionUpdateMany = vi.fn(async () => ({ count: 1 }));
+    const tx = {
+      billingEvent: {
+        findUnique: vi
+          .fn()
+          .mockResolvedValueOnce(storedEvent())
+          .mockResolvedValueOnce(
+            storedEvent({
+              processingStatus: 'APPLIED',
+              processedAt,
+              subscriptionId: 'subscription-1',
+            }),
+          ),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+        update: vi.fn(),
+      },
+      plan: {
+        findUnique: vi.fn(async () => ({
+          id: 'plan-pro-yearly',
+          isActive: true,
+        })),
+      },
+      subscription: {
+        findUnique: subscriptionFindUnique,
+        updateMany: subscriptionUpdateMany,
+      },
+    };
+    const repository = createPaymentsRepository(
+      /** @type {any} */ ({
+        $transaction: vi.fn(async (callback) => callback(tx)),
+      }),
+    );
+
+    const result = await repository.applyVerifiedSubscriptionState({
+      eventId: 'billing-event-1',
+      subscriptionId: 'subscription-1',
+      provider: 'revenuecat',
+      planKey: 'PRO_YEARLY',
+      status: 'ACTIVE',
+      currentPeriodEnd: periodEnd,
+      canceledAt: null,
+      providerStateUpdatedAt: stateTime,
+      processedAt,
+    });
+
+    expect(tx.plan.findUnique).toHaveBeenCalledWith({
+      where: { key: 'PRO_YEARLY' },
+      select: { id: true, isActive: true },
+    });
+    expect(subscriptionUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          provider: 'revenuecat',
+          planId: 'plan-pro-yearly',
+          status: 'ACTIVE',
+          currentPeriodEnd: periodEnd,
+          providerStateUpdatedAt: stateTime,
+        }),
+      }),
+    );
+    expect(result).toMatchObject({
+      outcome: 'APPLIED',
+      subscription: { planId: 'plan-pro-yearly' },
+    });
+  });
+
   it('claims the event and compare-and-swaps newer provider state in one transaction', async () => {
     const stateTime = new Date('2026-09-23T14:25:00.000Z');
     const processedAt = new Date('2026-09-23T14:30:00.000Z');
