@@ -210,6 +210,7 @@ export async function buildApp(options = {}) {
       options.revenueCatWebhookToleranceSeconds ?? env.REVENUECAT_WEBHOOK_TOLERANCE_SECONDS,
     revenueCatWebhookNow: options.revenueCatWebhookNow,
     revenueCatWebhookProcessor: options.revenueCatWebhookProcessor,
+    revenueCatAndroidAppId: options.revenueCatAndroidAppId ?? env.REVENUECAT_ANDROID_APP_ID,
     revenueCatAndroidProductIds:
       options.revenueCatAndroidProductIds ?? revenueCatAndroidProductIdsFromEnvironment(env),
     revenueCatProductPolicy: options.revenueCatProductPolicy,
