@@ -19,6 +19,7 @@ export const commonIgnores = [
   '**/test-results/**',
   'packages/database/prisma/migrations/**',
   'pnpm-lock.yaml',
+  'packages/node-forge-patched/**',
 ];
 
 const baseConfig = [
