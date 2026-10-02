@@ -75,6 +75,12 @@ function parseVerifiedTransfer({ rawPayload, evidence, expectedAppId }) {
   if (!(evidence.occurredAt instanceof Date) || !Number.isFinite(evidence.occurredAt.getTime())) {
     throw new ValidationError('RevenueCat transfer event time is required.');
   }
+  if (!Number.isSafeInteger(event.event_timestamp_ms) || event.event_timestamp_ms <= 0) {
+    throw new ValidationError('RevenueCat transfer event timestamp is invalid.');
+  }
+  if (event.event_timestamp_ms !== evidence.occurredAt.getTime()) {
+    throw new ValidationError('RevenueCat verified transfer event time does not match payload.');
+  }
 
   const from = requiredIdentityList(event.transferred_from, 'RevenueCat transferred_from');
   const to = requiredIdentityList(event.transferred_to, 'RevenueCat transferred_to');
