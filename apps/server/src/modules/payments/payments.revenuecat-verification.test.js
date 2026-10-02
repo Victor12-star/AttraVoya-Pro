@@ -216,24 +216,30 @@ describe('RevenueCat webhook verifier', () => {
     }
   });
 
-  it('rejects invalid event timestamps after authentication', async () => {
-    const rawPayload = payload({ event_timestamp_ms: -1 });
+  it('rejects missing or invalid event timestamps after authentication', async () => {
     const verify = createRevenueCatWebhookVerifier({
       webhookSigningSecret: SECRET,
       now: () => NOW,
     });
 
-    await expect(
-      verify({
-        rawPayload,
-        headers: {
-          'x-revenuecat-webhook-signature': header(rawPayload),
-        },
-      }),
-    ).rejects.toMatchObject({
-      statusCode: 400,
-      code: 'VALIDATION_ERROR',
-    });
+    for (const rawPayload of [
+      payload({ event_timestamp_ms: undefined }),
+      payload({ event_timestamp_ms: null }),
+      payload({ event_timestamp_ms: -1 }),
+      payload({ event_timestamp_ms: 1.5 }),
+    ]) {
+      await expect(
+        verify({
+          rawPayload,
+          headers: {
+            'x-revenuecat-webhook-signature': header(rawPayload),
+          },
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        code: 'VALIDATION_ERROR',
+      });
+    }
   });
 
   it('requires a configured signing secret and valid server time', async () => {
