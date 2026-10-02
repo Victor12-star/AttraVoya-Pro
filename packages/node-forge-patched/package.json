@@ -11,5 +11,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/digitalbazaar/forge"
+  },
+  "scripts": {
+    "test": "node --test tests/cve-2026-85393.test.cjs"
   }
 }
