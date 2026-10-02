@@ -320,6 +320,62 @@ describe('RevenueCat subscription event processor', () => {
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
+  it('explicitly ignores documented non-authoritative RevenueCat events', async () => {
+    const { instance, deps } = processor();
+
+    for (const eventType of [
+      'PRODUCT_CHANGE',
+      'NON_RENEWING_PURCHASE',
+      'TEMPORARY_ENTITLEMENT_GRANT',
+      'VIRTUAL_CURRENCY_TRANSACTION',
+      'EXPERIMENT_ENROLLMENT',
+      'PURCHASE_REDEEMED',
+      'REFUND_REVERSED',
+      'INVOICE_ISSUANCE',
+    ]) {
+      const result = await instance.process({
+        rawPayload: payload({
+          id: `evt_rc_${eventType.toLowerCase()}`,
+          type: eventType,
+        }),
+      });
+
+      expect(result.outcome).toBe('IGNORED');
+    }
+
+    expect(
+      deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
+    ).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedRevenueCatOwnershipTransfer).not.toHaveBeenCalled();
+  });
+
+  it('fails closed for an unknown verified RevenueCat event type', async () => {
+    const { instance, deps } = processor();
+
+    const result = await instance.process({
+      rawPayload: payload({
+        id: 'evt_rc_future_unknown',
+        type: 'FUTURE_PROVIDER_EVENT',
+      }),
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'FAILED',
+      failureCode: 'REVENUECAT_EVENT_TYPE_UNSUPPORTED',
+    });
+    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      outcome: 'FAILED',
+      failureCode: 'REVENUECAT_EVENT_TYPE_UNSUPPORTED',
+    });
+    expect(
+      deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
+    ).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedRevenueCatOwnershipTransfer).not.toHaveBeenCalled();
+  });
+
   it('rejects a verified lifecycle event from a different RevenueCat app', async () => {
     const { instance, deps } = processor();
 

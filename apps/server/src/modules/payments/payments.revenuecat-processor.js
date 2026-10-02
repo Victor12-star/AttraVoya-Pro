@@ -16,6 +16,18 @@ const REVENUECAT_SUBSCRIPTION_EVENT_TYPES = new Set([
   'SUBSCRIPTION_EXTENDED',
 ]);
 
+const REVENUECAT_KNOWN_NON_AUTHORITATIVE_EVENT_TYPES = new Set([
+  'TEST',
+  'PRODUCT_CHANGE',
+  'NON_RENEWING_PURCHASE',
+  'TEMPORARY_ENTITLEMENT_GRANT',
+  'VIRTUAL_CURRENCY_TRANSACTION',
+  'EXPERIMENT_ENROLLMENT',
+  'PURCHASE_REDEEMED',
+  'REFUND_REVERSED',
+  'INVOICE_ISSUANCE',
+]);
+
 function isExpectedLifecycleFailure(error) {
   return (
     error instanceof ValidationError ||
@@ -163,6 +175,14 @@ export function createRevenueCatSubscriptionEventProcessor({
     }
 
     if (!REVENUECAT_SUBSCRIPTION_EVENT_TYPES.has(evidence.eventType)) {
+      if (!REVENUECAT_KNOWN_NON_AUTHORITATIVE_EVENT_TYPES.has(evidence.eventType)) {
+        const failed = await finalizeFailure(eventId, 'REVENUECAT_EVENT_TYPE_UNSUPPORTED');
+        return {
+          ...failed,
+          duplicate: recorded.duplicate || failed.duplicate,
+        };
+      }
+
       const finalized = await paymentsService.finalizeVerifiedEvent({
         eventId,
         outcome: 'IGNORED',
