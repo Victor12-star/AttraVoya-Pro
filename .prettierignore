@@ -20,3 +20,4 @@ pnpm-lock.yaml
 *.snap
 
 packages/node-forge-patched/
+packages/braces-patched/

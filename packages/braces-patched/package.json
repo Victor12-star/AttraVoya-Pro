@@ -1,0 +1,21 @@
+{
+  "name": "braces",
+  "version": "3.0.4-attravoya.0",
+  "private": true,
+  "description": "Temporary vendored braces runtime carrying the CVE-2026-93687 depth-limit fix from upstream PR #72.",
+  "license": "MIT",
+  "main": "index.js",
+  "engines": {
+    "node": ">=8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/micromatch/braces"
+  },
+  "scripts": {
+    "test": "node --test tests/cve-2026-93687.test.cjs"
+  },
+  "dependencies": {
+    "fill-range": "^7.1.1"
+  }
+}

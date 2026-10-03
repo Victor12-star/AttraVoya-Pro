@@ -20,6 +20,7 @@ export const commonIgnores = [
   'packages/database/prisma/migrations/**',
   'pnpm-lock.yaml',
   'packages/node-forge-patched/**',
+  'packages/braces-patched/**',
 ];
 
 const baseConfig = [
