@@ -2,10 +2,11 @@ import { assertAndroidProductionBuildConfiguration } from './tooling/android-pro
 import { readRevenueCatAndroidPublicConfig } from './tooling/revenuecat-public-config.js';
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+const webBaseUrl = process.env.EXPO_PUBLIC_WEB_BASE_URL ?? 'http://localhost:3000';
 const easProjectId = process.env.EAS_PROJECT_ID;
 const revenueCatAndroid = readRevenueCatAndroidPublicConfig();
 
-assertAndroidProductionBuildConfiguration({ apiBaseUrl, revenueCatAndroid });
+assertAndroidProductionBuildConfiguration({ apiBaseUrl, webBaseUrl, revenueCatAndroid });
 
 /** @type {import('expo/config').ExpoConfig} */
 const appConfig = {
@@ -52,6 +53,7 @@ const appConfig = {
     // Expo public configuration is bundled into the app. Never place provider
     // provider secrets, authentication secrets, or database URLs in this object.
     apiBaseUrl,
+    webBaseUrl,
     revenueCatAndroid,
     ...(easProjectId
       ? {
