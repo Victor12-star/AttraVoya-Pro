@@ -222,7 +222,7 @@ export function MobileSubscriptionStatusContent({
   );
   const [managementMessage, setManagementMessage] = useState(/** @type {string | null} */ (null));
   const managementRefreshPendingRef = useRef(false);
-  const managementAccessSnapshotRef = useRef(null);
+  const managementAccessSnapshotRef = useRef(/** @type {any} */ (null));
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
