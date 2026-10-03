@@ -27,6 +27,7 @@ import { createMobileApiClient } from '../../services/api-client.js';
 const PLAN_KEYS = new Set(['FREE', 'PRO_MONTHLY', 'PRO_YEARLY']);
 const PRO_STATUSES = new Set(['ACTIVE', 'TRIALING']);
 const GOOGLE_PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';
+const DEFAULT_VERIFICATION_RETRY_DELAYS_MS = Object.freeze([5_000, 10_000, 15_000]);
 
 function subscribeToNativeAppState(listener) {
   const subscription = AppState.addEventListener('change', listener);
@@ -47,6 +48,40 @@ function safeIsoDate(value) {
 
 function safeManagementChannel(value) {
   return value?.channel === 'GOOGLE_PLAY' ? 'GOOGLE_PLAY' : null;
+}
+
+function waitForVerificationDelay(delayMs) {
+  return new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+export async function recheckServerVerifiedAccess({
+  refetch,
+  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
+  waitForDelay = waitForVerificationDelay,
+}) {
+  if (typeof refetch !== 'function' || typeof waitForDelay !== 'function') {
+    throw new TypeError('Server verification recheck dependencies are required.');
+  }
+  if (
+    !Array.isArray(retryDelaysMs) ||
+    retryDelaysMs.length > DEFAULT_VERIFICATION_RETRY_DELAYS_MS.length ||
+    retryDelaysMs.some(
+      (delayMs) => !Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 60_000,
+    )
+  ) {
+    throw new TypeError('Server verification retry delays are invalid.');
+  }
+
+  let refreshed = await refetch();
+  if (refreshed.data?.tier === 'PRO') return refreshed;
+
+  for (const delayMs of retryDelaysMs) {
+    await waitForDelay(delayMs);
+    refreshed = await refetch();
+    if (refreshed.data?.tier === 'PRO') break;
+  }
+
+  return refreshed;
 }
 
 export function normalizeAndroidPurchaseAvailability(response) {
@@ -129,7 +164,7 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void)}} props */
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void), verificationRetryDelaysMs?: number[], waitForVerificationDelay?: (delayMs: number) => Promise<void>}} props */
 export function MobileSubscriptionStatusContent({
   client: suppliedClient,
   loadOfferingCatalog,
@@ -137,6 +172,8 @@ export function MobileSubscriptionStatusContent({
   purchasePlan,
   restorePurchases,
   subscribeToAppState = subscribeToNativeAppState,
+  verificationRetryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
+  waitForVerificationDelay: suppliedWaitForVerificationDelay = waitForVerificationDelay,
 }) {
   const client = useMemo(() => suppliedClient ?? createMobileApiClient(), [suppliedClient]);
   const [purchaseState, setPurchaseState] = useState(
@@ -263,7 +300,15 @@ export function MobileSubscriptionStatusContent({
       return;
     }
 
-    const refreshed = await query.refetch();
+    setPurchaseState({
+      status: 'pending',
+      message: 'Google Play completed the purchase. Verifying Pro access with AttraVoya…',
+    });
+    const refreshed = await recheckServerVerifiedAccess({
+      refetch: query.refetch,
+      retryDelaysMs: verificationRetryDelaysMs,
+      waitForDelay: suppliedWaitForVerificationDelay,
+    });
     if (refreshed.data?.tier === 'PRO') {
       setPurchaseState({
         status: 'verified',
@@ -330,7 +375,15 @@ export function MobileSubscriptionStatusContent({
       return;
     }
 
-    const refreshed = await query.refetch();
+    setRestoreState({
+      status: 'pending',
+      message: 'Google Play restore completed. Verifying Pro access with AttraVoya…',
+    });
+    const refreshed = await recheckServerVerifiedAccess({
+      refetch: query.refetch,
+      retryDelaysMs: verificationRetryDelaysMs,
+      waitForDelay: suppliedWaitForVerificationDelay,
+    });
     if (refreshed.data?.tier === 'PRO') {
       setRestoreState({
         status: 'verified',
