@@ -10,6 +10,8 @@ const PROD_ANDROID = {
   EAS_BUILD_PLATFORM: 'android',
 };
 
+const EAS_PROJECT_ID = '0cd3da2d-1234-4abc-8def-1234567890ab';
+
 describe('Android production mobile configuration', () => {
   it('recognizes only the production Android build target', () => {
     expect(isAndroidProductionBuild(PROD_ANDROID)).toBe(true);
@@ -33,6 +35,7 @@ describe('Android production mobile configuration', () => {
         environment: PROD_ANDROID,
         apiBaseUrl: 'https://api.attravoya.example',
         webBaseUrl: 'https://attravoya.example',
+        easProjectId: EAS_PROJECT_ID,
         revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
       }),
     ).not.toThrow();
@@ -51,6 +54,7 @@ describe('Android production mobile configuration', () => {
           environment: PROD_ANDROID,
           apiBaseUrl,
           webBaseUrl: 'https://attravoya.example',
+          easProjectId: EAS_PROJECT_ID,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
       ).toThrow('Android production configuration');
@@ -73,9 +77,24 @@ describe('Android production mobile configuration', () => {
           environment: PROD_ANDROID,
           apiBaseUrl: 'https://api.attravoya.example',
           webBaseUrl,
+          easProjectId: EAS_PROJECT_ID,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
       ).toThrow('Android production configuration');
+    }
+  });
+
+  it('rejects a production Android build without a valid EAS project ID', () => {
+    for (const easProjectId of [undefined, '', 'not-a-project-id']) {
+      expect(() =>
+        assertAndroidProductionBuildConfiguration({
+          environment: PROD_ANDROID,
+          apiBaseUrl: 'https://api.attravoya.example',
+          webBaseUrl: 'https://attravoya.example',
+          easProjectId,
+          revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
+        }),
+      ).toThrow('EAS_PROJECT_ID must be a valid project UUID');
     }
   });
 
@@ -85,6 +104,7 @@ describe('Android production mobile configuration', () => {
         environment: PROD_ANDROID,
         apiBaseUrl: 'https://api.attravoya.example',
         webBaseUrl: 'https://attravoya.example',
+        easProjectId: EAS_PROJECT_ID,
         revenueCatAndroid: { enabled: false },
       }),
     ).toThrow('RevenueCat Android must be enabled');
