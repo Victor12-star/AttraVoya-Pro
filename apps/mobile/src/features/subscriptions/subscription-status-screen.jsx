@@ -64,11 +64,7 @@ function serverAccessFingerprint(access) {
   ]);
 }
 
-export async function recheckServerVerifiedAccess({
-  refetch,
-  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
-  waitForDelay = waitForVerificationDelay,
-}) {
+function assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay }) {
   if (typeof refetch !== 'function' || typeof waitForDelay !== 'function') {
     throw new TypeError('Server verification recheck dependencies are required.');
   }
@@ -81,6 +77,14 @@ export async function recheckServerVerifiedAccess({
   ) {
     throw new TypeError('Server verification retry delays are invalid.');
   }
+}
+
+export async function recheckServerVerifiedAccess({
+  refetch,
+  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
+  waitForDelay = waitForVerificationDelay,
+}) {
+  assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay });
 
   let refreshed = await refetch();
   if (refreshed.data?.tier === 'PRO') return refreshed;
@@ -100,6 +104,7 @@ export async function recheckServerVerifiedAccessChange({
   retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
   waitForDelay = waitForVerificationDelay,
 }) {
+  assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay });
   if (!previousAccess || typeof previousAccess !== 'object') {
     throw new TypeError('Previous server verified access is required.');
   }
