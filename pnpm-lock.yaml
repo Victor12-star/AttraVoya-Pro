@@ -10,6 +10,7 @@ overrides:
   fast-uri@>=4.0.0 <5.0.0: 4.2.1
   deepmerge-ts: 8.0.1
   node-forge: workspace:1.4.1-0
+  braces: workspace:3.0.4-attravoya.0
   mysql2: 3.24.3
   js-yaml@>=3.0.0 <3.15.2: 3.15.2
   js-yaml@>=4.0.0 <4.3.2: 4.3.2
@@ -606,6 +607,12 @@ importers:
   packages/javascript-config: {}
 
   packages/localization: {}
+
+  packages/braces-patched:
+    dependencies:
+      fill-range:
+        specifier: ^7.1.1
+        version: 7.1.1
 
   packages/node-forge-patched: {}
 
@@ -3704,9 +3711,6 @@ packages:
     resolution: {integrity: sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==}
     engines: {node: 20 || >=22}
 
-  braces@3.0.3:
-    resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
-    engines: {node: '>=8'}
 
   browserslist@4.28.8:
     resolution: {integrity: sha512-V2NpofLblG64mfOtSgDhOJESZEGogzDMBv/q+W6oc4LXWP/q75eOXoOaaOu1EOadB9U4Bwx/e0yzbvwKH8zalA==}
@@ -11773,9 +11777,6 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
-  braces@3.0.3:
-    dependencies:
-      fill-range: 7.1.1
 
   browserslist@4.28.8:
     dependencies:
@@ -14744,7 +14745,7 @@ snapshots:
 
   micromatch@4.0.8:
     dependencies:
-      braces: 3.0.3
+      braces: link:packages/braces-patched
       picomatch: 2.3.2
 
   mime-db@1.52.0: {}
