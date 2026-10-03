@@ -164,7 +164,7 @@ function safeLoadMessage(error) {
   return 'Your plan status could not be loaded safely. Please try again.';
 }
 
-/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void), verificationRetryDelaysMs?: number[], waitForVerificationDelay?: (delayMs: number) => Promise<void>}} props */
+/** @param {{client?: any, loadOfferingCatalog?: () => Promise<any[]>, openSubscriptionManagement?: () => Promise<any>, purchasePlan?: (period: 'monthly' | 'yearly') => Promise<any>, restorePurchases?: () => Promise<any>, subscribeToAppState?: (listener: (state: string) => void) => (() => void), verificationRetryDelaysMs?: readonly number[], waitForVerificationDelay?: (delayMs: number) => Promise<void>}} props */
 export function MobileSubscriptionStatusContent({
   client: suppliedClient,
   loadOfferingCatalog,
