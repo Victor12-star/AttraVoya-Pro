@@ -13,6 +13,8 @@ function renderContent(
   restorePurchases,
   openSubscriptionManagement,
   subscribeToAppState,
+  verificationRetryDelaysMs = [],
+  waitForVerificationDelay,
 ) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -39,6 +41,8 @@ function renderContent(
         purchasePlan={purchasePlan}
         restorePurchases={restorePurchases}
         subscribeToAppState={subscribeToAppState}
+        verificationRetryDelaysMs={verificationRetryDelaysMs}
+        waitForVerificationDelay={waitForVerificationDelay}
       />
     </QueryClientProvider>,
   );
@@ -195,6 +199,59 @@ describe('mobile subscription status', () => {
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
   });
 
+  it('rechecks only the authoritative server while a completed purchase webhook catches up', async () => {
+    const freeAccess = {
+      access: {
+        plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+        entitlements: [],
+        limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+        subscription: null,
+      },
+    };
+    const client = {
+      getMyEntitlements: jest
+        .fn()
+        .mockResolvedValueOnce(freeAccess)
+        .mockResolvedValueOnce(freeAccess)
+        .mockResolvedValueOnce(freeAccess)
+        .mockResolvedValueOnce({
+          access: {
+            plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+            entitlements: ['offline_maps'],
+            limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+            subscription: {
+              status: 'ACTIVE',
+              currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+            },
+          },
+        }),
+    };
+    const loadOfferingCatalog = jest
+      .fn()
+      .mockResolvedValue([{ period: 'monthly', price: 'SEK 49.00' }]);
+    const purchasePlan = jest.fn().mockResolvedValue({ status: 'completed' });
+    const waitForVerificationDelay = jest.fn().mockResolvedValue(undefined);
+
+    const result = await renderContent(
+      client,
+      loadOfferingCatalog,
+      purchasePlan,
+      undefined,
+      undefined,
+      undefined,
+      [5_000, 10_000],
+      waitForVerificationDelay,
+    );
+
+    expect(await result.findByText('SEK 49.00')).toBeTruthy();
+    await fireEvent.press(result.getByText('Choose monthly'));
+
+    expect(await result.findByText('Pro Monthly')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(4);
+    expect(waitForVerificationDelay).toHaveBeenNthCalledWith(1, 5_000);
+    expect(waitForVerificationDelay).toHaveBeenNthCalledWith(2, 10_000);
+  });
+
   it('keeps a cancelled purchase on Free without leaking provider details', async () => {
     const client = {
       getMyEntitlements: jest.fn().mockResolvedValue({
@@ -279,6 +336,46 @@ describe('mobile subscription status', () => {
     ).toBeTruthy();
     expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops bounded restore rechecks without granting Pro when the server stays Free', async () => {
+    const freeAccess = {
+      access: {
+        plan: { key: 'FREE', tier: 'FREE', name: 'Free' },
+        entitlements: [],
+        limits: { maxTrips: 1, maxFavorites: 10, offlineMaps: 0 },
+        subscription: null,
+      },
+    };
+    const client = {
+      getMyEntitlements: jest.fn().mockResolvedValue(freeAccess),
+    };
+    const loadOfferingCatalog = jest.fn().mockResolvedValue([]);
+    const restorePurchases = jest.fn().mockResolvedValue({ status: 'completed' });
+    const waitForVerificationDelay = jest.fn().mockResolvedValue(undefined);
+
+    const result = await renderContent(
+      client,
+      loadOfferingCatalog,
+      undefined,
+      restorePurchases,
+      undefined,
+      undefined,
+      [5_000, 10_000, 15_000],
+      waitForVerificationDelay,
+    );
+
+    expect(await result.findByText('Restore purchases')).toBeTruthy();
+    await fireEvent.press(result.getByText('Restore purchases'));
+
+    expect(
+      await result.findByText(
+        'Google Play restore completed. AttraVoya has not verified Pro access yet. Refresh status shortly.',
+      ),
+    ).toBeTruthy();
+    expect(result.getByText('Your account is using the Free plan.')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(5);
+    expect(waitForVerificationDelay).toHaveBeenCalledTimes(3);
   });
 
   it('shows restored Pro only after the server confirms it', async () => {
