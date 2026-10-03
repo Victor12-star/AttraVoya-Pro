@@ -39,7 +39,6 @@ const appConfig = {
   plugins: [
     './plugins/with-android-billing-launch-mode.js',
     'expo-router',
-    'expo-notifications',
     'expo-secure-store',
     [
       'expo-location',
