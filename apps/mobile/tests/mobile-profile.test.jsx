@@ -6,6 +6,10 @@ import {
   ProfileContent,
   ProfileDeletionConfirmation,
 } from '../src/app/(tabs)/profile.jsx';
+import {
+  buildConfiguredPublicWebPageUrl,
+  normalizePublicWebBaseUrl,
+} from '../src/services/public-web-links.js';
 
 describe('mobile profile screen', () => {
   it('renders validated identity and provides an accessible sign-out action', async () => {
@@ -80,6 +84,23 @@ describe('mobile profile screen', () => {
       await result.findByText('This legal page could not be opened. Please try again.'),
     ).toBeTruthy();
     expect(result.queryByText('private linking detail')).toBeNull();
+  });
+
+  it('restricts public legal links to the configured safe origin', () => {
+    const expoConfig = { extra: { webBaseUrl: 'https://attravoya.example' } };
+
+    expect(normalizePublicWebBaseUrl('https://attravoya.example/')).toBe(
+      'https://attravoya.example',
+    );
+    expect(buildConfiguredPublicWebPageUrl('/privacy', expoConfig)).toBe(
+      'https://attravoya.example/privacy',
+    );
+    expect(buildConfiguredPublicWebPageUrl('/terms', expoConfig)).toBe(
+      'https://attravoya.example/terms',
+    );
+    expect(() => buildConfiguredPublicWebPageUrl('/admin', expoConfig)).toThrow(
+      'mobile public web configuration',
+    );
   });
 
   it('requires a valid password and an exact destructive confirmation', () => {
