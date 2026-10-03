@@ -56,10 +56,11 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.autoIncrement).toBe(true);
   });
 
-  it('builds production Android as an app bundle for Google Play', async () => {
+  it('builds production Android as an app bundle with EAS-managed signing credentials', async () => {
     const configuration = await readEasConfiguration();
 
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
+    expect(configuration.build.production.android?.credentialsSource).toBe('remote');
   });
 
   it('pins the Google Play application ID to the production Android package', async () => {
