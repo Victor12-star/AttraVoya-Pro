@@ -28,6 +28,7 @@
       "autoIncrement": true,
       "channel": "production",
       "distribution": "store",
+      "withoutCredentials": false,
       "android": {
         "buildType": "app-bundle",
         "credentialsSource": "remote"

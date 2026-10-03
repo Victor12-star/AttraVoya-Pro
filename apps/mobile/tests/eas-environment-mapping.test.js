@@ -62,6 +62,7 @@ describe('mobile EAS environment mapping', () => {
     const configuration = await readEasConfiguration();
 
     expect(configuration.build.production.distribution).toBe('store');
+    expect(configuration.build.production.withoutCredentials).toBe(false);
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
     expect(configuration.build.production.android?.credentialsSource).toBe('remote');
   });
