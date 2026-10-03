@@ -233,7 +233,8 @@ describe('RevenueCat subscription event processor', () => {
     const { instance, deps } = processor();
     const result = await instance.process({
       rawPayload: payload({
-        period_type: 'UNSUPPORTED',
+        type: 'CANCELLATION',
+        cancel_reason: undefined,
       }),
     });
 
@@ -420,8 +421,7 @@ describe('RevenueCat subscription event processor', () => {
 
     const result = await instance.process({
       rawPayload: payload({
-        type: 'CANCELLATION',
-        cancel_reason: undefined,
+        period_type: 'UNSUPPORTED',
       }),
     });
 
