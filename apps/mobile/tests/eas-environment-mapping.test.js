@@ -13,6 +13,17 @@ async function readMobilePackage() {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
+async function readRootPackage() {
+  const filePath = path.join(process.cwd(), '..', '..', 'package.json');
+  return JSON.parse(await readFile(filePath, 'utf8'));
+}
+
+function minimumNodeVersion(engine) {
+  const match = typeof engine === 'string' ? engine.match(/^>=(\d+\.\d+\.\d+)\s+</) : null;
+  if (!match) throw new TypeError('Root Node engine minimum is invalid.');
+  return match[1];
+}
+
 describe('mobile EAS environment mapping', () => {
   it('pins every canonical build profile to its matching EAS environment', async () => {
     const configuration = await readEasConfiguration();
@@ -20,6 +31,16 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.development.environment).toBe('development');
     expect(configuration.build.preview.environment).toBe('preview');
     expect(configuration.build.production.environment).toBe('production');
+  });
+
+  it('keeps every EAS profile at or above the repository Node engine minimum', async () => {
+    const configuration = await readEasConfiguration();
+    const rootPackage = await readRootPackage();
+    const expectedNodeVersion = minimumNodeVersion(rootPackage.engines?.node);
+
+    expect(configuration.build.development.node).toBe(expectedNodeVersion);
+    expect(configuration.build.preview.node).toBe(expectedNodeVersion);
+    expect(configuration.build.production.node).toBe(expectedNodeVersion);
   });
 
   it('uses an Expo development client for native Android billing tests', async () => {
