@@ -18,6 +18,11 @@ async function readRootPackage() {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
+async function readAppConfigSource() {
+  const filePath = path.join(process.cwd(), 'app.config.js');
+  return readFile(filePath, 'utf8');
+}
+
 function minimumNodeVersion(engine) {
   const match = typeof engine === 'string' ? engine.match(/^>=(\d+\.\d+\.\d+)\s+</) : null;
   if (!match) throw new TypeError('Root Node engine minimum is invalid.');
@@ -47,6 +52,14 @@ describe('mobile EAS environment mapping', () => {
     const configuration = await readEasConfiguration();
 
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
+  });
+
+  it('keeps unused Expo notifications native surface out of production mobile', async () => {
+    const mobilePackage = await readMobilePackage();
+    const appConfigSource = await readAppConfigSource();
+
+    expect(mobilePackage.dependencies['expo-notifications']).toBeUndefined();
+    expect(appConfigSource).not.toContain("'expo-notifications'");
   });
 
   it('uses an Expo development client for native Android billing tests', async () => {
