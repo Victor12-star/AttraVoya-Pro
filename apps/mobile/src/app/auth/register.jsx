@@ -11,6 +11,7 @@ import { Link } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -23,6 +24,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMobileAuth } from '../../providers/mobile-auth-provider.jsx';
+import { buildConfiguredPublicWebPageUrl } from '../../services/public-web-links.js';
 
 export function normalizeRegistrationInput(email, password, confirmPassword) {
   if (password !== confirmPassword) return null;
@@ -53,7 +55,7 @@ export function RegistrationSuccess({ email, verificationDelivery }) {
   );
 }
 
-export function RegisterForm({ onRegister }) {
+export function RegisterForm({ onOpenPrivacy, onOpenTerms, onRegister }) {
   const { width } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -63,6 +65,15 @@ export function RegisterForm({ onRegister }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const pageGutter = getPageGutter(width);
+
+  async function openLegalPage(openPage) {
+    setError(null);
+    try {
+      await openPage();
+    } catch {
+      setError('This legal page could not be opened. Please try again.');
+    }
+  }
 
   async function submit() {
     if (submittingRef.current) return;
@@ -186,6 +197,27 @@ export function RegisterForm({ onRegister }) {
                   </Text>
                 </Pressable>
 
+                <Text style={styles.legalNotice}>
+                  By creating an account, you can review the Privacy policy and Terms of service
+                  before continuing.
+                </Text>
+                <View style={styles.legalLinks}>
+                  <Pressable
+                    accessibilityRole="link"
+                    onPress={() => void openLegalPage(onOpenPrivacy)}
+                    style={({ pressed }) => [styles.legalLink, pressed && styles.buttonPressed]}
+                  >
+                    <Text style={styles.textLink}>Privacy policy</Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="link"
+                    onPress={() => void openLegalPage(onOpenTerms)}
+                    style={({ pressed }) => [styles.legalLink, pressed && styles.buttonPressed]}
+                  >
+                    <Text style={styles.textLink}>Terms of service</Text>
+                  </Pressable>
+                </View>
+
                 <View style={styles.signInRow}>
                   <Text style={styles.signInPrompt}>Already have an account?</Text>
                   <Link href="/auth/login" style={styles.textLink}>
@@ -203,7 +235,18 @@ export function RegisterForm({ onRegister }) {
 
 export default function RegisterScreen() {
   const { register } = useMobileAuth();
-  return <RegisterForm onRegister={register} />;
+
+  async function openPublicPage(path) {
+    await Linking.openURL(buildConfiguredPublicWebPageUrl(path));
+  }
+
+  return (
+    <RegisterForm
+      onOpenPrivacy={() => openPublicPage('/privacy')}
+      onOpenTerms={() => openPublicPage('/terms')}
+      onRegister={register}
+    />
+  );
 }
 
 const styles = StyleSheet.create({
@@ -270,6 +313,17 @@ const styles = StyleSheet.create({
   primaryButtonLabel: { color: lightTheme.surface, fontSize: 16, fontWeight: '700' },
   buttonPressed: { opacity: interaction.pressedOpacity },
   buttonDisabled: { opacity: interaction.disabledOpacity },
+  legalNotice: { color: lightTheme.textMuted, fontSize: 13, lineHeight: 19, marginTop: spacing[2] },
+  legalLinks: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: spacing[4],
+  },
+  legalLink: {
+    minHeight: interaction.minimumTargetSize,
+    justifyContent: 'center',
+  },
   signInRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

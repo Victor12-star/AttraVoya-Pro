@@ -9,6 +9,7 @@ import {
 import { passwordSchema } from '@attravoya/validation';
 import { useRef, useState } from 'react';
 import {
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -20,6 +21,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMobileAuth } from '../../providers/mobile-auth-provider.jsx';
+import { buildConfiguredPublicWebPageUrl } from '../../services/public-web-links.js';
 
 export function normalizeDeletionConfirmation(password, confirmation) {
   if (confirmation !== 'DELETE') return null;
@@ -106,7 +108,7 @@ export function ProfileDeletionConfirmation({
   );
 }
 
-export function ProfileContent({ onDeleteAccount, onLogout, user }) {
+export function ProfileContent({ onDeleteAccount, onLogout, onOpenPrivacy, onOpenTerms, user }) {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeletion, setShowDeletion] = useState(false);
@@ -151,6 +153,15 @@ export function ProfileContent({ onDeleteAccount, onLogout, user }) {
     } finally {
       deletingRef.current = false;
       setIsDeleting(false);
+    }
+  }
+
+  async function openLegalPage(openPage) {
+    setError(null);
+    try {
+      await openPage();
+    } catch {
+      setError('This legal page could not be opened. Please try again.');
     }
   }
 
@@ -205,9 +216,25 @@ export function ProfileContent({ onDeleteAccount, onLogout, user }) {
       <View style={styles.notice}>
         <Text style={styles.noticeTitle}>Privacy and account controls</Text>
         <Text style={styles.bodyText}>
-          Account deletion is available below. Session management and data export will be added in
-          verified stages before public release.
+          Review how AttraVoya handles your data and the terms that govern the service. Account
+          deletion is available below.
         </Text>
+        <View style={styles.legalLinks}>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => void openLegalPage(onOpenPrivacy)}
+            style={({ pressed }) => [styles.legalLink, pressed && styles.buttonPressed]}
+          >
+            <Text style={styles.legalLinkLabel}>Privacy policy</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => void openLegalPage(onOpenTerms)}
+            style={({ pressed }) => [styles.legalLink, pressed && styles.buttonPressed]}
+          >
+            <Text style={styles.legalLinkLabel}>Terms of service</Text>
+          </Pressable>
+        </View>
       </View>
 
       {error ? (
@@ -277,6 +304,10 @@ export function ProfileContent({ onDeleteAccount, onLogout, user }) {
 export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const { deleteAccount, logout, user } = useMobileAuth();
+
+  async function openPublicPage(path) {
+    await Linking.openURL(buildConfiguredPublicWebPageUrl(path));
+  }
   const pageGutter = getPageGutter(width);
 
   return (
@@ -293,7 +324,13 @@ export default function ProfileScreen() {
           <Text style={styles.subtitle}>
             Review your account identity and control the secure session on this device.
           </Text>
-          <ProfileContent onDeleteAccount={deleteAccount} onLogout={logout} user={user} />
+          <ProfileContent
+            onDeleteAccount={deleteAccount}
+            onLogout={logout}
+            onOpenPrivacy={() => openPublicPage('/privacy')}
+            onOpenTerms={() => openPublicPage('/terms')}
+            user={user}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -371,6 +408,13 @@ const styles = StyleSheet.create({
     padding: spacing[5],
   },
   noticeTitle: { color: lightTheme.textPrimary, fontSize: 16, fontWeight: '700' },
+  legalLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[3] },
+  legalLink: {
+    minHeight: interaction.minimumTargetSize,
+    justifyContent: 'center',
+    paddingVertical: spacing[2],
+  },
+  legalLinkLabel: { color: lightTheme.brandSecondary, fontSize: 15, fontWeight: '700' },
   bodyText: { color: lightTheme.textSecondary, fontSize: 15, lineHeight: 23 },
   errorText: { color: lightTheme.danger, fontSize: 14, lineHeight: 21, marginTop: spacing[4] },
   logoutButton: {
