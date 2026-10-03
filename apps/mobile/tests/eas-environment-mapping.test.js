@@ -96,10 +96,11 @@ describe('mobile EAS environment mapping', () => {
     expect(mobilePackage.dependencies['expo-dev-client']).toBe('~57.0.19');
   });
 
-  it('keeps RevenueCat and API values out of committed EAS build configuration', async () => {
+  it('keeps Google Play service-account paths and public runtime values out of committed EAS config', async () => {
     const configuration = await readEasConfiguration();
     const serialized = JSON.stringify(configuration);
 
+    expect(configuration.submit.production.android?.serviceAccountKeyPath).toBeUndefined();
     expect(serialized).not.toContain('EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY');
     expect(serialized).not.toContain('goog_');
     expect(serialized).not.toContain('EXPO_PUBLIC_API_BASE_URL');
