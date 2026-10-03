@@ -66,6 +66,7 @@ describe('mobile EAS environment mapping', () => {
 
     expect(configuration.submit.production.android?.track).toBe('internal');
     expect(configuration.submit.production.android?.releaseStatus).toBe('draft');
+    expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
   });
 
   it('keeps unused Expo notifications native surface out of production mobile', async () => {
