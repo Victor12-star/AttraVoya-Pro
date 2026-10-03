@@ -14,12 +14,12 @@ function isAndroidProductionBuild(environment) {
   );
 }
 
-function assertProductionApiBaseUrl(apiBaseUrl) {
+function assertProductionPublicHttpsUrl(value, variableName) {
   let url;
   try {
-    url = new URL(apiBaseUrl);
+    url = new URL(value);
   } catch {
-    throw productionConfigurationError('EXPO_PUBLIC_API_BASE_URL must be a valid HTTPS URL.');
+    throw productionConfigurationError(`${variableName} must be a valid HTTPS URL.`);
   }
 
   if (
@@ -27,10 +27,12 @@ function assertProductionApiBaseUrl(apiBaseUrl) {
     !url.hostname ||
     LOOPBACK_HOSTS.has(url.hostname.toLowerCase()) ||
     url.username ||
-    url.password
+    url.password ||
+    url.search ||
+    url.hash
   ) {
     throw productionConfigurationError(
-      'EXPO_PUBLIC_API_BASE_URL must use HTTPS, must not be loopback, and must not contain credentials.',
+      `${variableName} must use HTTPS, must not be loopback, and must not contain credentials, query parameters, or fragments.`,
     );
   }
 }
@@ -45,11 +47,13 @@ function assertProductionApiBaseUrl(apiBaseUrl) {
 export function assertAndroidProductionBuildConfiguration({
   environment = process.env,
   apiBaseUrl,
+  webBaseUrl,
   revenueCatAndroid,
 }) {
   if (!isAndroidProductionBuild(environment)) return;
 
-  assertProductionApiBaseUrl(apiBaseUrl);
+  assertProductionPublicHttpsUrl(apiBaseUrl, 'EXPO_PUBLIC_API_BASE_URL');
+  assertProductionPublicHttpsUrl(webBaseUrl, 'EXPO_PUBLIC_WEB_BASE_URL');
 
   if (revenueCatAndroid?.enabled !== true) {
     throw productionConfigurationError(
