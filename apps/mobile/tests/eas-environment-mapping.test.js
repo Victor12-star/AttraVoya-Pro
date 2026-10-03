@@ -48,6 +48,13 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.node).toBe(expectedNodeVersion);
   });
 
+  it('uses remote developer-facing versions with production auto-increment', async () => {
+    const configuration = await readEasConfiguration();
+
+    expect(configuration.cli.appVersionSource).toBe('remote');
+    expect(configuration.build.production.autoIncrement).toBe(true);
+  });
+
   it('builds production Android as an app bundle for Google Play', async () => {
     const configuration = await readEasConfiguration();
 
