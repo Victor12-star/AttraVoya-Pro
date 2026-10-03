@@ -27,6 +27,44 @@ describe('mobile registration screen', () => {
     expect(onRegister).not.toHaveBeenCalled();
   });
 
+  it('exposes privacy and terms before account creation', async () => {
+    const onOpenPrivacy = jest.fn(async () => undefined);
+    const onOpenTerms = jest.fn(async () => undefined);
+    const result = await render(
+      <RegisterForm
+        onOpenPrivacy={onOpenPrivacy}
+        onOpenTerms={onOpenTerms}
+        onRegister={jest.fn()}
+      />,
+    );
+
+    expect(result.getByRole('link', { name: 'Privacy policy' })).toBeTruthy();
+    expect(result.getByRole('link', { name: 'Terms of service' })).toBeTruthy();
+
+    await fireEvent.press(result.getByText('Privacy policy'));
+    await fireEvent.press(result.getByText('Terms of service'));
+
+    expect(onOpenPrivacy).toHaveBeenCalledTimes(1);
+    expect(onOpenTerms).toHaveBeenCalledTimes(1);
+  });
+
+  it('contains registration legal-link failures without exposing diagnostics', async () => {
+    const result = await render(
+      <RegisterForm
+        onOpenPrivacy={jest.fn().mockRejectedValue(new Error('private linking detail'))}
+        onOpenTerms={jest.fn()}
+        onRegister={jest.fn()}
+      />,
+    );
+
+    await fireEvent.press(result.getByText('Privacy policy'));
+
+    expect(
+      await result.findByText('This legal page could not be opened. Please try again.'),
+    ).toBeTruthy();
+    expect(result.queryByText('private linking detail')).toBeNull();
+  });
+
   it('explains successful verification delivery', async () => {
     const sent = await render(
       <RegistrationSuccess email="user@example.test" verificationDelivery="sent" />,
