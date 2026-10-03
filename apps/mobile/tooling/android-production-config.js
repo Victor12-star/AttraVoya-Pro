@@ -2,8 +2,7 @@ import process from 'node:process';
 import { URL } from 'node:url';
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
-const EAS_PROJECT_ID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const EAS_PROJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function productionConfigurationError(message) {
   return new Error(`Android production configuration: ${message}`);
