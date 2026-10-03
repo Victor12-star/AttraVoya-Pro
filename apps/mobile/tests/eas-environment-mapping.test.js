@@ -48,9 +48,11 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.node).toBe(expectedNodeVersion);
   });
 
-  it('requires committed source for EAS builds and uses remote versions', async () => {
+  it('pins EAS CLI to the installed mobile dependency and uses remote versions', async () => {
     const configuration = await readEasConfiguration();
+    const mobilePackage = await readMobilePackage();
 
+    expect(configuration.cli.version).toBe(mobilePackage.devDependencies['eas-cli']);
     expect(configuration.cli.requireCommit).toBe(true);
     expect(configuration.cli.appVersionSource).toBe('remote');
     expect(configuration.build.production.autoIncrement).toBe(true);
