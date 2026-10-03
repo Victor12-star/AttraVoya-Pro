@@ -54,11 +54,17 @@ function waitForVerificationDelay(delayMs) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
-export async function recheckServerVerifiedAccess({
-  refetch,
-  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
-  waitForDelay = waitForVerificationDelay,
-}) {
+function serverAccessFingerprint(access) {
+  return JSON.stringify([
+    access?.key ?? null,
+    access?.tier ?? null,
+    access?.status ?? null,
+    access?.currentPeriodEnd ?? null,
+    access?.managementChannel ?? null,
+  ]);
+}
+
+function assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay }) {
   if (typeof refetch !== 'function' || typeof waitForDelay !== 'function') {
     throw new TypeError('Server verification recheck dependencies are required.');
   }
@@ -71,6 +77,14 @@ export async function recheckServerVerifiedAccess({
   ) {
     throw new TypeError('Server verification retry delays are invalid.');
   }
+}
+
+export async function recheckServerVerifiedAccess({
+  refetch,
+  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
+  waitForDelay = waitForVerificationDelay,
+}) {
+  assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay });
 
   let refreshed = await refetch();
   if (refreshed.data?.tier === 'PRO') return refreshed;
@@ -79,6 +93,30 @@ export async function recheckServerVerifiedAccess({
     await waitForDelay(delayMs);
     refreshed = await refetch();
     if (refreshed.data?.tier === 'PRO') break;
+  }
+
+  return refreshed;
+}
+
+export async function recheckServerVerifiedAccessChange({
+  refetch,
+  previousAccess,
+  retryDelaysMs = DEFAULT_VERIFICATION_RETRY_DELAYS_MS,
+  waitForDelay = waitForVerificationDelay,
+}) {
+  assertServerRecheckOptions({ refetch, retryDelaysMs, waitForDelay });
+  if (!previousAccess || typeof previousAccess !== 'object') {
+    throw new TypeError('Previous server verified access is required.');
+  }
+
+  const previousFingerprint = serverAccessFingerprint(previousAccess);
+  let refreshed = await refetch();
+  if (serverAccessFingerprint(refreshed.data) !== previousFingerprint) return refreshed;
+
+  for (const delayMs of retryDelaysMs) {
+    await waitForDelay(delayMs);
+    refreshed = await refetch();
+    if (serverAccessFingerprint(refreshed.data) !== previousFingerprint) break;
   }
 
   return refreshed;
@@ -184,6 +222,7 @@ export function MobileSubscriptionStatusContent({
   );
   const [managementMessage, setManagementMessage] = useState(/** @type {string | null} */ (null));
   const managementRefreshPendingRef = useRef(false);
+  const managementAccessSnapshotRef = useRef(/** @type {any} */ (null));
   const query = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -234,9 +273,23 @@ export function MobileSubscriptionStatusContent({
     return subscribeToAppState((nextState) => {
       if (nextState !== 'active' || !managementRefreshPendingRef.current) return;
       managementRefreshPendingRef.current = false;
-      void refetchSubscriptionStatus();
+      const previousAccess = managementAccessSnapshotRef.current;
+      managementAccessSnapshotRef.current = null;
+      if (!previousAccess) return;
+
+      void recheckServerVerifiedAccessChange({
+        refetch: refetchSubscriptionStatus,
+        previousAccess,
+        retryDelaysMs: verificationRetryDelaysMs,
+        waitForDelay: suppliedWaitForVerificationDelay,
+      });
     });
-  }, [refetchSubscriptionStatus, subscribeToAppState]);
+  }, [
+    refetchSubscriptionStatus,
+    subscribeToAppState,
+    suppliedWaitForVerificationDelay,
+    verificationRetryDelaysMs,
+  ]);
 
   if (query.isPending) {
     return <ContentState kind="loading" message="Checking your current AttraVoya plan…" />;
@@ -333,11 +386,13 @@ export function MobileSubscriptionStatusContent({
     }
 
     setManagementMessage(null);
+    managementAccessSnapshotRef.current = access;
     managementRefreshPendingRef.current = true;
     try {
       await openSubscriptionManagement();
     } catch {
       managementRefreshPendingRef.current = false;
+      managementAccessSnapshotRef.current = null;
       setManagementMessage(
         'Google Play subscription management could not be opened. Please try again.',
       );
