@@ -54,6 +54,7 @@ describe('Android production mobile configuration', () => {
           environment: PROD_ANDROID,
           apiBaseUrl,
           webBaseUrl: 'https://attravoya.example',
+          easProjectId: EAS_PROJECT_ID,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
       ).toThrow('Android production configuration');
