@@ -33,7 +33,7 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.environment).toBe('production');
   });
 
-  it('keeps every EAS profile at or above the repository Node engine minimum', async () => {
+  it('matches every EAS profile to the repository Node engine minimum', async () => {
     const configuration = await readEasConfiguration();
     const rootPackage = await readRootPackage();
     const expectedNodeVersion = minimumNodeVersion(rootPackage.engines?.node);
