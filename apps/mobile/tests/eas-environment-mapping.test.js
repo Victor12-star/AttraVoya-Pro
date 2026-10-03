@@ -62,9 +62,13 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
   });
 
-  it('submits production Android builds to Google Play internal testing', async () => {
+  it('pins the Google Play application ID to the production Android package', async () => {
     const configuration = await readEasConfiguration();
+    const appConfigSource = await readAppConfigSource();
+    const packageMatch = appConfigSource.match(/package:\s*'([^']+)'/);
 
+    expect(packageMatch?.[1]).toBeDefined();
+    expect(configuration.submit.production.android?.applicationId).toBe(packageMatch?.[1]);
     expect(configuration.submit.production.android?.track).toBe('internal');
     expect(configuration.submit.production.android?.releaseStatus).toBe('draft');
     expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
