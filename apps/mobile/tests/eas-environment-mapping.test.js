@@ -58,9 +58,10 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.autoIncrement).toBe(true);
   });
 
-  it('builds production Android as an app bundle with EAS-managed signing credentials', async () => {
+  it('builds production Android for store distribution with EAS-managed signing credentials', async () => {
     const configuration = await readEasConfiguration();
 
+    expect(configuration.build.production.distribution).toBe('store');
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
     expect(configuration.build.production.android?.credentialsSource).toBe('remote');
   });
