@@ -55,7 +55,7 @@ function millisecondsDate(value, name, { nullable = false } = {}) {
 }
 
 function cancellationReason(event, eventType) {
-  if (eventType !== 'CANCELLATION') return null;
+  if (eventType !== 'CANCELLATION' || event.cancel_reason == null) return null;
 
   const reason = requiredText(event.cancel_reason, 'RevenueCat cancellation reason', 40);
   if (!CANCELLATION_REASONS.has(reason)) {
