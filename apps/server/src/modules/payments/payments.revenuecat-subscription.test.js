@@ -83,6 +83,25 @@ describe('RevenueCat Android lifecycle normalization', () => {
     expect(normalized).not.toHaveProperty('transactionId');
   });
 
+  it('normalizes a verified Android lifecycle event when RevenueCat omits the optional store field', async () => {
+    const rawPayload = payload({ store: undefined });
+    const evidence = await verifiedEvidence(rawPayload);
+
+    const normalized = normalizeVerifiedRevenueCatAndroidLifecycle({
+      rawPayload,
+      evidence,
+      productPolicy: productPolicy(),
+    });
+
+    expect(normalized).toMatchObject({
+      provider: 'revenuecat',
+      store: 'PLAY_STORE',
+      environment: 'PRODUCTION',
+      planKey: PLANS.PRO_MONTHLY,
+      eventType: 'INITIAL_PURCHASE',
+    });
+  });
+
   it('normalizes only allowlisted Google Play cancellation reasons', async () => {
     const rawPayload = payload({
       type: 'CANCELLATION',
