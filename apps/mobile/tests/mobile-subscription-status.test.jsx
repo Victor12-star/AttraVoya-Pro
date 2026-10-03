@@ -556,6 +556,78 @@ describe('mobile subscription status', () => {
     expect(client.getMyEntitlements).toHaveBeenCalledTimes(2);
   });
 
+  it('rechecks the authoritative server after Google Play management until plan state changes', async () => {
+    const monthlyAccess = {
+      access: {
+        plan: { key: 'PRO_MONTHLY', tier: 'PRO', name: 'Pro Monthly' },
+        entitlements: ['offline_maps'],
+        limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+        subscription: {
+          status: 'ACTIVE',
+          currentPeriodEnd: '2026-10-22T17:00:00.000Z',
+          management: { channel: 'GOOGLE_PLAY' },
+        },
+      },
+    };
+    const yearlyAccess = {
+      access: {
+        plan: { key: 'PRO_YEARLY', tier: 'PRO', name: 'Pro Yearly' },
+        entitlements: ['offline_maps'],
+        limits: { maxTrips: null, maxFavorites: null, offlineMaps: null },
+        subscription: {
+          status: 'ACTIVE',
+          currentPeriodEnd: '2027-10-22T17:00:00.000Z',
+          management: { channel: 'GOOGLE_PLAY' },
+        },
+      },
+    };
+    const client = {
+      getMyEntitlements: jest
+        .fn()
+        .mockResolvedValueOnce(monthlyAccess)
+        .mockResolvedValueOnce(monthlyAccess)
+        .mockResolvedValueOnce(monthlyAccess)
+        .mockResolvedValueOnce(yearlyAccess),
+    };
+    const openSubscriptionManagement = jest.fn().mockResolvedValue(undefined);
+    const waitForVerificationDelay = jest.fn().mockResolvedValue(undefined);
+    let appStateListener = null;
+    const subscribeToAppState = jest.fn((listener) => {
+      appStateListener = listener;
+      return jest.fn();
+    });
+
+    const result = await renderContent(
+      client,
+      undefined,
+      undefined,
+      undefined,
+      openSubscriptionManagement,
+      subscribeToAppState,
+      [5_000, 10_000],
+      waitForVerificationDelay,
+    );
+
+    expect(await result.findByText('Pro Monthly')).toBeTruthy();
+    await fireEvent.press(result.getByText('Manage in Google Play'));
+
+    await act(async () => {
+      appStateListener?.('background');
+      appStateListener?.('active');
+    });
+
+    expect(await result.findByText('Pro Yearly')).toBeTruthy();
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(4);
+    expect(waitForVerificationDelay).toHaveBeenNthCalledWith(1, 5_000);
+    expect(waitForVerificationDelay).toHaveBeenNthCalledWith(2, 10_000);
+
+    await act(async () => {
+      appStateListener?.('active');
+    });
+
+    expect(client.getMyEntitlements).toHaveBeenCalledTimes(4);
+  });
+
   it('does not schedule a foreground refresh when Google Play management fails to open', async () => {
     const client = {
       getMyEntitlements: jest.fn().mockResolvedValue({
