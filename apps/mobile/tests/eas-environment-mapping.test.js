@@ -43,6 +43,12 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.node).toBe(expectedNodeVersion);
   });
 
+  it('builds production Android as an app bundle for Google Play', async () => {
+    const configuration = await readEasConfiguration();
+
+    expect(configuration.build.production.android?.buildType).toBe('app-bundle');
+  });
+
   it('uses an Expo development client for native Android billing tests', async () => {
     const configuration = await readEasConfiguration();
 
