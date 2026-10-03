@@ -76,7 +76,7 @@ function parseVerifiedTransfer({ rawPayload, evidence, expectedAppId }) {
   if (event.app_id !== expectedAppId.trim()) {
     throw new ValidationError('RevenueCat transfer event is for an unexpected app.');
   }
-  if (event.store !== 'PLAY_STORE') {
+  if (event.store != null && event.store !== 'PLAY_STORE') {
     throw new ValidationError('RevenueCat transfer event is not from Google Play.');
   }
   if (event.environment !== 'PRODUCTION') {
