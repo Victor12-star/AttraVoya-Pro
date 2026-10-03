@@ -32,6 +32,7 @@ describe('Android production mobile configuration', () => {
       assertAndroidProductionBuildConfiguration({
         environment: PROD_ANDROID,
         apiBaseUrl: 'https://api.attravoya.example',
+        webBaseUrl: 'https://attravoya.example',
         revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
       }),
     ).not.toThrow();
@@ -49,6 +50,29 @@ describe('Android production mobile configuration', () => {
         assertAndroidProductionBuildConfiguration({
           environment: PROD_ANDROID,
           apiBaseUrl,
+          webBaseUrl: 'https://attravoya.example',
+          revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
+        }),
+      ).toThrow('Android production configuration');
+    }
+  });
+
+  it('rejects missing, insecure, loopback and credential-bearing public web URLs', () => {
+    for (const webBaseUrl of [
+      undefined,
+      'http://attravoya.example',
+      'https://localhost:3000',
+      'https://127.0.0.1:3000',
+      'https://user:password@attravoya.example',
+      'https://attravoya.example?source=mobile',
+      'https://attravoya.example#privacy',
+      'not-a-url',
+    ]) {
+      expect(() =>
+        assertAndroidProductionBuildConfiguration({
+          environment: PROD_ANDROID,
+          apiBaseUrl: 'https://api.attravoya.example',
+          webBaseUrl,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
       ).toThrow('Android production configuration');
@@ -60,6 +84,7 @@ describe('Android production mobile configuration', () => {
       assertAndroidProductionBuildConfiguration({
         environment: PROD_ANDROID,
         apiBaseUrl: 'https://api.attravoya.example',
+        webBaseUrl: 'https://attravoya.example',
         revenueCatAndroid: { enabled: false },
       }),
     ).toThrow('RevenueCat Android must be enabled');
@@ -76,6 +101,7 @@ describe('Android production mobile configuration', () => {
         assertAndroidProductionBuildConfiguration({
           environment,
           apiBaseUrl: 'http://localhost:5000',
+          webBaseUrl: 'http://localhost:3000',
           revenueCatAndroid: { enabled: false },
         }),
       ).not.toThrow();
