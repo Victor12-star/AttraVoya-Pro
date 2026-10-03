@@ -156,8 +156,8 @@ export function normalizeVerifiedRevenueCatAndroidLifecycle({
     }
   }
 
-  const store = requiredText(event.store, 'RevenueCat store', 40);
-  if (store !== 'PLAY_STORE') {
+  const store = event.store == null ? null : requiredText(event.store, 'RevenueCat store', 40);
+  if (store != null && store !== 'PLAY_STORE') {
     throw new ValidationError('RevenueCat lifecycle event is not from Google Play.');
   }
 
