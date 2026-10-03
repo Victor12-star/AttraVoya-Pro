@@ -7,7 +7,7 @@
     "development": {
       "distribution": "internal",
       "channel": "development",
-      "node": "24.19.0",
+      "node": "24.20.0",
       "env": {
         "APP_VARIANT": "development"
       },
@@ -17,7 +17,7 @@
     "preview": {
       "distribution": "internal",
       "channel": "preview",
-      "node": "24.19.0",
+      "node": "24.20.0",
       "env": {
         "APP_VARIANT": "preview"
       },
@@ -26,7 +26,7 @@
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "node": "24.19.0",
+      "node": "24.20.0",
       "env": {
         "APP_VARIANT": "production"
       },
