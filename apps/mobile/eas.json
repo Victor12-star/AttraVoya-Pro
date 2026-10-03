@@ -40,6 +40,7 @@
   "submit": {
     "production": {
       "android": {
+        "applicationId": "com.attravoya.pro",
         "track": "internal",
         "releaseStatus": "draft",
         "changesNotSentForReview": true
