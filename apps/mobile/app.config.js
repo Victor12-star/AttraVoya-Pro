@@ -6,7 +6,7 @@ const webBaseUrl = process.env.EXPO_PUBLIC_WEB_BASE_URL ?? 'http://localhost:300
 const easProjectId = process.env.EAS_PROJECT_ID;
 const revenueCatAndroid = readRevenueCatAndroidPublicConfig();
 
-assertAndroidProductionBuildConfiguration({ apiBaseUrl, webBaseUrl, revenueCatAndroid });
+assertAndroidProductionBuildConfiguration({ apiBaseUrl, webBaseUrl, easProjectId, revenueCatAndroid });
 
 /** @type {import('expo/config').ExpoConfig} */
 const appConfig = {
