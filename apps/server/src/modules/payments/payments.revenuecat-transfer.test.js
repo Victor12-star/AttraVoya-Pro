@@ -73,6 +73,24 @@ describe('RevenueCat Android transfer ownership', () => {
     expect(identities.resolveOwnedUser).toHaveBeenCalledTimes(2);
   });
 
+  it('accepts a verified Android transfer when RevenueCat omits the optional store field', async () => {
+    const rawPayload = payload({ store: undefined });
+    const evidence = await evidenceFor(rawPayload);
+
+    await expect(
+      resolveVerifiedRevenueCatAndroidTransfer({
+        rawPayload,
+        evidence,
+        expectedAppId: APP_ID,
+        subscriberIdentityService: subscriberIdentityService(),
+      }),
+    ).resolves.toMatchObject({
+      action: 'APPLY',
+      fromUserId: 'user-from',
+      toUserId: 'user-to',
+    });
+  });
+
   it('rejects transfer event-time evidence that does not match the verified payload', async () => {
     const rawPayload = payload();
     const event = JSON.parse(rawPayload.toString('utf8')).event;
