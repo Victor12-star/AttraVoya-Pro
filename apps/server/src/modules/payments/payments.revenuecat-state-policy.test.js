@@ -134,6 +134,20 @@ describe('RevenueCat Android subscription state policy', () => {
     }
   });
 
+  it('preserves access when RevenueCat omits the optional cancellation reason', async () => {
+    const result = await decision({
+      type: 'CANCELLATION',
+      period_type: 'NORMAL',
+      cancel_reason: undefined,
+    });
+
+    expect(result).toMatchObject({
+      action: 'IGNORE',
+      reason: 'ACCESS_REMAINS_UNTIL_EXPIRATION',
+      state: null,
+    });
+  });
+
   it('revokes access immediately for a verified Google Play refund cancellation', async () => {
     const result = await decision({
       type: 'CANCELLATION',

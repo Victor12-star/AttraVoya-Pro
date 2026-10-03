@@ -229,6 +229,26 @@ describe('RevenueCat subscription event processor', () => {
     expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
   });
 
+  it('ignores cancellation without a provider reason and preserves access until expiration', async () => {
+    const { instance, deps } = processor();
+    const result = await instance.process({
+      rawPayload: payload({
+        type: 'CANCELLATION',
+        cancel_reason: undefined,
+      }),
+    });
+
+    expect(result.outcome).toBe('IGNORED');
+    expect(deps.paymentsService.finalizeVerifiedEvent).toHaveBeenCalledWith({
+      eventId: 'billing-event-1',
+      outcome: 'IGNORED',
+    });
+    expect(
+      deps.ownershipRepository.createOrReuseProviderSubscriptionOwnership,
+    ).not.toHaveBeenCalled();
+    expect(deps.paymentsService.applyVerifiedSubscriptionState).not.toHaveBeenCalled();
+  });
+
   it('applies immediate non-entitling state for a verified Google Play refund', async () => {
     const { instance, deps } = processor();
     deps.paymentsService.applyVerifiedSubscriptionState.mockResolvedValueOnce({
@@ -401,8 +421,7 @@ describe('RevenueCat subscription event processor', () => {
 
     const result = await instance.process({
       rawPayload: payload({
-        type: 'CANCELLATION',
-        cancel_reason: undefined,
+        period_type: 'UNSUPPORTED',
       }),
     });
 
