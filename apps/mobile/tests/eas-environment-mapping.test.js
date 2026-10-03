@@ -61,6 +61,12 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.android?.buildType).toBe('app-bundle');
   });
 
+  it('submits production Android builds to Google Play internal testing', async () => {
+    const configuration = await readEasConfiguration();
+
+    expect(configuration.submit.production.android?.track).toBe('internal');
+  });
+
   it('keeps unused Expo notifications native surface out of production mobile', async () => {
     const mobilePackage = await readMobilePackage();
     const appConfigSource = await readAppConfigSource();
