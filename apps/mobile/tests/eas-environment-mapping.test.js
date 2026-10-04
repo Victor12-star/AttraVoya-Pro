@@ -84,7 +84,9 @@ describe('mobile EAS environment mapping', () => {
   it('keeps Android location foreground-only for Google Play policy', async () => {
     const appConfigSource = await readAppConfigSource();
 
-    expect(appConfigSource).toContain("blockedPermissions: ['android.permission.ACCESS_BACKGROUND_LOCATION']");
+    expect(appConfigSource).toContain(
+      "blockedPermissions: ['android.permission.ACCESS_BACKGROUND_LOCATION']",
+    );
     expect(appConfigSource).toContain('locationWhenInUsePermission');
     expect(appConfigSource).not.toContain('isAndroidBackgroundLocationEnabled: true');
   });
