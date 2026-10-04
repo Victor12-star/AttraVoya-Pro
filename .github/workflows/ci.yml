@@ -369,6 +369,8 @@ jobs:
         run: pnpm db:generate
 
       - name: Build workspace
+        env:
+          NEXT_PUBLIC_SITE_URL: https://web.ci.attravoya.invalid
         run: pnpm build
 
       - name: Build and smoke-test API container
