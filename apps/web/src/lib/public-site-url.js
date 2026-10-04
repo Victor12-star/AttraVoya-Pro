@@ -1,9 +1,28 @@
 const LOCAL_DEVELOPMENT_SITE_URL = 'http://localhost:3000';
 const PRODUCTION_ENVIRONMENT = 'production';
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+const RESERVED_EXACT_HOSTNAMES = new Set(['example.com', 'example.net', 'example.org']);
+const RESERVED_HOST_SUFFIXES = ['.example', '.invalid', '.test'];
 
 function isProduction(env) {
   return env.NODE_ENV?.trim().toLowerCase() === PRODUCTION_ENVIRONMENT;
+}
+
+function isReservedHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+
+  return (
+    RESERVED_EXACT_HOSTNAMES.has(normalized) ||
+    RESERVED_HOST_SUFFIXES.some((suffix) => normalized.endsWith(suffix))
+  );
+}
+
+function allowsReservedCiOrigin(env, hostname) {
+  return (
+    env.CI?.trim().toLowerCase() === 'true' &&
+    env.ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL?.trim().toLowerCase() === 'true' &&
+    hostname.toLowerCase().endsWith('.invalid')
+  );
 }
 
 function parseSiteOrigin(value) {
@@ -47,6 +66,9 @@ export function resolvePublicSiteUrl(env = process.env) {
     }
     if (LOCAL_HOSTNAMES.has(url.hostname)) {
       throw new Error('Public site URL must not use a local hostname in production.');
+    }
+    if (isReservedHostname(url.hostname) && !allowsReservedCiOrigin(env, url.hostname)) {
+      throw new Error('Public site URL must not use a reserved placeholder hostname in production.');
     }
   }
 
