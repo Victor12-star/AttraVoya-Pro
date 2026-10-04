@@ -46,22 +46,21 @@ describe('public site URL', () => {
     ).toThrow('Public site URL must not use a local hostname in production.');
   });
 
-
   it(
     'rejects reserved placeholder production hostnames outside the explicit CI exception',
     () => {
-    for (const value of [
-      'https://attravoya.example',
-      'https://attravoya.test',
-      'https://attravoya.invalid',
-      'https://example.com',
-    ]) {
-      expect(() =>
-        resolvePublicSiteUrl({
-          NODE_ENV: 'production',
-          NEXT_PUBLIC_SITE_URL: value,
-        }),
-      ).toThrow('Public site URL must not use a reserved placeholder hostname in production.');
+      for (const value of [
+        'https://attravoya.example',
+        'https://attravoya.test',
+        'https://attravoya.invalid',
+        'https://example.com',
+      ]) {
+        expect(() =>
+          resolvePublicSiteUrl({
+            NODE_ENV: 'production',
+            NEXT_PUBLIC_SITE_URL: value,
+          }),
+        ).toThrow('Public site URL must not use a reserved placeholder hostname in production.');
       }
     },
   );
