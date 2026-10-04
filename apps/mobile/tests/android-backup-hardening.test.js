@@ -38,7 +38,17 @@ describe('Android backup hardening config plugin', () => {
       expect(ANDROID_DATA_EXTRACTION_RULES).toContain(`<${section}>`);
     }
 
-    for (const domain of ['root', 'file', 'database', 'sharedpref', 'external']) {
+    for (const domain of [
+      'root',
+      'file',
+      'database',
+      'sharedpref',
+      'external',
+      'device_root',
+      'device_file',
+      'device_database',
+      'device_sharedpref',
+    ]) {
       const rule = `<exclude domain="${domain}" path="." />`;
       expect(ANDROID_DATA_EXTRACTION_RULES.match(new RegExp(rule, 'g'))).toHaveLength(2);
     }
