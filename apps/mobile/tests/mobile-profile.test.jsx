@@ -15,12 +15,14 @@ describe('mobile profile screen', () => {
   it('renders validated identity and provides an accessible sign-out action', async () => {
     const onLogout = jest.fn(async () => undefined);
     const onDeleteAccount = jest.fn(async () => undefined);
+    const onOpenDeleteAccount = jest.fn(async () => undefined);
     const onOpenPrivacy = jest.fn(async () => undefined);
     const onOpenTerms = jest.fn(async () => undefined);
     const result = await render(
       <ProfileContent
         onDeleteAccount={onDeleteAccount}
         onLogout={onLogout}
+        onOpenDeleteAccount={onOpenDeleteAccount}
         onOpenPrivacy={onOpenPrivacy}
         onOpenTerms={onOpenTerms}
         user={{
@@ -35,11 +37,14 @@ describe('mobile profile screen', () => {
     expect(result.getByText('traveller@example.test')).toBeTruthy();
     expect(result.getByText('Verified')).toBeTruthy();
     expect(result.getByRole('button', { name: 'Delete account' })).toBeTruthy();
+    expect(result.getByRole('link', { name: 'Delete account on web' })).toBeTruthy();
     expect(result.getByRole('link', { name: 'Privacy policy' })).toBeTruthy();
     expect(result.getByRole('link', { name: 'Terms of service' })).toBeTruthy();
 
+    await fireEvent.press(result.getByText('Delete account on web'));
     await fireEvent.press(result.getByText('Privacy policy'));
     await fireEvent.press(result.getByText('Terms of service'));
+    expect(onOpenDeleteAccount).toHaveBeenCalledTimes(1);
     expect(onOpenPrivacy).toHaveBeenCalledTimes(1);
     expect(onOpenTerms).toHaveBeenCalledTimes(1);
 
@@ -52,6 +57,7 @@ describe('mobile profile screen', () => {
       <ProfileContent
         onDeleteAccount={jest.fn()}
         onLogout={jest.fn()}
+        onOpenDeleteAccount={jest.fn()}
         onOpenPrivacy={jest.fn()}
         onOpenTerms={jest.fn()}
         user={null}
@@ -67,6 +73,7 @@ describe('mobile profile screen', () => {
       <ProfileContent
         onDeleteAccount={jest.fn()}
         onLogout={jest.fn()}
+        onOpenDeleteAccount={jest.fn()}
         onOpenPrivacy={jest.fn().mockRejectedValue(new Error('private linking detail'))}
         onOpenTerms={jest.fn()}
         user={{
@@ -91,6 +98,9 @@ describe('mobile profile screen', () => {
 
     expect(normalizePublicWebBaseUrl('https://attravoya.example/')).toBe(
       'https://attravoya.example',
+    );
+    expect(buildConfiguredPublicWebPageUrl('/delete-account', expoConfig)).toBe(
+      'https://attravoya.example/delete-account',
     );
     expect(buildConfiguredPublicWebPageUrl('/privacy', expoConfig)).toBe(
       'https://attravoya.example/privacy',
