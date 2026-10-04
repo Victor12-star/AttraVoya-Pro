@@ -28,9 +28,7 @@ describe('Android backup hardening config plugin', () => {
 
     expect(application['android:allowBackup']).toBe('false');
     expect(application['android:fullBackupContent']).toBe('false');
-    expect(application['android:dataExtractionRules']).toBe(
-      '@xml/attravoya_data_extraction_rules',
-    );
+    expect(application['android:dataExtractionRules']).toBe('@xml/attravoya_data_extraction_rules');
   });
 
   it('excludes every supported app-data domain from cloud backup and device transfer', () => {
@@ -63,9 +61,7 @@ describe('Android backup hardening config plugin', () => {
     const application = manifest.manifest.application[0].$;
     expect(application['android:allowBackup']).toBe('false');
     expect(application['android:fullBackupContent']).toBe('false');
-    expect(application['android:dataExtractionRules']).toBe(
-      '@xml/attravoya_data_extraction_rules',
-    );
+    expect(application['android:dataExtractionRules']).toBe('@xml/attravoya_data_extraction_rules');
   });
 
   it('fails closed when the application node cannot be identified', () => {
