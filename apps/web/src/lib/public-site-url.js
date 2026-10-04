@@ -68,7 +68,9 @@ export function resolvePublicSiteUrl(env = process.env) {
       throw new Error('Public site URL must not use a local hostname in production.');
     }
     if (isReservedHostname(url.hostname) && !allowsReservedCiOrigin(env, url.hostname)) {
-      throw new Error('Public site URL must not use a reserved placeholder hostname in production.');
+      throw new Error(
+        'Public site URL must not use a reserved placeholder hostname in production.',
+      );
     }
   }
 
