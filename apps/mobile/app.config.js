@@ -44,6 +44,7 @@ const appConfig = {
   },
   plugins: [
     './plugins/with-android-billing-launch-mode.js',
+    './plugins/with-android-cleartext-traffic-disabled.js',
     'expo-router',
     'expo-secure-store',
     [
