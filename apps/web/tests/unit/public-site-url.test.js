@@ -47,7 +47,9 @@ describe('public site URL', () => {
   });
 
 
-  it('rejects reserved placeholder production hostnames outside the explicit CI exception', () => {
+  it(
+    'rejects reserved placeholder production hostnames outside the explicit CI exception',
+    () => {
     for (const value of [
       'https://attravoya.example',
       'https://attravoya.test',
@@ -60,8 +62,9 @@ describe('public site URL', () => {
           NEXT_PUBLIC_SITE_URL: value,
         }),
       ).toThrow('Public site URL must not use a reserved placeholder hostname in production.');
-    }
-  });
+      }
+    },
+  );
 
   it('allows only the reserved .invalid CI metadata origin behind the explicit CI flag', () => {
     expect(
