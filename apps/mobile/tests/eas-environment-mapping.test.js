@@ -80,6 +80,15 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
   });
 
+
+  it('keeps Android location foreground-only for Google Play policy', async () => {
+    const appConfigSource = await readAppConfigSource();
+
+    expect(appConfigSource).toContain("blockedPermissions: ['android.permission.ACCESS_BACKGROUND_LOCATION']");
+    expect(appConfigSource).toContain('locationWhenInUsePermission');
+    expect(appConfigSource).not.toContain('isAndroidBackgroundLocationEnabled: true');
+  });
+
   it('keeps unused Expo notifications native surface out of production mobile', async () => {
     const mobilePackage = await readMobilePackage();
     const appConfigSource = await readAppConfigSource();
