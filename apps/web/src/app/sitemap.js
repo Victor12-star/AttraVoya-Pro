@@ -1,4 +1,4 @@
-const siteUrl = process.env.NEXT_PUBLIC_WEB_URL || process.env.WEB_URL || 'http://localhost:3000';
+import { resolvePublicSiteUrl } from '../lib/public-site-url.js';
 
 const publicRoutes = [
   '/',
@@ -19,6 +19,8 @@ const publicRoutes = [
 ];
 
 export default function sitemap() {
+  const siteUrl = resolvePublicSiteUrl();
+
   return publicRoutes.map((path) => ({
     url: `${siteUrl}${path}`,
     changeFrequency: path === '/' ? 'weekly' : 'monthly',
