@@ -44,9 +44,10 @@ const appConfig = {
   },
   plugins: [
     './plugins/with-android-billing-launch-mode.js',
+    './plugins/with-android-backup-hardening.js',
     './plugins/with-android-cleartext-traffic-disabled.js',
     'expo-router',
-    'expo-secure-store',
+    ['expo-secure-store', { configureAndroidBackup: false }],
     [
       'expo-location',
       {
