@@ -6,10 +6,10 @@ describe('root metadata', () => {
   it('uses the validated production public site origin as metadataBase', () => {
     const metadata = createRootMetadata({
       NODE_ENV: 'production',
-      NEXT_PUBLIC_SITE_URL: 'https://www.attravoya.example',
+      NEXT_PUBLIC_SITE_URL: 'https://www.attravoya.app',
     });
 
-    expect(metadata.metadataBase).toEqual(new URL('https://www.attravoya.example'));
+    expect(metadata.metadataBase).toEqual(new URL('https://www.attravoya.app'));
     expect(metadata.title.default).toBe('AttraVoya Pro');
   });
 
@@ -23,7 +23,7 @@ describe('root metadata', () => {
     expect(() =>
       createRootMetadata({
         NODE_ENV: 'production',
-        NEXT_PUBLIC_SITE_URL: 'http://attravoya.example',
+        NEXT_PUBLIC_SITE_URL: 'http://attravoya.app',
       }),
     ).toThrow('Public site URL must use HTTPS in production.');
 
