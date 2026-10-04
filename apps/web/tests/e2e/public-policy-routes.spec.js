@@ -21,9 +21,8 @@ test.describe('public policy and account-control routes', () => {
       const response = await page.goto(route.path);
 
       expect(response?.ok()).toBe(true);
-      await expect(page).toHaveURL(new RegExp(`${route.path.replace('/', '\\/')}$`));
       await expect(page.getByRole('heading', { level: 1, name: route.heading })).toBeVisible();
-      expect(new URL(page.url()).pathname).not.toBe('/login');
+      expect(new URL(page.url()).pathname).toBe(route.path);
     });
   }
 });
