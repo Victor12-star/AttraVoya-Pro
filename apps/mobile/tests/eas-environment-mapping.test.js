@@ -80,7 +80,6 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
   });
 
-
   it('keeps Android location foreground-only for Google Play policy', async () => {
     const appConfigSource = await readAppConfigSource();
 
