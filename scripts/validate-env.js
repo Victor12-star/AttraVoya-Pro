@@ -29,6 +29,16 @@ function parseEnvFile(filePath) {
   return values;
 }
 
+
+function isValidPublicEmail(value) {
+  const normalized = value?.trim();
+  return (
+    typeof normalized === 'string' &&
+    normalized.length <= 320 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)
+  );
+}
+
 /** @type {Record<string, string | undefined>} */
 const env = {
   ...parseEnvFile(path.join(process.cwd(), '.env')),
@@ -51,6 +61,17 @@ requireValue('DATABASE_URL');
 requireValue('JWT_ACCESS_SECRET', 32);
 requireValue('COOKIE_SECRET', 32);
 requireValue('DATA_ENCRYPTION_KEY', 32);
+
+if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
+  const privacyContact =
+    env.NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL?.trim() || env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim();
+
+  if (!isValidPublicEmail(privacyContact)) {
+    errors.push(
+      'A valid NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL or NEXT_PUBLIC_SUPPORT_EMAIL is required in production.',
+    );
+  }
+}
 
 const stripeWebhookEnabled = env.STRIPE_WEBHOOK_ENABLED?.trim().toLowerCase();
 if (stripeWebhookEnabled && !['true', 'false'].includes(stripeWebhookEnabled)) {
