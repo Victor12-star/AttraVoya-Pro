@@ -108,7 +108,14 @@ export function ProfileDeletionConfirmation({
   );
 }
 
-export function ProfileContent({ onDeleteAccount, onLogout, onOpenPrivacy, onOpenTerms, user }) {
+export function ProfileContent({
+  onDeleteAccount,
+  onLogout,
+  onOpenDeleteAccount,
+  onOpenPrivacy,
+  onOpenTerms,
+  user,
+}) {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeletion, setShowDeletion] = useState(false);
@@ -269,6 +276,13 @@ export function ProfileContent({ onDeleteAccount, onLogout, onOpenPrivacy, onOpe
               Permanently remove your AttraVoya account and associated personal data.
             </Text>
             <Pressable
+              accessibilityRole="link"
+              onPress={() => void openLegalPage(onOpenDeleteAccount)}
+              style={({ pressed }) => [styles.legalLink, pressed && styles.buttonPressed]}
+            >
+              <Text style={styles.legalLinkLabel}>Delete account on web</Text>
+            </Pressable>
+            <Pressable
               accessibilityHint="Opens the permanent account deletion confirmation."
               accessibilityRole="button"
               disabled={isSigningOut}
@@ -327,6 +341,7 @@ export default function ProfileScreen() {
           <ProfileContent
             onDeleteAccount={deleteAccount}
             onLogout={logout}
+            onOpenDeleteAccount={() => openPublicPage('/delete-account')}
             onOpenPrivacy={() => openPublicPage('/privacy')}
             onOpenTerms={() => openPublicPage('/terms')}
             user={user}
