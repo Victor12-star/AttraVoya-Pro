@@ -29,7 +29,6 @@ function parseEnvFile(filePath) {
   return values;
 }
 
-
 function isValidPublicEmail(value) {
   const normalized = value?.trim();
   return (
