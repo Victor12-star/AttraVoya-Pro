@@ -1,4 +1,10 @@
 const LOCAL_DEVELOPMENT_SITE_URL = 'http://localhost:3000';
+const PRODUCTION_ENVIRONMENT = 'production';
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1']);
+
+function isProduction(env) {
+  return env.NODE_ENV?.trim().toLowerCase() === PRODUCTION_ENVIRONMENT;
+}
 
 function parseSiteOrigin(value) {
   const url = new URL(value);
@@ -19,18 +25,17 @@ function parseSiteOrigin(value) {
   return url.origin;
 }
 
-function isLocalHostname(hostname) {
-  return ['localhost', '127.0.0.1', '::1'].includes(hostname);
-}
-
 export function resolvePublicSiteUrl(env = process.env) {
-  const configured =
-    env.NEXT_PUBLIC_SITE_URL?.trim() ||
-    env.NEXT_PUBLIC_WEB_URL?.trim() ||
-    env.WEB_URL?.trim();
+  const configured = [
+    env.NEXT_PUBLIC_SITE_URL,
+    env.NEXT_PUBLIC_WEB_URL,
+    env.WEB_URL,
+  ]
+    .find((value) => value?.trim())
+    ?.trim();
 
   if (!configured) {
-    if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
+    if (isProduction(env)) {
       throw new Error('NEXT_PUBLIC_SITE_URL is required in production.');
     }
     return LOCAL_DEVELOPMENT_SITE_URL;
@@ -38,12 +43,13 @@ export function resolvePublicSiteUrl(env = process.env) {
 
   const origin = parseSiteOrigin(configured);
 
-  if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
+  if (isProduction(env)) {
     const url = new URL(origin);
+
     if (url.protocol !== 'https:') {
       throw new Error('Public site URL must use HTTPS in production.');
     }
-    if (isLocalHostname(url.hostname)) {
+    if (LOCAL_HOSTNAMES.has(url.hostname)) {
       throw new Error('Public site URL must not use a local hostname in production.');
     }
   }
