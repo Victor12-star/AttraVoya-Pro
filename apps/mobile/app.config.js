@@ -25,6 +25,7 @@ const appConfig = {
   android: {
     package: 'com.attravoya.pro',
     versionCode: 1,
+    allowBackup: false,
     predictiveBackGestureEnabled: true,
     // Background location is intentionally blocked. Nearby and emergency features
     // request foreground location only when the user actively opens those tools.

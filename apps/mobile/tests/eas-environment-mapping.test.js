@@ -80,6 +80,12 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
   });
 
+  it('keeps Android local app data out of automatic backups', async () => {
+    const appConfigSource = await readAppConfigSource();
+
+    expect(appConfigSource).toContain('allowBackup: false');
+  });
+
   it('keeps Android location foreground-only for Google Play policy', async () => {
     const appConfigSource = await readAppConfigSource();
 
