@@ -77,6 +77,17 @@ jobs:
       - name: Validate environment contract
         run: pnpm env:check
 
+      - name: Verify production privacy contact contract
+        run: |
+          set -euo pipefail
+
+          if env -u NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL -u NEXT_PUBLIC_SUPPORT_EMAIL             NODE_ENV=production pnpm env:check; then
+            echo "Production environment validation unexpectedly passed without a privacy contact."
+            exit 1
+          fi
+
+          NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL=privacy@example.test             NODE_ENV=production pnpm env:check
+
       - name: Generate Prisma client for JavaScript checks
         run: pnpm db:generate
 
