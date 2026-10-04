@@ -24,7 +24,11 @@ async function readAppConfigSource() {
 }
 
 async function readAndroidCleartextPluginSource() {
-  const filePath = path.join(process.cwd(), 'plugins', 'with-android-cleartext-traffic-disabled.js');
+  const filePath = path.join(
+    process.cwd(),
+    'plugins',
+    'with-android-cleartext-traffic-disabled.js',
+  );
   return readFile(filePath, 'utf8');
 }
 
@@ -96,7 +100,9 @@ describe('mobile EAS environment mapping', () => {
     const pluginSource = await readAndroidCleartextPluginSource();
 
     expect(appConfigSource).toContain("'./plugins/with-android-cleartext-traffic-disabled.js'");
-    expect(pluginSource).toContain("application.$['android:usesCleartextTraffic'] = 'false'");
+    expect(pluginSource).toContain(
+      "application.$['android:usesCleartextTraffic'] = 'false'",
+    );
   });
 
   it('keeps Android location foreground-only for Google Play policy', async () => {
