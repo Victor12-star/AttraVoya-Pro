@@ -26,11 +26,7 @@ function parseSiteOrigin(value) {
 }
 
 export function resolvePublicSiteUrl(env = process.env) {
-  const configured = [
-    env.NEXT_PUBLIC_SITE_URL,
-    env.NEXT_PUBLIC_WEB_URL,
-    env.WEB_URL,
-  ]
+  const configured = [env.NEXT_PUBLIC_SITE_URL, env.NEXT_PUBLIC_WEB_URL, env.WEB_URL]
     .find((value) => value?.trim())
     ?.trim();
 
