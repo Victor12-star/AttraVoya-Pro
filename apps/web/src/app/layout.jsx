@@ -4,21 +4,8 @@ import './contrast.css';
 import { getTextDirection } from '@attravoya/localization';
 
 import { getRequestLocale } from '../i18n/request-locale.js';
-import { resolvePublicSiteUrl } from '../lib/public-site-url.js';
+import { createRootMetadata } from '../lib/root-metadata.js';
 import { ThemeProvider } from '../providers/theme-provider.jsx';
-
-export function createRootMetadata(env = process.env) {
-  return {
-    metadataBase: new URL(resolvePublicSiteUrl(env)),
-    title: {
-      default: 'AttraVoya Pro',
-      template: '%s · AttraVoya Pro',
-    },
-    description:
-      'Budget-aware destination discovery, trip planning, local travel tools and safety support.',
-    applicationName: 'AttraVoya Pro',
-  };
-}
 
 export const metadata = createRootMetadata();
 
