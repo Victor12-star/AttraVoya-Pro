@@ -71,21 +71,21 @@ describe('public site URL', () => {
     'allows only the reserved .invalid CI metadata origin behind the explicit CI flag',
     () => {
       expect(
-      resolvePublicSiteUrl({
-        NODE_ENV: 'production',
-        CI: 'true',
-        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
-        NEXT_PUBLIC_SITE_URL: 'https://web.ci.attravoya.invalid',
-      }),
-    ).toBe('https://web.ci.attravoya.invalid');
+        resolvePublicSiteUrl({
+          NODE_ENV: 'production',
+          CI: 'true',
+          ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+          NEXT_PUBLIC_SITE_URL: 'https://web.ci.attravoya.invalid',
+        }),
+      ).toBe('https://web.ci.attravoya.invalid');
 
-    expect(() =>
-      resolvePublicSiteUrl({
-        NODE_ENV: 'production',
-        CI: 'true',
-        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
-        NEXT_PUBLIC_SITE_URL: 'https://attravoya.example',
-      }),
+      expect(() =>
+        resolvePublicSiteUrl({
+          NODE_ENV: 'production',
+          CI: 'true',
+          ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+          NEXT_PUBLIC_SITE_URL: 'https://attravoya.example',
+        }),
       ).toThrow(
         'Public site URL must not use a reserved placeholder hostname in production.',
       );
