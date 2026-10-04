@@ -1,6 +1,8 @@
-const siteUrl = process.env.NEXT_PUBLIC_WEB_URL || process.env.WEB_URL || 'http://localhost:3000';
+import { resolvePublicSiteUrl } from '../lib/public-site-url.js';
 
 export default function robots() {
+  const siteUrl = resolvePublicSiteUrl();
+
   return {
     rules: [
       {
