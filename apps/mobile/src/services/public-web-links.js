@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const ALLOWED_PUBLIC_PATHS = new Set(['/privacy', '/terms']);
+const ALLOWED_PUBLIC_PATHS = new Set(['/delete-account', '/privacy', '/terms']);
 
 function invalidConfiguration() {
   return new Error('The mobile public web configuration is invalid.');
