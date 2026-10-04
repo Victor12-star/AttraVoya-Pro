@@ -46,7 +46,7 @@ export default defineConfig({
     // CI exercises the optimized production build users will receive. Local
     // development keeps the faster dev-server workflow and reuse behavior.
     command: isContinuousIntegration
-      ? 'NODE_ENV=production pnpm build && NODE_ENV=production pnpm start'
+      ? 'NEXT_PUBLIC_SITE_URL=https://web.ci.attravoya.invalid NODE_ENV=production pnpm build && NEXT_PUBLIC_SITE_URL=https://web.ci.attravoya.invalid NODE_ENV=production pnpm start'
       : 'pnpm dev',
     reuseExistingServer: !isContinuousIntegration,
     stderr: 'pipe',
