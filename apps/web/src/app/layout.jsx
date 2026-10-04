@@ -4,17 +4,10 @@ import './contrast.css';
 import { getTextDirection } from '@attravoya/localization';
 
 import { getRequestLocale } from '../i18n/request-locale.js';
+import { createRootMetadata } from '../lib/root-metadata.js';
 import { ThemeProvider } from '../providers/theme-provider.jsx';
 
-export const metadata = {
-  title: {
-    default: 'AttraVoya Pro',
-    template: '%s · AttraVoya Pro',
-  },
-  description:
-    'Budget-aware destination discovery, trip planning, local travel tools and safety support.',
-  applicationName: 'AttraVoya Pro',
-};
+export const metadata = createRootMetadata();
 
 export default async function RootLayout({ children }) {
   const locale = await getRequestLocale();
