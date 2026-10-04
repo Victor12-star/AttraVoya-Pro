@@ -89,10 +89,12 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.submit.production.android?.changesNotSentForReview).toBe(true);
   });
 
-  it('keeps Android local app data out of automatic backups', async () => {
+  it('keeps Android local app data out of backup and device-transfer paths', async () => {
     const appConfigSource = await readAppConfigSource();
 
     expect(appConfigSource).toContain('allowBackup: false');
+    expect(appConfigSource).toContain("'./plugins/with-android-backup-hardening.js'");
+    expect(appConfigSource).toContain("['expo-secure-store', { configureAndroidBackup: false }]");
   });
 
   it('blocks Android cleartext traffic at the native manifest boundary', async () => {
