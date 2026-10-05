@@ -77,6 +77,16 @@ describe('mobile EAS environment mapping', () => {
     expect(configuration.build.production.android?.credentialsSource).toBe('remote');
   });
 
+  it('builds Android preview as an internally distributed signed APK', async () => {
+    const configuration = await readEasConfiguration();
+
+    expect(configuration.build.preview.distribution).toBe('internal');
+    expect(configuration.build.preview.developmentClient).toBe(false);
+    expect(configuration.build.preview.withoutCredentials).toBe(false);
+    expect(configuration.build.preview.android?.buildType).toBe('apk');
+    expect(configuration.build.preview.android?.credentialsSource).toBe('remote');
+  });
+
   it('pins the Google Play application ID to the production Android package', async () => {
     const configuration = await readEasConfiguration();
     const appConfigSource = await readAppConfigSource();
