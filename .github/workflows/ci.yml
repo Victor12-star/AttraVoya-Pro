@@ -82,6 +82,17 @@ jobs:
           WEB_URL: https://app.attravoya.app
           ADMIN_URL: https://admin.attravoya.app
           API_URL: https://api.attravoya.app
+          MAPS_PROVIDER: none
+          PLACES_PROVIDER: none
+          GEOCODING_PROVIDER: none
+          ROUTING_PROVIDER: none
+          ACCOMMODATION_PROVIDER: none
+          EVENTS_PROVIDER: none
+          NEWS_PROVIDER: none
+          IMAGE_PROVIDER: none
+          EMAIL_PROVIDER: resend
+          RESEND_API_KEY: placeholder-resend-key
+          EMAIL_FROM: noreply@attravoya.app
         run: |
           set -euo pipefail
 
