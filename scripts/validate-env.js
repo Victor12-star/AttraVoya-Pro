@@ -64,11 +64,16 @@ function isValidProductionOrigin(value) {
 
 function isValidPublicEmail(value) {
   const normalized = value?.trim();
-  return (
-    typeof normalized === 'string' &&
-    normalized.length <= 320 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)
-  );
+  if (
+    typeof normalized !== 'string' ||
+    normalized.length > 320 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)
+  ) {
+    return false;
+  }
+
+  const domain = normalized.slice(normalized.lastIndexOf('@') + 1);
+  return !isReservedHostname(domain);
 }
 
 /** @type {Record<string, string | undefined>} */
@@ -108,7 +113,7 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
 
   if (!isValidPublicEmail(privacyContact)) {
     errors.push(
-      'A valid NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL or NEXT_PUBLIC_SUPPORT_EMAIL is required in production.',
+      'A valid non-placeholder NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL or NEXT_PUBLIC_SUPPORT_EMAIL is required in production.',
     );
   }
 }
