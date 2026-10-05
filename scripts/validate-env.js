@@ -125,12 +125,28 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
     'ACCOMMODATION_PROVIDER',
   ].some((key) => env[key]?.trim().toLowerCase() === 'geoapify');
 
-  for (const [selected, credential, label] of [
-    [geoapifySelected, 'GEOAPIFY_API_KEY', 'Geoapify'],
-    [env.EVENTS_PROVIDER?.trim().toLowerCase() === 'ticketmaster', 'TICKETMASTER_API_KEY', 'Ticketmaster'],
-    [env.NEWS_PROVIDER?.trim().toLowerCase() === 'newsdata', 'NEWSDATA_API_KEY', 'NewsData'],
-    [env.IMAGE_PROVIDER?.trim().toLowerCase() === 'pexels', 'PEXELS_API_KEY', 'Pexels'],
-    [env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend', 'RESEND_API_KEY', 'Resend'],
+  for (const { selected, credential, label } of [
+    { selected: geoapifySelected, credential: 'GEOAPIFY_API_KEY', label: 'Geoapify' },
+    {
+      selected: env.EVENTS_PROVIDER?.trim().toLowerCase() === 'ticketmaster',
+      credential: 'TICKETMASTER_API_KEY',
+      label: 'Ticketmaster',
+    },
+    {
+      selected: env.NEWS_PROVIDER?.trim().toLowerCase() === 'newsdata',
+      credential: 'NEWSDATA_API_KEY',
+      label: 'NewsData',
+    },
+    {
+      selected: env.IMAGE_PROVIDER?.trim().toLowerCase() === 'pexels',
+      credential: 'PEXELS_API_KEY',
+      label: 'Pexels',
+    },
+    {
+      selected: env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend',
+      credential: 'RESEND_API_KEY',
+      label: 'Resend',
+    },
   ]) {
     if (selected && !env[credential]?.trim()) {
       errors.push(`${credential} is required in production when ${label} is selected.`);
