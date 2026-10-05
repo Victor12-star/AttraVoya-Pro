@@ -9,24 +9,24 @@ afterEach(() => {
 });
 
 describe('public site URL', () => {
-  it('prefers the documented NEXT_PUBLIC_SITE_URL over compatibility fallbacks', () => {
+  it('prefers NEXT_PUBLIC_SITE_URL', () => {
     expect(
       resolvePublicSiteUrl({
         NODE_ENV: 'production',
-        NEXT_PUBLIC_SITE_URL: 'https://www.attravoya.example',
-        NEXT_PUBLIC_WEB_URL: 'https://legacy-public.example',
-        WEB_URL: 'https://legacy-server.example',
+        NEXT_PUBLIC_SITE_URL: 'https://www.attravoya.app',
+        NEXT_PUBLIC_WEB_URL: 'https://legacy-public.attravoya.app',
+        WEB_URL: 'https://legacy-server.attravoya.app',
       }),
-    ).toBe('https://www.attravoya.example');
+    ).toBe('https://www.attravoya.app');
   });
 
-  it('keeps the localhost fallback outside production', () => {
+  it('keeps localhost outside production', () => {
     expect(resolvePublicSiteUrl({ NODE_ENV: 'test' })).toBe('http://localhost:3000');
   });
 
-  it('fails closed when production has no configured public site URL', () => {
+  it('fails closed without a production site URL', () => {
     expect(() => resolvePublicSiteUrl({ NODE_ENV: 'production' })).toThrow(
-      'NEXT_PUBLIC_SITE_URL is required in production.',
+      /NEXT_PUBLIC_SITE_URL is required/,
     );
   });
 
@@ -34,24 +34,60 @@ describe('public site URL', () => {
     expect(() =>
       resolvePublicSiteUrl({
         NODE_ENV: 'production',
-        NEXT_PUBLIC_SITE_URL: 'http://attravoya.example',
+        NEXT_PUBLIC_SITE_URL: 'http://attravoya.app',
       }),
-    ).toThrow('Public site URL must use HTTPS in production.');
+    ).toThrow(/must use HTTPS/);
 
     expect(() =>
       resolvePublicSiteUrl({
         NODE_ENV: 'production',
         NEXT_PUBLIC_SITE_URL: 'https://localhost',
       }),
-    ).toThrow('Public site URL must not use a local hostname in production.');
+    ).toThrow(/local hostname/);
   });
 
-  it('rejects credentials, paths, query strings, and fragments', () => {
+  it('rejects reserved production hosts', () => {
     for (const value of [
-      'https://user:password@attravoya.example',
-      'https://attravoya.example/app',
-      'https://attravoya.example?source=test',
-      'https://attravoya.example#privacy',
+      'https://attravoya.example',
+      'https://attravoya.test',
+      'https://attravoya.invalid',
+      'https://example.com',
+    ]) {
+      expect(() =>
+        resolvePublicSiteUrl({
+          NODE_ENV: 'production',
+          NEXT_PUBLIC_SITE_URL: value,
+        }),
+      ).toThrow(/reserved placeholder hostname/);
+    }
+  });
+
+  it('allows the reserved CI metadata origin only with its CI flag', () => {
+    expect(
+      resolvePublicSiteUrl({
+        NODE_ENV: 'production',
+        CI: 'true',
+        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+        NEXT_PUBLIC_SITE_URL: 'https://web.ci.attravoya.invalid',
+      }),
+    ).toBe('https://web.ci.attravoya.invalid');
+
+    expect(() =>
+      resolvePublicSiteUrl({
+        NODE_ENV: 'production',
+        CI: 'true',
+        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+        NEXT_PUBLIC_SITE_URL: 'https://attravoya.example',
+      }),
+    ).toThrow(/reserved placeholder hostname/);
+  });
+
+  it('rejects credentials, paths, queries, and fragments', () => {
+    for (const value of [
+      'https://user:password@attravoya.app',
+      'https://attravoya.app/app',
+      'https://attravoya.app?source=test',
+      'https://attravoya.app#privacy',
     ]) {
       expect(() =>
         resolvePublicSiteUrl({
@@ -62,15 +98,15 @@ describe('public site URL', () => {
     }
   });
 
-  it('uses the canonical production origin for sitemap and robots metadata', () => {
+  it('uses the canonical origin for sitemap and robots metadata', () => {
     vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.attravoya.example');
-    vi.stubEnv('NEXT_PUBLIC_WEB_URL', 'https://legacy-public.example');
-    vi.stubEnv('WEB_URL', 'https://legacy-server.example');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.attravoya.app');
+    vi.stubEnv('NEXT_PUBLIC_WEB_URL', 'https://legacy-public.attravoya.app');
+    vi.stubEnv('WEB_URL', 'https://legacy-server.attravoya.app');
 
     expect(sitemap().find(({ url }) => url.endsWith('/privacy'))?.url).toBe(
-      'https://www.attravoya.example/privacy',
+      'https://www.attravoya.app/privacy',
     );
-    expect(robots().sitemap).toBe('https://www.attravoya.example/sitemap.xml');
+    expect(robots().sitemap).toBe('https://www.attravoya.app/sitemap.xml');
   });
 });

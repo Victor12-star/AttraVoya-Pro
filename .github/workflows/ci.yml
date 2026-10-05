@@ -370,6 +370,7 @@ jobs:
 
       - name: Build workspace
         env:
+          ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true'
           NEXT_PUBLIC_SITE_URL: https://web.ci.attravoya.invalid
         run: pnpm build
 
