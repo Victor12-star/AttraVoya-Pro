@@ -14,9 +14,9 @@ const { loadEnvironment } = await import('./env.js');
 function baseEnvironment(overrides = {}) {
   return {
     NODE_ENV: 'test',
-    WEB_URL: 'https://app.example.test',
-    ADMIN_URL: 'https://admin.example.test',
-    API_URL: 'https://api.example.test',
+    WEB_URL: 'https://app.attravoya.app',
+    ADMIN_URL: 'https://admin.attravoya.app',
+    API_URL: 'https://api.attravoya.app',
     DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
     JWT_ACCESS_SECRET: 'a'.repeat(64),
     COOKIE_SECRET: 'b'.repeat(64),

@@ -14,9 +14,9 @@ const { loadEnvironment, stripeCheckoutReturnUrlsFromEnvironment } = await impor
 function checkoutEnvironment(overrides = {}) {
   return {
     NODE_ENV: 'test',
-    WEB_URL: 'https://app.example.test',
-    ADMIN_URL: 'https://admin.example.test',
-    API_URL: 'https://api.example.test',
+    WEB_URL: 'https://app.attravoya.app',
+    ADMIN_URL: 'https://admin.attravoya.app',
+    API_URL: 'https://api.attravoya.app',
     DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
     JWT_ACCESS_SECRET: 'a'.repeat(64),
     COOKIE_SECRET: 'b'.repeat(64),
@@ -35,14 +35,14 @@ describe('Stripe checkout return policy', () => {
   it('derives same-origin premium return URLs entirely from server WEB_URL', () => {
     const environment = loadEnvironment(
       checkoutEnvironment({
-        WEB_URL: 'https://app.example.test/some/deployment/path?ignored=true#ignored',
+        WEB_URL: 'https://app.attravoya.app/some/deployment/path?ignored=true#ignored',
       }),
     );
 
     expect(stripeCheckoutReturnUrlsFromEnvironment(environment)).toEqual({
       successUrl:
-        'https://app.example.test/premium?checkout=success&session_id={CHECKOUT_SESSION_ID}',
-      cancelUrl: 'https://app.example.test/premium?checkout=cancelled',
+        'https://app.attravoya.app/premium?checkout=success&session_id={CHECKOUT_SESSION_ID}',
+      cancelUrl: 'https://app.attravoya.app/premium?checkout=cancelled',
     });
   });
 
@@ -62,20 +62,20 @@ describe('Stripe checkout return policy', () => {
       loadEnvironment(
         checkoutEnvironment({
           NODE_ENV: 'production',
-          WEB_URL: 'http://app.example.test',
+          WEB_URL: 'http://app.attravoya.app',
           EMAIL_PROVIDER: 'resend',
           RESEND_API_KEY: 'example-resend-key-1234567890',
-          EMAIL_FROM: 'noreply@example.test',
+          EMAIL_FROM: 'noreply@attravoya.app',
         }),
       ),
-    ).toThrow(/WEB_URL must use HTTPS/);
+    ).toThrow(/WEB_URL: production must use a non-local, non-placeholder HTTPS origin/);
   });
 
   it('rejects checkout return origins containing embedded credentials', () => {
     expect(() =>
       loadEnvironment(
         checkoutEnvironment({
-          WEB_URL: 'https://user:password@app.example.test',
+          WEB_URL: 'https://user:password@app.attravoya.app',
         }),
       ),
     ).toThrow(/WEB_URL must be an HTTP\(S\) origin without embedded credentials/);

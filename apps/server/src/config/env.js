@@ -1,6 +1,10 @@
 import { PLANS } from '@attravoya/constants';
 import { z } from 'zod';
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+const RESERVED_EXACT_HOSTNAMES = new Set(['example.com', 'example.net', 'example.org']);
+const RESERVED_HOST_SUFFIXES = ['.example', '.invalid', '.test'];
+
 const strictBoolean = z.preprocess((value) => {
   if (value === undefined || value === '') return false;
   if (value === true || value === false) return value;
@@ -152,6 +156,38 @@ const REQUEST_BUDGET_CONFIGS = [
   { provider: 'pexels', prefix: 'PEXELS' },
   { provider: 'resend', prefix: 'RESEND' },
 ];
+
+function isReservedHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+
+  return (
+    RESERVED_EXACT_HOSTNAMES.has(normalized) ||
+    RESERVED_HOST_SUFFIXES.some((suffix) => normalized.endsWith(suffix))
+  );
+}
+
+function validateProductionPublicOrigins(environment) {
+  if (environment.NODE_ENV !== 'production') return;
+
+  for (const field of ['WEB_URL', 'ADMIN_URL', 'API_URL']) {
+    const url = new URL(environment[field]);
+
+    if (
+      url.protocol !== 'https:' ||
+      LOOPBACK_HOSTS.has(url.hostname.toLowerCase()) ||
+      isReservedHostname(url.hostname) ||
+      url.username ||
+      url.password ||
+      url.search ||
+      url.hash ||
+      (url.pathname !== '/' && url.pathname !== '')
+    ) {
+      throw new Error(
+        `Invalid AttraVoya Pro server environment:\n${field}: production must use a non-local, non-placeholder HTTPS origin without credentials, path, query, or fragment.`,
+      );
+    }
+  }
+}
 
 function formatEnvironmentErrors(error) {
   return error.issues
@@ -414,6 +450,7 @@ export function loadEnvironment(source = process.env) {
   }
 
   validateProviderBudgetPairs(result.data);
+  validateProductionPublicOrigins(result.data);
   validateStripeWebhookConfiguration(result.data);
   validateStripePurchaseConfiguration(result.data);
   validateRevenueCatAndroidProductConfiguration(result.data);
