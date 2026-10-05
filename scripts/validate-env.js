@@ -29,6 +29,39 @@ function parseEnvFile(filePath) {
   return values;
 }
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+const RESERVED_EXACT_HOSTNAMES = new Set(['example.com', 'example.net', 'example.org']);
+const RESERVED_HOST_SUFFIXES = ['.example', '.invalid', '.test'];
+
+function isReservedHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+  return (
+    RESERVED_EXACT_HOSTNAMES.has(normalized) ||
+    RESERVED_HOST_SUFFIXES.some((suffix) => normalized.endsWith(suffix))
+  );
+}
+
+function isValidProductionOrigin(value) {
+  if (!value?.trim()) return false;
+
+  try {
+    const url = new URL(value.trim());
+    return (
+      url.protocol === 'https:' &&
+      Boolean(url.hostname) &&
+      !LOOPBACK_HOSTS.has(url.hostname.toLowerCase()) &&
+      !isReservedHostname(url.hostname) &&
+      !url.username &&
+      !url.password &&
+      !url.search &&
+      !url.hash &&
+      (url.pathname === '/' || url.pathname === '')
+    );
+  } catch {
+    return false;
+  }
+}
+
 function isValidPublicEmail(value) {
   const normalized = value?.trim();
   return (
@@ -62,6 +95,14 @@ requireValue('COOKIE_SECRET', 32);
 requireValue('DATA_ENCRYPTION_KEY', 32);
 
 if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
+  for (const key of ['WEB_URL', 'ADMIN_URL', 'API_URL']) {
+    if (!isValidProductionOrigin(env[key])) {
+      errors.push(
+        `${key} must be a non-local, non-placeholder HTTPS origin without credentials, path, query, or fragment in production.`,
+      );
+    }
+  }
+
   const privacyContact =
     env.NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL?.trim() || env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim();
 
