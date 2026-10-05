@@ -84,7 +84,6 @@ describe('Android production mobile configuration', () => {
     }
   });
 
-
   it('rejects reserved placeholder production hosts', () => {
     for (const value of [
       'https://api.attravoya.example',
