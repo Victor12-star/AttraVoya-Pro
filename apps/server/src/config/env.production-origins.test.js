@@ -22,7 +22,7 @@ function productionEnvironment(overrides = {}) {
     COOKIE_SECRET: 'b'.repeat(64),
     DATA_ENCRYPTION_KEY: 'c'.repeat(64),
     EMAIL_PROVIDER: 'resend',
-    RESEND_API_KEY: 're_test_example_only_1234567890',
+    RESEND_API_KEY: 'placeholder-resend-key',
     EMAIL_FROM: 'noreply@attravoya.app',
     ...overrides,
   };
@@ -60,7 +60,7 @@ describe('production public origin contract', () => {
               [field]: value,
             }),
           ),
-        ).toThrow(new RegExp(field));
+        ).toThrow(field);
       }
     }
   });
