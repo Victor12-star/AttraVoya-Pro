@@ -68,7 +68,7 @@ describe('Stripe checkout return policy', () => {
           EMAIL_FROM: 'noreply@attravoya.app',
         }),
       ),
-    ).toThrow(/WEB_URL must use HTTPS/);
+    ).toThrow(/WEB_URL: production must use a non-local, non-placeholder HTTPS origin/);
   });
 
   it('rejects checkout return origins containing embedded credentials', () => {
