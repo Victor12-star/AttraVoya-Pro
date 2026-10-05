@@ -96,5 +96,4 @@ describe('maintenance mode', () => {
       }),
     ).resolves.toBeUndefined();
   });
-
 });
