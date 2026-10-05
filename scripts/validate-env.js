@@ -116,6 +116,30 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
       'A valid non-placeholder NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL or NEXT_PUBLIC_SUPPORT_EMAIL is required in production.',
     );
   }
+
+  const geoapifySelected = [
+    'MAPS_PROVIDER',
+    'PLACES_PROVIDER',
+    'GEOCODING_PROVIDER',
+    'ROUTING_PROVIDER',
+    'ACCOMMODATION_PROVIDER',
+  ].some((key) => env[key]?.trim().toLowerCase() === 'geoapify');
+
+  for (const [selected, credential, label] of [
+    [geoapifySelected, 'GEOAPIFY_API_KEY', 'Geoapify'],
+    [env.EVENTS_PROVIDER?.trim().toLowerCase() === 'ticketmaster', 'TICKETMASTER_API_KEY', 'Ticketmaster'],
+    [env.NEWS_PROVIDER?.trim().toLowerCase() === 'newsdata', 'NEWSDATA_API_KEY', 'NewsData'],
+    [env.IMAGE_PROVIDER?.trim().toLowerCase() === 'pexels', 'PEXELS_API_KEY', 'Pexels'],
+    [env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend', 'RESEND_API_KEY', 'Resend'],
+  ]) {
+    if (selected && !env[credential]?.trim()) {
+      errors.push(`${credential} is required in production when ${label} is selected.`);
+    }
+  }
+
+  if (env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend' && !env.EMAIL_FROM?.trim()) {
+    errors.push('EMAIL_FROM is required in production when Resend is selected.');
+  }
 }
 
 const stripeWebhookEnabled = env.STRIPE_WEBHOOK_ENABLED?.trim().toLowerCase();
