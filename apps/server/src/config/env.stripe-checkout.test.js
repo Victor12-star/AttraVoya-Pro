@@ -63,6 +63,12 @@ describe('Stripe checkout return policy', () => {
         checkoutEnvironment({
           NODE_ENV: 'production',
           WEB_URL: 'http://app.attravoya.app',
+          MAPS_PROVIDER: 'none',
+          PLACES_PROVIDER: 'none',
+          ACCOMMODATION_PROVIDER: 'none',
+          EVENTS_PROVIDER: 'none',
+          NEWS_PROVIDER: 'none',
+          IMAGE_PROVIDER: 'none',
           EMAIL_PROVIDER: 'resend',
           RESEND_API_KEY: 'example-resend-key-1234567890',
           EMAIL_FROM: 'noreply@attravoya.app',
