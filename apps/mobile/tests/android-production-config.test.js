@@ -33,8 +33,8 @@ describe('Android production mobile configuration', () => {
     expect(() =>
       assertAndroidProductionBuildConfiguration({
         environment: PROD_ANDROID,
-        apiBaseUrl: 'https://api.attravoya.example',
-        webBaseUrl: 'https://attravoya.example',
+        apiBaseUrl: 'https://api.attravoya.app',
+        webBaseUrl: 'https://attravoya.app',
         easProjectId: EAS_PROJECT_ID,
         revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
       }),
@@ -43,17 +43,17 @@ describe('Android production mobile configuration', () => {
 
   it('rejects localhost, insecure and credential-bearing production API URLs', () => {
     for (const apiBaseUrl of [
-      'http://api.attravoya.example',
+      'http://api.attravoya.app',
       'https://localhost:5000',
       'https://127.0.0.1:5000',
-      'https://user:password@api.attravoya.example',
+      'https://user:password@api.attravoya.app',
       'not-a-url',
     ]) {
       expect(() =>
         assertAndroidProductionBuildConfiguration({
           environment: PROD_ANDROID,
           apiBaseUrl,
-          webBaseUrl: 'https://attravoya.example',
+          webBaseUrl: 'https://attravoya.app',
           easProjectId: EAS_PROJECT_ID,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
@@ -64,18 +64,18 @@ describe('Android production mobile configuration', () => {
   it('rejects missing, insecure, loopback and credential-bearing public web URLs', () => {
     for (const webBaseUrl of [
       undefined,
-      'http://attravoya.example',
+      'http://attravoya.app',
       'https://localhost:3000',
       'https://127.0.0.1:3000',
-      'https://user:password@attravoya.example',
-      'https://attravoya.example?source=mobile',
-      'https://attravoya.example#privacy',
+      'https://user:password@attravoya.app',
+      'https://attravoya.app?source=mobile',
+      'https://attravoya.app#privacy',
       'not-a-url',
     ]) {
       expect(() =>
         assertAndroidProductionBuildConfiguration({
           environment: PROD_ANDROID,
-          apiBaseUrl: 'https://api.attravoya.example',
+          apiBaseUrl: 'https://api.attravoya.app',
           webBaseUrl,
           easProjectId: EAS_PROJECT_ID,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
@@ -84,13 +84,32 @@ describe('Android production mobile configuration', () => {
     }
   });
 
+  it('rejects reserved placeholder production hosts', () => {
+    for (const value of [
+      'https://api.attravoya.example',
+      'https://attravoya.test',
+      'https://attravoya.invalid',
+      'https://example.com',
+    ]) {
+      expect(() =>
+        assertAndroidProductionBuildConfiguration({
+          environment: PROD_ANDROID,
+          apiBaseUrl: value,
+          webBaseUrl: 'https://attravoya.app',
+          easProjectId: EAS_PROJECT_ID,
+          revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
+        }),
+      ).toThrow('reserved placeholder host');
+    }
+  });
+
   it('rejects a production Android build without a valid EAS project ID', () => {
     for (const easProjectId of [undefined, '', 'not-a-project-id']) {
       expect(() =>
         assertAndroidProductionBuildConfiguration({
           environment: PROD_ANDROID,
-          apiBaseUrl: 'https://api.attravoya.example',
-          webBaseUrl: 'https://attravoya.example',
+          apiBaseUrl: 'https://api.attravoya.app',
+          webBaseUrl: 'https://attravoya.app',
           easProjectId,
           revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
         }),
@@ -102,8 +121,8 @@ describe('Android production mobile configuration', () => {
     expect(() =>
       assertAndroidProductionBuildConfiguration({
         environment: PROD_ANDROID,
-        apiBaseUrl: 'https://api.attravoya.example',
-        webBaseUrl: 'https://attravoya.example',
+        apiBaseUrl: 'https://api.attravoya.app',
+        webBaseUrl: 'https://attravoya.app',
         easProjectId: EAS_PROJECT_ID,
         revenueCatAndroid: { enabled: false },
       }),

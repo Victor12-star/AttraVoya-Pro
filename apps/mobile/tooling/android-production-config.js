@@ -2,6 +2,8 @@ import process from 'node:process';
 import { URL } from 'node:url';
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+const RESERVED_EXACT_HOSTNAMES = new Set(['example.com', 'example.net', 'example.org']);
+const RESERVED_HOST_SUFFIXES = ['.example', '.invalid', '.test'];
 const EAS_PROJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function productionConfigurationError(message) {
@@ -12,6 +14,15 @@ function isAndroidProductionBuild(environment) {
   return (
     environment.APP_VARIANT?.trim().toLowerCase() === 'production' &&
     environment.EAS_BUILD_PLATFORM?.trim().toLowerCase() === 'android'
+  );
+}
+
+function isReservedHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+
+  return (
+    RESERVED_EXACT_HOSTNAMES.has(normalized) ||
+    RESERVED_HOST_SUFFIXES.some((suffix) => normalized.endsWith(suffix))
   );
 }
 
@@ -27,13 +38,14 @@ function assertProductionPublicHttpsUrl(value, variableName) {
     url.protocol !== 'https:' ||
     !url.hostname ||
     LOOPBACK_HOSTS.has(url.hostname.toLowerCase()) ||
+    isReservedHostname(url.hostname) ||
     url.username ||
     url.password ||
     url.search ||
     url.hash
   ) {
     throw productionConfigurationError(
-      `${variableName} must use HTTPS, must not be loopback, and must not contain credentials, query parameters, or fragments.`,
+      `${variableName} must use HTTPS, must not be loopback or a reserved placeholder host, and must not contain credentials, query parameters, or fragments.`,
     );
   }
 }
