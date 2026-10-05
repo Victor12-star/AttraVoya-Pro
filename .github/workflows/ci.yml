@@ -126,6 +126,8 @@ jobs:
           EMAIL_PROVIDER: resend
           RESEND_API_KEY: placeholder-resend-key
           EMAIL_FROM: noreply@attravoya.app
+          RESEND_REQUEST_BUDGET_MAX: '100'
+          RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '86400'
           NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL: privacy@attravoya.app
         run: |
           set -euo pipefail
