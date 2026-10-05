@@ -24,6 +24,8 @@ function productionEnvironment(overrides = {}) {
     EMAIL_PROVIDER: 'resend',
     RESEND_API_KEY: 'placeholder-resend-key',
     EMAIL_FROM: 'noreply@attravoya.app',
+    RESEND_REQUEST_BUDGET_MAX: '1000',
+    RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '2592000',
     ...overrides,
   };
 }
