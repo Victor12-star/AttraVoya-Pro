@@ -28,6 +28,12 @@ function baseEnvironment(overrides = {}) {
 function productionEnvironment(overrides = {}) {
   return baseEnvironment({
     NODE_ENV: 'production',
+    MAPS_PROVIDER: 'none',
+    PLACES_PROVIDER: 'none',
+    ACCOMMODATION_PROVIDER: 'none',
+    EVENTS_PROVIDER: 'none',
+    NEWS_PROVIDER: 'none',
+    IMAGE_PROVIDER: 'none',
     EMAIL_PROVIDER: 'resend',
     RESEND_API_KEY: 'resend-test-key',
     EMAIL_FROM: 'AttraVoya Pro <noreply@attravoya.app>',
@@ -54,6 +60,7 @@ describe('provider request budget environment', () => {
     expect(() =>
       loadEnvironment(
         productionEnvironment({
+          MAPS_PROVIDER: 'geoapify',
           GEOAPIFY_API_KEY: 'geoapify-test-key',
         }),
       ),
@@ -63,6 +70,8 @@ describe('provider request budget environment', () => {
   it('accepts explicit production budgets and builds normalized runtime policies', () => {
     const environment = loadEnvironment(
       productionEnvironment({
+        MAPS_PROVIDER: 'geoapify',
+        EVENTS_PROVIDER: 'ticketmaster',
         GEOAPIFY_API_KEY: 'geoapify-test-key',
         GEOAPIFY_REQUEST_BUDGET_MAX: '1000',
         GEOAPIFY_REQUEST_BUDGET_WINDOW_SECONDS: '86400',

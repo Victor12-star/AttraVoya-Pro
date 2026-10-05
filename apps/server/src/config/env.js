@@ -219,41 +219,56 @@ function validateProviderBudgetPairs(environment) {
   }
 }
 
-function enabledCredentialedProviders(environment) {
-  const enabled = new Set();
+function selectedCredentialedProviders(environment) {
+  const selected = new Set();
 
   if (
-    environment.GEOAPIFY_API_KEY?.trim() &&
     [environment.MAPS_PROVIDER, environment.PLACES_PROVIDER, environment.ACCOMMODATION_PROVIDER]
       .map((value) => value.toLowerCase())
       .includes('geoapify')
   ) {
-    enabled.add('geoapify');
+    selected.add('geoapify');
   }
-  if (environment.TICKETMASTER_API_KEY?.trim() && environment.EVENTS_PROVIDER === 'ticketmaster') {
-    enabled.add('ticketmaster');
-  }
-  if (environment.NEWSDATA_API_KEY?.trim() && environment.NEWS_PROVIDER === 'newsdata') {
-    enabled.add('newsdata');
-  }
-  if (environment.PEXELS_API_KEY?.trim() && environment.IMAGE_PROVIDER === 'pexels') {
-    enabled.add('pexels');
-  }
-  if (environment.RESEND_API_KEY?.trim() && environment.EMAIL_PROVIDER === 'resend') {
-    enabled.add('resend');
+  if (environment.EVENTS_PROVIDER === 'ticketmaster') selected.add('ticketmaster');
+  if (environment.NEWS_PROVIDER === 'newsdata') selected.add('newsdata');
+  if (environment.IMAGE_PROVIDER === 'pexels') selected.add('pexels');
+  if (environment.EMAIL_PROVIDER === 'resend') selected.add('resend');
+
+  return selected;
+}
+
+function validateProductionProviderCredentials(environment) {
+  if (environment.NODE_ENV !== 'production') return;
+
+  const selected = selectedCredentialedProviders(environment);
+  const missing = [];
+
+  for (const [provider, credential] of [
+    ['geoapify', 'GEOAPIFY_API_KEY'],
+    ['ticketmaster', 'TICKETMASTER_API_KEY'],
+    ['newsdata', 'NEWSDATA_API_KEY'],
+    ['pexels', 'PEXELS_API_KEY'],
+  ]) {
+    if (selected.has(provider) && !environment[credential]?.trim()) {
+      missing.push(credential);
+    }
   }
 
-  return enabled;
+  if (missing.length) {
+    throw new Error(
+      `Invalid AttraVoya Pro server environment:\n${missing.join(', ')}: required in production when the corresponding provider is selected.`,
+    );
+  }
 }
 
 function validateProductionProviderBudgets(environment) {
   if (environment.NODE_ENV !== 'production') return;
 
-  const enabled = enabledCredentialedProviders(environment);
+  const selected = selectedCredentialedProviders(environment);
   const missing = [];
 
   for (const { provider, prefix } of REQUEST_BUDGET_CONFIGS) {
-    if (!enabled.has(provider)) continue;
+    if (!selected.has(provider)) continue;
     const { maxField, windowField } = budgetFields(prefix);
     if (environment[maxField] === undefined || environment[windowField] === undefined) {
       missing.push(`${maxField} and ${windowField}`);
@@ -456,6 +471,7 @@ export function loadEnvironment(source = process.env) {
   validateRevenueCatAndroidProductConfiguration(result.data);
   validateRevenueCatWebhookConfiguration(result.data);
   validateProductionEmailConfiguration(result.data);
+  validateProductionProviderCredentials(result.data);
   validateProductionProviderBudgets(result.data);
   return Object.freeze(result.data);
 }
