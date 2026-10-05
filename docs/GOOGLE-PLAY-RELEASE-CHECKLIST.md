@@ -101,6 +101,8 @@ replaced with fake placeholders.
       barriers that prevent users from starting the required flow.
 - [ ] Accessibility smoke tests pass and key mobile flows are manually checked with TalkBack.
 - [ ] Crash/error monitoring and operational alerts are active before widening rollout.
+- [ ] Production monitoring calculates the documented availability/latency SLOs and current
+      error budget without collecting unnecessary personal data.
 - [ ] Internal testing is stable before staged production rollout.
 - [ ] Production rollout is staged and monitored rather than immediately released to 100%.
 
