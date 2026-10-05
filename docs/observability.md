@@ -16,3 +16,9 @@ For one production replica, `METRICS_AGGREGATION_MODE=process_local` is supporte
 Instance identifiers are operational labels only. They must not contain user data, credentials, host secrets, request values, or other private information. Metric labels remain bounded and code-defined.
 
 This exporter architecture keeps shared coordination off the request path. A managed monitoring backend may be selected during deployment, but the repository does not require Redis or write high-frequency telemetry into the application database merely to support horizontal API scaling.
+
+## Production SLOs and error budgets
+
+The production service-level objectives, service-level indicators and error-budget process are
+defined in [PRODUCTION-SLOS.md](./PRODUCTION-SLOS.md). Process-local metrics and CI checks are
+inputs to that policy; they are not evidence that the deployed service already meets its SLOs.
