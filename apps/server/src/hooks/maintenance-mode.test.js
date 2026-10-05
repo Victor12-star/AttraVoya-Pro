@@ -41,7 +41,8 @@ describe('maintenance mode', () => {
     expect(response.json()).toMatchObject({
       error: {
         code: 'SERVICE_UNAVAILABLE',
-        message: 'AttraVoya Pro is temporarily unavailable for maintenance. Please try again shortly.',
+        message:
+          'AttraVoya Pro is temporarily unavailable for maintenance. Please try again shortly.',
         details: { reason: 'maintenance' },
       },
     });
