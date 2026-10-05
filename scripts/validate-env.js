@@ -76,6 +76,11 @@ function isValidPublicEmail(value) {
   return !isReservedHostname(domain);
 }
 
+function isPositiveIntegerString(value) {
+  const normalized = value?.trim();
+  return typeof normalized === 'string' && /^[1-9]\d*$/.test(normalized);
+}
+
 /** @type {Record<string, string | undefined>} */
 const env = {
   ...parseEnvFile(path.join(process.cwd(), '.env')),
@@ -155,6 +160,41 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
 
   if (env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend' && !env.EMAIL_FROM?.trim()) {
     errors.push('EMAIL_FROM is required in production when Resend is selected.');
+  }
+
+  for (const { selected, prefix, label } of [
+    { selected: geoapifySelected, prefix: 'GEOAPIFY', label: 'Geoapify' },
+    {
+      selected: env.EVENTS_PROVIDER?.trim().toLowerCase() === 'ticketmaster',
+      prefix: 'TICKETMASTER',
+      label: 'Ticketmaster',
+    },
+    {
+      selected: env.NEWS_PROVIDER?.trim().toLowerCase() === 'newsdata',
+      prefix: 'NEWSDATA',
+      label: 'NewsData',
+    },
+    {
+      selected: env.IMAGE_PROVIDER?.trim().toLowerCase() === 'pexels',
+      prefix: 'PEXELS',
+      label: 'Pexels',
+    },
+    {
+      selected: env.EMAIL_PROVIDER?.trim().toLowerCase() === 'resend',
+      prefix: 'RESEND',
+      label: 'Resend',
+    },
+  ]) {
+    if (!selected) continue;
+
+    for (const field of [
+      `${prefix}_REQUEST_BUDGET_MAX`,
+      `${prefix}_REQUEST_BUDGET_WINDOW_SECONDS`,
+    ]) {
+      if (!isPositiveIntegerString(env[field])) {
+        errors.push(`${field} must be a positive integer in production when ${label} is selected.`);
+      }
+    }
   }
 }
 
