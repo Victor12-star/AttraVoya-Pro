@@ -26,6 +26,7 @@ import { registerRequestContext } from './hooks/request-context.js';
 import { createAuthenticateHook } from './hooks/authenticate.js';
 import { createAuthorizeHook } from './hooks/authorize.js';
 import { createRequireEntitlementHook } from './hooks/require-entitlement.js';
+import { createMaintenanceModeHook } from './hooks/maintenance-mode.js';
 import { configureProviderRequestBudgets } from './integrations/http/provider-request-budget.js';
 import { createReadinessState } from './lifecycle/readiness-state.js';
 import { createLoggerOptions, requestRouteForLog } from './logging/logger.js';
@@ -67,6 +68,9 @@ export async function buildApp(options = {}) {
   );
 
   const readinessState = options.readinessState ?? createReadinessState();
+  const maintenanceMode = options.maintenanceMode ?? env.MAINTENANCE_MODE;
+  if (maintenanceMode) readinessState.markDraining();
+
   const app = Fastify({
     logger: options.logger ?? createLoggerOptions(),
     genReqId: () => randomUUID(),
@@ -86,6 +90,7 @@ export async function buildApp(options = {}) {
 
   registerErrorHandler(app);
   await registerRequestContext(app);
+  app.addHook('onRequest', createMaintenanceModeHook({ enabled: maintenanceMode }));
 
   // Keep trusted database-backed identity separate from request.user, which is
   // the decoded JWT payload populated by @fastify/jwt.
