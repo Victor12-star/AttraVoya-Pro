@@ -1,0 +1,117 @@
+name: Android Preview Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-preview-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: Queue EAS Android preview build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+
+    steps:
+      - name: Guard verified develop branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$GITHUB_REF" != "refs/heads/develop" ]; then
+            echo "::error::Android preview builds must be started from the develop branch."
+            exit 1
+          fi
+
+      - name: Verify EAS authentication inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${EXPO_TOKEN:-}" ]; then
+            echo "::error::Repository secret EXPO_TOKEN is required to queue an EAS preview build."
+            exit 1
+          fi
+
+          if [[ ! "${EAS_PROJECT_ID:-}" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+            echo "::error::Repository secret EAS_PROJECT_ID must contain the linked EAS project UUID."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify mobile preview contract
+        run: pnpm --filter @attravoya/mobile test -- eas-environment-mapping.test.js
+
+      - name: Queue EAS Android preview build
+        working-directory: apps/mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          pnpm exec eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --no-wait \
+            --json > "$RUNNER_TEMP/eas-preview-build.json"
+
+      - name: Publish preview build link
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const buildFile = path.join(process.env.RUNNER_TEMP, 'eas-preview-build.json');
+          const parsed = JSON.parse(fs.readFileSync(buildFile, 'utf8'));
+          const build = Array.isArray(parsed) ? parsed[0] : parsed;
+
+          if (!build?.id) {
+            throw new Error('EAS did not return a preview build ID.');
+          }
+
+          const detailsUrl = build.buildDetailsPageUrl;
+          const summary = [
+            '## Android Preview Build',
+            '',
+            `- Commit: \`${process.env.GITHUB_SHA}\``,
+            `- EAS build ID: \`${build.id}\``,
+            detailsUrl ? `- [Open EAS build page](${detailsUrl})` : null,
+            '',
+            'This uses the `preview` EAS profile and queues an internally distributed signed Android APK.',
+            'Open the EAS build page to watch progress and install/download the APK when the build finishes.',
+            '',
+          ]
+            .filter(Boolean)
+            .join('\n');
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+          console.log(`EAS build ID: ${build.id}`);
+          if (detailsUrl) console.log(`EAS build page: ${detailsUrl}`);
+          NODE
