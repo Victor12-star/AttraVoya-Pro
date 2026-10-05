@@ -22,7 +22,13 @@
       "env": {
         "APP_VARIANT": "preview"
       },
-      "environment": "preview"
+      "environment": "preview",
+      "developmentClient": false,
+      "withoutCredentials": false,
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "remote"
+      }
     },
     "production": {
       "autoIncrement": true,
