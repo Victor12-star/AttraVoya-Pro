@@ -90,6 +90,11 @@ jobs:
             exit 1
           fi
 
+          if NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL=privacy@example.test NODE_ENV=production pnpm env:check; then
+            echo "Production environment validation unexpectedly passed with a placeholder privacy contact."
+            exit 1
+          fi
+
           NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL=privacy@attravoya.app NODE_ENV=production pnpm env:check
 
       - name: Generate Prisma client for JavaScript checks
