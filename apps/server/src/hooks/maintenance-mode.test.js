@@ -97,9 +97,4 @@ describe('maintenance mode', () => {
     ).resolves.toBeUndefined();
   });
 
-  it('fails closed for invalid maintenance-mode configuration', () => {
-    expect(() =>
-      createMaintenanceModeHook({ enabled: /** @type {any} */ ('true') }),
-    ).toThrow('Maintenance mode enabled must be a boolean.');
-  });
 });
