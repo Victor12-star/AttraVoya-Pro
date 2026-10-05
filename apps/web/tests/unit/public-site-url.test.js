@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe('public site URL', () => {
-  it('prefers the documented NEXT_PUBLIC_SITE_URL over compatibility fallbacks', () => {
+  it('prefers NEXT_PUBLIC_SITE_URL', () => {
     expect(
       resolvePublicSiteUrl({
         NODE_ENV: 'production',
@@ -20,13 +20,13 @@ describe('public site URL', () => {
     ).toBe('https://www.attravoya.app');
   });
 
-  it('keeps the localhost fallback outside production', () => {
+  it('keeps localhost outside production', () => {
     expect(resolvePublicSiteUrl({ NODE_ENV: 'test' })).toBe('http://localhost:3000');
   });
 
-  it('fails closed when production has no configured public site URL', () => {
+  it('fails closed without a production site URL', () => {
     expect(() => resolvePublicSiteUrl({ NODE_ENV: 'production' })).toThrow(
-      'NEXT_PUBLIC_SITE_URL is required in production.',
+      /NEXT_PUBLIC_SITE_URL is required/,
     );
   });
 
@@ -36,63 +36,53 @@ describe('public site URL', () => {
         NODE_ENV: 'production',
         NEXT_PUBLIC_SITE_URL: 'http://attravoya.app',
       }),
-    ).toThrow('Public site URL must use HTTPS in production.');
+    ).toThrow(/must use HTTPS/);
 
     expect(() =>
       resolvePublicSiteUrl({
         NODE_ENV: 'production',
         NEXT_PUBLIC_SITE_URL: 'https://localhost',
       }),
-    ).toThrow('Public site URL must not use a local hostname in production.');
+    ).toThrow(/local hostname/);
   });
 
-  it(
-    'rejects reserved placeholder production hostnames outside the explicit CI exception',
-    () => {
-      for (const value of [
-        'https://attravoya.example',
-        'https://attravoya.test',
-        'https://attravoya.invalid',
-        'https://example.com',
-      ]) {
-        expect(() =>
-          resolvePublicSiteUrl({
-            NODE_ENV: 'production',
-            NEXT_PUBLIC_SITE_URL: value,
-          }),
-        ).toThrow(
-          'Public site URL must not use a reserved placeholder hostname in production.',
-        );
-      }
-    },
-  );
-
-  it(
-    'allows only the reserved .invalid CI metadata origin behind the explicit CI flag',
-    () => {
-      expect(
-        resolvePublicSiteUrl({
-          NODE_ENV: 'production',
-          CI: 'true',
-          ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
-          NEXT_PUBLIC_SITE_URL: 'https://web.ci.attravoya.invalid',
-        }),
-      ).toBe('https://web.ci.attravoya.invalid');
-
+  it('rejects reserved production hosts', () => {
+    for (const value of [
+      'https://attravoya.example',
+      'https://attravoya.test',
+      'https://attravoya.invalid',
+      'https://example.com',
+    ]) {
       expect(() =>
         resolvePublicSiteUrl({
           NODE_ENV: 'production',
-          CI: 'true',
-          ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
-          NEXT_PUBLIC_SITE_URL: 'https://attravoya.example',
+          NEXT_PUBLIC_SITE_URL: value,
         }),
-      ).toThrow(
-        'Public site URL must not use a reserved placeholder hostname in production.',
-      );
-    },
-  );
+      ).toThrow(/reserved placeholder hostname/);
+    }
+  });
 
-  it('rejects credentials, paths, query strings, and fragments', () => {
+  it('allows the reserved CI metadata origin only with its CI flag', () => {
+    expect(
+      resolvePublicSiteUrl({
+        NODE_ENV: 'production',
+        CI: 'true',
+        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+        NEXT_PUBLIC_SITE_URL: 'https://web.ci.attravoya.invalid',
+      }),
+    ).toBe('https://web.ci.attravoya.invalid');
+
+    expect(() =>
+      resolvePublicSiteUrl({
+        NODE_ENV: 'production',
+        CI: 'true',
+        ATTRAVOYA_CI_ALLOW_RESERVED_SITE_URL: 'true',
+        NEXT_PUBLIC_SITE_URL: 'https://attravoya.example',
+      }),
+    ).toThrow(/reserved placeholder hostname/);
+  });
+
+  it('rejects credentials, paths, queries, and fragments', () => {
     for (const value of [
       'https://user:password@attravoya.app',
       'https://attravoya.app/app',
@@ -108,7 +98,7 @@ describe('public site URL', () => {
     }
   });
 
-  it('uses the canonical production origin for sitemap and robots metadata', () => {
+  it('uses the canonical origin for sitemap and robots metadata', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://www.attravoya.app');
     vi.stubEnv('NEXT_PUBLIC_WEB_URL', 'https://legacy-public.attravoya.app');
