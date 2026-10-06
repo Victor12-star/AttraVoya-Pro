@@ -6,16 +6,28 @@ import { createAdminApiClient } from '../../lib/api-client.js';
 
 const WINDOW_OPTIONS = [7, 30, 90];
 
+/**
+ * @typedef {object} AnalyticsSummary
+ * @property {{ days: number, start: string, end: string }} window
+ * @property {{ totalRegistered: number, newRegistered: number }} users
+ */
+
+/** @param {{ status?: number, code?: string } | null | undefined} error */
 function analyticsErrorMessage(error) {
   if (error?.status === 401) return 'Sign in with an administrator account to view analytics.';
   if (error?.status === 403) return 'Your account does not have permission to view analytics.';
   return 'Analytics are temporarily unavailable. Please try again.';
 }
 
+/**
+ * @param {{
+ *   client?: { getUserAnalytics: (input?: { days?: number }) => Promise<AnalyticsSummary> },
+ * }} props
+ */
 export function AnalyticsDashboard({ client }) {
   const analyticsClient = useMemo(() => client ?? createAdminApiClient(), [client]);
   const [days, setDays] = useState(7);
-  const [summary, setSummary] = useState(null);
+  const [summary, setSummary] = useState(/** @type {AnalyticsSummary | null} */ (null));
   const [requestVersion, setRequestVersion] = useState(0);
   const [state, setState] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
