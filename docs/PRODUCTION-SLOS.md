@@ -115,6 +115,32 @@ Before AttraVoya Pro may claim that an SLO is met:
 Synthetic checks and CI tests may supplement production measurements, but they do not replace
 real service telemetry.
 
+## Vendor-neutral evaluator
+
+The repository includes `scripts/slo-evaluator.js` as a small aggregate-only evaluation layer for
+monitoring exports. It accepts no request payloads, user identifiers, tokens, URLs, trip data or
+other personal data. Its input contract is deliberately limited to:
+
+- observation-window duration;
+- total user-facing request count;
+- HTTP 5xx count;
+- aggregate non-provider latency sample count and p95 latency.
+
+Run it with a JSON export from the chosen monitoring backend:
+
+```bash
+pnpm slo:evaluate ./aggregate-slo-window.json
+```
+
+The evaluator reports availability status, request-based error-budget consumption and the
+non-provider p95 target status. A window shorter than 30 days may still show whether its local
+aggregate values meet the numerical thresholds, but the evaluator marks it as ineligible for a
+production-SLO claim. This prevents a short healthy sample from being misrepresented as proof of
+the documented rolling 30-day objective.
+
+The evaluator is intentionally vendor-neutral. Selecting, deploying and operating the production
+monitoring backend remains an operations step and must still aggregate every serving replica.
+
 ## Alerting principles
 
 Alerts should identify conditions that require an operator action rather than every transient
