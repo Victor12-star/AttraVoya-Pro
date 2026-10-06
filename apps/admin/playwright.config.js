@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isContinuousIntegration = Boolean(process.env.CI);
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3001';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3001';
 
 export default defineConfig({
   expect: {
@@ -43,7 +43,9 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm dev',
+    command: isContinuousIntegration
+      ? 'NODE_ENV=production pnpm build && NODE_ENV=production pnpm start'
+      : 'pnpm dev',
     reuseExistingServer: !isContinuousIntegration,
     stderr: 'pipe',
     stdout: 'pipe',

@@ -186,6 +186,11 @@ jobs:
           NODE_ENV: development
         run: pnpm --filter @attravoya/web test:e2e:ci
 
+      - name: Run admin browser accessibility smoke tests
+        env:
+          NODE_ENV: development
+        run: pnpm --filter @attravoya/admin test:e2e:ci
+
       - name: Check formatting
         run: pnpm format:check
 
