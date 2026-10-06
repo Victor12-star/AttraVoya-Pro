@@ -23,6 +23,7 @@ export const PERMISSIONS = Object.freeze({
   PROVIDERS_WRITE: 'providers:write',
   FEATURE_FLAGS_WRITE: 'feature-flags:write',
   AUDIT_READ: 'audit:read',
+  ANALYTICS_READ: 'analytics:read',
   SUBSCRIPTIONS_READ: 'subscriptions:read',
   SUBSCRIPTIONS_WRITE: 'subscriptions:write',
 });
@@ -42,6 +43,7 @@ export const PERMISSION_LABELS = Object.freeze({
   [PERMISSIONS.PROVIDERS_WRITE]: 'Configure providers',
   [PERMISSIONS.FEATURE_FLAGS_WRITE]: 'Toggle feature flags',
   [PERMISSIONS.AUDIT_READ]: 'View audit logs',
+  [PERMISSIONS.ANALYTICS_READ]: 'View aggregate analytics',
   [PERMISSIONS.SUBSCRIPTIONS_READ]: 'View subscriptions',
   [PERMISSIONS.SUBSCRIPTIONS_WRITE]: 'Edit subscriptions',
 });
