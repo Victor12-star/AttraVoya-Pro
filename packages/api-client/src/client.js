@@ -317,9 +317,14 @@ export function createApiClient(options) {
         cache: 'no-store',
       }),
     getUserAnalytics: ({ days = 7 } = {}) =>
-      request(`/api/v1/analytics/users?${toSearchParams({ days: normalizeAnalyticsWindowDays(days) })}`, {
-        cache: 'no-store',
-      }),
+      request(
+        `/api/v1/analytics/users?${toSearchParams({
+          days: normalizeAnalyticsWindowDays(days),
+        })}`,
+        {
+          cache: 'no-store',
+        },
+      ),
     getRevenueCatAndroidIdentity: () =>
       request('/api/v1/payments/revenuecat/android/identity', {
         cache: 'no-store',
