@@ -54,8 +54,8 @@ describe('analytics API client', () => {
     });
   });
 
-  it.each([0, 91, 1.5, '30'])(
-    'rejects invalid analytics window %j before making a request',
+  it.each([0, 91, 1.5])(
+    'rejects invalid numeric analytics window %j before making a request',
     async (days) => {
       const fetchImpl = vi.fn();
       const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
@@ -66,4 +66,15 @@ describe('analytics API client', () => {
       expect(fetchImpl).not.toHaveBeenCalled();
     },
   );
+
+  it('rejects a non-numeric analytics window before making a request', async () => {
+    const fetchImpl = vi.fn();
+    const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+    const invalidDays = /** @type {any} */ ('30');
+
+    await expect(client.getUserAnalytics({ days: invalidDays })).rejects.toThrow(
+      'Analytics window days must be an integer from 1 to 90.',
+    );
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
 });
