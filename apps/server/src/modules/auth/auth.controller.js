@@ -73,6 +73,20 @@ export function createAuthController({
   onPasswordResetRequested,
 }) {
   return {
+    async currentAuth(request, reply) {
+      const auth = /** @type {any} */ (request).auth;
+      return sendPrivate(reply, {
+        user: {
+          id: auth.id,
+          email: auth.email,
+          status: auth.status,
+          emailVerified: Boolean(auth.emailVerifiedAt),
+          roles: [...auth.roles],
+          permissions: [...auth.permissions],
+        },
+      });
+    },
+
     async register(request, reply) {
       const result = await service.register(request.body);
       let verificationDelivery = onVerificationRequested ? 'sent' : 'not_configured';
