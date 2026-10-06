@@ -43,7 +43,9 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm dev',
+    command: isContinuousIntegration
+      ? 'NODE_ENV=production pnpm build && NODE_ENV=production pnpm start'
+      : 'pnpm dev',
     reuseExistingServer: !isContinuousIntegration,
     stderr: 'pipe',
     stdout: 'pipe',
