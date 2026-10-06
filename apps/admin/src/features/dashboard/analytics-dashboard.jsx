@@ -21,14 +21,13 @@ export function AnalyticsDashboard({ client }) {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
     let active = true;
 
     setState('loading');
     setErrorMessage('');
 
     analyticsClient
-      .getUserAnalytics({ days, signal: controller.signal })
+      .getUserAnalytics({ days })
       .then((result) => {
         if (!active) return;
         setSummary(result);
@@ -43,7 +42,6 @@ export function AnalyticsDashboard({ client }) {
 
     return () => {
       active = false;
-      controller.abort();
     };
   }, [analyticsClient, days, requestVersion]);
 
