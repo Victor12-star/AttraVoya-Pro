@@ -23,6 +23,18 @@ function requireIntegerNonNegative(value, name) {
   return value;
 }
 
+function availabilityStatusFor(observedRatio) {
+  if (observedRatio === null) return 'INSUFFICIENT_DATA';
+  if (observedRatio >= PRODUCTION_SLO.availabilityTargetRatio) return 'MEETS_TARGET';
+  return 'BREACH';
+}
+
+function latencyStatusFor(sampleCount, p95Ms) {
+  if (sampleCount === 0) return 'INSUFFICIENT_DATA';
+  if (p95Ms < PRODUCTION_SLO.nonProviderP95TargetMs) return 'MEETS_TARGET';
+  return 'BREACH';
+}
+
 export function evaluateSloSnapshot(snapshot) {
   const observationWindowSeconds = requireFiniteNonNegative(
     snapshot?.observationWindowSeconds,
@@ -50,19 +62,8 @@ export function evaluateSloSnapshot(snapshot) {
   const errorBudgetConsumedRatio =
     serverErrorRate === null ? null : serverErrorRate / allowedErrorRate;
 
-  const availabilityStatus =
-    availabilityObservedRatio === null
-      ? 'INSUFFICIENT_DATA'
-      : availabilityObservedRatio >= PRODUCTION_SLO.availabilityTargetRatio
-        ? 'MEETS_TARGET'
-        : 'BREACH';
-
-  const latencyStatus =
-    nonProviderSamples === 0
-      ? 'INSUFFICIENT_DATA'
-      : nonProviderP95Ms < PRODUCTION_SLO.nonProviderP95TargetMs
-        ? 'MEETS_TARGET'
-        : 'BREACH';
+  const availabilityStatus = availabilityStatusFor(availabilityObservedRatio);
+  const latencyStatus = latencyStatusFor(nonProviderSamples, nonProviderP95Ms);
 
   const fullProductionWindow =
     observationWindowSeconds >= PRODUCTION_SLO.rollingWindowSeconds;
