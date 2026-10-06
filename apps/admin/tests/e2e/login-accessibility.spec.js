@@ -10,9 +10,7 @@ test.describe('admin sign-in', () => {
       const response = await page.goto('/login');
 
       expect(response?.ok()).toBe(true);
-      await expect(
-        page.getByRole('heading', { level: 1, name: 'Admin sign in' }),
-      ).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: 'Admin sign in' })).toBeVisible();
 
       const accessibility = await new AxeBuilder({ page }).include('main').analyze();
       const blockingViolations = accessibility.violations.filter(({ impact }) =>
