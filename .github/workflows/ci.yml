@@ -93,6 +93,8 @@ jobs:
           EMAIL_PROVIDER: resend
           RESEND_API_KEY: placeholder-resend-key
           EMAIL_FROM: noreply@attravoya.app
+          RESEND_REQUEST_BUDGET_MAX: '100'
+          RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '86400'
         run: |
           set -euo pipefail
 
@@ -124,6 +126,8 @@ jobs:
           EMAIL_PROVIDER: resend
           RESEND_API_KEY: placeholder-resend-key
           EMAIL_FROM: noreply@attravoya.app
+          RESEND_REQUEST_BUDGET_MAX: '100'
+          RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '86400'
           NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL: privacy@attravoya.app
         run: |
           set -euo pipefail
@@ -133,7 +137,16 @@ jobs:
             exit 1
           fi
 
-          MAPS_PROVIDER=geoapify GEOAPIFY_API_KEY=geoapify-test-key NODE_ENV=production pnpm env:check
+          if MAPS_PROVIDER=geoapify GEOAPIFY_API_KEY=geoapify-test-key NODE_ENV=production pnpm env:check; then
+            echo "Production environment validation unexpectedly passed without the selected Geoapify request budget."
+            exit 1
+          fi
+
+          MAPS_PROVIDER=geoapify \
+            GEOAPIFY_API_KEY=geoapify-test-key \
+            GEOAPIFY_REQUEST_BUDGET_MAX=1000 \
+            GEOAPIFY_REQUEST_BUDGET_WINDOW_SECONDS=86400 \
+            NODE_ENV=production pnpm env:check
 
       - name: Generate Prisma client for JavaScript checks
         run: pnpm db:generate
