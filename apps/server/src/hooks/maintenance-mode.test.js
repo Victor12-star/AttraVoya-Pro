@@ -69,7 +69,10 @@ describe('maintenance mode', () => {
     });
 
     expect(liveness.statusCode).toBe(200);
-    expect(liveness.json()).toMatchObject({ status: 'ok', service: 'attravoya-api' });
+    expect(liveness.json()).toMatchObject({
+      status: 'ok',
+      service: 'attravoya-api',
+    });
     expect(readiness.statusCode).toBe(503);
     expect(readiness.json()).toMatchObject({
       error: {
