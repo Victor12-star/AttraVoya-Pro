@@ -148,6 +148,43 @@ jobs:
             GEOAPIFY_REQUEST_BUDGET_WINDOW_SECONDS=86400 \
             NODE_ENV=production pnpm env:check
 
+      - name: Verify production replica topology preflight
+        env:
+          WEB_URL: https://app.attravoya.app
+          ADMIN_URL: https://admin.attravoya.app
+          API_URL: https://api.attravoya.app
+          MAPS_PROVIDER: none
+          PLACES_PROVIDER: none
+          GEOCODING_PROVIDER: none
+          ROUTING_PROVIDER: none
+          ACCOMMODATION_PROVIDER: none
+          EVENTS_PROVIDER: none
+          NEWS_PROVIDER: none
+          IMAGE_PROVIDER: none
+          EMAIL_PROVIDER: resend
+          RESEND_API_KEY: placeholder-resend-key
+          EMAIL_FROM: noreply@attravoya.app
+          RESEND_REQUEST_BUDGET_MAX: '100'
+          RESEND_REQUEST_BUDGET_WINDOW_SECONDS: '86400'
+          NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL: privacy@attravoya.app
+        run: |
+          set -euo pipefail
+
+          if API_REPLICA_COUNT=2 METRICS_AGGREGATION_MODE=process_local NODE_ENV=production pnpm env:check; then
+            echo "Production environment validation unexpectedly passed unsafe multi-replica process-local metrics."
+            exit 1
+          fi
+
+          if API_REPLICA_COUNT=2 METRICS_AGGREGATION_MODE=external METRICS_INSTANCE_ID= NODE_ENV=production pnpm env:check; then
+            echo "Production environment validation unexpectedly passed external metrics without an instance ID."
+            exit 1
+          fi
+
+          API_REPLICA_COUNT=2 \
+            METRICS_AGGREGATION_MODE=external \
+            METRICS_INSTANCE_ID=api-1 \
+            NODE_ENV=production pnpm env:check
+
       - name: Generate Prisma client for JavaScript checks
         run: pnpm db:generate
 
