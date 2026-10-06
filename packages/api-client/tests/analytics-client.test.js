@@ -60,7 +60,7 @@ describe('analytics API client', () => {
       const fetchImpl = vi.fn();
       const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
 
-      await expect(client.getUserAnalytics({ days })).rejects.toThrow(
+      expect(() => client.getUserAnalytics({ days })).toThrow(
         'Analytics window days must be an integer from 1 to 90.',
       );
       expect(fetchImpl).not.toHaveBeenCalled();
@@ -72,7 +72,7 @@ describe('analytics API client', () => {
     const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
     const invalidDays = /** @type {any} */ ('30');
 
-    await expect(client.getUserAnalytics({ days: invalidDays })).rejects.toThrow(
+    expect(() => client.getUserAnalytics({ days: invalidDays })).toThrow(
       'Analytics window days must be an integer from 1 to 90.',
     );
     expect(fetchImpl).not.toHaveBeenCalled();
