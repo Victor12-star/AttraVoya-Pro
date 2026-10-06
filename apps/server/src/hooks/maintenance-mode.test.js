@@ -22,9 +22,7 @@ afterEach(async () => {
 });
 
 describe('maintenance mode', () => {
-  it(
-    'returns a stable service-unavailable response before user-facing business logic runs',
-    async () => {
+  it('blocks user-facing traffic before business logic during maintenance', async () => {
     const listCountries = vi.fn(async () => []);
     const app = await buildApp({
       logger: false,
@@ -50,8 +48,7 @@ describe('maintenance mode', () => {
     });
     expect(response.headers['x-request-id']).toBeTruthy();
     expect(listCountries).not.toHaveBeenCalled();
-    },
-  );
+  });
 
   it('keeps liveness available and fails readiness without touching PostgreSQL', async () => {
     const checkDatabase = vi.fn(async () => true);
