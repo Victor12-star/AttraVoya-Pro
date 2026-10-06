@@ -21,11 +21,15 @@ function analyticsErrorMessage(error) {
 
 /**
  * @param {{
+ *   apiBaseUrl?: string | null,
  *   client?: { getUserAnalytics: (input?: { days?: number }) => Promise<AnalyticsSummary> },
  * }} props
  */
-export function AnalyticsDashboard({ client }) {
-  const analyticsClient = useMemo(() => client ?? createAdminApiClient(), [client]);
+export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
+  const analyticsClient = useMemo(
+    () => client ?? (apiBaseUrl ? createAdminApiClient({ baseUrl: apiBaseUrl }) : null),
+    [apiBaseUrl, client],
+  );
   const [days, setDays] = useState(7);
   const [summary, setSummary] = useState(/** @type {AnalyticsSummary | null} */ (null));
   const [requestVersion, setRequestVersion] = useState(0);
@@ -37,6 +41,15 @@ export function AnalyticsDashboard({ client }) {
 
     setState('loading');
     setErrorMessage('');
+
+    if (!analyticsClient) {
+      setSummary(null);
+      setErrorMessage('Analytics are not configured for this Admin deployment.');
+      setState('error');
+      return () => {
+        active = false;
+      };
+    }
 
     analyticsClient
       .getUserAnalytics({ days })
