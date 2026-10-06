@@ -65,8 +65,7 @@ export function evaluateSloSnapshot(snapshot) {
   const availabilityStatus = availabilityStatusFor(availabilityObservedRatio);
   const latencyStatus = latencyStatusFor(nonProviderSamples, nonProviderP95Ms);
 
-  const fullProductionWindow =
-    observationWindowSeconds >= PRODUCTION_SLO.rollingWindowSeconds;
+  const fullProductionWindow = observationWindowSeconds >= PRODUCTION_SLO.rollingWindowSeconds;
 
   return Object.freeze({
     scope: 'AGGREGATE_WINDOW_ONLY',
