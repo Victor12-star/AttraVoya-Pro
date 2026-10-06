@@ -52,6 +52,13 @@ function normalizeStripeProPlanKey(value) {
   return normalized;
 }
 
+function normalizeAnalyticsWindowDays(value = 7) {
+  if (!Number.isInteger(value) || value < 1 || value > 90) {
+    throw new TypeError('Analytics window days must be an integer from 1 to 90.');
+  }
+  return value;
+}
+
 /**
  * Forward caller cancellation into the request-owned controller so the hard
  * client deadline remains active even when a screen supplies its own signal.
@@ -309,6 +316,15 @@ export function createApiClient(options) {
       request('/api/v1/entitlements/me', {
         cache: 'no-store',
       }),
+    getUserAnalytics: ({ days = 7 } = {}) =>
+      request(
+        `/api/v1/analytics/users?${toSearchParams({
+          days: normalizeAnalyticsWindowDays(days),
+        })}`,
+        {
+          cache: 'no-store',
+        },
+      ),
     getRevenueCatAndroidIdentity: () =>
       request('/api/v1/payments/revenuecat/android/identity', {
         cache: 'no-store',
