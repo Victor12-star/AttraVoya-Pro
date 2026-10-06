@@ -24,8 +24,11 @@ test('evaluates a healthy full production window without claiming more than aggr
   assert.equal(result.availability.status, 'MEETS_TARGET');
   assert.equal(result.availability.observedRatio, 0.9995);
   assert.equal(result.availability.serverErrorRate, 0.0005);
-  assert.notEqual(result.availability.errorBudgetConsumedRatio, null);
-  assert.ok(Math.abs(result.availability.errorBudgetConsumedRatio - 0.5) < 1e-9);
+  const healthyBudgetConsumption = result.availability.errorBudgetConsumedRatio;
+  if (healthyBudgetConsumption === null) {
+    assert.fail('Expected a numeric error-budget consumption ratio.');
+  }
+  assert.ok(Math.abs(healthyBudgetConsumption - 0.5) < 1e-9);
   assert.equal(result.nonProviderLatency.status, 'MEETS_TARGET');
   assert.equal(result.nonProviderLatency.observedP95Ms, 420);
 });
@@ -42,8 +45,11 @@ test('marks availability and latency breaches explicitly', () => {
   );
 
   assert.equal(result.availability.status, 'BREACH');
-  assert.notEqual(result.availability.errorBudgetConsumedRatio, null);
-  assert.ok(result.availability.errorBudgetConsumedRatio > 1);
+  const breachedBudgetConsumption = result.availability.errorBudgetConsumedRatio;
+  if (breachedBudgetConsumption === null) {
+    assert.fail('Expected a numeric error-budget consumption ratio.');
+  }
+  assert.ok(breachedBudgetConsumption > 1);
   assert.equal(result.nonProviderLatency.status, 'BREACH');
 });
 
