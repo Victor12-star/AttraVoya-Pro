@@ -10,7 +10,7 @@ allowBuilds:
   'argon2@0.44.0': true
   'dtrace-provider@0.8.8': false
   'prisma@7.9.1': true
-  'sharp@0.34.5': true
+  'sharp@0.35.5': true
   'unrs-resolver@1.12.2': false
 
 overrides:
@@ -22,6 +22,8 @@ overrides:
   'deepmerge-ts': '8.0.1'
   'source-map-js': '1.2.2'
   'compression': '1.8.2'
+  'shell-quote': '1.11.0'
+  'sharp': '0.35.5'
   'node-forge': 'workspace:1.4.1-0'
   'braces': 'workspace:3.0.4-attravoya.0'
   'mysql2': '3.24.3'

@@ -169,6 +169,9 @@ jobs:
       - name: Test HTTP load harness
         run: pnpm load:harness:test
 
+      - name: Test SLO evaluator
+        run: pnpm slo:test
+
       - name: Run unit tests
         run: pnpm test
 
