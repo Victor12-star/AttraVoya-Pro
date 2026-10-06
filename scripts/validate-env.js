@@ -81,6 +81,19 @@ function isPositiveIntegerString(value) {
   return typeof normalized === 'string' && /^[1-9]\d*$/.test(normalized);
 }
 
+function parseReplicaCount(value) {
+  const normalized = value?.trim() || '1';
+  if (!/^\d+$/.test(normalized)) return null;
+
+  const parsed = Number(normalized);
+  return Number.isSafeInteger(parsed) && parsed >= 1 && parsed <= 100 ? parsed : null;
+}
+
+function isValidMetricsInstanceId(value) {
+  const normalized = value?.trim();
+  return typeof normalized === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(normalized);
+}
+
 /** @type {Record<string, string | undefined>} */
 const env = {
   ...parseEnvFile(path.join(process.cwd(), '.env')),
@@ -119,6 +132,34 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
   if (!isValidPublicEmail(privacyContact)) {
     errors.push(
       'A valid non-placeholder NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL or NEXT_PUBLIC_SUPPORT_EMAIL is required in production.',
+    );
+  }
+
+  const replicaCount = parseReplicaCount(env.API_REPLICA_COUNT);
+  if (replicaCount === null) {
+    errors.push('API_REPLICA_COUNT must be a whole number between 1 and 100 in production.');
+  }
+
+  const metricsAggregationMode =
+    env.METRICS_AGGREGATION_MODE?.trim().toLowerCase() || 'process_local';
+  if (!['process_local', 'external'].includes(metricsAggregationMode)) {
+    errors.push(
+      "METRICS_AGGREGATION_MODE must be either 'process_local' or 'external' in production.",
+    );
+  }
+
+  if (replicaCount !== null && replicaCount > 1 && metricsAggregationMode !== 'external') {
+    errors.push(
+      "METRICS_AGGREGATION_MODE must be 'external' in production when API_REPLICA_COUNT is greater than 1.",
+    );
+  }
+
+  if (
+    metricsAggregationMode === 'external' &&
+    !isValidMetricsInstanceId(env.METRICS_INSTANCE_ID)
+  ) {
+    errors.push(
+      'METRICS_INSTANCE_ID must be 1 to 64 letters, numbers, dots, underscores, or dashes, starting with a letter or number, when METRICS_AGGREGATION_MODE=external.',
     );
   }
 
