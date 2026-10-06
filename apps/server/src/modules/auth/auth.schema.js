@@ -15,6 +15,17 @@ const mobileSessionSchema = z
   })
   .strict();
 
+const currentAuthResponseSchema = z.object({
+  user: z.object({
+    id: z.string().min(1),
+    email: z.string().email(),
+    status: z.string().min(1),
+    emailVerified: z.boolean(),
+    roles: z.array(z.string().min(1)),
+    permissions: z.array(z.string().min(1)),
+  }),
+});
+
 export const authSchemas = Object.freeze({
   register: {
     body: registerSchema,
@@ -36,5 +47,8 @@ export const authSchemas = Object.freeze({
   },
   mobileSession: {
     body: mobileSessionSchema,
+  },
+  currentAuth: {
+    response: { 200: currentAuthResponseSchema },
   },
 });
