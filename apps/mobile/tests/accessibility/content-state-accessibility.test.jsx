@@ -16,7 +16,9 @@ function findNodeByProps(node, expectedProps) {
 
   if (typeof node !== 'object') return null;
 
-  const matches = Object.entries(expectedProps).every(([key, value]) => node.props?.[key] === value);
+  const matches = Object.entries(expectedProps).every(
+    ([key, value]) => node.props?.[key] === value,
+  );
   if (matches) return node;
 
   return findNodeByProps(node.children, expectedProps);
@@ -68,7 +70,9 @@ describe('mobile content-state accessibility', () => {
         accessibilityRole: 'alert',
       }),
     ).toBeTruthy();
-    expect(view.getByText('This information is unavailable').props.accessibilityRole).toBe('header');
+    expect(view.getByText('This information is unavailable').props.accessibilityRole).toBe(
+      'header',
+    );
     expect(findNodeByProps(view.toJSON(), { accessibilityRole: 'button' })).toBeNull();
   }, 20_000);
 });
