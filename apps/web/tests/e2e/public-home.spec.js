@@ -179,8 +179,10 @@ test.describe('public home page', () => {
     expect(blockingViolations).toEqual([]);
   });
 
-
-  test('supports keyboard navigation through the primary navigation', async ({ page, isMobile }) => {
+  test('supports keyboard navigation through the primary navigation', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, 'Desktop primary navigation is hidden on mobile viewports.');
 
     await page.goto('/');
