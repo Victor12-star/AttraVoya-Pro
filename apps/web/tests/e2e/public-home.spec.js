@@ -179,6 +179,47 @@ test.describe('public home page', () => {
     expect(blockingViolations).toEqual([]);
   });
 
+  test('supports keyboard navigation through the primary navigation', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Desktop primary navigation is hidden on mobile viewports.');
+
+    await page.goto('/');
+
+    const primaryNavigation = page.getByRole('navigation', { name: 'Primary navigation' });
+    const exploreLink = primaryNavigation.getByRole('link', { name: 'Explore' });
+    const flightsLink = primaryNavigation.getByRole('link', { name: 'Flights' });
+
+    await exploreLink.focus();
+    await expect(exploreLink).toBeFocused();
+
+    await page.keyboard.press('Tab');
+    await expect(flightsLink).toBeFocused();
+
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/\/flights$/);
+  });
+
+  test('supports keyboard activation of the mobile navigation', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'Mobile navigation is hidden on desktop viewports.');
+
+    await page.goto('/');
+
+    const menuButton = page.getByRole('button', { name: 'Open navigation' });
+    await menuButton.focus();
+    await expect(menuButton).toBeFocused();
+
+    await page.keyboard.press('Enter');
+
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+    await expect(mobileNavigation).toBeVisible();
+
+    await page.keyboard.press('Tab');
+    await expect(mobileNavigation.getByRole('link', { name: 'Explore' })).toBeFocused();
+  });
+
   test('opens the mobile navigation on mobile viewports', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'This interaction is specific to the mobile navigation.');
 
