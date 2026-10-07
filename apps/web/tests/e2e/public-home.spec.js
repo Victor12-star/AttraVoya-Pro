@@ -196,7 +196,7 @@ test.describe('public home page', () => {
     await expect(flightsLink).toBeFocused();
 
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\\/flights$/);
+    await expect(page).toHaveURL(/\/flights$/);
   });
 
   test('supports keyboard activation of the mobile navigation', async ({ page, isMobile }) => {
