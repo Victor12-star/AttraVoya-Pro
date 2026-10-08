@@ -201,6 +201,34 @@ test.describe('public home page', () => {
     expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
   });
 
+  test('renders the Arabic locale in RTL without horizontal overflow', async ({ page }) => {
+    await page.context().addCookies([
+      {
+        name: 'attravoya_locale',
+        value: 'ar',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
+
+    const response = await page.goto('/');
+
+    expect(response?.ok()).toBe(true);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('a[href="/plan-by-budget"]').first()).toBeVisible();
+
+    const layout = await page.evaluate(() => ({
+      direction: getComputedStyle(document.documentElement).direction,
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+
+    expect(layout.direction).toBe('rtl');
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth + 1);
+  });
+
   test('supports keyboard navigation through the primary navigation', async ({
     page,
     isMobile,
