@@ -1,0 +1,49 @@
+name: Temporary emergency truthfulness formatting
+
+on:
+  push:
+    branches:
+      - phase-10eby-emergency-truthfulness
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v5
+        with:
+          ref: phase-10eby-emergency-truthfulness
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format emergency truthfulness files
+        run: pnpm exec prettier --write apps/mobile/src/app/emergency/index.jsx apps/mobile/tests/mobile-emergency-safety.test.jsx
+
+      - name: Commit formatted files
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- apps/mobile/src/app/emergency/index.jsx apps/mobile/tests/mobile-emergency-safety.test.jsx; then
+            echo "Files already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/src/app/emergency/index.jsx apps/mobile/tests/mobile-emergency-safety.test.jsx
+          git commit -m "style(mobile): format emergency truthfulness slice"
+          git push origin HEAD:phase-10eby-emergency-truthfulness
