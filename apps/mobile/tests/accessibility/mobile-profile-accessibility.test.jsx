@@ -1,7 +1,10 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 
-import { ProfileContent } from '../../src/app/(tabs)/profile.jsx';
+import {
+  ProfileContent,
+  ProfileDeletionConfirmation,
+} from '../../src/app/(tabs)/profile.jsx';
 
 const user = {
   id: 'user-1',
@@ -38,9 +41,17 @@ describe('mobile profile accessibility', () => {
   });
 
   it('keeps destructive confirmation fields labelled and actions explicit', async () => {
-    const result = await renderProfile();
-
-    fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
+    const result = await render(
+      <ProfileDeletionConfirmation
+        confirmation=""
+        isDeleting={false}
+        onCancel={jest.fn()}
+        onConfirmationChange={jest.fn()}
+        onDelete={jest.fn()}
+        onPasswordChange={jest.fn()}
+        password=""
+      />,
+    );
 
     expect(result.getByLabelText('Current password')).toBeTruthy();
     expect(result.getByLabelText('Type DELETE to confirm')).toBeTruthy();
@@ -48,16 +59,16 @@ describe('mobile profile accessibility', () => {
     expect(result.getByRole('button', { name: 'Cancel' })).toBeTruthy();
   });
 
-  it('announces invalid deletion confirmation through a polite live region', async () => {
-    const result = await renderProfile();
+  it('announces profile action failures through a polite live region', async () => {
+    const result = await renderProfile({
+      onOpenPrivacy: jest.fn().mockRejectedValue(new Error('private linking detail')),
+    });
 
-    fireEvent.press(result.getByRole('button', { name: 'Delete account' }));
-    fireEvent.press(result.getByRole('button', { name: 'Permanently delete account' }));
+    fireEvent.press(result.getByRole('link', { name: 'Privacy policy' }));
 
-    const error = await result.findByText(
-      'Enter your current password and type DELETE exactly to confirm.',
-    );
+    const error = await result.findByText('This legal page could not be opened. Please try again.');
     expect(error.props.accessibilityLiveRegion).toBe('polite');
+    expect(result.queryByText('private linking detail')).toBeNull();
   });
 
   it('announces unavailable account state without exposing private controls', async () => {
