@@ -51,6 +51,10 @@ export async function serviceMetricsRoutes(app, options = {}) {
     options.requestMetrics ?? protectedApp.requestMetrics,
     'Request metrics',
   );
+  const applicationErrorMetrics = requireSnapshotSource(
+    options.applicationErrorMetrics,
+    'Application error metrics',
+  );
   const configuredProviderMetrics = requireSnapshotSource(
     options.providerMetrics ?? providerMetrics,
     'Provider metrics',
@@ -91,6 +95,7 @@ export async function serviceMetricsRoutes(app, options = {}) {
         aggregationMode: topology.aggregationMode.toUpperCase(),
       },
       http: requestMetrics.snapshot(),
+      applicationErrors: applicationErrorMetrics.snapshot(),
       providers: configuredProviderMetrics.snapshot(),
       providerCache: configuredProviderCacheMetrics.snapshot(),
       runtime: configuredRuntimeMetrics.snapshot(),

@@ -62,7 +62,8 @@ function classifyError(error) {
   };
 }
 
-export function registerErrorHandler(app) {
+export function registerErrorHandler(app, options = {}) {
+  const errorMetrics = options.errorMetrics;
   app.setNotFoundHandler((request, reply) => {
     return reply.status(404).send({
       error: {
@@ -75,6 +76,11 @@ export function registerErrorHandler(app) {
 
   app.setErrorHandler((error, request, reply) => {
     const publicError = classifyError(error);
+
+    errorMetrics?.record?.({
+      code: publicError.code,
+      statusCode: publicError.statusCode,
+    });
 
     request.log.error(
       {
