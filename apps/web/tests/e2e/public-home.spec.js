@@ -201,7 +201,9 @@ test.describe('public home page', () => {
     expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
   });
 
-  test('honors reduced-motion preferences for scrolling and transitions', async ({ page }) => {
+  test('honors reduced-motion preferences for scrolling and transitions', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const response = await page.goto('/');
 
