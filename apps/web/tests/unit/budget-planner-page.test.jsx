@@ -146,10 +146,9 @@ describe('BudgetPlannerPage', () => {
     expect(screen.getByLabelText('Adults')).toHaveValue(2);
     expect(screen.getByLabelText('Children ages')).toHaveValue('4, 8');
     expect(screen.getByLabelText('Interests')).toHaveValue('history, food');
-    expect(screen.getByRole('button', { name: 'Save planning brief' }).closest('form')).toHaveAttribute(
-      'aria-busy',
-      'false',
-    );
+    expect(
+      screen.getByRole('button', { name: 'Save planning brief' }).closest('form'),
+    ).toHaveAttribute('aria-busy', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
     await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(2));
