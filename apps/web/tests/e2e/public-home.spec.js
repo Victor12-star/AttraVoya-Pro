@@ -179,6 +179,28 @@ test.describe('public home page', () => {
     expect(blockingViolations).toEqual([]);
   });
 
+  test('reflows core content at an equivalent 200 percent zoom viewport', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The zoom reflow contract is exercised from desktop viewport dimensions.');
+
+    await page.setViewportSize({ width: 640, height: 720 });
+    const response = await page.goto('/');
+
+    expect(response?.ok()).toBe(true);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
+    await expect(page.locator('a[href="/plan-by-budget"]').first()).toBeVisible();
+
+    const overflow = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+
+    expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+  });
+
   test('supports keyboard navigation through the primary navigation', async ({
     page,
     isMobile,
