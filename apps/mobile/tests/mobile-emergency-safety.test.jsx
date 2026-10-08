@@ -17,7 +17,9 @@ describe('mobile emergency safety state', () => {
       ),
     ).toBeTruthy();
     expect(
-      result.getByText(/use your phone's emergency calling feature or call the local emergency number/i),
+      result.getByText(
+        /use your phone's emergency calling feature or call the local emergency number/i,
+      ),
     ).toBeTruthy();
   });
 
