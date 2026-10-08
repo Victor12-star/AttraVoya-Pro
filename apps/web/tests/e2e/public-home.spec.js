@@ -201,6 +201,42 @@ test.describe('public home page', () => {
     expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
   });
 
+  test('honors reduced-motion preferences for scrolling and transitions', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const response = await page.goto('/');
+
+    expect(response?.ok()).toBe(true);
+
+    const motion = await page.evaluate(() => {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const button = document.querySelector('.button');
+      const destinationImage = document.querySelector('.destination-card__image');
+
+      if (!(button instanceof HTMLElement) || !(destinationImage instanceof HTMLElement)) {
+        throw new Error('Expected representative motion-enabled elements.');
+      }
+
+      const buttonStyle = getComputedStyle(button);
+      const destinationStyle = getComputedStyle(destinationImage);
+
+      return {
+        scrollBehavior: rootStyle.scrollBehavior,
+        buttonTransitionDurationSeconds: Number.parseFloat(buttonStyle.transitionDuration),
+        destinationTransitionDurationSeconds: Number.parseFloat(
+          destinationStyle.transitionDuration,
+        ),
+        destinationAnimationDurationSeconds: Number.parseFloat(destinationStyle.animationDuration),
+        destinationAnimationIterationCount: destinationStyle.animationIterationCount,
+      };
+    });
+
+    expect(motion.scrollBehavior).toBe('auto');
+    expect(motion.buttonTransitionDurationSeconds).toBeLessThanOrEqual(0.001);
+    expect(motion.destinationTransitionDurationSeconds).toBeLessThanOrEqual(0.001);
+    expect(motion.destinationAnimationDurationSeconds).toBeLessThanOrEqual(0.001);
+    expect(motion.destinationAnimationIterationCount).toBe('1');
+  });
+
   test('renders the Arabic locale in RTL without horizontal overflow', async ({ page }) => {
     await page.context().addCookies([
       {
