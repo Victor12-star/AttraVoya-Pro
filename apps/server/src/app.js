@@ -56,6 +56,7 @@ import { imagesRoutes } from './modules/images/images.routes.js';
 import { plannerRoutes } from './modules/planner/planner.routes.js';
 import { tripsRoutes } from './modules/trips/trips.routes.js';
 import { usersRoutes } from './modules/users/users.routes.js';
+import { createApplicationErrorMetrics } from './observability/application-error-metrics.js';
 import {
   createHttpRequestMetrics,
   createHttpRequestMetricsHook,
@@ -86,10 +87,12 @@ export async function buildApp(options = {}) {
   app.setSerializerCompiler(serializerCompiler);
 
   const requestMetrics = options.requestMetrics ?? createHttpRequestMetrics();
+  const applicationErrorMetrics =
+    options.applicationErrorMetrics ?? createApplicationErrorMetrics();
   app.decorate('requestMetrics', requestMetrics);
   app.addHook('onResponse', createHttpRequestMetricsHook(requestMetrics, requestRouteForLog));
 
-  registerErrorHandler(app);
+  registerErrorHandler(app, { errorMetrics: applicationErrorMetrics });
   await registerRequestContext(app);
   app.addHook('onRequest', createMaintenanceModeHook({ enabled: maintenanceMode }));
 
@@ -238,6 +241,7 @@ export async function buildApp(options = {}) {
   await app.register(serviceMetricsRoutes, {
     prefix: `${API_PREFIX}/operations/service-metrics`,
     requestMetrics,
+    applicationErrorMetrics,
     providerMetrics: options.serviceMetricsProviderMetrics,
     providerCacheMetrics: options.serviceMetricsProviderCacheMetrics,
     runtimeMetrics: options.serviceMetricsRuntimeMetrics,
