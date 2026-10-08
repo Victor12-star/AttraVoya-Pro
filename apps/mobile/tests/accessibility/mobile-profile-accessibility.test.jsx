@@ -1,10 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react-native';
 
-import {
-  ProfileContent,
-  ProfileDeletionConfirmation,
-} from '../../src/app/(tabs)/profile.jsx';
+import { ProfileContent, ProfileDeletionConfirmation } from '../../src/app/(tabs)/profile.jsx';
 
 const user = {
   id: 'user-1',
