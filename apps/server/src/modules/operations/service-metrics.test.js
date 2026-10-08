@@ -64,6 +64,18 @@ async function createApp() {
       ],
     })),
   };
+  const applicationErrorMetrics = {
+    snapshot: vi.fn(() => ({
+      errors: 3,
+      serverErrors: 2,
+      serverErrorRate: 2 / 3,
+      statusClasses: { '4xx': 1, '5xx': 2, other: 0 },
+      codes: [
+        { code: 'VALIDATION_ERROR', count: 1 },
+        { code: 'INTERNAL_ERROR', count: 2 },
+      ],
+    })),
+  };
   const providerMetrics = {
     snapshot: vi.fn(() => ({
       windowSeconds: 60,
@@ -143,6 +155,7 @@ async function createApp() {
     authRepository: authorizationRepository(),
     healthRepository: { checkDatabase: async () => true },
     requestMetrics,
+    applicationErrorMetrics,
     serviceMetricsProviderMetrics: providerMetrics,
     serviceMetricsProviderCacheMetrics: providerCacheMetrics,
     serviceMetricsRuntimeMetrics: runtimeMetrics,
@@ -153,6 +166,7 @@ async function createApp() {
   return {
     app,
     requestMetrics,
+    applicationErrorMetrics,
     providerMetrics,
     providerCacheMetrics,
     runtimeMetrics,
@@ -176,6 +190,7 @@ describe('admin service metrics', () => {
     expect(response.statusCode).toBe(401);
     expect(response.json()).toMatchObject({ error: { code: 'AUTHENTICATION_REQUIRED' } });
     expect(metrics.requestMetrics.snapshot).not.toHaveBeenCalled();
+    expect(metrics.applicationErrorMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerCacheMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.runtimeMetrics.snapshot).not.toHaveBeenCalled();
@@ -194,6 +209,7 @@ describe('admin service metrics', () => {
     expect(response.statusCode).toBe(403);
     expect(response.json()).toMatchObject({ error: { code: 'FORBIDDEN' } });
     expect(metrics.requestMetrics.snapshot).not.toHaveBeenCalled();
+    expect(metrics.applicationErrorMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.providerCacheMetrics.snapshot).not.toHaveBeenCalled();
     expect(metrics.runtimeMetrics.snapshot).not.toHaveBeenCalled();
@@ -224,6 +240,16 @@ describe('admin service metrics', () => {
           serverErrors: 1,
           latencyMsUpperBound: { p95: 500 },
         },
+      },
+      applicationErrors: {
+        errors: 3,
+        serverErrors: 2,
+        serverErrorRate: 2 / 3,
+        statusClasses: { '4xx': 1, '5xx': 2, other: 0 },
+        codes: [
+          { code: 'VALIDATION_ERROR', count: 1 },
+          { code: 'INTERNAL_ERROR', count: 2 },
+        ],
       },
       providers: {
         providers: [{ provider: 'geoapify', requests: 3, failures: 1 }],
@@ -257,6 +283,7 @@ describe('admin service metrics', () => {
     expect(response.body).not.toContain('query');
     expect(response.body).not.toContain('cacheKey');
     expect(metrics.requestMetrics.snapshot).toHaveBeenCalledTimes(1);
+    expect(metrics.applicationErrorMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.providerMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.providerCacheMetrics.snapshot).toHaveBeenCalledTimes(1);
     expect(metrics.runtimeMetrics.snapshot).toHaveBeenCalledTimes(1);
