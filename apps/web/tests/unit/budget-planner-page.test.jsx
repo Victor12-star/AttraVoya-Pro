@@ -139,6 +139,17 @@ describe('BudgetPlannerPage', () => {
     expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1);
     const firstKey = mocks.createBudgetPlanRequest.mock.calls[0][1];
 
+    expect(screen.getByLabelText('Where are you travelling from?')).toHaveValue('Stockholm');
+    expect(screen.getByLabelText('Departure')).toHaveValue('2026-10-10');
+    expect(screen.getByLabelText('Return')).toHaveValue('2026-10-17');
+    expect(screen.getByLabelText('Budget')).toHaveValue(25000);
+    expect(screen.getByLabelText('Adults')).toHaveValue(2);
+    expect(screen.getByLabelText('Children ages')).toHaveValue('4, 8');
+    expect(screen.getByLabelText('Interests')).toHaveValue('history, food');
+    expect(
+      screen.getByRole('button', { name: 'Save planning brief' }).closest('form'),
+    ).toHaveAttribute('aria-busy', 'false');
+
     fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
     await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(2));
 
@@ -163,8 +174,11 @@ describe('BudgetPlannerPage', () => {
     fireEvent.submit(form);
     fireEvent.submit(form);
 
+    expect(form).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeDisabled();
     await waitFor(() => expect(mocks.createBudgetPlanRequest).toHaveBeenCalledTimes(1));
     expect(await screen.findByText('Planning brief saved')).toBeInTheDocument();
+    expect(form).toHaveAttribute('aria-busy', 'false');
   });
 
   it('rejects an incomplete flexible window before calling the server', async () => {

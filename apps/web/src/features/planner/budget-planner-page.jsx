@@ -285,7 +285,7 @@ export function BudgetPlannerPage({
         </header>
 
         <div className={styles.layout}>
-          <form className={styles.formCard} onSubmit={submit} noValidate>
+          <form className={styles.formCard} onSubmit={submit} noValidate aria-busy={submitting}>
             <div className={styles.sectionHeading}>
               <FileText size={20} aria-hidden="true" />
               <div>
