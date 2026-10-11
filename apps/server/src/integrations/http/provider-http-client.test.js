@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { runWithRequestContext } from '../../observability/request-context.js';
 import { createProviderHttpClient } from './provider-http-client.js';
 
 function jsonResponse(status, payload, headers = {}) {
@@ -47,6 +48,33 @@ describe('provider HTTP client', () => {
     await expect(client.requestJson('https://provider.example/data')).resolves.toEqual({
       ok: true,
     });
+  });
+
+  it('propagates the trusted request correlation id to provider calls', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
+    const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 0 });
+    const requestId = '22222222-2222-4222-8222-222222222222';
+
+    await runWithRequestContext(requestId, () =>
+      client.requestJson('https://provider.example/data', {
+        headers: { 'x-request-id': 'untrusted-caller-value' },
+      }),
+    );
+
+    const [, requestInit] = fetchImpl.mock.calls[0];
+    expect(new Headers(requestInit.headers).get('x-request-id')).toBe(requestId);
+  });
+
+  it('does not propagate malformed request context values', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
+    const client = createProviderHttpClient({ provider: 'test', fetchImpl, retryMax: 0 });
+
+    await runWithRequestContext('traveller@example.test', () =>
+      client.requestJson('https://provider.example/data'),
+    );
+
+    const [, requestInit] = fetchImpl.mock.calls[0];
+    expect(new Headers(requestInit.headers).has('x-request-id')).toBe(false);
   });
 
   it('does not retry rate-limit responses in a tight loop', async () => {
