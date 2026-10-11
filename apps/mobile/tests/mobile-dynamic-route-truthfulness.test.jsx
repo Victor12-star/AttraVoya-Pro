@@ -13,7 +13,7 @@ describe('mobile dynamic route truthfulness', () => {
     ).toBeTruthy();
     expect(result.getByText('Destination')).toBeTruthy();
     expect(result.getByText(/live availability and prices are not available/i)).toBeTruthy();
-    expect(result.queryByText(/€|$|available rooms|live fare/i)).toBeNull();
+    expect(result.queryByText(/€|\$|available rooms|live fare/i)).toBeNull();
   });
 
   it('renders a complete truthful trip fallback', async () => {
