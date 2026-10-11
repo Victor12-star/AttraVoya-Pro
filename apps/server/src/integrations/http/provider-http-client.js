@@ -1,6 +1,7 @@
 import { ProviderResponseError, ProviderUnavailableError } from '../../errors/app-error.js';
 import { ERROR_CODES } from '../../errors/error-codes.js';
 import { providerMetrics as defaultProviderMetrics } from '../../observability/provider-metrics.js';
+import { getCurrentRequestId } from '../../observability/request-context.js';
 import { mapProviderHttpError } from './provider-error-mapper.js';
 import { consumeProviderRequestBudget } from './provider-request-budget.js';
 
@@ -387,6 +388,9 @@ export function createProviderHttpClient(options) {
       try {
         const headers = new Headers(requestOptions.headers);
         headers.set('Accept', 'application/json');
+
+        const requestId = getCurrentRequestId();
+        if (requestId) headers.set('x-request-id', requestId);
 
         let body = requestOptions.body;
         if (
