@@ -1,54 +1,68 @@
 # Native Android performance release gate
 
-## Scope and status
+## Status
 
-This document defines a repeatable **manual evidence gate** for AttraVoya Pro's first native Android release. It complements `docs/WEB-MOBILE-PERFORMANCE-BUDGET.md`, which primarily measures web performance. It does not assert that any Android production build or device test has already passed.
+This is a manual evidence gate for the first native Android release.
+It complements `docs/WEB-MOBILE-PERFORMANCE-BUDGET.md`.
+It is not evidence that a production Android build or device test has passed.
+Web browser measurements are not proof of native Android performance.
 
-Do not use browser Lighthouse or Chromium transfer measurements as proof of native Android launch or frame performance.
+## Test setup
 
-## Test prerequisites
+- Record the exact commit, build number, Android version and device model.
+- Test on a low or mid-range physical device and a current physical device.
+- Label emulator results separately from physical-device measurements.
+- Use a signed release build, preferably from Google Play internal testing.
+- Use disposable accounts and non-sensitive seeded travel data.
+- Record network conditions, cache-clearing policy and test date.
+- Measure five cold starts and five warm resumes without discarding slow trials.
+- Report all trial values, medians and maximums.
+- Do not upload authentication tokens, private trip data or child information.
 
-- Use an actual Android App Bundle distributed through Google Play internal testing, or a clearly identified equivalent signed release build for pre-submission investigation.
-- Record the exact Git commit, build number, Android version, device model, memory class, test date and relevant test-network condition.
-- Use at least one supported low/mid-range Android device and one representative current Android device. Identify physical devices separately from emulator results.
-- Use disposable test accounts and non-sensitive seeded trips; never upload private travel details, authentication tokens or child-sensitive information to logs, screenshots or metrics services.
-- Run cold start after force-stop and warm start after background/resume separately, with five measured repetitions per condition. Document whether caches are cleared and do not selectively discard slow trials.
-- Report median, maximum and all five trial outcomes for each timing and memory measure. Avoid pretending these targets are established production baselines.
+## Initial investigation thresholds
 
-## Initial candidate budgets pending baseline calibration
+These are provisional targets that require device baseline calibration.
+They do not represent proven production performance.
 
-These are *provisional engineering investigation thresholds*, not an assertion of production performance or guaranteed acceptance on every handset:
+- Cold start: investigate median time above 3 seconds to usable home screen.
+- Warm resume: investigate median time above 1 second to usable interaction.
+- Interaction: investigate repeated unresponsiveness above 500 milliseconds.
+- Frames: record dropped frames, refresh rate and diagnostic method.
+- Memory: record baseline, peak and memory after repeated usage cycles.
+- Network: record aggregate data use and investigate duplicate API requests.
 
-- Cold start: flag median time to a usable home screen above 3 seconds on the mid-range test device.
-- Warm resume: flag median time to a usable interaction above 1 second.
-- Responsiveness: flag any repeatable user interaction that leaves the interface unresponsive for over 500 milliseconds.
-- Visual smoothness: flag observable or instrumented dropped frames on repeated navigation, scrolling or state transitions; record the measurement tool and device refresh rate rather than imposing an unmeasured universal frame rate.
-- Memory: flag a sustained increase across repeated navigation, background and return cycles. Record baseline, peak and after-cycle memory. Do not invent a fixed memory ceiling without target-device measurements.
-- Network: record data use for each representative scenario and investigate unexplained duplicate provider/API calls. Never log request payloads or user-specific URLs.
+Approve final device-specific budgets only after reviewing measured baselines.
+Never silently raise a threshold to make a release pass.
 
-Release approval requires measured baselines, reviewed thresholds appropriate to the supported device range, and retesting after material client regressions. Thresholds must not be silently raised merely to pass.
+## User journeys
 
-## Required journeys
+- Fresh install, first launch, permissions, navigation and sign-in.
+- Returning session, cold launch, warm resume and session refresh.
+- Budget planner, validation, save retry and preservation of entered data.
+- Discovery during slow, failed or unavailable travel-provider responses.
+- Subscription status and unavailable Google Play offerings.
+- Foreground location consent, refusal and permission revocation.
+- Background, airplane mode, reconnection, restart and duplicate-write safety.
+- Account deletion, sign-out, retries and failure handling.
 
-1. Fresh installation, first launch, permission decisions, initial navigation and sign-in.
-2. Returning session, cold launch, warm resume and secure session refresh.
-3. Budget-planner input, validation, save retry and preservation of unsaved data on recoverable failures.
-4. Destination discovery with normal, slow, timeout and temporarily unavailable providers; never invent live fares or availability.
-5. Profile, subscription-status display and safe handling of unavailable Google Play offerings.
-6. Foreground location flow after consent, permission refusal and permission revocation.
-7. Background/foreground transitions, airplane mode, reconnection, app restart and recovery without duplicate writes.
-8. Account deletion and sign-out, including failure/retry paths.
+Check TalkBack, enlarged text, focus order and content-state announcements.
+Verify right-to-left layout and relevant system animation preferences.
 
-Run accessibility checks using Android TalkBack and enlarged text. Verify labels, focus progression and content-state announcements. Test right-to-left layout where Arabic is enabled, as well as reduced-motion/system-animation preferences where supported.
+## Evidence and release decision
 
-## Evidence collection and release decision
+Record the build, devices, method, metrics, failures and reviewer decision.
+Mark each journey as pass, fail or not run with supporting evidence.
+A missing test is not a pass.
 
-Use platform and device diagnostic tools only where appropriate, with explicit data-minimization review. Record coarse, aggregate performance results and release-only observations, not raw network contents, user identifiers, exact locations, secrets or payment data.
+Collect aggregate measurements without private URLs, payloads or identifiers.
+Do not publish exact locations, payment data or secrets.
 
-The release record must include test build, hardware, OS, methodology, metrics, failures, mitigations and reviewer decision. Mark each journey pass/fail/not run with evidence. A "not run" cannot be treated as a pass.
-
-A repository CI pass is a necessary code-quality gate but **not sufficient** for Android release readiness. Complete physical-device testing and Google Play internal-track verification before staged rollout. If a critical crash, misleading purchase state, privacy exposure or account-loss scenario remains, block release irrespective of performance scores.
+Repository CI alone does not prove native release readiness.
+Require physical-device checks and Google Play internal-track verification.
+Block release for critical crashes, privacy exposure or unsafe account behavior.
 
 ## External setup
 
-The Google Play internal track, Android signing, EAS build identity, production API host and RevenueCat configuration may require owner action. Request the provider-specific setup at the stage where it becomes necessary. Do not invent accounts or require secret keys in conversation.
+Google Play, Android signing, EAS builds, production API hosting and RevenueCat
+may require owner configuration. Explain the relevant website and manual steps
+when needed. Never request passwords or secret API keys in the chat.
