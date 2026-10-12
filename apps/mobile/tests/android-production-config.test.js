@@ -47,6 +47,7 @@ describe('Android production mobile configuration', () => {
       'https://localhost:5000',
       'https://127.0.0.1:5000',
       'https://user:password@api.attravoya.app',
+      'https://api.attravoya.app/v1',
       'not-a-url',
     ]) {
       expect(() =>
@@ -68,6 +69,8 @@ describe('Android production mobile configuration', () => {
       'https://localhost:3000',
       'https://127.0.0.1:3000',
       'https://user:password@attravoya.app',
+      'https://attravoya.app/privacy',
+      'https://attravoya.app/api/',
       'https://attravoya.app?source=mobile',
       'https://attravoya.app#privacy',
       'not-a-url',
