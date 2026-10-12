@@ -62,6 +62,18 @@ describe('Android production mobile configuration', () => {
     }
   });
 
+  it('explains why a production API URL containing a path is rejected', () => {
+    expect(() =>
+      assertAndroidProductionBuildConfiguration({
+        environment: PROD_ANDROID,
+        apiBaseUrl: 'https://api.vikwora.com/v1',
+        webBaseUrl: 'https://vikwora.com',
+        easProjectId: EAS_PROJECT_ID,
+        revenueCatAndroid: { enabled: true, apiKey: 'goog_public123' },
+      }),
+    ).toThrow('must not contain credentials, paths, query parameters, or fragments');
+  });
+
   it('rejects missing, insecure, loopback and credential-bearing public web URLs', () => {
     for (const webBaseUrl of [
       undefined,
