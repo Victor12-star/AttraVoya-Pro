@@ -1,4 +1,4 @@
-import { interaction, lightTheme, radius, spacing } from '@attravoya/design-tokens';
+import { colors, interaction, lightTheme, radius, spacing } from '@attravoya/design-tokens';
 import { router } from 'expo-router';
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const HERO_IMAGE = {
   uri: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
 };
+
+const heroOverlay = 'rgba(0, 30, 67, 0.65)';
 
 export default function HomeScreen() {
   return (
@@ -87,19 +89,19 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: lightTheme.background },
   content: { paddingHorizontal: spacing[4], paddingTop: spacing[6], paddingBottom: spacing[10] },
   brand: { color: lightTheme.brandPrimary, fontSize: 26, fontWeight: '800' },
-  brandAccent: { color: '#1267F5' },
+  brandAccent: { color: colors.info },
   subtitle: { color: lightTheme.textSecondary, fontSize: 14, marginTop: spacing[1], marginBottom: spacing[5] },
-  hero: { overflow: 'hidden', borderRadius: radius.xl, backgroundColor: '#145F95' },
+  hero: { overflow: 'hidden', borderRadius: radius.xl, backgroundColor: colors.ocean[700] },
   heroImageContainer: { minHeight: 330, justifyContent: 'flex-end' },
   heroImage: { borderRadius: radius.xl },
-  heroShade: { padding: spacing[6], paddingTop: spacing[10], backgroundColor: 'rgba(0, 30, 67, 0.65)' },
-  heroEyebrow: { color: '#DDF3FF', letterSpacing: 2, fontSize: 12, fontWeight: '700', marginBottom: spacing[3] },
-  heroTitle: { color: '#FFFFFF', fontSize: 32, lineHeight: 39, fontWeight: '800', marginBottom: spacing[3] },
-  heroDescription: { color: '#F1F8FF', fontSize: 16, lineHeight: 23 },
+  heroShade: { padding: spacing[6], paddingTop: spacing[10], backgroundColor: heroOverlay },
+  heroEyebrow: { color: colors.ocean[100], letterSpacing: 2, fontSize: 12, fontWeight: '700', marginBottom: spacing[3] },
+  heroTitle: { color: colors.white, fontSize: 32, lineHeight: 39, fontWeight: '800', marginBottom: spacing[3] },
+  heroDescription: { color: colors.ink[50], fontSize: 16, lineHeight: 23 },
   sectionTitle: { color: lightTheme.textPrimary, fontSize: 23, fontWeight: '800', marginTop: spacing[7] },
   sectionDescription: { color: lightTheme.textSecondary, fontSize: 15, lineHeight: 23, marginTop: spacing[2], marginBottom: spacing[5] },
-  primaryButton: { minHeight: interaction.minimumTargetSize, backgroundColor: '#1267F5', alignItems: 'center', justifyContent: 'center', borderRadius: radius.lg, paddingHorizontal: spacing[4], paddingVertical: spacing[4] },
-  primaryButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  primaryButton: { minHeight: interaction.minimumTargetSize, backgroundColor: colors.info, alignItems: 'center', justifyContent: 'center', borderRadius: radius.lg, paddingHorizontal: spacing[4], paddingVertical: spacing[4] },
+  primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   pressed: { opacity: 0.8 },
   quickActions: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[4] },
   quickAction: { flex: 1, minHeight: 112, backgroundColor: lightTheme.surface, borderWidth: 1, borderColor: lightTheme.borderSubtle, borderRadius: radius.lg, padding: spacing[4], justifyContent: 'center' },
