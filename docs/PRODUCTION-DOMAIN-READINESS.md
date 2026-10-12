@@ -6,11 +6,9 @@ Victor has acquired `vikwora.com` for AttraVoya Pro. Ownership alone does not pr
 
 ## Proposed host mapping (not yet activated)
 
-| Host | Intended role | Verification |
-| --- | --- | --- |
-| `https://vikwora.com` | Public web frontend | DNS, TLS, frontend response and public policy pages |
-| `https://api.vikwora.com` | API server | DNS, TLS, expected API response and health/readiness endpoints |
-| `https://admin.vikwora.com` | Admin frontend | DNS, TLS, sign-in routing and access controls |
+- `https://vikwora.com`: public web frontend; verify DNS, TLS, frontend response and public policy pages.
+- `https://api.vikwora.com`: API server; verify DNS, TLS, expected API response and health/readiness endpoints.
+- `https://admin.vikwora.com`: admin frontend; verify DNS, TLS, sign-in routing and access controls.
 
 Public policy URLs proposed under the web origin: `/privacy`, `/terms`, and `/delete-account`. Do not advertise them to Google Play until the final public pages are actually reachable and accurate.
 
