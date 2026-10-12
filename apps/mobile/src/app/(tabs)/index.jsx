@@ -104,10 +104,18 @@ const styles = StyleSheet.create({
     marginTop: spacing[1],
     marginBottom: spacing[5],
   },
-  hero: { overflow: 'hidden', borderRadius: radius.xl, backgroundColor: colors.ocean[700] },
+  hero: {
+    overflow: 'hidden',
+    borderRadius: radius.xl,
+    backgroundColor: colors.ocean[700],
+  },
   heroImageContainer: { minHeight: 330, justifyContent: 'flex-end' },
   heroImage: { borderRadius: radius.xl },
-  heroShade: { padding: spacing[6], paddingTop: spacing[10], backgroundColor: heroOverlay },
+  heroShade: {
+    padding: spacing[6],
+    paddingTop: spacing[10],
+    backgroundColor: heroOverlay,
+  },
   heroEyebrow: {
     color: colors.ocean[100],
     letterSpacing: 2,
@@ -147,7 +155,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   pressed: { opacity: 0.8 },
-  quickActions: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[4] },
+  quickActions: {
+    flexDirection: 'row',
+    gap: spacing[3],
+    marginTop: spacing[4],
+  },
   quickAction: {
     flex: 1,
     minHeight: 112,
@@ -171,7 +183,11 @@ const styles = StyleSheet.create({
     padding: spacing[4],
     marginTop: spacing[5],
   },
-  noteTitle: { color: lightTheme.brandPrimary, fontWeight: '700', fontSize: 15 },
+  noteTitle: {
+    color: lightTheme.brandPrimary,
+    fontWeight: '700',
+    fontSize: 15,
+  },
   noteText: {
     color: lightTheme.textSecondary,
     fontSize: 13,
