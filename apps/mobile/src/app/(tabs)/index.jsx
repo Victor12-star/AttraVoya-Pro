@@ -91,7 +91,11 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: lightTheme.background },
-  content: { paddingHorizontal: spacing[4], paddingTop: spacing[6], paddingBottom: spacing[10] },
+  content: {
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[6],
+    paddingBottom: spacing[10],
+  },
   brand: { color: lightTheme.brandPrimary, fontSize: 26, fontWeight: '800' },
   brandAccent: { color: colors.info },
   subtitle: {
