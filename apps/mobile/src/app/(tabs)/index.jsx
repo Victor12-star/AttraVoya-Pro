@@ -15,7 +15,9 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.brand}>AttraVoya <Text style={styles.brandAccent}>Pro</Text></Text>
+        <Text style={styles.brand}>
+          AttraVoya <Text style={styles.brandAccent}>Pro</Text>
+        </Text>
         <Text style={styles.subtitle}>Plan smarter. Travel further.</Text>
 
         <View style={styles.hero}>
@@ -38,7 +40,9 @@ export default function HomeScreen() {
           </ImageBackground>
         </View>
 
-        <Text accessibilityRole="header" style={styles.sectionTitle}>Where will you go next?</Text>
+        <Text accessibilityRole="header" style={styles.sectionTitle}>
+          Where will you go next?
+        </Text>
         <Text style={styles.sectionDescription}>
           Discover places, plan a trip, or revisit your saved plans.
         </Text>
@@ -90,24 +94,84 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing[4], paddingTop: spacing[6], paddingBottom: spacing[10] },
   brand: { color: lightTheme.brandPrimary, fontSize: 26, fontWeight: '800' },
   brandAccent: { color: colors.info },
-  subtitle: { color: lightTheme.textSecondary, fontSize: 14, marginTop: spacing[1], marginBottom: spacing[5] },
+  subtitle: {
+    color: lightTheme.textSecondary,
+    fontSize: 14,
+    marginTop: spacing[1],
+    marginBottom: spacing[5],
+  },
   hero: { overflow: 'hidden', borderRadius: radius.xl, backgroundColor: colors.ocean[700] },
   heroImageContainer: { minHeight: 330, justifyContent: 'flex-end' },
   heroImage: { borderRadius: radius.xl },
   heroShade: { padding: spacing[6], paddingTop: spacing[10], backgroundColor: heroOverlay },
-  heroEyebrow: { color: colors.ocean[100], letterSpacing: 2, fontSize: 12, fontWeight: '700', marginBottom: spacing[3] },
-  heroTitle: { color: colors.white, fontSize: 32, lineHeight: 39, fontWeight: '800', marginBottom: spacing[3] },
+  heroEyebrow: {
+    color: colors.ocean[100],
+    letterSpacing: 2,
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: spacing[3],
+  },
+  heroTitle: {
+    color: colors.white,
+    fontSize: 32,
+    lineHeight: 39,
+    fontWeight: '800',
+    marginBottom: spacing[3],
+  },
   heroDescription: { color: colors.ink[50], fontSize: 16, lineHeight: 23 },
-  sectionTitle: { color: lightTheme.textPrimary, fontSize: 23, fontWeight: '800', marginTop: spacing[7] },
-  sectionDescription: { color: lightTheme.textSecondary, fontSize: 15, lineHeight: 23, marginTop: spacing[2], marginBottom: spacing[5] },
-  primaryButton: { minHeight: interaction.minimumTargetSize, backgroundColor: colors.info, alignItems: 'center', justifyContent: 'center', borderRadius: radius.lg, paddingHorizontal: spacing[4], paddingVertical: spacing[4] },
+  sectionTitle: {
+    color: lightTheme.textPrimary,
+    fontSize: 23,
+    fontWeight: '800',
+    marginTop: spacing[7],
+  },
+  sectionDescription: {
+    color: lightTheme.textSecondary,
+    fontSize: 15,
+    lineHeight: 23,
+    marginTop: spacing[2],
+    marginBottom: spacing[5],
+  },
+  primaryButton: {
+    minHeight: interaction.minimumTargetSize,
+    backgroundColor: colors.info,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[4],
+  },
   primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   pressed: { opacity: 0.8 },
   quickActions: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[4] },
-  quickAction: { flex: 1, minHeight: 112, backgroundColor: lightTheme.surface, borderWidth: 1, borderColor: lightTheme.borderSubtle, borderRadius: radius.lg, padding: spacing[4], justifyContent: 'center' },
+  quickAction: {
+    flex: 1,
+    minHeight: 112,
+    backgroundColor: lightTheme.surface,
+    borderWidth: 1,
+    borderColor: lightTheme.borderSubtle,
+    borderRadius: radius.lg,
+    padding: spacing[4],
+    justifyContent: 'center',
+  },
   quickTitle: { color: lightTheme.brandPrimary, fontSize: 17, fontWeight: '700' },
-  quickDescription: { color: lightTheme.textSecondary, fontSize: 13, lineHeight: 19, marginTop: spacing[2] },
-  transparencyNote: { backgroundColor: lightTheme.surfaceMuted, borderRadius: radius.lg, padding: spacing[4], marginTop: spacing[5] },
+  quickDescription: {
+    color: lightTheme.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: spacing[2],
+  },
+  transparencyNote: {
+    backgroundColor: lightTheme.surfaceMuted,
+    borderRadius: radius.lg,
+    padding: spacing[4],
+    marginTop: spacing[5],
+  },
   noteTitle: { color: lightTheme.brandPrimary, fontWeight: '700', fontSize: 15 },
-  noteText: { color: lightTheme.textSecondary, fontSize: 13, lineHeight: 20, marginTop: spacing[2] },
+  noteText: {
+    color: lightTheme.textSecondary,
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: spacing[2],
+  },
 });
