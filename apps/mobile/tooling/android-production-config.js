@@ -41,6 +41,7 @@ function assertProductionPublicHttpsUrl(value, variableName) {
     isReservedHostname(url.hostname) ||
     url.username ||
     url.password ||
+    (url.pathname !== '/' && url.pathname !== '') ||
     url.search ||
     url.hash
   ) {
