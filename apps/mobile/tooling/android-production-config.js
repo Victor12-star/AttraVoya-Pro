@@ -46,7 +46,7 @@ function assertProductionPublicHttpsUrl(value, variableName) {
     url.hash
   ) {
     throw productionConfigurationError(
-      `${variableName} must use HTTPS, must not be loopback or a reserved placeholder host, and must not contain credentials, query parameters, or fragments.`,
+      `${variableName} must use HTTPS, must not be loopback or a reserved placeholder host, and must not contain credentials, paths, query parameters, or fragments.`,
     );
   }
 }
