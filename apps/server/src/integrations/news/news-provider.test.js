@@ -34,6 +34,25 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('reports source attribution completeness without calling sources verified', () => {
+    const result = normalizeNewsDataResponse({
+      results: [
+        { article_id: 'full', source_name: 'Example News', link: 'https://example.test/story' },
+        { article_id: 'named', source_name: 'Example News', link: 'javascript:alert(1)' },
+        { article_id: 'unnamed', link: 'https://example.test/other' },
+        { article_id: 'none' },
+      ],
+    });
+
+    expect(result.articles.map((article) => article.sourceAttributionStatus)).toEqual([
+      'named_source_and_article_link',
+      'named_source_only',
+      'source_unavailable',
+      'source_unavailable',
+    ]);
+    expect(result.realtimeGuaranteed).toBe(false);
+  });
+
   it('rejects private network and loopback article links', () => {
     const links = [
       'http://127.0.0.1/article',

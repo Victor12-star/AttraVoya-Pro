@@ -103,6 +103,12 @@ export function normalizeNewsDataArticle(article) {
   };
 }
 
+function sourceAttributionStatus(article) {
+  if (article.source.name && article.url) return 'named_source_and_article_link';
+  if (article.source.name) return 'named_source_only';
+  return 'source_unavailable';
+}
+
 function deduplicateArticles(articles) {
   const seenIds = new Set();
   const seenUrls = new Set();
@@ -146,6 +152,7 @@ export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOS
     articles: deduplicateArticles(results.map(normalizeNewsDataArticle)).map((article) => ({
       ...article,
       publicationRecency: publicationRecency(article, fetchedAt),
+      sourceAttributionStatus: sourceAttributionStatus(article),
     })),
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
