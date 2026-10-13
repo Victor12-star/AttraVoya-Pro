@@ -194,12 +194,6 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-      - name: Diagnose mobile home formatting
-        if: failure()
-        run: |
-          pnpm exec prettier --write 'apps/mobile/src/app/(tabs)/index.jsx'
-          git diff -- 'apps/mobile/src/app/(tabs)/index.jsx'
-
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-24.04
