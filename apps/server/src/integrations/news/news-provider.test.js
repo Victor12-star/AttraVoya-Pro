@@ -35,7 +35,11 @@ const payload = {
 
 describe('NewsData news adapter', () => {
   it('rejects intranet-only hostnames while retaining public news domains', () => {
-    const links = ['http://intranet/article', 'https://newsroom/story', 'https://example.test/story'];
+    const links = [
+      'http://intranet/article',
+      'https://newsroom/story',
+      'https://example.test/story',
+    ];
     const result = normalizeNewsDataResponse({
       results: links.map((link, index) => ({ article_id: String(index), link })),
     });
