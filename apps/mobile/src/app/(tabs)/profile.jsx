@@ -338,9 +338,7 @@ export default function ProfileScreen() {
             <Text accessibilityRole="header" style={styles.welcomeTitle}>
               Travel on your terms.
             </Text>
-            <Text style={styles.welcomeDescription}>
-              Your journeys, your account, your choice.
-            </Text>
+            <Text style={styles.welcomeDescription}>Your journeys, your account, your choice.</Text>
           </View>
           <Text style={styles.subtitle}>
             Review your account identity and control the secure session on this device.
