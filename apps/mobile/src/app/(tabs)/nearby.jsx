@@ -17,9 +17,7 @@ export default function NearbyScreen() {
         <Text accessibilityRole="header" style={styles.title}>
           Find more to love nearby.
         </Text>
-        <Text style={styles.intro}>
-          Great travel experiences can begin just around the corner.
-        </Text>
+        <Text style={styles.intro}>Great travel experiences can begin just around the corner.</Text>
 
         <View style={styles.hero}>
           <ImageBackground
@@ -52,8 +50,8 @@ export default function NearbyScreen() {
         <View style={styles.notice}>
           <Text style={styles.noticeTitle}>Real places, verified information</Text>
           <Text style={styles.noticeBody}>
-            Photography is illustrative. We do not show invented nearby businesses, opening hours
-            or availability.
+            Photography is illustrative. We do not show invented nearby businesses, opening hours or
+            availability.
           </Text>
         </View>
       </ScrollView>
