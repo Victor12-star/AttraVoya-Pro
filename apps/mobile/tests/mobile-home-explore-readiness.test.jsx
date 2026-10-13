@@ -8,9 +8,7 @@ describe('mobile home and explore readiness', () => {
   it('keeps budget-first discovery and honest pricing guidance visible', async () => {
     const result = await render(<HomeScreen />);
 
-    expect(
-      result.getByRole('header', { name: 'Explore the world on your budget.' }),
-    ).toBeTruthy();
+    expect(result.getByRole('header', { name: 'Explore the world on your budget.' })).toBeTruthy();
     expect(result.getByRole('button', { name: 'Explore destinations' })).toBeTruthy();
     expect(result.getByRole('button', { name: 'Open my trips' })).toBeTruthy();
     expect(
