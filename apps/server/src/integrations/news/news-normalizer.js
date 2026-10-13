@@ -46,17 +46,16 @@ export function normalizeNewsDataArticle(article) {
 }
 
 function deduplicateArticles(articles) {
-  const seen = new Set();
+  const seenIds = new Set();
+  const seenUrls = new Set();
 
   return articles.filter((article) => {
-    const key = article.externalId
-      ? `id:${article.externalId}`
-      : article.url
-        ? `url:${article.url}`
-        : null;
+    if (article.duplicate) return false;
+    if (article.externalId && seenIds.has(article.externalId)) return false;
+    if (article.url && seenUrls.has(article.url)) return false;
 
-    if (!key || seen.has(key) || article.duplicate) return false;
-    seen.add(key);
+    if (article.externalId) seenIds.add(article.externalId);
+    if (article.url) seenUrls.add(article.url);
     return true;
   });
 }
