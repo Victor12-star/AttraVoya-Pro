@@ -129,9 +129,8 @@ function countryRelevance(article, countryCode) {
   if (!article.countries.length) return 'unknown';
 
   const requestedCode = countryCode.toLowerCase();
-  const requestedName = new Intl.DisplayNames(['en'], { type: 'region' })
-    .of(countryCode.toUpperCase())
-    ?.toLowerCase();
+  const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+  const requestedName = displayNames.of(countryCode.toUpperCase())?.toLowerCase();
 
   const matchesCountry = article.countries.some((country) => {
     const normalized = country.toLowerCase();
@@ -152,7 +151,11 @@ function publicationRecency(article, fetchedAt) {
   return ageMs <= 48 * 60 * 60 * 1000 ? 'within_48_hours' : 'older';
 }
 
-export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOString(), countryCode) {
+export function normalizeNewsDataResponse(
+  payload,
+  fetchedAt = new Date().toISOString(),
+  countryCode,
+) {
   if (!payload || typeof payload !== 'object') {
     throw new TypeError('NewsData payload must be an object.');
   }
