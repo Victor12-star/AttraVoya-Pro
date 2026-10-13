@@ -15,9 +15,13 @@ describe('mobile dynamic route truthfulness', () => {
     expect(result.getByText(/live availability and prices are not available/i)).toBeTruthy();
     expect(result.queryByText(/€|\$|available rooms|live fare/i)).toBeNull();
     expect(result.getByRole('header', { name: 'Destination safety and awareness' })).toBeTruthy();
-    expect(result.getByText(/current destination safety updates are temporarily unavailable/i)).toBeTruthy();
+    expect(
+      result.getByText(/current destination safety updates are temporarily unavailable/i),
+    ).toBeTruthy();
     expect(result.getByText(/check official travel advisories before departure/i)).toBeTruthy();
-    expect(result.getByText(/no current news, advisory, or last-checked time has been verified/i)).toBeTruthy();
+    expect(
+      result.getByText(/no current news, advisory, or last-checked time has been verified/i),
+    ).toBeTruthy();
   });
 
   it('renders a complete truthful trip fallback', async () => {
