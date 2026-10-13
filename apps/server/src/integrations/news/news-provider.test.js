@@ -34,6 +34,40 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects unsafe and malformed article media and publisher links', () => {
+    const result = normalizeNewsDataResponse({
+      results: [
+        {
+          article_id: 'unsafe',
+          link: 'javascript:alert(1)',
+          image_url: 'data:text/html,unsafe',
+          video_url: 'file:///private/media',
+          source_url: 'javascript:alert(2)',
+          source_icon: '/relative-icon.png',
+        },
+        {
+          article_id: 'safe',
+          link: 'https://example.test/travel',
+          image_url: 'https://example.test/image.jpg',
+          video_url: 'http://example.test/video',
+          source_url: 'https://publisher.test/',
+          source_icon: 'https://publisher.test/logo.png',
+        },
+      ],
+    });
+
+    expect(result.articles[0].url).toBeNull();
+    expect(result.articles[0].imageUrl).toBeNull();
+    expect(result.articles[0].videoUrl).toBeNull();
+    expect(result.articles[0].source.url).toBeNull();
+    expect(result.articles[0].source.iconUrl).toBeNull();
+    expect(result.articles[1].url).toBe('https://example.test/travel');
+    expect(result.articles[1].imageUrl).toBe('https://example.test/image.jpg');
+    expect(result.articles[1].videoUrl).toBe('http://example.test/video');
+    expect(result.articles[1].source.url).toBe('https://publisher.test/');
+    expect(result.articles[1].source.iconUrl).toBe('https://publisher.test/logo.png');
+  });
+
   it('reports publication recency relative to retrieval without promising live updates', () => {
     const fetchedAt = '2026-10-13T12:00:00.000Z';
     const result = normalizeNewsDataResponse(
