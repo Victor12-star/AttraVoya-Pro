@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ProviderAuthenticationError, ProviderResponseError } from '../../errors/app-error.js';
 import { createProviderCache } from '../http/provider-cache.js';
 import { createNewsDataNewsProvider } from './newsdata-news-provider.js';
+import { normalizeNewsDataResponse } from './news-normalizer.js';
 
 const payload = {
   status: 'success',
@@ -33,6 +34,30 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('reports publication recency relative to retrieval without promising live updates', () => {
+    const fetchedAt = '2026-10-13T12:00:00.000Z';
+    const result = normalizeNewsDataResponse(
+      {
+        results: [
+          { article_id: 'recent', pubDate: '2026-10-12 12:00:00', pubDateTZ: 'UTC' },
+          { article_id: 'old', pubDate: '2026-10-09 12:00:00', pubDateTZ: 'UTC' },
+          { article_id: 'future', pubDate: '2026-10-14 12:00:00', pubDateTZ: 'UTC' },
+          { article_id: 'unverified', pubDate: '2026-10-12 12:00:00' },
+        ],
+      },
+      fetchedAt,
+    );
+
+    expect(result.articles.map((article) => article.publicationRecency)).toEqual([
+      'within_48_hours',
+      'older',
+      'unknown',
+      'unknown',
+    ]);
+    expect(result.fetchedAt).toBe(fetchedAt);
+    expect(result.realtimeGuaranteed).toBe(false);
+  });
+
   it('normalizes only valid explicitly UTC publication times', async () => {
     const provider = createNewsDataNewsProvider({
       http: {
