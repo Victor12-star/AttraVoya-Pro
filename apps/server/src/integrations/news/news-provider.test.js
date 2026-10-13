@@ -33,6 +33,46 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('keeps unique, attributed news and excludes repeated articles', async () => {
+    const http = {
+      requestJson: vi.fn().mockResolvedValue({
+        status: 'success',
+        totalResults: 5,
+        results: [
+          {
+            article_id: 'a',
+            link: 'https://example.test/a',
+            title: 'First',
+            pubDate: '2026-10-13 09:00:00',
+            source_name: 'Publisher',
+          },
+          { article_id: 'a', link: 'https://example.test/repeated', title: 'Repeated ID' },
+          { article_id: 'b', link: 'https://example.test/a', title: 'Repeated URL' },
+          {
+            article_id: 'c',
+            link: 'https://example.test/c',
+            title: 'Provider duplicate',
+            duplicate: true,
+          },
+          { article_id: 'd', link: 'https://example.test/d', title: 'Second' },
+        ],
+      }),
+    };
+    const provider = createNewsDataNewsProvider({
+      http,
+      apiKey: 'test-key',
+      cache: createProviderCache(),
+    });
+
+    const result = await provider.searchNews({ countryCode: 'SE' });
+
+    expect(result.articles.map((article) => article.title)).toEqual(['First', 'Second']);
+    expect(result.articles[0].publishedAt).toBe('2026-10-13 09:00:00');
+    expect(result.articles[0].source.name).toBe('Publisher');
+    expect(result.page.totalResults).toBe(5);
+    expect(result.realtimeGuaranteed).toBe(false);
+  });
+
   it('normalizes and caches recent news without exposing full article content', async () => {
     const http = { requestJson: vi.fn().mockResolvedValue(payload) };
     const provider = createNewsDataNewsProvider({

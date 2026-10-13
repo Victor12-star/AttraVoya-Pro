@@ -45,6 +45,21 @@ export function normalizeNewsDataArticle(article) {
   };
 }
 
+function deduplicateArticles(articles) {
+  const seenIds = new Set();
+  const seenUrls = new Set();
+
+  return articles.filter((article) => {
+    if (article.duplicate) return false;
+    if (article.externalId && seenIds.has(article.externalId)) return false;
+    if (article.url && seenUrls.has(article.url)) return false;
+
+    if (article.externalId) seenIds.add(article.externalId);
+    if (article.url) seenUrls.add(article.url);
+    return true;
+  });
+}
+
 export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOString()) {
   if (!payload || typeof payload !== 'object') {
     throw new TypeError('NewsData payload must be an object.');
@@ -58,7 +73,7 @@ export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOS
     // NewsData's free development tier can be delayed. Never label these
     // articles as guaranteed real-time or breaking news in the product UI.
     realtimeGuaranteed: false,
-    articles: results.map(normalizeNewsDataArticle),
+    articles: deduplicateArticles(results.map(normalizeNewsDataArticle)),
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
       nextPage: stringOrNull(payload.nextPage),
