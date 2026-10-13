@@ -194,12 +194,6 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-      - name: Diagnose Profile formatting
-        if: failure()
-        run: |
-          pnpm exec prettier --write 'apps/mobile/src/app/(tabs)/profile.jsx'
-          git diff -- 'apps/mobile/src/app/(tabs)/profile.jsx'
-
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-24.04
