@@ -2,6 +2,17 @@ function stringOrNull(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
+function safeHttpUrl(value) {
+  const candidate = stringOrNull(value);
+  if (!candidate) return null;
+  try {
+    const url = new URL(candidate);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 function stringArray(value) {
   if (Array.isArray(value)) {
     return value
@@ -37,9 +48,9 @@ export function normalizeNewsDataArticle(article) {
     externalId: stringOrNull(article?.article_id),
     title: stringOrNull(article?.title),
     description: stringOrNull(article?.description),
-    url: stringOrNull(article?.link),
-    imageUrl: stringOrNull(article?.image_url),
-    videoUrl: stringOrNull(article?.video_url),
+    url: safeHttpUrl(article?.link),
+    imageUrl: safeHttpUrl(article?.image_url),
+    videoUrl: safeHttpUrl(article?.video_url),
     publishedAt: stringOrNull(article?.pubDate),
     publishedTimezone: stringOrNull(article?.pubDateTZ),
     publishedAtUtc: normalizedUtcPublication(article),
@@ -52,8 +63,8 @@ export function normalizeNewsDataArticle(article) {
     source: {
       externalId: stringOrNull(article?.source_id),
       name: stringOrNull(article?.source_name),
-      url: stringOrNull(article?.source_url),
-      iconUrl: stringOrNull(article?.source_icon),
+      url: safeHttpUrl(article?.source_url),
+      iconUrl: safeHttpUrl(article?.source_icon),
       priority: finiteNumberOrNull(article?.source_priority),
     },
   };
