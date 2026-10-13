@@ -194,6 +194,12 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
+      - name: Diagnose Home Explore test formatting
+        if: failure()
+        run: |
+          pnpm exec prettier --write 'apps/mobile/tests/mobile-home-explore-readiness.test.jsx'
+          git diff -- 'apps/mobile/tests/mobile-home-explore-readiness.test.jsx'
+
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-24.04
