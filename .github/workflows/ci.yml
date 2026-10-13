@@ -194,6 +194,12 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
+      - name: Diagnose Trips formatting
+        if: failure()
+        run: |
+          pnpm exec prettier --write 'apps/mobile/src/app/(tabs)/trips.jsx'
+          git diff -- 'apps/mobile/src/app/(tabs)/trips.jsx'
+
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-24.04
