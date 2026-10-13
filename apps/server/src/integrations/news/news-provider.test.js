@@ -39,7 +39,13 @@ describe('NewsData news adapter', () => {
         status: 'success',
         totalResults: 5,
         results: [
-          { article_id: 'a', link: 'https://example.test/a', title: 'First', pubDate: '2026-10-13 09:00:00', source_name: 'Publisher' },
+          {
+            article_id: 'a',
+            link: 'https://example.test/a',
+            title: 'First',
+            pubDate: '2026-10-13 09:00:00',
+            source_name: 'Publisher',
+          },
           { article_id: 'a', link: 'https://example.test/repeated', title: 'Repeated ID' },
           { article_id: 'b', link: 'https://example.test/a', title: 'Repeated URL' },
           { article_id: 'c', link: 'https://example.test/c', title: 'Provider duplicate', duplicate: true },
