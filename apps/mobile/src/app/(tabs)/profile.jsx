@@ -1,4 +1,5 @@
 import {
+  colors,
   contentWidths,
   getPageGutter,
   interaction,
@@ -332,9 +333,13 @@ export default function ProfileScreen() {
       >
         <View style={styles.content}>
           <Text style={styles.eyebrow}>YOUR PREFERENCES</Text>
-          <Text accessibilityRole="header" style={styles.title}>
-            Travel on your terms
-          </Text>
+          <View style={styles.welcomeBanner}>
+            <Text style={styles.welcomeEyebrow}>ATTRAVOYA PRO</Text>
+            <Text accessibilityRole="header" style={styles.welcomeTitle}>
+              Travel on your terms.
+            </Text>
+            <Text style={styles.welcomeDescription}>Your journeys, your account, your choice.</Text>
+          </View>
           <Text style={styles.subtitle}>
             Review your account identity and control the secure session on this device.
           </Text>
@@ -367,17 +372,35 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.4,
   },
-  title: {
-    color: lightTheme.textPrimary,
-    fontSize: 36,
-    fontWeight: '700',
-    lineHeight: 43,
-    marginTop: spacing[2],
-  },
   subtitle: {
     color: lightTheme.textSecondary,
     fontSize: 17,
     lineHeight: 25,
+    marginTop: spacing[3],
+  },
+  welcomeBanner: {
+    backgroundColor: colors.ocean[700],
+    borderRadius: radius.xl,
+    padding: spacing[6],
+    marginTop: spacing[3],
+  },
+  welcomeEyebrow: {
+    color: colors.ocean[100],
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  welcomeTitle: {
+    color: colors.white,
+    fontSize: 30,
+    fontWeight: '800',
+    lineHeight: 38,
+    marginTop: spacing[3],
+  },
+  welcomeDescription: {
+    color: colors.ink[50],
+    fontSize: 15,
+    lineHeight: 23,
     marginTop: spacing[3],
   },
   card: {
