@@ -23,7 +23,7 @@ function normalizedUtcPublication(article) {
   const value = stringOrNull(article?.pubDate);
   if (!value || !/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/.test(value)) return null;
 
-  const timestamp = value.replace(' ', 'T') + 'Z';
+  const timestamp = `${value.replace(' ', 'T')}Z`;
   const date = new Date(timestamp);
   if (!Number.isFinite(date.getTime())) return null;
 
