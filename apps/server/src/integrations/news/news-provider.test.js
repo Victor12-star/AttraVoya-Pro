@@ -54,8 +54,10 @@ describe('NewsData news adapter', () => {
       'country_not_listed',
       'unknown',
     ]);
-    expect(normalizeNewsDataResponse({ results: [{ article_id: 'a', country: ['sweden'] }] })
-      .articles[0].countryRelevance).toBe('unknown');
+    const withoutCountry = normalizeNewsDataResponse({
+      results: [{ article_id: 'a', country: ['sweden'] }],
+    });
+    expect(withoutCountry.articles[0].countryRelevance).toBe('unknown');
   });
 
   it('reports source attribution completeness without calling sources verified', () => {
