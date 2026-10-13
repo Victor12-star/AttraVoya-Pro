@@ -53,7 +53,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/explore')}
           style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
         >
-          <Text style={styles.primaryButtonText}>Explore destinations  →</Text>
+          <Text style={styles.primaryButtonText}>Explore destinations →</Text>
         </Pressable>
 
         <View style={styles.quickActions}>
