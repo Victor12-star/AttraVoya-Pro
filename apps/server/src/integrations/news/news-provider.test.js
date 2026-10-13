@@ -48,7 +48,12 @@ describe('NewsData news adapter', () => {
           },
           { article_id: 'a', link: 'https://example.test/repeated', title: 'Repeated ID' },
           { article_id: 'b', link: 'https://example.test/a', title: 'Repeated URL' },
-          { article_id: 'c', link: 'https://example.test/c', title: 'Provider duplicate', duplicate: true },
+          {
+            article_id: 'c',
+            link: 'https://example.test/c',
+            title: 'Provider duplicate',
+            duplicate: true,
+          },
           { article_id: 'd', link: 'https://example.test/d', title: 'Second' },
         ],
       }),
