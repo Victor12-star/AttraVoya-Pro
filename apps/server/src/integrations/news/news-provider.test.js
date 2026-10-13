@@ -34,6 +34,35 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects private network and loopback article links', () => {
+    const links = [
+      'http://127.0.0.1/article',
+      'http://10.0.0.1/article',
+      'http://172.16.0.1/article',
+      'http://192.168.1.3/article',
+      'http://169.254.1.1/article',
+      'http://[::1]/article',
+      'https://news.local/article',
+      'https://example.localhost/article',
+      'https://example.test/article',
+    ];
+    const result = normalizeNewsDataResponse({
+      results: links.map((link, index) => ({ article_id: String(index), link })),
+    });
+
+    expect(result.articles.map((article) => article.url)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      'https://example.test/article',
+    ]);
+  });
+
   it('does not expose embedded credentials or local news links', () => {
     const result = normalizeNewsDataResponse({
       results: [
