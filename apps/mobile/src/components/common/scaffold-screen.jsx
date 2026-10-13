@@ -14,9 +14,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * explicit prevents unfinished screens from suggesting that live travel data
  * has already been retrieved.
  *
- * @param {{description: string, eyebrow: string, title: string}} props
+ * @param {{description: string, eyebrow: string, title: string, children?: import('react').ReactNode}} props
  */
-export default function ScaffoldScreen({ description, eyebrow, title }) {
+export default function ScaffoldScreen({ children, description, eyebrow, title }) {
   const { width } = useWindowDimensions();
   const pageGutter = getPageGutter(width);
 
@@ -45,6 +45,7 @@ export default function ScaffoldScreen({ description, eyebrow, title }) {
               only be shown after a provider confirms them.
             </Text>
           </View>
+          {children}
         </View>
       </ScrollView>
     </SafeAreaView>
