@@ -133,12 +133,11 @@ function countryRelevance(article, countryCode) {
     .of(countryCode.toUpperCase())
     ?.toLowerCase();
 
-  return article.countries.some((country) => {
+  const matchesCountry = article.countries.some((country) => {
     const normalized = country.toLowerCase();
     return normalized === requestedCode || normalized === requestedName;
-  })
-    ? 'country_match'
-    : 'country_not_listed';
+  });
+  return matchesCountry ? 'country_match' : 'country_not_listed';
 }
 
 function publicationRecency(article, fetchedAt) {
