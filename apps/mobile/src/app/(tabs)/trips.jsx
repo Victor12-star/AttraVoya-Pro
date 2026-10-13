@@ -33,9 +33,7 @@ export default function TripsScreen() {
             <View style={styles.heroOverlay}>
               <Text style={styles.heroEyebrow}>DREAM. PLAN. EXPLORE.</Text>
               <Text style={styles.heroTitle}>Make memories, one journey at a time.</Text>
-              <Text style={styles.heroBody}>
-                Your plans deserve a beautiful place to live.
-              </Text>
+              <Text style={styles.heroBody}>Your plans deserve a beautiful place to live.</Text>
             </View>
           </ImageBackground>
         </View>
@@ -46,8 +44,8 @@ export default function TripsScreen() {
           </Text>
           <Text style={styles.statusBody}>
             Your authenticated trip list is not connected to this screen yet. We will show your
-            actual saved journeys after that integration is verified, rather than displaying
-            sample trips as real bookings.
+            actual saved journeys after that integration is verified, rather than displaying sample
+            trips as real bookings.
           </Text>
         </View>
       </ScrollView>
