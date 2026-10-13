@@ -53,7 +53,7 @@ export function createNewsDataNewsProvider({ http, apiKey, cache, cacheTtlSecond
             throw new ProviderResponseError('NewsData returned an unsuccessful response.');
           }
 
-          return normalizeNewsDataResponse(payload);
+          return normalizeNewsDataResponse(payload, new Date().toISOString(), query.countryCode);
         },
       });
     },

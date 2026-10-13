@@ -124,6 +124,21 @@ function deduplicateArticles(articles) {
   });
 }
 
+function countryRelevance(article, countryCode) {
+  if (!countryCode || !/^[a-z]{2}$/i.test(countryCode)) return 'unknown';
+  if (!article.countries.length) return 'unknown';
+
+  const requestedCode = countryCode.toLowerCase();
+  const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+  const requestedName = displayNames.of(countryCode.toUpperCase())?.toLowerCase();
+
+  const matchesCountry = article.countries.some((country) => {
+    const normalized = country.toLowerCase();
+    return normalized === requestedCode || normalized === requestedName;
+  });
+  return matchesCountry ? 'country_match' : 'country_not_listed';
+}
+
 function publicationRecency(article, fetchedAt) {
   if (!article.publishedAtUtc) return 'unknown';
 
@@ -136,7 +151,11 @@ function publicationRecency(article, fetchedAt) {
   return ageMs <= 48 * 60 * 60 * 1000 ? 'within_48_hours' : 'older';
 }
 
-export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOString()) {
+export function normalizeNewsDataResponse(
+  payload,
+  fetchedAt = new Date().toISOString(),
+  countryCode,
+) {
   if (!payload || typeof payload !== 'object') {
     throw new TypeError('NewsData payload must be an object.');
   }
@@ -153,6 +172,7 @@ export function normalizeNewsDataResponse(payload, fetchedAt = new Date().toISOS
       ...article,
       publicationRecency: publicationRecency(article, fetchedAt),
       sourceAttributionStatus: sourceAttributionStatus(article),
+      countryRelevance: countryRelevance(article, countryCode),
     })),
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
