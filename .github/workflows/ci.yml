@@ -194,12 +194,6 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-      - name: Diagnose travel tab test formatting
-        if: failure()
-        run: |
-          pnpm exec prettier --write 'apps/mobile/tests/mobile-travel-tab-readiness.test.jsx'
-          git diff -- 'apps/mobile/tests/mobile-travel-tab-readiness.test.jsx'
-
   database:
     name: PostgreSQL and Prisma verification
     runs-on: ubuntu-24.04
