@@ -34,6 +34,31 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects reserved and documentation IPv4 news links but retains public links', () => {
+    const urls = [
+      'http://192.0.0.1/article',
+      'http://192.0.2.1/article',
+      'http://198.18.0.1/article',
+      'http://198.19.255.1/article',
+      'http://198.51.100.5/article',
+      'http://203.0.113.8/article',
+      'https://8.8.8.8/article',
+    ];
+    const result = normalizeNewsDataResponse({
+      results: urls.map((link, index) => ({ article_id: String(index), link })),
+    });
+
+    expect(result.articles.map((article) => article.url)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      'https://8.8.8.8/article',
+    ]);
+  });
+
   it('labels destination country relevance without treating unlisted countries as unsafe', () => {
     const result = normalizeNewsDataResponse(
       {
