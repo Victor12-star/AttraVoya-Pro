@@ -8,7 +8,9 @@ describe('mobile travel tab readiness', () => {
   it('keeps the Trips tab clear about unconnected saved journeys', async () => {
     const result = await render(<TripsScreen />);
 
-    expect(result.getByRole('header', { name: 'Every adventure begins with a plan.' })).toBeTruthy();
+    expect(
+      result.getByRole('header', { name: 'Every adventure begins with a plan.' }),
+    ).toBeTruthy();
     expect(result.getByRole('header', { name: 'Saved trips are coming to mobile' })).toBeTruthy();
     expect(result.getByText(/authenticated trip list is not connected/i)).toBeTruthy();
     expect(result.queryByText(/confirmed booking|live fare|available rooms/i)).toBeNull();
