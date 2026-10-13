@@ -34,6 +34,30 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('does not expose embedded credentials or local news links', () => {
+    const result = normalizeNewsDataResponse({
+      results: [
+        {
+          article_id: 'credentials',
+          link: 'https://user:secret@example.test/story',
+          image_url: 'https://user@example.test/image.jpg',
+          source_url: 'http://localhost:3000/internal',
+        },
+        {
+          article_id: 'normal',
+          link: 'https://example.test/story',
+          source_url: 'https://publisher.test/',
+        },
+      ],
+    });
+
+    expect(result.articles[0].url).toBeNull();
+    expect(result.articles[0].imageUrl).toBeNull();
+    expect(result.articles[0].source.url).toBeNull();
+    expect(result.articles[1].url).toBe('https://example.test/story');
+    expect(result.articles[1].source.url).toBe('https://publisher.test/');
+  });
+
   it('rejects unsafe and malformed article media and publisher links', () => {
     const result = normalizeNewsDataResponse({
       results: [
