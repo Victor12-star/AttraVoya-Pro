@@ -19,7 +19,7 @@ function isLocalOrPrivateHost(hostname) {
 
   const octets = host.split('.');
   if (octets.length !== 4 || !octets.every((item) => /^\d{1,3}$/.test(item))) return false;
-  const [first, second] = octets.map(Number);
+  const [first, second, third] = octets.map(Number);
   return (
     first === 0 ||
     first === 10 ||
@@ -28,6 +28,10 @@ function isLocalOrPrivateHost(hostname) {
     (first === 169 && second === 254) ||
     (first === 172 && second >= 16 && second <= 31) ||
     (first === 192 && second === 168) ||
+    (first === 192 && second === 0 && (third === 0 || third === 2)) ||
+    (first === 198 && (second === 18 || second === 19)) ||
+    (first === 198 && second === 51 && third === 100) ||
+    (first === 203 && second === 0 && third === 113) ||
     (first === 100 && second >= 64 && second <= 127)
   );
 }
