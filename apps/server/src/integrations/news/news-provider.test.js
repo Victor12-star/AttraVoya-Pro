@@ -40,11 +40,7 @@ describe('NewsData news adapter', () => {
       results: links.map((link, index) => ({ article_id: String(index), link })),
     });
 
-    expect(result.articles.map((article) => article.url)).toEqual([
-      null,
-      null,
-      'https://example.test/story',
-    ]);
+    expect(result.articles.map((article) => article.url)).toEqual([null, null, 'https://example.test/story']);
   });
 
   it('rejects reserved and documentation IPv4 news links but retains public links', () => {
