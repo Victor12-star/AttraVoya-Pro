@@ -21,7 +21,7 @@ function finiteNumberOrNull(value) {
 function normalizedUtcPublication(article) {
   if (stringOrNull(article?.pubDateTZ)?.toUpperCase() !== 'UTC') return null;
   const value = stringOrNull(article?.pubDate);
-  if (!value || !/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/.test(value)) return null;
+  if (!value || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) return null;
 
   const timestamp = `${value.replace(' ', 'T')}Z`;
   const date = new Date(timestamp);
