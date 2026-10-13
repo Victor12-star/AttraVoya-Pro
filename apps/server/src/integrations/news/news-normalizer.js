@@ -7,7 +7,10 @@ function safeHttpUrl(value) {
   if (!candidate) return null;
   try {
     const url = new URL(candidate);
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+    // Do not expose embedded URL credentials or local-only links to travellers.
+    if (url.username || url.password || url.hostname === 'localhost') return null;
+    return url.href;
   } catch {
     return null;
   }
