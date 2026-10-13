@@ -2,6 +2,36 @@ function stringOrNull(value) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
+function isLocalOrPrivateHost(hostname) {
+  const host = hostname.toLowerCase();
+  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
+  if (host.startsWith('[') && host.endsWith(']')) {
+    const address = host.slice(1, -1);
+    return (
+      address === '::1' ||
+      address === '::' ||
+      address.startsWith('fc') ||
+      address.startsWith('fd') ||
+      /^fe[89ab]/.test(address) ||
+      address.startsWith('::ffff:')
+    );
+  }
+
+  const octets = host.split('.');
+  if (octets.length !== 4 || !octets.every((item) => /^\d{1,3}$/.test(item))) return false;
+  const [first, second] = octets.map(Number);
+  return (
+    first === 0 ||
+    first === 10 ||
+    first === 127 ||
+    first >= 224 ||
+    (first === 169 && second === 254) ||
+    (first === 172 && second >= 16 && second <= 31) ||
+    (first === 192 && second === 168) ||
+    (first === 100 && second >= 64 && second <= 127)
+  );
+}
+
 function safeHttpUrl(value) {
   const candidate = stringOrNull(value);
   if (!candidate) return null;
@@ -9,7 +39,7 @@ function safeHttpUrl(value) {
     const url = new URL(candidate);
     if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
     // Do not expose embedded URL credentials or local-only links to travellers.
-    if (url.username || url.password || url.hostname === 'localhost') return null;
+    if (url.username || url.password || isLocalOrPrivateHost(url.hostname)) return null;
     return url.href;
   } catch {
     return null;
