@@ -33,6 +33,35 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('normalizes only valid explicitly UTC publication times', async () => {
+    const provider = createNewsDataNewsProvider({
+      http: {
+        requestJson: vi.fn().mockResolvedValue({
+          status: 'success',
+          results: [
+            { article_id: 'valid', pubDate: '2026-10-13 09:30:00', pubDateTZ: 'UTC' },
+            { article_id: 'invalid', pubDate: '2026-02-30 09:30:00', pubDateTZ: 'UTC' },
+            { article_id: 'unknown-zone', pubDate: '2026-10-13 09:30:00', pubDateTZ: 'CET' },
+            { article_id: 'no-zone', pubDate: '2026-10-13 09:30:00' },
+          ],
+        }),
+      },
+      apiKey: 'test-key',
+      cache: createProviderCache(),
+    });
+
+    const result = await provider.searchNews({ countryCode: 'SE' });
+
+    expect(result.articles.map((article) => article.publishedAtUtc)).toEqual([
+      '2026-10-13T09:30:00.000Z',
+      null,
+      null,
+      null,
+    ]);
+    expect(result.articles[1].publishedAt).toBe('2026-02-30 09:30:00');
+    expect(result.realtimeGuaranteed).toBe(false);
+  });
+
   it('keeps unique, attributed news and excludes repeated articles', async () => {
     const http = {
       requestJson: vi.fn().mockResolvedValue({

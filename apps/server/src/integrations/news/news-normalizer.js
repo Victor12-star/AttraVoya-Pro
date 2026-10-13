@@ -18,6 +18,19 @@ function finiteNumberOrNull(value) {
   return Number.isFinite(number) ? number : null;
 }
 
+function normalizedUtcPublication(article) {
+  if (stringOrNull(article?.pubDateTZ)?.toUpperCase() !== 'UTC') return null;
+  const value = stringOrNull(article?.pubDate);
+  if (!value || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) return null;
+
+  const timestamp = `${value.replace(' ', 'T')}Z`;
+  const date = new Date(timestamp);
+  if (!Number.isFinite(date.getTime())) return null;
+
+  // Reject silently rolled-over dates such as February 30.
+  return date.toISOString() === timestamp.replace('Z', '.000Z') ? date.toISOString() : null;
+}
+
 export function normalizeNewsDataArticle(article) {
   return {
     provider: 'newsdata',
@@ -29,6 +42,7 @@ export function normalizeNewsDataArticle(article) {
     videoUrl: stringOrNull(article?.video_url),
     publishedAt: stringOrNull(article?.pubDate),
     publishedTimezone: stringOrNull(article?.pubDateTZ),
+    publishedAtUtc: normalizedUtcPublication(article),
     language: stringOrNull(article?.language),
     countries: stringArray(article?.country),
     categories: stringArray(article?.category),
