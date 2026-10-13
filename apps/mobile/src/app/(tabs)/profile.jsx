@@ -374,13 +374,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.4,
   },
-  title: {
-    color: lightTheme.textPrimary,
-    fontSize: 36,
-    fontWeight: '700',
-    lineHeight: 43,
-    marginTop: spacing[2],
-  },
   subtitle: {
     color: lightTheme.textSecondary,
     fontSize: 17,
