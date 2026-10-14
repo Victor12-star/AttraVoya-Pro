@@ -34,6 +34,19 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('discloses when destination-specific news scope is unavailable', () => {
+    const payloadWithArticle = { results: [{ article_id: 'one', country: ['sweden'] }] };
+    expect(normalizeNewsDataResponse(payloadWithArticle).destinationScopeStatus).toBe(
+      'country_unspecified',
+    );
+    expect(normalizeNewsDataResponse(payloadWithArticle, undefined, 'SWE').destinationScopeStatus).toBe(
+      'country_unspecified',
+    );
+    expect(normalizeNewsDataResponse(payloadWithArticle, undefined, 'SE').destinationScopeStatus).toBe(
+      'country_specified',
+    );
+  });
+
   it('discloses when recent destination news lacks usable linked attribution', () => {
     const fetchedAt = '2026-10-14T12:00:00.000Z';
     const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
