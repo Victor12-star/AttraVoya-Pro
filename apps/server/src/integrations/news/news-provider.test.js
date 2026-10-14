@@ -34,6 +34,20 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('reports deduplicated response-page count separately from provider total', () => {
+    const response = normalizeNewsDataResponse({
+      totalResults: 12,
+      results: [
+        { article_id: 'first' },
+        { article_id: 'first' },
+        { article_id: 'second' },
+      ],
+    });
+    expect(response.returnedArticleCount).toBe(2);
+    expect(response.page.totalResults).toBe(12);
+    expect(normalizeNewsDataResponse({ results: [] }).returnedArticleCount).toBe(0);
+  });
+
   it('discloses when destination-specific news scope is unavailable', () => {
     const payloadWithArticle = { results: [{ article_id: 'one', country: ['sweden'] }] };
     const unspecified = normalizeNewsDataResponse(payloadWithArticle);
