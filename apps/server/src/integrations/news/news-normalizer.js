@@ -250,7 +250,9 @@ export function normalizeNewsDataResponse(
     articles,
     page: {
       // A fallback based on this response page must not masquerade as provider totals.
-      totalResultsStatus: Number.isInteger(payload.totalResults) ? 'provider_reported' : 'page_fallback',
+      totalResultsStatus: Number.isInteger(payload.totalResults)
+        ? 'provider_reported'
+        : 'page_fallback',
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
       nextPage: stringOrNull(payload.nextPage),
     },
