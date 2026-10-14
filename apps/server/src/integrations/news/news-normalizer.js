@@ -229,6 +229,10 @@ export function normalizeNewsDataResponse(
     // Number of confirmed recent, destination-matching articles after deduplication.
     destinationRecentArticleCount,
     linkedRecentDestinationArticleCount,
+    linkedDestinationFreshnessStatus:
+      linkedRecentDestinationArticleCount > 0
+        ? 'recent_linked_destination_articles_present'
+        : 'no_confirmed_recent_linked_destination_articles',
     destinationFreshnessStatus:
       destinationRecentArticleCount > 0
         ? 'recent_destination_articles_present'
