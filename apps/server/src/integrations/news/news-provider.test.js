@@ -34,6 +34,15 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('indicates when the provider returned a continuation page cursor', () => {
+    const withNextPage = normalizeNewsDataResponse({ results: [], nextPage: 'cursor-2' });
+    const withoutNextPage = normalizeNewsDataResponse({ results: [] });
+    const blankCursor = normalizeNewsDataResponse({ results: [], nextPage: '   ' });
+    expect(withNextPage.additionalPagesAvailable).toBe(true);
+    expect(withoutNextPage.additionalPagesAvailable).toBe(false);
+    expect(blankCursor.additionalPagesAvailable).toBe(false);
+  });
+
   it('reports deduplicated response-page count separately from provider total', () => {
     const response = normalizeNewsDataResponse({
       totalResults: 12,

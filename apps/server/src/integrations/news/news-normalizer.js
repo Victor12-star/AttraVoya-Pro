@@ -221,6 +221,8 @@ export function normalizeNewsDataResponse(
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
     // Number of normalized, deduplicated articles in this response page.
     returnedArticleCount: articles.length,
+    // Provider pagination may mean additional articles were not included in this response.
+    additionalPagesAvailable: Boolean(stringOrNull(payload.nextPage)),
     publicationBreakdown,
     // Freshness describes published timestamps, not completeness or destination safety.
     freshnessStatus:
