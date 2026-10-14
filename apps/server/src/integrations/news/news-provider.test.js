@@ -49,7 +49,9 @@ describe('NewsData news adapter', () => {
       'SE',
     );
     expect(response.destinationRecentArticleCount).toBe(1);
-    expect(normalizeNewsDataResponse({ results: [] }, fetchedAt, 'SE').destinationRecentArticleCount).toBe(0);
+    expect(
+      normalizeNewsDataResponse({ results: [] }, fetchedAt, 'SE').destinationRecentArticleCount,
+    ).toBe(0);
   });
 
   it('does not treat unrelated recent news as recent destination coverage', () => {
