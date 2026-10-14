@@ -203,6 +203,13 @@ export function normalizeNewsDataResponse(
       article.countryRelevance === 'country_match' &&
       article.publicationRecency === 'within_48_hours',
   ).length;
+  // Separately count timely destination items with publisher attribution and an article link.
+  const linkedRecentDestinationArticleCount = articles.filter(
+    (article) =>
+      article.countryRelevance === 'country_match' &&
+      article.publicationRecency === 'within_48_hours' &&
+      article.sourceAttributionStatus === 'named_source_and_article_link',
+  ).length;
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -221,6 +228,7 @@ export function normalizeNewsDataResponse(
     countryRelevanceBreakdown,
     // Number of confirmed recent, destination-matching articles after deduplication.
     destinationRecentArticleCount,
+    linkedRecentDestinationArticleCount,
     destinationFreshnessStatus:
       destinationRecentArticleCount > 0
         ? 'recent_destination_articles_present'
