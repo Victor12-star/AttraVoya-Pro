@@ -170,6 +170,12 @@ export function normalizeNewsDataResponse(
   }
 
   const results = Array.isArray(payload.results) ? payload.results : [];
+  const articles = deduplicateArticles(results.map(normalizeNewsDataArticle)).map((article) => ({
+    ...article,
+    publicationRecency: publicationRecency(article, fetchedAt),
+    sourceAttributionStatus: sourceAttributionStatus(article),
+    countryRelevance: countryRelevance(article, countryCode),
+  }));
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -177,12 +183,9 @@ export function normalizeNewsDataResponse(
     // NewsData's free development tier can be delayed. Never label these
     // articles as guaranteed real-time or breaking news in the product UI.
     realtimeGuaranteed: false,
-    articles: deduplicateArticles(results.map(normalizeNewsDataArticle)).map((article) => ({
-      ...article,
-      publicationRecency: publicationRecency(article, fetchedAt),
-      sourceAttributionStatus: sourceAttributionStatus(article),
-      countryRelevance: countryRelevance(article, countryCode),
-    })),
+    // An empty feed never establishes that a destination is safe.
+    coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
+    articles,
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
       nextPage: stringOrNull(payload.nextPage),
