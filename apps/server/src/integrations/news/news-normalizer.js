@@ -182,6 +182,13 @@ export function normalizeNewsDataResponse(
     else if (article.publicationRecency === 'older') publicationBreakdown.older += 1;
     else publicationBreakdown.unknown += 1;
   }
+  const countryRelevanceBreakdown = { countryMatch: 0, countryNotListed: 0, unknown: 0 };
+  for (const article of articles) {
+    if (article.countryRelevance === 'country_match') countryRelevanceBreakdown.countryMatch += 1;
+    else if (article.countryRelevance === 'country_not_listed') {
+      countryRelevanceBreakdown.countryNotListed += 1;
+    } else countryRelevanceBreakdown.unknown += 1;
+  }
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -192,6 +199,7 @@ export function normalizeNewsDataResponse(
     // An empty feed never establishes that a destination is safe.
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
     publicationBreakdown,
+    countryRelevanceBreakdown,
     articles,
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
