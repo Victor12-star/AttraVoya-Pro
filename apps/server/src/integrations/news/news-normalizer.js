@@ -197,6 +197,12 @@ export function normalizeNewsDataResponse(
       attributionBreakdown.namedOnly += 1;
     } else attributionBreakdown.unavailable += 1;
   }
+  // Only destination-matching articles can substantiate recent destination coverage.
+  const destinationRecentArticleCount = articles.filter(
+    (article) =>
+      article.countryRelevance === 'country_match' &&
+      article.publicationRecency === 'within_48_hours',
+  ).length;
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -213,6 +219,10 @@ export function normalizeNewsDataResponse(
         ? 'recent_articles_present'
         : 'no_confirmed_recent_articles',
     countryRelevanceBreakdown,
+    destinationFreshnessStatus:
+      destinationRecentArticleCount > 0
+        ? 'recent_destination_articles_present'
+        : 'no_confirmed_recent_destination_articles',
     attributionBreakdown,
     articles,
     page: {
