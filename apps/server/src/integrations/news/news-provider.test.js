@@ -34,6 +34,28 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('does not treat unrelated recent news as recent destination coverage', () => {
+    const fetchedAt = '2026-10-14T12:00:00.000Z';
+    const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
+    const unrelated = normalizeNewsDataResponse(
+      { results: [{ article_id: 'unrelated', country: ['norway'], ...recent }] },
+      fetchedAt,
+      'SE',
+    );
+    expect(unrelated.freshnessStatus).toBe('recent_articles_present');
+    expect(unrelated.destinationFreshnessStatus).toBe(
+      'no_confirmed_recent_destination_articles',
+    );
+    const matching = normalizeNewsDataResponse(
+      { results: [{ article_id: 'matching', country: ['sweden'], ...recent }] },
+      fetchedAt,
+      'SE',
+    );
+    expect(matching.destinationFreshnessStatus).toBe('recent_destination_articles_present');
+    const empty = normalizeNewsDataResponse({ results: [] }, fetchedAt, 'SE');
+    expect(empty.destinationFreshnessStatus).toBe('no_confirmed_recent_destination_articles');
+  });
+
   it('summarizes attribution without claiming independent fact verification', () => {
     const result = normalizeNewsDataResponse({
       results: [
