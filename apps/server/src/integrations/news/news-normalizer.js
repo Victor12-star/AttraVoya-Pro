@@ -219,6 +219,8 @@ export function normalizeNewsDataResponse(
         ? 'recent_articles_present'
         : 'no_confirmed_recent_articles',
     countryRelevanceBreakdown,
+    // Number of confirmed recent, destination-matching articles after deduplication.
+    destinationRecentArticleCount,
     destinationFreshnessStatus:
       destinationRecentArticleCount > 0
         ? 'recent_destination_articles_present'
