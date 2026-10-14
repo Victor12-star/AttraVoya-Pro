@@ -185,6 +185,12 @@ export function normalizeNewsDataResponse(
     realtimeGuaranteed: false,
     // An empty feed never establishes that a destination is safe.
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
+    publicationBreakdown: {
+      within48Hours: articles.filter((article) => article.publicationRecency === 'within_48_hours')
+        .length,
+      older: articles.filter((article) => article.publicationRecency === 'older').length,
+      unknown: articles.filter((article) => article.publicationRecency === 'unknown').length,
+    },
     articles,
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
