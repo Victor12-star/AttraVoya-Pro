@@ -34,6 +34,21 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('distinguishes empty news coverage without implying destination safety', () => {
+    const empty = normalizeNewsDataResponse({ results: [] });
+    const populated = normalizeNewsDataResponse({
+      results: [{ article_id: 'one', title: 'Travel update' }],
+    });
+    const duplicatesOnly = normalizeNewsDataResponse({
+      results: [{ article_id: 'duplicate', duplicate: true }],
+    });
+
+    expect(empty.coverageStatus).toBe('no_articles_returned');
+    expect(duplicatesOnly.coverageStatus).toBe('no_articles_returned');
+    expect(populated.coverageStatus).toBe('articles_returned');
+    expect(empty.realtimeGuaranteed).toBe(false);
+  });
+
   it('rejects expanded IPv6 loopback and unspecified hosts', () => {
     const result = normalizeNewsDataResponse({
       results: [
