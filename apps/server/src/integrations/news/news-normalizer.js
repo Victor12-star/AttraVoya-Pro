@@ -189,6 +189,14 @@ export function normalizeNewsDataResponse(
       countryRelevanceBreakdown.countryNotListed += 1;
     } else countryRelevanceBreakdown.unknown += 1;
   }
+  const attributionBreakdown = { namedAndLinked: 0, namedOnly: 0, unavailable: 0 };
+  for (const article of articles) {
+    if (article.sourceAttributionStatus === 'named_source_and_article_link') {
+      attributionBreakdown.namedAndLinked += 1;
+    } else if (article.sourceAttributionStatus === 'named_source_only') {
+      attributionBreakdown.namedOnly += 1;
+    } else attributionBreakdown.unavailable += 1;
+  }
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -205,6 +213,7 @@ export function normalizeNewsDataResponse(
         ? 'recent_articles_present'
         : 'no_confirmed_recent_articles',
     countryRelevanceBreakdown,
+    attributionBreakdown,
     articles,
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
