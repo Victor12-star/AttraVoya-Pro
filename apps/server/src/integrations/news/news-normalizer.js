@@ -219,6 +219,8 @@ export function normalizeNewsDataResponse(
     realtimeGuaranteed: false,
     // An empty feed never establishes that a destination is safe.
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
+    // Number of normalized, deduplicated articles in this response page.
+    returnedArticleCount: articles.length,
     publicationBreakdown,
     // Freshness describes published timestamps, not completeness or destination safety.
     freshnessStatus:
