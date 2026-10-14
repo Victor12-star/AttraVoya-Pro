@@ -34,6 +34,32 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('counts only recent destination articles with a named source and usable link', () => {
+    const fetchedAt = '2026-10-14T12:00:00.000Z';
+    const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
+    const result = normalizeNewsDataResponse(
+      {
+        results: [
+          {
+            article_id: 'linked',
+            country: ['sweden'],
+            source_name: 'Publisher',
+            link: 'https://example.test/news',
+            ...recent,
+          },
+          { article_id: 'unlinked', country: ['sweden'], source_name: 'Publisher', ...recent },
+          { article_id: 'unrelated', country: ['norway'], source_name: 'Publisher', ...recent },
+        ],
+      },
+      fetchedAt,
+      'SE',
+    );
+    expect(result.destinationRecentArticleCount).toBe(2);
+    expect(result.linkedRecentDestinationArticleCount).toBe(1);
+    const empty = normalizeNewsDataResponse({ results: [] }, fetchedAt, 'SE');
+    expect(empty.linkedRecentDestinationArticleCount).toBe(0);
+  });
+
   it('counts confirmed recent destination matches without including unrelated articles', () => {
     const fetchedAt = '2026-10-14T12:00:00.000Z';
     const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
