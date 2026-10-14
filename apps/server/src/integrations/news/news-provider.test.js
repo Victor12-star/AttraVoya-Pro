@@ -43,9 +43,7 @@ describe('NewsData news adapter', () => {
       'SE',
     );
     expect(unrelated.freshnessStatus).toBe('recent_articles_present');
-    expect(unrelated.destinationFreshnessStatus).toBe(
-      'no_confirmed_recent_destination_articles',
-    );
+    expect(unrelated.destinationFreshnessStatus).toBe('no_confirmed_recent_destination_articles');
     const matching = normalizeNewsDataResponse(
       { results: [{ article_id: 'matching', country: ['sweden'], ...recent }] },
       fetchedAt,
