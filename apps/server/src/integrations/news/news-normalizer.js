@@ -5,6 +5,8 @@ function stringOrNull(value) {
 function isLocalOrPrivateHost(hostname) {
   const host = hostname.toLowerCase();
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
+  // Bare intranet names should not be offered as public article links.
+  if (!host.includes('.') && !host.startsWith('[')) return true;
   if (host.startsWith('[') && host.endsWith(']')) {
     const address = host.slice(1, -1);
     return (

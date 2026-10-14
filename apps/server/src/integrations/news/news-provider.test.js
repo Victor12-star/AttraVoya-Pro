@@ -34,6 +34,20 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects intranet-only hostnames while retaining public news domains', () => {
+    const links = [
+      'http://intranet/article',
+      'https://newsroom/story',
+      'https://example.test/story',
+    ];
+    const result = normalizeNewsDataResponse({
+      results: links.map((link, index) => ({ article_id: String(index), link })),
+    });
+
+    const articleUrls = result.articles.map((article) => article.url);
+    expect(articleUrls).toEqual([null, null, 'https://example.test/story']);
+  });
+
   it('rejects reserved and documentation IPv4 news links but retains public links', () => {
     const urls = [
       'http://192.0.0.1/article',
