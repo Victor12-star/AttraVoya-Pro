@@ -225,6 +225,11 @@ export function normalizeNewsDataResponse(
       publicationBreakdown.within48Hours > 0
         ? 'recent_articles_present'
         : 'no_confirmed_recent_articles',
+    // An omitted or invalid country code means no destination-specific check was possible.
+    destinationScopeStatus:
+      typeof countryCode === 'string' && /^[a-z]{2}$/i.test(countryCode)
+        ? 'country_specified'
+        : 'country_unspecified',
     countryRelevanceBreakdown,
     // Number of confirmed recent, destination-matching articles after deduplication.
     destinationRecentArticleCount,
