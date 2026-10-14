@@ -34,6 +34,27 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('summarizes attribution without claiming independent fact verification', () => {
+    const result = normalizeNewsDataResponse({
+      results: [
+        { article_id: 'linked', source_name: 'Publisher', link: 'https://example.test/story' },
+        { article_id: 'named', source_name: 'Publisher' },
+        { article_id: 'unknown' },
+      ],
+    });
+    expect(result.attributionBreakdown).toEqual({
+      namedAndLinked: 1,
+      namedOnly: 1,
+      unavailable: 1,
+    });
+    const empty = normalizeNewsDataResponse({ results: [] });
+    expect(empty.attributionBreakdown).toEqual({
+      namedAndLinked: 0,
+      namedOnly: 0,
+      unavailable: 0,
+    });
+  });
+
   it('discloses when no article has a confirmed recent publication time', () => {
     const fetchedAt = '2026-10-14T12:00:00.000Z';
     const recent = normalizeNewsDataResponse(
