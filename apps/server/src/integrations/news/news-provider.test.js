@@ -37,11 +37,7 @@ describe('NewsData news adapter', () => {
   it('reports deduplicated response-page count separately from provider total', () => {
     const response = normalizeNewsDataResponse({
       totalResults: 12,
-      results: [
-        { article_id: 'first' },
-        { article_id: 'first' },
-        { article_id: 'second' },
-      ],
+      results: [{ article_id: 'first' }, { article_id: 'first' }, { article_id: 'second' }],
     });
     expect(response.returnedArticleCount).toBe(2);
     expect(response.page.totalResults).toBe(12);
