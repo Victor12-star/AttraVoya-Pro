@@ -12,6 +12,8 @@ function isLocalOrPrivateHost(hostname) {
     const address = host.slice(1, -1);
     return (
       address === '::1' ||
+      address === '0:0:0:0:0:0:0:1' ||
+      address === '0:0:0:0:0:0:0:0' ||
       address === '::' ||
       address.startsWith('fc') ||
       address.startsWith('fd') ||

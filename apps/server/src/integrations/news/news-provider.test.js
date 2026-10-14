@@ -34,6 +34,18 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects expanded IPv6 loopback and unspecified hosts', () => {
+    const result = normalizeNewsDataResponse({
+      results: [
+        { article_id: 'loopback', link: 'http://[0:0:0:0:0:0:0:1]/story' },
+        { article_id: 'unspecified', link: 'http://[0:0:0:0:0:0:0:0]/story' },
+        { article_id: 'public', link: 'https://example.test/story' },
+      ],
+    });
+    const urls = result.articles.map((article) => article.url);
+    expect(urls).toEqual([null, null, 'https://example.test/story']);
+  });
+
   it('rejects local hosts with trailing DNS dots', () => {
     const links = [
       'http://localhost./story',
