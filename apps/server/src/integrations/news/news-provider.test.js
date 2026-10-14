@@ -34,6 +34,21 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('rejects local hosts with trailing DNS dots', () => {
+    const links = [
+      'http://localhost./story',
+      'https://news.local./story',
+      'https://intranet./story',
+      'http://127.0.0.1./story',
+      'https://example.test./story',
+    ];
+    const result = normalizeNewsDataResponse({
+      results: links.map((link, index) => ({ article_id: String(index), link })),
+    });
+    const articleUrls = result.articles.map((article) => article.url);
+    expect(articleUrls).toEqual([null, null, null, null, 'https://example.test./story']);
+  });
+
   it('rejects intranet-only hostnames while retaining public news domains', () => {
     const links = [
       'http://intranet/article',

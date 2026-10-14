@@ -3,7 +3,8 @@ function stringOrNull(value) {
 }
 
 function isLocalOrPrivateHost(hostname) {
-  const host = hostname.toLowerCase();
+  // Fully-qualified hostnames may end in a dot; normalize before local-host checks.
+  const host = hostname.toLowerCase().replace(/\.+$/, '');
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
   // Bare intranet names should not be offered as public article links.
   if (!host.includes('.') && !host.startsWith('[')) return true;
