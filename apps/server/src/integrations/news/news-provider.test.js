@@ -34,6 +34,18 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('distinguishes provider-reported totals from current-page fallback counts', () => {
+    const reported = normalizeNewsDataResponse({ totalResults: 20, results: [] });
+    const fallback = normalizeNewsDataResponse({
+      results: [{ article_id: 'same' }, { article_id: 'same' }],
+    });
+    expect(reported.page.totalResultsStatus).toBe('provider_reported');
+    expect(reported.page.totalResults).toBe(20);
+    expect(fallback.page.totalResultsStatus).toBe('page_fallback');
+    expect(fallback.page.totalResults).toBe(2);
+    expect(fallback.returnedArticleCount).toBe(1);
+  });
+
   it('indicates when the provider returned a continuation page cursor', () => {
     const withNextPage = normalizeNewsDataResponse({ results: [], nextPage: 'cursor-2' });
     const withoutNextPage = normalizeNewsDataResponse({ results: [] });
