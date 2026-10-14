@@ -34,6 +34,26 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('discloses when no article has a confirmed recent publication time', () => {
+    const fetchedAt = '2026-10-14T12:00:00.000Z';
+    const recent = normalizeNewsDataResponse(
+      { results: [{ article_id: 'recent', pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' }] },
+      fetchedAt,
+    );
+    const older = normalizeNewsDataResponse(
+      { results: [{ article_id: 'old', pubDate: '2026-10-10 12:00:00', pubDateTZ: 'UTC' }] },
+      fetchedAt,
+    );
+    const unknown = normalizeNewsDataResponse({ results: [{ article_id: 'unknown' }] });
+    const empty = normalizeNewsDataResponse({ results: [] });
+
+    expect(recent.freshnessStatus).toBe('recent_articles_present');
+    expect(older.freshnessStatus).toBe('no_confirmed_recent_articles');
+    expect(unknown.freshnessStatus).toBe('no_confirmed_recent_articles');
+    expect(empty.freshnessStatus).toBe('no_confirmed_recent_articles');
+    expect(recent.realtimeGuaranteed).toBe(false);
+  });
+
   it('summarizes country relevance without implying a destination is safe', () => {
     const result = normalizeNewsDataResponse(
       {
