@@ -34,6 +34,31 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('summarizes publication recency without claiming real-time reporting', () => {
+    const response = normalizeNewsDataResponse(
+      {
+        results: [
+          { article_id: 'recent', pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' },
+          { article_id: 'older', pubDate: '2026-10-09 12:00:00', pubDateTZ: 'UTC' },
+          { article_id: 'unknown' },
+        ],
+      },
+      '2026-10-14T12:00:00.000Z',
+    );
+
+    expect(response.publicationBreakdown).toEqual({
+      within48Hours: 1,
+      older: 1,
+      unknown: 1,
+    });
+    expect(normalizeNewsDataResponse({ results: [] }).publicationBreakdown).toEqual({
+      within48Hours: 0,
+      older: 0,
+      unknown: 0,
+    });
+    expect(response.realtimeGuaranteed).toBe(false);
+  });
+
   it('distinguishes empty news coverage without implying destination safety', () => {
     const empty = normalizeNewsDataResponse({ results: [] });
     const populated = normalizeNewsDataResponse({
