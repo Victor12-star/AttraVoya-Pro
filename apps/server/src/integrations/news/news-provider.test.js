@@ -34,6 +34,38 @@ const payload = {
 };
 
 describe('NewsData news adapter', () => {
+  it('discloses when recent destination news lacks usable linked attribution', () => {
+    const fetchedAt = '2026-10-14T12:00:00.000Z';
+    const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
+    const unlinked = normalizeNewsDataResponse(
+      { results: [{ article_id: 'unlinked', country: ['sweden'], ...recent }] },
+      fetchedAt,
+      'SE',
+    );
+    expect(unlinked.destinationRecentArticleCount).toBe(1);
+    expect(unlinked.linkedDestinationFreshnessStatus).toBe(
+      'no_confirmed_recent_linked_destination_articles',
+    );
+    const linked = normalizeNewsDataResponse(
+      {
+        results: [
+          {
+            article_id: 'linked',
+            country: ['sweden'],
+            source_name: 'Publisher',
+            link: 'https://example.test/news',
+            ...recent,
+          },
+        ],
+      },
+      fetchedAt,
+      'SE',
+    );
+    expect(linked.linkedDestinationFreshnessStatus).toBe(
+      'recent_linked_destination_articles_present',
+    );
+  });
+
   it('counts only recent destination articles with a named source and usable link', () => {
     const fetchedAt = '2026-10-14T12:00:00.000Z';
     const recent = { pubDate: '2026-10-13 12:00:00', pubDateTZ: 'UTC' };
