@@ -176,6 +176,12 @@ export function normalizeNewsDataResponse(
     sourceAttributionStatus: sourceAttributionStatus(article),
     countryRelevance: countryRelevance(article, countryCode),
   }));
+  const publicationBreakdown = { within48Hours: 0, older: 0, unknown: 0 };
+  for (const article of articles) {
+    if (article.publicationRecency === 'within_48_hours') publicationBreakdown.within48Hours += 1;
+    else if (article.publicationRecency === 'older') publicationBreakdown.older += 1;
+    else publicationBreakdown.unknown += 1;
+  }
   return {
     provider: 'newsdata',
     fetchedAt,
@@ -185,6 +191,7 @@ export function normalizeNewsDataResponse(
     realtimeGuaranteed: false,
     // An empty feed never establishes that a destination is safe.
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
+    publicationBreakdown,
     articles,
     page: {
       totalResults: Number.isInteger(payload.totalResults) ? payload.totalResults : results.length,
