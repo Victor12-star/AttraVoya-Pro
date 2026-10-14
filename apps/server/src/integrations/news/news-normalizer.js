@@ -199,6 +199,11 @@ export function normalizeNewsDataResponse(
     // An empty feed never establishes that a destination is safe.
     coverageStatus: articles.length > 0 ? 'articles_returned' : 'no_articles_returned',
     publicationBreakdown,
+    // Freshness describes published timestamps, not completeness or destination safety.
+    freshnessStatus:
+      publicationBreakdown.within48Hours > 0
+        ? 'recent_articles_present'
+        : 'no_confirmed_recent_articles',
     countryRelevanceBreakdown,
     articles,
     page: {
