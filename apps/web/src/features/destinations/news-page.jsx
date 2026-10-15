@@ -81,6 +81,8 @@ function normalizeArticle(row, destinationCountryCode, resultProvider) {
   const countries = textArray(value?.countries);
 
   if (!title || value?.duplicate === true) return null;
+  // Respect the backend's country-name and country-code relevance check.
+  if (value?.countryRelevance === 'country_not_listed') return null;
   if (articleProvider && articleProvider !== resultProvider) return null;
   if (hasDefiniteCountryMismatch(countries, destinationCountryCode)) return null;
 
