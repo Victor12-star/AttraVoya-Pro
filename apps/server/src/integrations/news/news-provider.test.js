@@ -37,7 +37,10 @@ describe('NewsData news adapter', () => {
   it('does not accept negative or unsafe provider-reported news totals', () => {
     const results = [{ article_id: 'one' }];
     const negative = normalizeNewsDataResponse({ results, totalResults: -2 });
-    const unsafe = normalizeNewsDataResponse({ results, totalResults: Number.MAX_SAFE_INTEGER + 1 });
+    const unsafe = normalizeNewsDataResponse({
+      results,
+      totalResults: Number.MAX_SAFE_INTEGER + 1,
+    });
     expect(negative.page.totalResultsStatus).toBe('page_fallback');
     expect(negative.page.totalResults).toBe(1);
     expect(unsafe.page.totalResultsStatus).toBe('page_fallback');
