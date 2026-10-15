@@ -330,6 +330,43 @@ describe('NewsDestinationPage', () => {
     expect(screen.queryByText('Stockholm travel update')).not.toBeInTheDocument();
   });
 
+  it('hides previous destination articles while the new destination is loading', async () => {
+    let resolveOslo;
+    const pendingOslo = new Promise((resolve) => {
+      resolveOslo = resolve;
+    });
+    mocks.getNews.mockResolvedValueOnce(newsResponse()).mockImplementationOnce(() => pendingOslo);
+
+    const { rerender } = render(
+      <NewsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm travel update', level: 3 }),
+    ).toBeInTheDocument();
+
+    const oslo = { ...destination, name: 'Oslo', countryCode: 'NO', slug: 'oslo-no' };
+    rerender(<NewsDestinationPage destination={oslo} locale="en" messages={messages} />);
+
+    expect(screen.queryByText('Stockholm travel update')).not.toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
+
+    resolveOslo(
+      newsResponse({
+        articles: [
+          {
+            provider: 'newsdata',
+            externalId: 'oslo-story',
+            title: 'Oslo travel update',
+            countries: ['NO'],
+          },
+        ],
+      }),
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Oslo travel update', level: 3 }),
+    ).toBeInTheDocument();
+  });
+
   it('renders an invalid destination state without calling the provider', () => {
     render(<NewsDestinationPage destination={null} locale="en" messages={messages} />);
 
