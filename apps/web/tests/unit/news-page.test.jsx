@@ -259,7 +259,7 @@ describe('NewsDestinationPage', () => {
 
     expect(
       await screen.findByText(
-        'The provider indicates additional pages. This list may not include every relevant article.',
+        'More pages are available. This list may be incomplete.',
       ),
     ).toBeInTheDocument();
   });
@@ -271,7 +271,7 @@ describe('NewsDestinationPage', () => {
 
     expect(
       await screen.findByText(
-        'The provider indicates additional pages. This list may not include every relevant article.',
+        'More pages are available. This list may be incomplete.',
       ),
     ).toBeInTheDocument();
   });
