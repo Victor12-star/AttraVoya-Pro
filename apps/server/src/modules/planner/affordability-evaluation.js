@@ -5,8 +5,8 @@ const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
 function moneyToCents(value) {
   if (typeof value !== 'string' || !/^\d+\.\d{2}$/.test(value)) return null;
   const [whole, fraction] = value.split('.');
-  const cents = Number(whole) * 100 + Number(fraction);
-  return Number.isSafeInteger(cents) ? cents : null;
+  const cents = BigInt(whole) * 100n + BigInt(fraction);
+  return cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) : null;
 }
 
 function formatCents(value) {
