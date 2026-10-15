@@ -367,6 +367,39 @@ describe('NewsDestinationPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('hides prior news when different places share a name and country', async () => {
+    let resolveSecond;
+    const secondResult = new Promise((resolve) => {
+      resolveSecond = resolve;
+    });
+    mocks.getNews.mockResolvedValueOnce(newsResponse()).mockImplementationOnce(() => secondResult);
+
+    const { rerender } = render(
+      <NewsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm travel update', level: 3 }),
+    ).toBeInTheDocument();
+
+    const distinctPlace = {
+      ...destination,
+      externalId: 'different-stockholm-place',
+      latitude: 59.34,
+      longitude: 18.07,
+    };
+    rerender(
+      <NewsDestinationPage destination={distinctPlace} locale="en" messages={messages} />,
+    );
+
+    expect(screen.queryByText('Stockholm travel update')).not.toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
+
+    resolveSecond(newsResponse({ articles: [] }));
+    expect(
+      await screen.findByText('No matching news articles were returned for this destination.'),
+    ).toBeInTheDocument();
+  });
+
   it('renders an invalid destination state without calling the provider', () => {
     render(<NewsDestinationPage destination={null} locale="en" messages={messages} />);
 
