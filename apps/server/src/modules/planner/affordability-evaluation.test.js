@@ -199,4 +199,37 @@ describe('affordability evaluation policy', () => {
       },
     });
   });
+  it('keeps affordability evidence exact at the maximum supported cent amount', () => {
+    const amount = '90071992547409.91';
+    const gate = completeGate({
+      spendableBudget: amount,
+      totalBudget: amount,
+      collected: [collectedEvidence('FLIGHTS', amount, amount)],
+    });
+
+    const evaluated = evaluateAffordabilityEvidenceGate(gate);
+    expect(evaluated.evaluation.budgetFit).toBe('COMFORTABLE');
+    expect(evaluated.evaluation.evaluationPolicy.totalEvidenceRange).toEqual({
+      amountMin: amount,
+      amountMax: amount,
+    });
+
+    const tooLarge = '90071992547409.92';
+    const invalidBudget = completeGate({
+      spendableBudget: tooLarge,
+      collected: [collectedEvidence('FLIGHTS', amount, amount)],
+    });
+    expect(evaluateAffordabilityEvidenceGate(invalidBudget).evaluation.budgetFit).toBe(
+      'NOT_EVALUATED',
+    );
+
+    const invalidEvidence = completeGate({
+      spendableBudget: amount,
+      collected: [collectedEvidence('FLIGHTS', amount, tooLarge)],
+    });
+    expect(evaluateAffordabilityEvidenceGate(invalidEvidence).evaluation.budgetFit).toBe(
+      'NOT_EVALUATED',
+    );
+  });
+
 });
