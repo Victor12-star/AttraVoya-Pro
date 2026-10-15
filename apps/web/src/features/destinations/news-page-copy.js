@@ -180,7 +180,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Gepubliceerd',
     publishedUnavailable: 'Publicatietijd niet beschikbaar',
     delayed: 'Providerresultaten kunnen vertraagd zijn',
-    morePagesAvailable: 'Er zijn meer pagina\'s. Deze lijst is mogelijk onvolledig.',
+    morePagesAvailable: "Er zijn meer pagina's. Deze lijst is mogelijk onvolledig.",
     disclaimer:
       'Artikelen komen van de ingestelde nieuwsprovider. Resultaten zijn niet gegarandeerd realtime of als breaking news. AttraVoya verifieert de juistheid van artikelen niet en behandelt nieuwsdekking niet als veiligheidsbeoordeling van een bestemming.',
   },
