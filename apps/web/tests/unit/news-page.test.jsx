@@ -265,9 +265,7 @@ describe('NewsDestinationPage', () => {
   });
 
   it('discloses additional pages even when the current page has no matching articles', async () => {
-    mocks.getNews.mockResolvedValue(
-      newsResponse({ articles: [], additionalPagesAvailable: true }),
-    );
+    mocks.getNews.mockResolvedValue(newsResponse({ articles: [], additionalPagesAvailable: true }));
 
     render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
 
