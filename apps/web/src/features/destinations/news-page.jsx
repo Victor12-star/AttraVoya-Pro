@@ -30,6 +30,7 @@ function safeHttpsUrl(value) {
     if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || (host.startsWith('[') && host.endsWith(']'))) {
       return null;
     }
+    if (!host.includes('.') && !host.startsWith('[')) return null;
     if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) {
       return null;
     }
