@@ -372,7 +372,9 @@ describe('NewsDestinationPage', () => {
     const secondResult = new Promise((resolve) => {
       resolveSecond = resolve;
     });
-    mocks.getNews.mockResolvedValueOnce(newsResponse()).mockImplementationOnce(() => secondResult);
+    mocks.getNews
+      .mockResolvedValueOnce(newsResponse())
+      .mockImplementationOnce(() => secondResult);
 
     const { rerender } = render(
       <NewsDestinationPage destination={destination} locale="en" messages={messages} />,
@@ -387,9 +389,7 @@ describe('NewsDestinationPage', () => {
       latitude: 59.34,
       longitude: 18.07,
     };
-    rerender(
-      <NewsDestinationPage destination={distinctPlace} locale="en" messages={messages} />,
-    );
+    rerender(<NewsDestinationPage destination={distinctPlace} locale="en" messages={messages} />);
 
     expect(screen.queryByText('Stockholm travel update')).not.toBeInTheDocument();
     expect(screen.getByText('Loading…')).toBeInTheDocument();
