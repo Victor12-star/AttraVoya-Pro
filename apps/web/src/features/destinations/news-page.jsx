@@ -149,6 +149,7 @@ async function requestNews(destination, locale) {
           provider,
           fetchedAt: validDateTime(payload?.fetchedAt),
           realtimeGuaranteed: payload?.realtimeGuaranteed === true,
+          additionalPagesAvailable: payload?.additionalPagesAvailable === true,
           articles: [],
         },
       };
@@ -160,6 +161,7 @@ async function requestNews(destination, locale) {
         provider,
         fetchedAt: validDateTime(payload?.fetchedAt),
         realtimeGuaranteed: payload?.realtimeGuaranteed === true,
+        additionalPagesAvailable: payload?.additionalPagesAvailable === true,
         articles,
       },
     };
@@ -327,6 +329,13 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
               ))}
             </div>
           </section>
+        ) : null}
+
+        {(state.status === 'success' || state.status === 'empty') &&
+        state.data?.additionalPagesAvailable ? (
+          <p className={styles.disclaimer} role="status">
+            {copy.morePagesAvailable}
+          </p>
         ) : null}
 
         <p className={styles.disclaimer}>{copy.disclaimer}</p>
