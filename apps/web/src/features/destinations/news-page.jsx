@@ -26,6 +26,10 @@ function safeHttpsUrl(value) {
     const url = new URL(text);
     if (url.protocol !== 'https:' || url.username || url.password) return null;
     const host = url.hostname.toLowerCase().replace(/\.+$/, '');
+    // Article links must use a public hostname, not a direct IPv4/IPv6 address.
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || (host.startsWith('[') && host.endsWith(']'))) {
+      return null;
+    }
     if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) {
       return null;
     }
