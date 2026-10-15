@@ -17,6 +17,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Published',
     publishedUnavailable: 'Publication time unavailable',
     delayed: 'Provider results may be delayed',
+    morePagesAvailable: 'The provider indicates additional pages. This list may not include every relevant article.',
     disclaimer:
       'Articles come from the configured news provider. Results are not guaranteed real-time or breaking news, and AttraVoya does not verify article accuracy or treat news coverage as a destination safety rating.',
   },
@@ -36,6 +37,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Publicerad',
     publishedUnavailable: 'Publiceringstid saknas',
     delayed: 'Leverantörens resultat kan vara fördröjda',
+    morePagesAvailable: 'Leverantören anger att fler sidor finns. Listan kanske inte innehåller alla relevanta artiklar.',
     disclaimer:
       'Artiklar kommer från den konfigurerade nyhetsleverantören. Resultaten är inte garanterat i realtid eller senaste nytt, och AttraVoya verifierar inte artiklarnas riktighet eller använder nyhetsbevakning som säkerhetsbetyg för destinationen.',
   },
@@ -55,6 +57,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Publicado',
     publishedUnavailable: 'Hora de publicación no disponible',
     delayed: 'Los resultados del proveedor pueden tener retraso',
+    morePagesAvailable: 'El proveedor indica que hay más páginas. Esta lista puede no incluir todos los artículos relevantes.',
     disclaimer:
       'Los artículos proceden del proveedor de noticias configurado. Los resultados no están garantizados en tiempo real ni como noticias de última hora, y AttraVoya no verifica la exactitud de los artículos ni trata la cobertura como una valoración de seguridad del destino.',
   },
@@ -75,6 +78,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Publié',
     publishedUnavailable: 'Heure de publication indisponible',
     delayed: 'Les résultats du fournisseur peuvent être retardés',
+    morePagesAvailable: 'Le fournisseur indique des pages supplémentaires. Cette liste peut ne pas inclure tous les articles pertinents.',
     disclaimer:
       'Les articles proviennent du fournisseur d’actualités configuré. Les résultats ne sont pas garantis en temps réel ni comme informations de dernière minute, et AttraVoya ne vérifie pas l’exactitude des articles ni ne considère la couverture comme une note de sécurité de la destination.',
   },
@@ -94,6 +98,8 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Veröffentlicht',
     publishedUnavailable: 'Veröffentlichungszeit nicht verfügbar',
     delayed: 'Anbieterergebnisse können verzögert sein',
+    morePagesAvailable: 'Il fornitore indica altre pagine. Questo elenco potrebbe non includere tutti gli articoli pertinenti.',
+    morePagesAvailable: 'Der Anbieter meldet weitere Seiten. Diese Liste enthält möglicherweise nicht alle relevanten Artikel.',
     disclaimer:
       'Die Artikel stammen vom konfigurierten Nachrichtenanbieter. Ergebnisse sind weder als Echtzeit- noch als Eilmeldungen garantiert. AttraVoya überprüft die Richtigkeit der Artikel nicht und wertet Berichterstattung nicht als Sicherheitsbewertung eines Reiseziels.',
   },
@@ -114,6 +120,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Pubblicato',
     publishedUnavailable: 'Ora di pubblicazione non disponibile',
     delayed: 'I risultati del fornitore possono essere in ritardo',
+    morePagesAvailable: 'O fornecedor indica páginas adicionais. Esta lista pode não incluir todos os artigos relevantes.',
     disclaimer:
       'Gli articoli provengono dal fornitore di notizie configurato. I risultati non sono garantiti in tempo reale né come ultime notizie, e AttraVoya non verifica l’accuratezza degli articoli né considera la copertura una valutazione della sicurezza della destinazione.',
   },
@@ -134,6 +141,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Publicado',
     publishedUnavailable: 'Hora de publicação indisponível',
     delayed: 'Os resultados do fornecedor podem estar atrasados',
+    morePagesAvailable: 'Dostawca wskazuje dodatkowe strony. Ta lista może nie obejmować wszystkich istotnych artykułów.',
     disclaimer:
       'Os artigos vêm do fornecedor de notícias configurado. Os resultados não são garantidos em tempo real nem como notícias de última hora, e a AttraVoya não verifica a exatidão dos artigos nem trata a cobertura como uma classificação de segurança do destino.',
   },
@@ -153,6 +161,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Opublikowano',
     publishedUnavailable: 'Czas publikacji niedostępny',
     delayed: 'Wyniki dostawcy mogą być opóźnione',
+    morePagesAvailable: 'De aanbieder meldt extra pagina\'s. Deze lijst bevat mogelijk niet alle relevante artikelen.',
     disclaimer:
       'Artykuły pochodzą od skonfigurowanego dostawcy wiadomości. Wyniki nie są gwarantowane w czasie rzeczywistym ani jako wiadomości z ostatniej chwili. AttraVoya nie weryfikuje poprawności artykułów i nie traktuje relacji medialnych jako oceny bezpieczeństwa celu podróży.',
   },
@@ -172,6 +181,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Gepubliceerd',
     publishedUnavailable: 'Publicatietijd niet beschikbaar',
     delayed: 'Providerresultaten kunnen vertraagd zijn',
+    morePagesAvailable: 'Leverandøren oppgir flere sider. Denne listen inneholder kanskje ikke alle relevante artikler.',
     disclaimer:
       'Artikelen komen van de ingestelde nieuwsprovider. Resultaten zijn niet gegarandeerd realtime of als breaking news. AttraVoya verifieert de juistheid van artikelen niet en behandelt nieuwsdekking niet als veiligheidsbeoordeling van een bestemming.',
   },
@@ -191,6 +201,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Publisert',
     publishedUnavailable: 'Publiseringstid ikke tilgjengelig',
     delayed: 'Leverandørresultater kan være forsinket',
+    morePagesAvailable: 'Udbyderen angiver flere sider. Listen indeholder muligvis ikke alle relevante artikler.',
     disclaimer:
       'Artikler kommer fra den konfigurerte nyhetsleverandøren. Resultatene er ikke garantert i sanntid eller som siste nytt, og AttraVoya verifiserer ikke artiklenes nøyaktighet eller behandler nyhetsdekning som en sikkerhetsvurdering av reisemålet.',
   },
@@ -210,6 +221,8 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Udgivet',
     publishedUnavailable: 'Udgivelsestid ikke tilgængelig',
     delayed: 'Udbyderresultater kan være forsinkede',
+    morePagesAvailable: 'Sağlayıcı ek sayfalar olduğunu bildiriyor. Bu liste tüm ilgili haberleri içermeyebilir.',
+    morePagesAvailable: 'Palveluntarjoajan mukaan sivuja on lisää. Luettelo ei välttämättä sisällä kaikkia olennaisia artikkeleita.',
     disclaimer:
       'Artikler kommer fra den konfigurerede nyhedsudbyder. Resultater er ikke garanteret i realtid eller som breaking news, og AttraVoya verificerer ikke artiklers nøjagtighed eller behandler nyhedsdækning som en sikkerhedsvurdering af destinationen.',
   },
@@ -230,6 +243,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Julkaistu',
     publishedUnavailable: 'Julkaisuaika ei saatavilla',
     delayed: 'Palveluntarjoajan tulokset voivat viivästyä',
+    morePagesAvailable: 'يشير مزود الأخبار إلى وجود صفحات إضافية. قد لا تتضمن هذه القائمة جميع المقالات ذات الصلة.',
     disclaimer:
       'Artikkelit tulevat määritetyltä uutispalveluntarjoajalta. Tuloksia ei taata reaaliaikaisiksi tai tuoreimmiksi uutisiksi. AttraVoya ei varmista artikkelien paikkansapitävyyttä eikä käsittele uutisointia kohteen turvallisuusluokituksena.',
   },
@@ -249,6 +263,8 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'Yayınlandı',
     publishedUnavailable: 'Yayın zamanı kullanılamıyor',
     delayed: 'Sağlayıcı sonuçları gecikmeli olabilir',
+    morePagesAvailable: '提供元によると、続きのページがあります。この一覧には関連する記事がすべて含まれていない可能性があります。',
+    morePagesAvailable: '新闻提供商显示还有其他页面。此列表可能未包含所有相关新闻。',
     disclaimer:
       'Makaleler yapılandırılmış haber sağlayıcısından gelir. Sonuçların gerçek zamanlı veya son dakika haberi olması garanti edilmez. AttraVoya makalelerin doğruluğunu doğrulamaz ve haber kapsamını hedef güvenlik puanı olarak değerlendirmez.',
   },
@@ -268,6 +284,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: 'نُشر',
     publishedUnavailable: 'وقت النشر غير متاح',
     delayed: 'قد تتأخر نتائج المزود',
+    morePagesAvailable: '제공업체에 따르면 추가 페이지가 있습니다. 이 목록에 모든 관련 기사가 포함되지 않을 수 있습니다.',
     disclaimer:
       'تأتي المقالات من مزود الأخبار المُعد. لا يوجد ضمان بأن النتائج آنية أو أخبار عاجلة، ولا تتحقق AttraVoya من دقة المقالات ولا تعتبر التغطية الإخبارية تقييماً لسلامة الوجهة.',
   },
@@ -287,6 +304,7 @@ const NEWS_PAGE_COPY = Object.freeze({
     published: '发布时间',
     publishedUnavailable: '发布时间不可用',
     delayed: '提供商结果可能存在延迟',
+    morePagesAvailable: 'समाचार प्रदाता के अनुसार और पृष्ठ उपलब्ध हैं। इस सूची में सभी प्रासंगिक लेख शामिल नहीं हो सकते हैं।',
     disclaimer:
       '文章来自已配置的新闻提供商。结果不保证为实时或突发新闻，AttraVoya 不验证文章准确性，也不会将新闻报道视为目的地安全评级。',
   },
