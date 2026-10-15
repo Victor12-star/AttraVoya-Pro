@@ -172,6 +172,31 @@ describe('affordability evaluation policy', () => {
     expect(evaluated.evaluation.evaluationPolicy.safetyReserveProtected).toBe(true);
   });
 
+  it('rejects ambiguous source timestamps without an explicit timezone', () => {
+    const invalidTimestamp = completeGate({
+      collected: [
+        collectedEvidence('FLIGHTS', '200.00', '250.00', {
+          sourceFetchedAt: '2026-09-06T12:00:00',
+        }),
+      ],
+    });
+
+    const evaluated = evaluateAffordabilityEvidenceGate(invalidTimestamp);
+    expect(evaluated.evaluation.budgetFit).toBe('NOT_EVALUATED');
+    expect(evaluated.evaluation.evaluationPolicy.status).toBe('BLOCKED');
+
+    const validTimestamp = completeGate({
+      collected: [
+        collectedEvidence('FLIGHTS', '200.00', '250.00', {
+          sourceFetchedAt: '2026-09-06T14:00:00+02:00',
+        }),
+      ],
+    });
+    expect(evaluateAffordabilityEvidenceGate(validTimestamp).evaluation.budgetFit).toBe(
+      'COMFORTABLE',
+    );
+  });
+
   it('fails closed when a complete evidence set is duplicated, mismatched, or unverified', () => {
     const flight = collectedEvidence('FLIGHTS', '200.00', '250.00');
     const gate = completeGate({
