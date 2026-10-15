@@ -193,6 +193,13 @@ describe('NewsDestinationPage', () => {
           },
           {
             provider: 'newsdata',
+            externalId: 'intranet-host',
+            title: 'Intranet host URL',
+            url: 'https://intranet/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
             externalId: 'public',
             title: 'Public URL',
             url: 'https://example.com/public-story',
