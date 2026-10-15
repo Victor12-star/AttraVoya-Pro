@@ -212,6 +212,51 @@ describe('NewsDestinationPage', () => {
     expect(links[0]).toHaveAttribute('href', 'https://example.com/public-story');
   });
 
+  it('does not link directly to IPv4 or IPv6 article hosts', async () => {
+    mocks.getNews.mockResolvedValue(
+      newsResponse({
+        articles: [
+          {
+            provider: 'newsdata',
+            externalId: 'ipv4-loopback',
+            title: 'Loopback address article',
+            url: 'https://127.0.0.1/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'ipv4-private',
+            title: 'Private address article',
+            url: 'https://192.168.1.5/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'ipv6-loopback',
+            title: 'IPv6 address article',
+            url: 'https://[::1]/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'public',
+            title: 'Public article',
+            url: 'https://example.com/public-story',
+            countries: ['SE'],
+          },
+        ],
+      }),
+    );
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+    expect(
+      await screen.findByRole('heading', { name: 'Public article', level: 3 }),
+    ).toBeInTheDocument();
+    const links = screen.getAllByRole('link', { name: 'Read article' });
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute('href', 'https://example.com/public-story');
+  });
+
   it('excludes articles that the backend explicitly marks as unrelated to the destination', async () => {
     mocks.getNews.mockResolvedValue(
       newsResponse({
