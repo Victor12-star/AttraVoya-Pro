@@ -16,9 +16,9 @@ describe('budget allocation exact arithmetic', () => {
     expect(result.totalBudget).toBe('90071992547409.91');
     expect(result.spendableBudget).toBe('90071992547409.91');
 
-    expect(() =>
-      buildBudgetEnvelope({ ...record, budgetAmount: '90071992547409.92' }),
-    ).toThrow(RangeError);
+    expect(() => buildBudgetEnvelope({ ...record, budgetAmount: '90071992547409.92' })).toThrow(
+      RangeError,
+    );
   });
 
   it('preserves cents at large supported budgets without floating-point drift', () => {
