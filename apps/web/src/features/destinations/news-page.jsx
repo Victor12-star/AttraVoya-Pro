@@ -86,7 +86,8 @@ function normalizeArticle(row, destinationCountryCode, resultProvider) {
 
   const url = safeHttpsUrl(value?.url);
   const externalId = textValue(value?.externalId);
-  const publishedAt = validDateTime(value?.publishedAt);
+  // Prefer the backend-validated UTC timestamp; raw provider dates may lack a timezone.
+  const publishedAt = validDateTime(value?.publishedAtUtc);
 
   return {
     key: externalId ?? url ?? `${title}-${publishedAt ?? 'undated'}`,
