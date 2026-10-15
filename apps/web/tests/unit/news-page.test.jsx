@@ -258,9 +258,7 @@ describe('NewsDestinationPage', () => {
     render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
-      await screen.findByText(
-        'More pages are available. This list may be incomplete.',
-      ),
+      await screen.findByText('More pages are available. This list may be incomplete.'),
     ).toBeInTheDocument();
   });
 
@@ -270,9 +268,7 @@ describe('NewsDestinationPage', () => {
     render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
 
     expect(
-      await screen.findByText(
-        'More pages are available. This list may be incomplete.',
-      ),
+      await screen.findByText('More pages are available. This list may be incomplete.'),
     ).toBeInTheDocument();
   });
 
