@@ -210,7 +210,8 @@ export function normalizeNewsDataResponse(
       article.publicationRecency === 'within_48_hours' &&
       article.sourceAttributionStatus === 'named_source_and_article_link',
   ).length;
-  const hasValidProviderTotal = Number.isSafeInteger(payload.totalResults) && payload.totalResults >= 0;
+  const hasValidProviderTotal =
+    Number.isSafeInteger(payload.totalResults) && payload.totalResults >= 0;
   return {
     provider: 'newsdata',
     fetchedAt,
