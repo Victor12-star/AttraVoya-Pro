@@ -26,16 +26,16 @@ function decimalToScaledInteger(value, scaleDigits, label) {
   }
 
   const [whole, fraction = ''] = normalized.split('.');
-  const scale = 10 ** scaleDigits;
+  const scale = 10n ** BigInt(scaleDigits);
   const paddedFraction = `${fraction}${'0'.repeat(scaleDigits)}`.slice(0, scaleDigits);
-  let scaled = Number(whole) * scale + Number(paddedFraction || 0);
+  let scaled = BigInt(whole) * scale + BigInt(paddedFraction || '0');
   const roundingDigit = fraction.charAt(scaleDigits);
-  if (roundingDigit && Number(roundingDigit) >= 5) scaled += 1;
+  if (roundingDigit && Number(roundingDigit) >= 5) scaled += 1n;
 
-  if (!Number.isSafeInteger(scaled)) {
+  if (scaled > BigInt(Number.MAX_SAFE_INTEGER)) {
     throw new RangeError(`${label} is outside the supported planning range.`);
   }
-  return scaled;
+  return Number(scaled);
 }
 
 function formatScaledInteger(value, scaleDigits) {
