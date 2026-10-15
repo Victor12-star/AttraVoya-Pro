@@ -25,7 +25,7 @@ function safeHttpsUrl(value) {
   try {
     const url = new URL(text);
     if (url.protocol !== 'https:' || url.username || url.password) return null;
-    const host = url.hostname.toLowerCase().replace(/\\.+$/, '');
+    const host = url.hostname.toLowerCase().replace(/\.+$/, '');
     if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) {
       return null;
     }
