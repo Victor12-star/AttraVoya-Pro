@@ -372,9 +372,7 @@ describe('NewsDestinationPage', () => {
     const secondResult = new Promise((resolve) => {
       resolveSecond = resolve;
     });
-    mocks.getNews
-      .mockResolvedValueOnce(newsResponse())
-      .mockImplementationOnce(() => secondResult);
+    mocks.getNews.mockResolvedValueOnce(newsResponse()).mockImplementationOnce(() => secondResult);
 
     const { rerender } = render(
       <NewsDestinationPage destination={destination} locale="en" messages={messages} />,
