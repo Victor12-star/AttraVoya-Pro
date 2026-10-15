@@ -20,11 +20,22 @@ function isNonEmptyString(value) {
 }
 
 function isValidTimestamp(value) {
-  return (
-    typeof value === 'string' &&
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
-    Number.isFinite(Date.parse(value))
-  );
+  if (typeof value !== 'string') return false;
+  const parts = value.split('T');
+  if (parts.length !== 2 || !/^\d{4}-\d{2}-\d{2}$/.test(parts[0])) return false;
+
+  const time = parts[1].slice(0, 8);
+  if (!/^\d{2}:\d{2}:\d{2}$/.test(time)) return false;
+
+  let suffix = parts[1].slice(8);
+  if (suffix.startsWith('.')) {
+    const fractional = /^\.\d{1,3}/.exec(suffix);
+    if (!fractional) return false;
+    suffix = suffix.slice(fractional[0].length);
+  }
+
+  if (suffix !== 'Z' && !/^[+-]\d{2}:\d{2}$/.test(suffix)) return false;
+  return Number.isFinite(Date.parse(value));
 }
 
 function blockedEvaluation(gate, reason) {
