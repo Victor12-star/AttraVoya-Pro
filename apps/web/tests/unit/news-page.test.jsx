@@ -272,6 +272,40 @@ describe('NewsDestinationPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('refreshes successful news results on request', async () => {
+    mocks.getNews
+      .mockResolvedValueOnce(newsResponse())
+      .mockResolvedValueOnce(newsResponse({ articles: [] }));
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm travel update', level: 3 }),
+    ).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Retry' }).click();
+    expect(
+      await screen.findByText('No matching news articles were returned for this destination.'),
+    ).toBeInTheDocument();
+    expect(mocks.getNews).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes an empty news result without requiring an error', async () => {
+    mocks.getNews
+      .mockResolvedValueOnce(newsResponse({ articles: [] }))
+      .mockResolvedValueOnce(newsResponse());
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+    expect(
+      await screen.findByText('No matching news articles were returned for this destination.'),
+    ).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Retry' }).click();
+    expect(
+      await screen.findByRole('heading', { name: 'Stockholm travel update', level: 3 }),
+    ).toBeInTheDocument();
+    expect(mocks.getNews).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps provider errors private and exposes a working retry', async () => {
     mocks.getNews
       .mockRejectedValueOnce(new Error('provider internals must not leak'))
