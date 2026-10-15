@@ -40,7 +40,8 @@ function newsResponse(overrides = {}) {
           title: 'Stockholm travel update',
           description: 'A factual provider description about Stockholm travel.',
           url: 'https://example.com/stockholm-travel-update',
-          publishedAt: '2026-09-05T07:30:00.000Z',
+          publishedAt: '2026-09-05 07:30:00',
+          publishedAtUtc: '2026-09-05T07:30:00.000Z',
           countries: ['SE'],
           categories: ['tourism'],
           duplicate: false,
@@ -89,6 +90,32 @@ describe('NewsDestinationPage', () => {
       language: 'en',
       size: 10,
     });
+  });
+
+  it('does not display raw provider dates without a validated UTC publication time', async () => {
+    mocks.getNews.mockResolvedValue(
+      newsResponse({
+        articles: [
+          {
+            provider: 'newsdata',
+            externalId: 'unknown-time',
+            title: 'Undated destination update',
+            publishedAt: '2026-09-05 07:30:00',
+            publishedAtUtc: null,
+            countries: ['SE'],
+            source: { name: 'Example News' },
+          },
+        ],
+      }),
+    );
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Undated destination update', level: 3 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Publication time unavailable')).toBeInTheDocument();
+    expect(screen.queryByText(/Published:/)).not.toBeInTheDocument();
   });
 
   it('rejects definite country mismatches, duplicate rows and unsafe article URLs', async () => {
