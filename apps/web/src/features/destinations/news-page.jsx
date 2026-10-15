@@ -190,12 +190,13 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
 
   useEffect(() => {
     if (!destination) return;
+    let active = true;
     const currentRequest = ++requestId.current;
     void requestNews(destination, locale).then((nextState) => {
-      if (requestId.current === currentRequest) setState(nextState);
+      if (active && requestId.current === currentRequest) setState(nextState);
     });
     return () => {
-      if (requestId.current === currentRequest) requestId.current++;
+      active = false;
     };
   }, [destination, locale]);
 
