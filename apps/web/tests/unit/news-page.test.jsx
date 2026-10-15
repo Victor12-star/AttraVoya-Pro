@@ -166,6 +166,52 @@ describe('NewsDestinationPage', () => {
     expect(screen.queryByRole('link', { name: 'Read article' })).not.toBeInTheDocument();
   });
 
+  it('does not link to credential-bearing or local HTTPS news URLs', async () => {
+    mocks.getNews.mockResolvedValue(
+      newsResponse({
+        articles: [
+          {
+            provider: 'newsdata',
+            externalId: 'credentials',
+            title: 'Credential URL',
+            url: 'https://user:secret@example.com/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'localhost',
+            title: 'Local URL',
+            url: 'https://localhost./internal',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'private-domain',
+            title: 'Local domain URL',
+            url: 'https://news.local/story',
+            countries: ['SE'],
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'public',
+            title: 'Public URL',
+            url: 'https://example.com/public-story',
+            countries: ['SE'],
+          },
+        ],
+      }),
+    );
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Public URL', level: 3 }),
+    ).toBeInTheDocument();
+    const links = screen.getAllByRole('link', { name: 'Read article' });
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute('href', 'https://example.com/public-story');
+  });
+
   it('excludes articles that the backend explicitly marks as unrelated to the destination', async () => {
     mocks.getNews.mockResolvedValue(
       newsResponse({
