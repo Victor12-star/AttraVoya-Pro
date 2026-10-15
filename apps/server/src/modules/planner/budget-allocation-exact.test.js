@@ -3,6 +3,24 @@ import { describe, expect, it } from 'vitest';
 import { buildBudgetEnvelope } from './budget-allocation.js';
 
 describe('budget allocation exact arithmetic', () => {
+  it('accepts the maximum safe cent amount and rejects one cent more', () => {
+    const record = {
+      id: 'maximum-budget',
+      budgetAmount: '90071992547409.91',
+      safetyReservePercent: '0',
+      childrenAges: [],
+      budgetCurrency: { code: 'SEK' },
+    };
+
+    const result = buildBudgetEnvelope(record);
+    expect(result.totalBudget).toBe('90071992547409.91');
+    expect(result.spendableBudget).toBe('90071992547409.91');
+
+    expect(() =>
+      buildBudgetEnvelope({ ...record, budgetAmount: '90071992547409.92' }),
+    ).toThrow(RangeError);
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
