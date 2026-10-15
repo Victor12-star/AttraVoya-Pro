@@ -199,6 +199,7 @@ describe('affordability evaluation policy', () => {
       },
     });
   });
+
   it('keeps affordability evidence exact at the maximum supported cent amount', () => {
     const amount = '90071992547409.91';
     const gate = completeGate({
@@ -231,5 +232,4 @@ describe('affordability evaluation policy', () => {
       'NOT_EVALUATED',
     );
   });
-
 });
