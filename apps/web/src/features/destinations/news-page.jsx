@@ -24,7 +24,12 @@ function safeHttpsUrl(value) {
   if (!text) return null;
   try {
     const url = new URL(text);
-    return url.protocol === 'https:' ? url.toString() : null;
+    if (url.protocol !== 'https:' || url.username || url.password) return null;
+    const host = url.hostname.toLowerCase().replace(/\\.+$/, '');
+    if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) {
+      return null;
+    }
+    return url.toString();
   } catch {
     return null;
   }
