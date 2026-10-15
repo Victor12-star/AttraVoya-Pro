@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ExternalLink, LoaderCircle, Newspaper, RefreshCw } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
@@ -182,6 +182,7 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
       data: null,
     }),
   );
+  const requestId = useRef(0);
   const dateFormatter = useMemo(
     () => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }),
     [locale],
@@ -190,8 +191,9 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
   useEffect(() => {
     if (!destination) return;
     let active = true;
+    const currentRequest = ++requestId.current;
     void requestNews(destination, locale).then((nextState) => {
-      if (active) setState(nextState);
+      if (active && requestId.current === currentRequest) setState(nextState);
     });
     return () => {
       active = false;
@@ -200,8 +202,11 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
 
   function retry() {
     if (!destination) return;
+    const currentRequest = ++requestId.current;
     setState({ status: 'loading', data: null });
-    void requestNews(destination, locale).then(setState);
+    void requestNews(destination, locale).then((nextState) => {
+      if (requestId.current === currentRequest) setState(nextState);
+    });
   }
 
   if (!destination) {

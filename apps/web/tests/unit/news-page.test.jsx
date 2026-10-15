@@ -289,6 +289,47 @@ describe('NewsDestinationPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('ignores a stale retry response after switching destinations', async () => {
+    let resolveRetry;
+    const pendingRetry = new Promise((resolve) => {
+      resolveRetry = resolve;
+    });
+    mocks.getNews
+      .mockRejectedValueOnce(new Error('temporary provider error'))
+      .mockImplementationOnce(() => pendingRetry)
+      .mockResolvedValueOnce(
+        newsResponse({
+          articles: [
+            {
+              provider: 'newsdata',
+              externalId: 'new-destination',
+              title: 'Oslo destination update',
+              countries: ['NO'],
+            },
+          ],
+        }),
+      );
+
+    const { rerender } = render(
+      <NewsDestinationPage destination={destination} locale="en" messages={messages} />,
+    );
+    expect(await screen.findByText('News could not be loaded right now.')).toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'Retry' }).click();
+    await waitFor(() => expect(mocks.getNews).toHaveBeenCalledTimes(2));
+
+    const oslo = { ...destination, name: 'Oslo', countryCode: 'NO', slug: 'oslo-no' };
+    rerender(<NewsDestinationPage destination={oslo} locale="en" messages={messages} />);
+    expect(
+      await screen.findByRole('heading', { name: 'Oslo destination update', level: 3 }),
+    ).toBeInTheDocument();
+
+    resolveRetry(newsResponse());
+    await waitFor(() => expect(mocks.getNews).toHaveBeenCalledTimes(3));
+    expect(screen.getByRole('heading', { name: 'Oslo destination update' })).toBeInTheDocument();
+    expect(screen.queryByText('Stockholm travel update')).not.toBeInTheDocument();
+  });
+
   it('renders an invalid destination state without calling the provider', () => {
     render(<NewsDestinationPage destination={null} locale="en" messages={messages} />);
 
