@@ -252,6 +252,26 @@ describe('NewsDestinationPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('discloses additional news pages without implying complete coverage', async () => {
+    mocks.getNews.mockResolvedValue(newsResponse({ additionalPagesAvailable: true }));
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+
+    expect(
+      await screen.findByText('More pages are available. This list may be incomplete.'),
+    ).toBeInTheDocument();
+  });
+
+  it('discloses additional pages even when the current page has no matching articles', async () => {
+    mocks.getNews.mockResolvedValue(newsResponse({ articles: [], additionalPagesAvailable: true }));
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+
+    expect(
+      await screen.findByText('More pages are available. This list may be incomplete.'),
+    ).toBeInTheDocument();
+  });
+
   it('keeps provider errors private and exposes a working retry', async () => {
     mocks.getNews
       .mockRejectedValueOnce(new Error('provider internals must not leak'))
