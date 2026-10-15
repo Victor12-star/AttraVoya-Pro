@@ -297,6 +297,17 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
           </div>
         ) : null}
 
+        {(visibleState.status === 'success' || visibleState.status === 'empty') && (
+          <button
+            className="button button--secondary button--compact"
+            type="button"
+            onClick={retry}
+          >
+            <RefreshCw size={15} aria-hidden="true" />
+            {messages.common.retry}
+          </button>
+        )}
+
         {visibleState.status === 'success' ? (
           <section aria-labelledby="news-results-title">
             <div className={styles.sectionHeading}>
