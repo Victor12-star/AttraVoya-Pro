@@ -177,7 +177,15 @@ function template(value, destinationName) {
 export function NewsDestinationPage({ destination, locale = 'en', messages }) {
   const copy = getNewsPageCopy(locale);
   const destinationKey = destination
-    ? JSON.stringify([locale, destination.countryCode, destination.name])
+    ? JSON.stringify([
+        locale,
+        destination.countryCode,
+        destination.name,
+        destination.provider,
+        destination.externalId,
+        destination.latitude,
+        destination.longitude,
+      ])
     : null;
   const [state, setState] = useState(
     /** @type {{status: NewsStatus, data: any, destinationKey: string | null}} */ ({
