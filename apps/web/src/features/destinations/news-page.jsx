@@ -176,10 +176,14 @@ function template(value, destinationName) {
 
 export function NewsDestinationPage({ destination, locale = 'en', messages }) {
   const copy = getNewsPageCopy(locale);
+  const destinationKey = destination
+    ? JSON.stringify([locale, destination.countryCode, destination.name])
+    : null;
   const [state, setState] = useState(
-    /** @type {{status: NewsStatus, data: any}} */ ({
+    /** @type {{status: NewsStatus, data: any, destinationKey: string | null}} */ ({
       status: destination ? 'loading' : 'idle',
       data: null,
+      destinationKey,
     }),
   );
   const requestId = useRef(0);
@@ -193,19 +197,21 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
     let active = true;
     const currentRequest = ++requestId.current;
     void requestNews(destination, locale).then((nextState) => {
-      if (active && requestId.current === currentRequest) setState(nextState);
+      if (active && requestId.current === currentRequest) {
+        setState({ ...nextState, destinationKey });
+      }
     });
     return () => {
       active = false;
     };
-  }, [destination, locale]);
+  }, [destination, locale, destinationKey]);
 
   function retry() {
     if (!destination) return;
     const currentRequest = ++requestId.current;
-    setState({ status: 'loading', data: null });
+    setState({ status: 'loading', data: null, destinationKey });
     void requestNews(destination, locale).then((nextState) => {
-      if (requestId.current === currentRequest) setState(nextState);
+      if (requestId.current === currentRequest) setState({ ...nextState, destinationKey });
     });
   }
 
@@ -224,8 +230,10 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
     );
   }
 
-  const provider = providerDisplayName(state.data?.provider);
-  const fetchedAt = state.data?.fetchedAt ? new Date(state.data.fetchedAt) : null;
+  const visibleState =
+    state.destinationKey === destinationKey ? state : { status: 'loading', data: null };
+  const provider = providerDisplayName(visibleState.data?.provider);
+  const fetchedAt = visibleState.data?.fetchedAt ? new Date(visibleState.data.fetchedAt) : null;
   const validFetchedAt = fetchedAt && Number.isFinite(fetchedAt.getTime());
 
   return (
@@ -243,7 +251,7 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
             <p>{copy.intro}</p>
           </div>
           <div className={styles.heroMeta}>
-            {state.data && state.data.realtimeGuaranteed === false ? (
+            {visibleState.data && visibleState.data.realtimeGuaranteed === false ? (
               <span>{copy.delayed}</span>
             ) : null}
             {provider ? <span>{provider}</span> : null}
@@ -253,21 +261,21 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
           </div>
         </header>
 
-        {state.status === 'loading' || state.status === 'idle' ? (
+        {visibleState.status === 'loading' || visibleState.status === 'idle' ? (
           <div className={styles.feedback} role="status">
             <LoaderCircle className={styles.spin} size={28} aria-hidden="true" />
             <span>{messages.common.loading}</span>
           </div>
         ) : null}
 
-        {state.status === 'empty' ? (
+        {visibleState.status === 'empty' ? (
           <div className={styles.feedback} role="status">
             <Newspaper size={28} aria-hidden="true" />
             <strong>{copy.noResults}</strong>
           </div>
         ) : null}
 
-        {state.status === 'error' ? (
+        {visibleState.status === 'error' ? (
           <div className={styles.feedback} role="status">
             <strong>{copy.unavailable}</strong>
             <button
@@ -281,13 +289,13 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
           </div>
         ) : null}
 
-        {state.status === 'success' ? (
+        {visibleState.status === 'success' ? (
           <section aria-labelledby="news-results-title">
             <div className={styles.sectionHeading}>
               <h2 id="news-results-title">{copy.results}</h2>
             </div>
             <div className={styles.grid}>
-              {state.data.articles.map((article) => (
+              {visibleState.data.articles.map((article) => (
                 <article className={styles.card} key={article.key}>
                   <div className={styles.cardHeading}>
                     <span className={styles.cardIcon} aria-hidden="true">
@@ -336,8 +344,8 @@ export function NewsDestinationPage({ destination, locale = 'en', messages }) {
           </section>
         ) : null}
 
-        {(state.status === 'success' || state.status === 'empty') &&
-        state.data?.additionalPagesAvailable ? (
+        {(visibleState.status === 'success' || visibleState.status === 'empty') &&
+        visibleState.data?.additionalPagesAvailable ? (
           <p className={styles.disclaimer} role="status">
             {copy.morePagesAvailable}
           </p>
