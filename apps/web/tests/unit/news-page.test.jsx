@@ -166,6 +166,36 @@ describe('NewsDestinationPage', () => {
     expect(screen.queryByRole('link', { name: 'Read article' })).not.toBeInTheDocument();
   });
 
+  it('excludes articles that the backend explicitly marks as unrelated to the destination', async () => {
+    mocks.getNews.mockResolvedValue(
+      newsResponse({
+        articles: [
+          {
+            provider: 'newsdata',
+            externalId: 'wrong-country-name',
+            title: 'Unrelated country news',
+            countries: ['norway'],
+            countryRelevance: 'country_not_listed',
+          },
+          {
+            provider: 'newsdata',
+            externalId: 'matching-country-name',
+            title: 'Relevant Sweden update',
+            countries: ['sweden'],
+            countryRelevance: 'country_match',
+          },
+        ],
+      }),
+    );
+
+    render(<NewsDestinationPage destination={destination} locale="en" messages={messages} />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Relevant Sweden update', level: 3 }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Unrelated country news')).not.toBeInTheDocument();
+  });
+
   it('shows an honest empty state when the provider returns no matching articles', async () => {
     mocks.getNews.mockResolvedValue(newsResponse({ articles: [] }));
 
