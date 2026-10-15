@@ -66,7 +66,7 @@ function buildTargets({ spendableCents, hasChildren }) {
 
   const targets = weights.map((target) => ({
     ...target,
-    amountCents: Math.floor((spendableCents * target.weightPercent) / 100),
+    amountCents: Number((BigInt(spendableCents) * BigInt(target.weightPercent)) / 100n),
   }));
   const assignedCents = targets.reduce((sum, target) => sum + target.amountCents, 0);
   const roundingRemainder = spendableCents - assignedCents;
@@ -91,7 +91,7 @@ export function buildBudgetEnvelope(record) {
     throw new RangeError('Safety reserve percent cannot exceed 100 percent.');
   }
 
-  const reserveCents = Math.round((totalCents * reserveBasisPoints) / 10_000);
+  const reserveCents = Number((BigInt(totalCents) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n);
   const spendableCents = totalCents - reserveCents;
   const targets = buildTargets({
     spendableCents,
