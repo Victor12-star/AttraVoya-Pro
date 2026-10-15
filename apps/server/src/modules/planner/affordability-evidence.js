@@ -29,9 +29,9 @@ export function applyMarketPricingCollection(gate, category, collection) {
   const required = gate.evidence.required.map((item) =>
     item.category === category ? { ...item, status: collection.status } : item,
   );
-  const collected = collectedEvidence
-    ? [...gate.evidence.collected, collectedEvidence]
-    : gate.evidence.collected;
+  // A repeated collection replaces the prior category result, including failed retries.
+  const otherEvidence = gate.evidence.collected.filter((item) => item.category !== category);
+  const collected = collectedEvidence ? [...otherEvidence, collectedEvidence] : otherEvidence;
   const missingCategories = required
     .filter((item) => item.status !== 'COLLECTED')
     .map((item) => item.category);
