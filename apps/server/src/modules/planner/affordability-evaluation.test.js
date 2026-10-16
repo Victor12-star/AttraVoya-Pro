@@ -205,9 +205,7 @@ describe('affordability evaluation policy', () => {
       '2026-00-01T12:00:00Z',
     ]) {
       const gate = completeGate({
-        collected: [
-          collectedEvidence('FLIGHTS', '200.00', '250.00', { sourceFetchedAt }),
-        ],
+        collected: [collectedEvidence('FLIGHTS', '200.00', '250.00', { sourceFetchedAt })],
       });
       expect(evaluateAffordabilityEvidenceGate(gate).evaluation.budgetFit).toBe('NOT_EVALUATED');
     }
