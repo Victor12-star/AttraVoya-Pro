@@ -39,6 +39,7 @@ function money(value, fieldName) {
   const validShape =
     (parts.length === 1 || parts.length === 2) &&
     parts[0].length > 0 &&
+    parts[0].length <= 10 &&
     [...parts[0]].every((character) => character >= '0' && character <= '9') &&
     (parts.length === 1 ||
       (parts[1].length >= 1 &&
