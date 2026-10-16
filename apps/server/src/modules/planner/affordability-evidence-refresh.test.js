@@ -26,6 +26,25 @@ describe('affordability evidence collection refresh', () => {
     },
   );
 
+  it.each(['UNKNOWN', 'COLLECTED ', 'ERROR', 'SUCCESS'])(
+    'rejects unsupported provider collection status %s',
+    (status) => {
+      expect(() => applyMarketPricingCollection(gate(), 'FLIGHTS', { status })).toThrow(
+        'Pricing collection status is invalid.',
+      );
+    },
+  );
+
+  it.each(['NOT_CONFIGURED', 'UNAVAILABLE', 'FAILED'])(
+    'keeps supported non-collected result %s incomplete',
+    (status) => {
+      const result = applyMarketPricingCollection(gate(), 'FLIGHTS', { status });
+      expect(result.evidence.status).toBe('INSUFFICIENT_EVIDENCE');
+      expect(result.evidence.missingCategories).toEqual(['FLIGHTS']);
+      expect(result.evidence.collected).toEqual([]);
+    },
+  );
+
   it('rejects otherwise supported categories that are not required by the plan', () => {
     expect(() =>
       applyMarketPricingCollection(gate(), 'ACCOMMODATION', {
