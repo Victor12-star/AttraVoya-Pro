@@ -161,6 +161,7 @@ function validateCompleteEvidence(gate) {
       !isNonEmptyString(item.sourceProvider) ||
       !isNonEmptyString(item.sourceExternalId) ||
       !isValidTimestamp(item.sourceFetchedAt) ||
+      Date.parse(item.sourceFetchedAt) > Date.now() ||
       item.verifiedMarketEvidence !== true
     ) {
       return null;
