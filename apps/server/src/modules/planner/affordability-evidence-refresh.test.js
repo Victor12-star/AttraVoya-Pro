@@ -17,6 +17,15 @@ function gate() {
 }
 
 describe('affordability evidence collection refresh', () => {
+  it('rejects otherwise supported categories that are not required by the plan', () => {
+    expect(() =>
+      applyMarketPricingCollection(gate(), 'ACCOMMODATION', {
+        status: 'COLLECTED',
+        evidence: { category: 'ACCOMMODATION', pricingBasis: 'LIVE' },
+      }),
+    ).toThrow('Pricing category is not required by the current plan.');
+  });
+
   it('rejects mismatched category evidence rather than marking the gate ready', () => {
     expect(() =>
       applyMarketPricingCollection(gate(), 'FLIGHTS', {
