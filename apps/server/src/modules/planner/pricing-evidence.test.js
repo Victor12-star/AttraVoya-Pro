@@ -152,6 +152,16 @@ describe('market pricing evidence normalization', () => {
     },
   );
 
+  it('rejects oversized provider price strings before integer conversion', () => {
+    const oversized = '9'.repeat(100_000);
+    expect(() =>
+      normalizeFlightPricingEvidence(validEvidence({ amountMin: oversized }), 'EUR'),
+    ).toThrow('valid non-negative money amount');
+    expect(() =>
+      normalizeFlightPricingEvidence(validEvidence({ amountMax: oversized }), 'EUR'),
+    ).toThrow('valid non-negative money amount');
+  });
+
   it('preserves exact cents and rejects amounts beyond the supported limit', () => {
     const evidence = normalizeFlightPricingEvidence(
       validEvidence({ amountMin: '000.01', amountMax: '1000000000.00' }),
