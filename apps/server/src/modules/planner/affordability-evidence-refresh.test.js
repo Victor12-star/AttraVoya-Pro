@@ -60,6 +60,39 @@ describe('affordability evidence collection refresh', () => {
     expect(refreshed.evaluation.evaluationPolicy).toBeUndefined();
   });
 
+  it('updates provenance when refreshed evidence changes from live to verified', () => {
+    const first = applyMarketPricingCollection(gate(), 'FLIGHTS', {
+      status: 'COLLECTED',
+      evidence: { category: 'FLIGHTS', amountMin: '100.00', pricingBasis: 'LIVE' },
+    });
+    const refreshed = applyMarketPricingCollection(first, 'FLIGHTS', {
+      status: 'COLLECTED',
+      evidence: { category: 'FLIGHTS', amountMin: '90.00', pricingBasis: 'VERIFIED_PRICE' },
+    });
+
+    expect(refreshed.provenance).toMatchObject({
+      liveDataUsed: false,
+      providerDataUsed: true,
+      pricingDataUsed: true,
+    });
+  });
+
+  it('removes pricing provenance if a failed refresh leaves no evidence', () => {
+    const first = applyMarketPricingCollection(gate(), 'FLIGHTS', {
+      status: 'COLLECTED',
+      evidence: { category: 'FLIGHTS', amountMin: '100.00', pricingBasis: 'LIVE' },
+    });
+    const failed = applyMarketPricingCollection(first, 'FLIGHTS', {
+      status: 'NOT_CONFIGURED',
+    });
+
+    expect(failed.provenance).toMatchObject({
+      liveDataUsed: false,
+      providerDataUsed: false,
+      pricingDataUsed: false,
+    });
+  });
+
   it('clears stale category evidence when a refresh cannot collect prices', () => {
     const first = applyMarketPricingCollection(gate(), 'FLIGHTS', {
       status: 'COLLECTED',
