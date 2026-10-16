@@ -94,7 +94,16 @@ function validateCompleteEvidence(gate) {
   }
 
   const spendableCents = moneyToCents(budget.spendableBudget);
-  if (spendableCents === null) return null;
+  const totalBudgetCents = moneyToCents(budget.totalBudget);
+  const reserveCents = moneyToCents(budget.safetyReserve?.amount);
+  if (
+    spendableCents === null ||
+    totalBudgetCents === null ||
+    reserveCents === null ||
+    spendableCents + reserveCents !== totalBudgetCents
+  ) {
+    return null;
+  }
 
   const requiredCategories = new Set();
   for (const item of required) {
