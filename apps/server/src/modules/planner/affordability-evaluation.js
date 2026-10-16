@@ -96,11 +96,17 @@ function validateCompleteEvidence(gate) {
   const spendableCents = moneyToCents(budget.spendableBudget);
   const totalBudgetCents = moneyToCents(budget.totalBudget);
   const reserveCents = moneyToCents(budget.safetyReserve?.amount);
+  const reserveBasisPoints = moneyToCents(budget.safetyReserve?.percentOfTotal);
   if (
     spendableCents === null ||
     totalBudgetCents === null ||
     reserveCents === null ||
-    spendableCents + reserveCents !== totalBudgetCents
+    reserveBasisPoints === null ||
+    reserveBasisPoints > 10_000 ||
+    budget.safetyReserve?.basis !== 'USER_INPUT_DERIVED' ||
+    spendableCents + reserveCents !== totalBudgetCents ||
+    BigInt(reserveCents) !==
+      (BigInt(totalBudgetCents) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n
   ) {
     return null;
   }

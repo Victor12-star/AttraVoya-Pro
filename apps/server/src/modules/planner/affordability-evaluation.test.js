@@ -24,6 +24,7 @@ function completeGate({
   collected,
   totalBudget = '1000.00',
   reserveAmount = '100.00',
+  reservePercent = '10.00',
 }) {
   const required = collected.map((item) => ({
     category: item.category,
@@ -42,6 +43,7 @@ function completeGate({
         spendableBudget,
         safetyReserve: {
           amount: reserveAmount,
+          percentOfTotal: reservePercent,
           basis: 'USER_INPUT_DERIVED',
         },
       },
@@ -177,6 +179,34 @@ describe('affordability evaluation policy', () => {
       evidenceReady: false,
       evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
     });
+  });
+
+  it.each([
+    { reservePercent: '20.00' },
+    { reservePercent: '101.00' },
+    { reservePercent: 'invalid' },
+    { reservePercent: '10.01' },
+  ])('blocks mismatched or invalid reserve percentage %#', (reserve) => {
+    const gate = completeGate({
+      ...reserve,
+      collected: [collectedEvidence('FLIGHTS', '200.00', '250.00')],
+    });
+    expect(evaluateAffordabilityEvidenceGate(gate).evaluation).toMatchObject({
+      budgetFit: 'NOT_EVALUATED',
+      affordabilityConfirmed: false,
+      evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+    });
+  });
+
+  it('accepts correctly rounded fractional-cent reserve amounts', () => {
+    const gate = completeGate({
+      totalBudget: '0.05',
+      spendableBudget: '0.04',
+      reserveAmount: '0.01',
+      reservePercent: '10.00',
+      collected: [collectedEvidence('FLIGHTS', '0.01', '0.03')],
+    });
+    expect(evaluateAffordabilityEvidenceGate(gate).evaluation.budgetFit).toBe('COMFORTABLE');
   });
 
   it('protects the safety reserve by comparing against spendable budget, not total budget', () => {
@@ -321,6 +351,7 @@ describe('affordability evaluation policy', () => {
       spendableBudget: amount,
       totalBudget: amount,
       reserveAmount: '0.00',
+      reservePercent: '0.00',
       collected: [collectedEvidence('FLIGHTS', amount, amount)],
     });
 
@@ -344,6 +375,7 @@ describe('affordability evaluation policy', () => {
       spendableBudget: amount,
       totalBudget: amount,
       reserveAmount: '0.00',
+      reservePercent: '0.00',
       collected: [collectedEvidence('FLIGHTS', amount, tooLarge)],
     });
     expect(evaluateAffordabilityEvidenceGate(invalidEvidence).evaluation.budgetFit).toBe(
