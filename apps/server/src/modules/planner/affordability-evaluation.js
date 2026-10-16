@@ -180,6 +180,16 @@ function validateCompleteEvidence(gate) {
 
 export function evaluateAffordabilityEvidenceGate(gate) {
   if (gate?.evidence?.status !== 'COMPLETE_EVIDENCE' || gate?.evaluation?.evidenceReady !== true) {
+    const hasStaleBudgetFit =
+      gate?.evaluation?.budgetFit != null && gate.evaluation.budgetFit !== 'NOT_EVALUATED';
+    if (
+      gate?.evaluation?.affordabilityConfirmed === true ||
+      gate?.evaluation?.rankingEligible === true ||
+      hasStaleBudgetFit ||
+      gate?.evaluation?.evaluationPolicy?.status === 'EVALUATED'
+    ) {
+      return blockedEvaluation(gate, 'INCOMPLETE_EVIDENCE');
+    }
     return gate;
   }
 
