@@ -1,6 +1,16 @@
 const POLICY_KEY = 'attravoya-affordability-evaluation-v1';
 const ACCEPTED_PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
+const SUPPORTED_COST_CATEGORIES = new Set([
+  'FLIGHTS',
+  'ACCOMMODATION',
+  'FOOD',
+  'LOCAL_TRANSPORT',
+  'ACTIVITIES',
+  'CHILDREN_ACTIVITIES',
+  'AIRPORT_TRANSFER',
+  'TRAVEL_INSURANCE',
+]);
 
 function moneyToCents(value) {
   if (typeof value !== 'string' || value.length > 17 || !/^\d+\.\d{2}$/.test(value)) {
@@ -115,7 +125,7 @@ function validateCompleteEvidence(gate) {
   for (const item of required) {
     if (
       !item ||
-      !isNonEmptyString(item.category) ||
+      !SUPPORTED_COST_CATEGORIES.has(item.category) ||
       item.status !== 'COLLECTED' ||
       item.targetBasis !== 'PLANNING_TARGET' ||
       moneyToCents(item.targetAmount) === null ||
