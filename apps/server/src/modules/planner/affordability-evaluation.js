@@ -98,7 +98,8 @@ function validateCompleteEvidence(gate) {
     !Array.isArray(missingCategories) ||
     missingCategories.length !== 0 ||
     !budget ||
-    typeof budget.currencyCode !== 'string'
+    typeof budget.currencyCode !== 'string' ||
+    !/^[A-Z]{3}$/.test(budget.currencyCode)
   ) {
     return null;
   }
