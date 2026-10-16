@@ -3,7 +3,9 @@ const ACCEPTED_PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
 
 function moneyToCents(value) {
-  if (typeof value !== 'string' || !/^\d+\.\d{2}$/.test(value)) return null;
+  if (typeof value !== 'string' || value.length > 17 || !/^\d+\.\d{2}$/.test(value)) {
+    return null;
+  }
   const [whole, fraction] = value.split('.');
   const cents = BigInt(whole) * 100n + BigInt(fraction);
   return cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) : null;
