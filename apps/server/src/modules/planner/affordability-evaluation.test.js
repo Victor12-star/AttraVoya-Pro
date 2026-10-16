@@ -271,6 +271,26 @@ describe('affordability evaluation policy', () => {
     });
   });
 
+  it('blocks oversized monetary strings before affordability integer conversion', () => {
+    const oversized = `${'9'.repeat(100_000)}.00`;
+    const flight = collectedEvidence('FLIGHTS', '200.00', '250.00');
+
+    const invalidBudget = completeGate({
+      spendableBudget: oversized,
+      collected: [flight],
+    });
+    expect(evaluateAffordabilityEvidenceGate(invalidBudget).evaluation.budgetFit).toBe(
+      'NOT_EVALUATED',
+    );
+
+    const invalidPrice = completeGate({
+      collected: [collectedEvidence('FLIGHTS', '200.00', oversized)],
+    });
+    expect(evaluateAffordabilityEvidenceGate(invalidPrice).evaluation.budgetFit).toBe(
+      'NOT_EVALUATED',
+    );
+  });
+
   it('keeps affordability evidence exact at the maximum supported cent amount', () => {
     const amount = '90071992547409.91';
     const gate = completeGate({
