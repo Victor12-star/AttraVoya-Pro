@@ -130,6 +130,7 @@ function validateCompleteEvidence(gate) {
       item.status !== 'COLLECTED' ||
       item.targetBasis !== 'PLANNING_TARGET' ||
       moneyToCents(item.targetAmount) === null ||
+      moneyToCents(item.targetAmount) === 0 ||
       requiredCategories.has(item.category)
     ) {
       return null;

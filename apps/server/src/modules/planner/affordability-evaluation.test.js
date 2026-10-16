@@ -134,6 +134,23 @@ describe('affordability evaluation policy', () => {
     },
   );
 
+  it.each(['0.00', '00.00', '000.00'])(
+    'blocks a required expense with a zero planning target %s',
+    (targetAmount) => {
+      const gate = completeGate({
+        collected: [collectedEvidence('FLIGHTS', '200.00', '250.00')],
+      });
+      gate.evidence.required[0].targetAmount = targetAmount;
+
+      expect(evaluateAffordabilityEvidenceGate(gate).evaluation).toMatchObject({
+        budgetFit: 'NOT_EVALUATED',
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+        evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+      });
+    },
+  );
+
   it('confirms comfortable budget fit only when the full upper range fits spendable budget', () => {
     const gate = completeGate({
       collected: [
