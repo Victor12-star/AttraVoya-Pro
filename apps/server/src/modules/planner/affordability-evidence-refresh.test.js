@@ -25,9 +25,9 @@ describe('affordability evidence collection refresh', () => {
       }),
     ).toThrow('Collected pricing evidence category does not match the request.');
 
-    expect(() =>
-      applyMarketPricingCollection(gate(), 'FLIGHTS', { status: 'COLLECTED' }),
-    ).toThrow('Collected pricing evidence category does not match the request.');
+    expect(() => applyMarketPricingCollection(gate(), 'FLIGHTS', { status: 'COLLECTED' })).toThrow(
+      'Collected pricing evidence category does not match the request.',
+    );
   });
 
   it('replaces previous category evidence on repeated successful collection', () => {
