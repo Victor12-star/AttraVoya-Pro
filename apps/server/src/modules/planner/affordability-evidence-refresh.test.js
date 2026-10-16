@@ -35,6 +35,31 @@ describe('affordability evidence collection refresh', () => {
     expect(refreshed.evidence.collectionAttempts).toHaveLength(2);
   });
 
+  it('invalidates previous affordability confirmation after recollecting evidence', () => {
+    const previouslyEvaluated = {
+      ...gate(),
+      evaluation: {
+        budgetFit: 'COMFORTABLE',
+        rankingEligible: true,
+        affordabilityConfirmed: true,
+        evidenceReady: true,
+        evaluationPolicy: { status: 'EVALUATED' },
+      },
+    };
+    const refreshed = applyMarketPricingCollection(previouslyEvaluated, 'FLIGHTS', {
+      status: 'COLLECTED',
+      evidence: { category: 'FLIGHTS', amountMin: '120.00', pricingBasis: 'LIVE' },
+    });
+
+    expect(refreshed.evaluation).toMatchObject({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: true,
+    });
+    expect(refreshed.evaluation.evaluationPolicy).toBeUndefined();
+  });
+
   it('clears stale category evidence when a refresh cannot collect prices', () => {
     const first = applyMarketPricingCollection(gate(), 'FLIGHTS', {
       status: 'COLLECTED',
