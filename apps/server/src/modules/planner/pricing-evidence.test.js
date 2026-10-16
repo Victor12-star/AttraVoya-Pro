@@ -146,11 +146,7 @@ describe('market pricing evidence normalization', () => {
       );
     }
     expect(() =>
-      normalizePlannerCategoryPricingEvidence(
-        validEvidence({ sourceFetchedAt }),
-        'EUR',
-        'FOOD',
-      ),
+      normalizePlannerCategoryPricingEvidence(validEvidence({ sourceFetchedAt }), 'EUR', 'FOOD'),
     ).toThrow('sourceFetchedAt is invalid');
   });
 
