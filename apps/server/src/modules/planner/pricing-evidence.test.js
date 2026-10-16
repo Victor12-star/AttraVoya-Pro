@@ -174,6 +174,15 @@ describe('market pricing evidence normalization', () => {
     ).toThrow('valid non-negative money amount');
   });
 
+  it.each(['toString', 'constructor', '__proto__', 'hasOwnProperty'])(
+    'rejects inherited object property %s as a cost category',
+    (category) => {
+      expect(() =>
+        normalizePlannerCategoryPricingEvidence(validEvidence(), 'EUR', category),
+      ).toThrow('category is not supported');
+    },
+  );
+
   it('rejects currency mismatch, invalid ranges, missing identity, and unsupported categories', () => {
     expect(() =>
       normalizeAccommodationPricingEvidence(validEvidence({ currencyCode: 'SEK' }), 'EUR'),

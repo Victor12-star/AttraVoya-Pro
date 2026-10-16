@@ -68,8 +68,10 @@ export function normalizePlannerCategoryPricingEvidence(
   expectedCurrencyCode,
   category,
 ) {
+  if (!Object.hasOwn(VERIFIED_COST_CATEGORY_LABELS, category)) {
+    throw new TypeError('Verified cost evidence category is not supported.');
+  }
   const label = VERIFIED_COST_CATEGORY_LABELS[category];
-  if (!label) throw new TypeError('Verified cost evidence category is not supported.');
   if (!rawEvidence || typeof rawEvidence !== 'object' || Array.isArray(rawEvidence)) {
     throw new TypeError(`${label} pricing evidence must be an object.`);
   }
