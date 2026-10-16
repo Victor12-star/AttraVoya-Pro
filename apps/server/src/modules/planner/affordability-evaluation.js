@@ -183,7 +183,8 @@ export function evaluateAffordabilityEvidenceGate(gate) {
     if (
       gate?.evaluation?.affordabilityConfirmed === true ||
       gate?.evaluation?.rankingEligible === true ||
-      gate?.evaluation?.budgetFit !== 'NOT_EVALUATED' ||
+      (gate?.evaluation?.budgetFit != null &&
+        gate.evaluation.budgetFit !== 'NOT_EVALUATED') ||
       gate?.evaluation?.evaluationPolicy?.status === 'EVALUATED'
     ) {
       return blockedEvaluation(gate, 'INCOMPLETE_EVIDENCE');
