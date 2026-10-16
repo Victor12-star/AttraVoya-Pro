@@ -143,6 +143,27 @@ describe('market pricing evidence normalization', () => {
     expect(evidence.sourceFetchedAt).toBe('2024-02-29T12:00:00.000Z');
   });
 
+  it.each(['10.001', '10.999', '1e2', ' 10.00 ', '', null, undefined])(
+    'rejects imprecise or ambiguous provider amount %s',
+    (amountMin) => {
+      expect(() => normalizeFlightPricingEvidence(validEvidence({ amountMin }), 'EUR')).toThrow(
+        'valid non-negative money amount',
+      );
+    },
+  );
+
+  it('preserves exact cents and rejects amounts beyond the supported limit', () => {
+    const evidence = normalizeFlightPricingEvidence(
+      validEvidence({ amountMin: '000.01', amountMax: '1000000000.00' }),
+      'EUR',
+    );
+    expect(evidence.amountMin).toBe('0.01');
+    expect(evidence.amountMax).toBe('1000000000.00');
+    expect(() =>
+      normalizeFlightPricingEvidence(validEvidence({ amountMax: '1000000000.01' }), 'EUR'),
+    ).toThrow('valid non-negative money amount');
+  });
+
   it('rejects currency mismatch, invalid ranges, missing identity, and unsupported categories', () => {
     expect(() =>
       normalizeAccommodationPricingEvidence(validEvidence({ currencyCode: 'SEK' }), 'EUR'),

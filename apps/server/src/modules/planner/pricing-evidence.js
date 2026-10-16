@@ -34,11 +34,25 @@ function currencyCode(value) {
 }
 
 function money(value, fieldName) {
-  const numeric = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numeric) || numeric < 0 || numeric > MAX_MONEY_AMOUNT) {
+  const text = typeof value === 'number' ? String(value) : value;
+  const parts = typeof text === 'string' ? text.split('.') : [];
+  const validShape =
+    (parts.length === 1 || parts.length === 2) &&
+    parts[0].length > 0 &&
+    [...parts[0]].every((character) => character >= '0' && character <= '9') &&
+    (parts.length === 1 ||
+      (parts[1].length >= 1 &&
+        parts[1].length <= 2 &&
+        [...parts[1]].every((character) => character >= '0' && character <= '9')));
+  if (!validShape) {
     throw new TypeError(`${fieldName} must be a valid non-negative money amount.`);
   }
-  return numeric.toFixed(2);
+  const [whole, fraction = ''] = parts;
+  const cents = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0') || '0');
+  if (cents > BigInt(MAX_MONEY_AMOUNT) * 100n) {
+    throw new TypeError(`${fieldName} must be a valid non-negative money amount.`);
+  }
+  return `${cents / 100n}.${String(cents % 100n).padStart(2, '0')}`;
 }
 
 function sourceTimestamp(value) {
