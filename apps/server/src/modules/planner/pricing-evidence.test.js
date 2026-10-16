@@ -177,9 +177,9 @@ describe('market pricing evidence normalization', () => {
   it.each(['toString', 'constructor', '__proto__', 'hasOwnProperty'])(
     'rejects inherited object property %s as a cost category',
     (category) => {
-      expect(() => normalizePlannerCategoryPricingEvidence(validEvidence(), 'EUR', category)).toThrow(
-        'category is not supported',
-      );
+      expect(() =>
+        normalizePlannerCategoryPricingEvidence(validEvidence(), 'EUR', category),
+      ).toThrow('category is not supported');
     },
   );
 
