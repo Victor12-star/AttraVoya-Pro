@@ -72,9 +72,10 @@ export function applyMarketPricingCollection(gate, category, collection) {
       liveDataUsed: collected.some((item) => item.pricingBasis === 'LIVE'),
       providerDataUsed: collected.length > 0,
       pricingDataUsed: collected.length > 0,
-      statement: collectedEvidence
-        ? 'Verified cost evidence was collected server-side for one or more planner categories, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
-        : gate.provenance.statement,
+      statement:
+        collected.length > 0
+          ? 'Verified cost evidence was collected server-side for one or more planner categories, but affordability and ranking remain unevaluated until the full required evidence set is available and evaluated.'
+          : 'No current market pricing evidence is retained for this plan. Affordability and ranking remain unevaluated until the full required evidence set is collected and evaluated.',
     },
   };
 }
