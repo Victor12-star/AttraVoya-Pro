@@ -34,11 +34,16 @@ function currencyCode(value) {
 }
 
 function money(value, fieldName) {
-  const numeric = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numeric) || numeric < 0 || numeric > MAX_MONEY_AMOUNT) {
+  const text = typeof value === 'number' ? String(value) : value;
+  if (typeof text !== 'string' || !/^\\d+(?:\\.\\d{1,2})?$/.test(text)) {
     throw new TypeError(`${fieldName} must be a valid non-negative money amount.`);
   }
-  return numeric.toFixed(2);
+  const [whole, fraction = ''] = text.split('.');
+  const cents = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0') || '0');
+  if (cents > BigInt(MAX_MONEY_AMOUNT) * 100n) {
+    throw new TypeError(`${fieldName} must be a valid non-negative money amount.`);
+  }
+  return `${cents / 100n}.${String(cents % 100n).padStart(2, '0')}`;
 }
 
 function sourceTimestamp(value) {
