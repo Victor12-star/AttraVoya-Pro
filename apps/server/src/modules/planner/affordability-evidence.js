@@ -54,7 +54,11 @@ export function applyMarketPricingCollection(gate, category, collection) {
     },
     evaluation: {
       ...gate.evaluation,
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
       evidenceReady: missingCategories.length === 0,
+      evaluationPolicy: undefined,
     },
     provenance: {
       ...gate.provenance,
