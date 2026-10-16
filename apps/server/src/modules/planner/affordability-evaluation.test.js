@@ -197,6 +197,31 @@ describe('affordability evaluation policy', () => {
     );
   });
 
+  it('rejects impossible source calendar dates and accepts leap-day evidence', () => {
+    for (const sourceFetchedAt of [
+      '2026-02-29T12:00:00Z',
+      '2026-04-31T12:00:00Z',
+      '2026-13-01T12:00:00Z',
+      '2026-00-01T12:00:00Z',
+    ]) {
+      const gate = completeGate({
+        collected: [
+          collectedEvidence('FLIGHTS', '200.00', '250.00', { sourceFetchedAt }),
+        ],
+      });
+      expect(evaluateAffordabilityEvidenceGate(gate).evaluation.budgetFit).toBe('NOT_EVALUATED');
+    }
+
+    const leapDay = completeGate({
+      collected: [
+        collectedEvidence('FLIGHTS', '200.00', '250.00', {
+          sourceFetchedAt: '2024-02-29T12:00:00Z',
+        }),
+      ],
+    });
+    expect(evaluateAffordabilityEvidenceGate(leapDay).evaluation.budgetFit).toBe('COMFORTABLE');
+  });
+
   it('fails closed when a complete evidence set is duplicated, mismatched, or unverified', () => {
     const flight = collectedEvidence('FLIGHTS', '200.00', '250.00');
     const gate = completeGate({
