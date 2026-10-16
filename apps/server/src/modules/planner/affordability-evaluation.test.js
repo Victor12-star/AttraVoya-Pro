@@ -297,6 +297,22 @@ describe('affordability evaluation policy', () => {
     expect(evaluateAffordabilityEvidenceGate(valid).evaluation.budgetFit).toBe('COMFORTABLE');
   });
 
+  it.each(['UNKNOWN_COST', 'constructor', '__proto__'])(
+    'blocks unsupported completed pricing category %s',
+    (category) => {
+      const gate = completeGate({
+        collected: [collectedEvidence(category, '200.00', '250.00')],
+      });
+      const evaluated = evaluateAffordabilityEvidenceGate(gate);
+      expect(evaluated.evaluation).toMatchObject({
+        budgetFit: 'NOT_EVALUATED',
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+        evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+      });
+    },
+  );
+
   it('fails closed when a complete evidence set is duplicated, mismatched, or unverified', () => {
     const flight = collectedEvidence('FLIGHTS', '200.00', '250.00');
     const gate = completeGate({
