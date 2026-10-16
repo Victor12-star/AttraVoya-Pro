@@ -17,6 +17,19 @@ function gate() {
 }
 
 describe('affordability evidence collection refresh', () => {
+  it('rejects mismatched category evidence rather than marking the gate ready', () => {
+    expect(() =>
+      applyMarketPricingCollection(gate(), 'FLIGHTS', {
+        status: 'COLLECTED',
+        evidence: { category: 'ACCOMMODATION', pricingBasis: 'LIVE' },
+      }),
+    ).toThrow('Collected pricing evidence category does not match the request.');
+
+    expect(() => applyMarketPricingCollection(gate(), 'FLIGHTS', { status: 'COLLECTED' })).toThrow(
+      'Collected pricing evidence category does not match the request.',
+    );
+  });
+
   it('replaces previous category evidence on repeated successful collection', () => {
     const first = applyMarketPricingCollection(gate(), 'FLIGHTS', {
       status: 'COLLECTED',
