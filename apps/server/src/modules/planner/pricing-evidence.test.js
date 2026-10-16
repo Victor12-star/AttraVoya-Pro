@@ -123,6 +123,26 @@ describe('market pricing evidence normalization', () => {
     },
   );
 
+  it.each([
+    '2026-02-29T12:00:00Z',
+    '2026-04-31T12:00:00Z',
+    '2026-09-06T24:00:00Z',
+    '2026-09-06T12:60:00Z',
+    '2026-09-06T12:00:00',
+  ])('rejects invalid source timestamp %s', (sourceFetchedAt) => {
+    expect(() => normalizeFlightPricingEvidence(validEvidence({ sourceFetchedAt }), 'EUR')).toThrow(
+      'sourceFetchedAt is invalid',
+    );
+  });
+
+  it('normalizes explicitly zoned provider timestamps with valid leap-day dates', () => {
+    const evidence = normalizeFlightPricingEvidence(
+      validEvidence({ sourceFetchedAt: '2024-02-29T14:00:00+02:00' }),
+      'EUR',
+    );
+    expect(evidence.sourceFetchedAt).toBe('2024-02-29T12:00:00.000Z');
+  });
+
   it('rejects currency mismatch, invalid ranges, missing identity, and unsupported categories', () => {
     expect(() =>
       normalizeAccommodationPricingEvidence(validEvidence({ currencyCode: 'SEK' }), 'EUR'),

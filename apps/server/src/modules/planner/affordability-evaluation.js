@@ -19,7 +19,7 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function isValidTimestamp(value) {
+export function isValidTimestamp(value) {
   if (typeof value !== 'string') return false;
   const parts = value.split('T');
   if (parts.length !== 2 || !/^\d{4}-\d{2}-\d{2}$/.test(parts[0])) return false;

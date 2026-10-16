@@ -1,3 +1,5 @@
+import { isValidTimestamp } from './affordability-evaluation.js';
+
 const ACCEPTED_PRICING_BASES = new Set(['LIVE', 'VERIFIED_PRICE']);
 const ACCEPTED_CONFIDENCE = new Set(['LOW', 'MEDIUM', 'HIGH']);
 const VERIFIED_COST_CATEGORY_LABELS = Object.freeze({
@@ -41,8 +43,8 @@ function money(value, fieldName) {
 
 function sourceTimestamp(value) {
   const normalized = boundedText(value, 'sourceFetchedAt', 64);
+  if (!isValidTimestamp(normalized)) throw new TypeError('sourceFetchedAt is invalid.');
   const parsed = new Date(normalized);
-  if (Number.isNaN(parsed.getTime())) throw new TypeError('sourceFetchedAt is invalid.');
   return parsed.toISOString();
 }
 
