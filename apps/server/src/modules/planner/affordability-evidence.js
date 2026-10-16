@@ -1,5 +1,10 @@
 const POLICY_KEY = 'attravoya-affordability-evidence-v1';
-const PRICING_COLLECTION_STATUSES = new Set(['COLLECTED', 'NOT_CONFIGURED', 'UNAVAILABLE', 'FAILED']);
+const PRICING_COLLECTION_STATUSES = new Set([
+  'COLLECTED',
+  'NOT_CONFIGURED',
+  'UNAVAILABLE',
+  'FAILED',
+]);
 const VERIFIED_COST_CATEGORIES = new Set([
   'FLIGHTS',
   'ACCOMMODATION',
