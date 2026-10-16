@@ -35,7 +35,7 @@ function currencyCode(value) {
 
 function money(value, fieldName) {
   const text = typeof value === 'number' ? String(value) : value;
-  if (typeof text !== 'string' || !/^\\d+(?:\\.\\d{1,2})?$/.test(text)) {
+  if (typeof text !== 'string' || !/^\d+(?:\.\d{1,2})?$/.test(text)) {
     throw new TypeError(`${fieldName} must be a valid non-negative money amount.`);
   }
   const [whole, fraction = ''] = text.split('.');
