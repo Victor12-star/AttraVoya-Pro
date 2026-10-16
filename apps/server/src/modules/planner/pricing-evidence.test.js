@@ -146,9 +146,9 @@ describe('market pricing evidence normalization', () => {
   it.each(['10.001', '10.999', '1e2', ' 10.00 ', '', null, undefined])(
     'rejects imprecise or ambiguous provider amount %s',
     (amountMin) => {
-      expect(() =>
-        normalizeFlightPricingEvidence(validEvidence({ amountMin }), 'EUR'),
-      ).toThrow('valid non-negative money amount');
+      expect(() => normalizeFlightPricingEvidence(validEvidence({ amountMin }), 'EUR')).toThrow(
+        'valid non-negative money amount',
+      );
     },
   );
 
