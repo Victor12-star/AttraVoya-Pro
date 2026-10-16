@@ -31,6 +31,8 @@ function isValidTimestamp(value) {
 
   const time = parts[1].slice(0, 8);
   if (!/^\d{2}:\d{2}:\d{2}$/.test(time)) return false;
+  const [hour, minute, second] = time.split(':').map(Number);
+  if (hour > 23 || minute > 59 || second > 59) return false;
 
   let suffix = parts[1].slice(8);
   if (suffix.startsWith('.')) {
