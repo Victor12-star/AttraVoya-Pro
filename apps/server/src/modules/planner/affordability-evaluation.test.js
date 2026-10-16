@@ -337,6 +337,25 @@ describe('affordability evaluation policy', () => {
     expect(evaluateAffordabilityEvidenceGate(leapDay).evaluation.budgetFit).toBe('COMFORTABLE');
   });
 
+  it('blocks future-dated market evidence without confirming affordability', () => {
+    const future = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const gate = completeGate({
+      collected: [
+        collectedEvidence('FLIGHTS', '200.00', '250.00', {
+          sourceFetchedAt: future,
+        }),
+      ],
+    });
+
+    expect(evaluateAffordabilityEvidenceGate(gate).evaluation).toMatchObject({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+      evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+    });
+  });
+
   it('rejects invalid source clock times without normalizing into another day', () => {
     for (const sourceFetchedAt of [
       '2026-09-06T24:00:00Z',
