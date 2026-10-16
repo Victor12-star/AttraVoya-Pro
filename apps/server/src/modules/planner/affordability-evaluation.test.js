@@ -220,6 +220,29 @@ describe('affordability evaluation policy', () => {
     expect(evaluateAffordabilityEvidenceGate(leapDay).evaluation.budgetFit).toBe('COMFORTABLE');
   });
 
+  it('rejects invalid source clock times without normalizing into another day', () => {
+    for (const sourceFetchedAt of [
+      '2026-09-06T24:00:00Z',
+      '2026-09-06T25:00:00Z',
+      '2026-09-06T12:60:00Z',
+      '2026-09-06T12:00:60Z',
+    ]) {
+      const gate = completeGate({
+        collected: [collectedEvidence('FLIGHTS', '200.00', '250.00', { sourceFetchedAt })],
+      });
+      expect(evaluateAffordabilityEvidenceGate(gate).evaluation.budgetFit).toBe('NOT_EVALUATED');
+    }
+
+    const valid = completeGate({
+      collected: [
+        collectedEvidence('FLIGHTS', '200.00', '250.00', {
+          sourceFetchedAt: '2026-09-06T23:59:59Z',
+        }),
+      ],
+    });
+    expect(evaluateAffordabilityEvidenceGate(valid).evaluation.budgetFit).toBe('COMFORTABLE');
+  });
+
   it('fails closed when a complete evidence set is duplicated, mismatched, or unverified', () => {
     const flight = collectedEvidence('FLIGHTS', '200.00', '250.00');
     const gate = completeGate({
