@@ -116,6 +116,24 @@ describe('affordability evaluation policy', () => {
     expect(evaluated.provenance.statement).toContain('blocked');
   });
 
+  it.each(['', 'eur', 'EURO', 'E1R', 'EUR ', '__proto__'])(
+    'blocks malformed budget currency code %s',
+    (currencyCode) => {
+      const gate = completeGate({
+        collected: [collectedEvidence('FLIGHTS', '200.00', '250.00')],
+      });
+      gate.searchContext.budget.currencyCode = currencyCode;
+      gate.evidence.collected[0].currencyCode = currencyCode;
+
+      expect(evaluateAffordabilityEvidenceGate(gate).evaluation).toMatchObject({
+        budgetFit: 'NOT_EVALUATED',
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+        evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+      });
+    },
+  );
+
   it('confirms comfortable budget fit only when the full upper range fits spendable budget', () => {
     const gate = completeGate({
       collected: [
