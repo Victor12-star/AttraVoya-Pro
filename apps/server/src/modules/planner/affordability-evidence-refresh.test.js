@@ -17,6 +17,15 @@ function gate() {
 }
 
 describe('affordability evidence collection refresh', () => {
+  it.each([undefined, null, {}, { status: '' }, { status: ' ' }, { status: 123 }])(
+    'rejects malformed collection payload %s',
+    (collection) => {
+      expect(() => applyMarketPricingCollection(gate(), 'FLIGHTS', collection)).toThrow(
+        'Pricing collection status is invalid.',
+      );
+    },
+  );
+
   it('rejects otherwise supported categories that are not required by the plan', () => {
     expect(() =>
       applyMarketPricingCollection(gate(), 'ACCOMMODATION', {

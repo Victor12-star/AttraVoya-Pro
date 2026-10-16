@@ -21,6 +21,9 @@ function evidenceStatus(required) {
 }
 
 export function applyMarketPricingCollection(gate, category, collection) {
+  if (!collection || typeof collection.status !== 'string' || !collection.status.trim()) {
+    throw new TypeError('Pricing collection status is invalid.');
+  }
   if (!VERIFIED_COST_CATEGORIES.has(category)) {
     throw new TypeError('Verified cost collection category is not supported.');
   }
