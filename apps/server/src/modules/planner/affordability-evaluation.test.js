@@ -19,7 +19,7 @@ function collectedEvidence(category, amountMin, amountMax, overrides = {}) {
   };
 }
 
-function completeGate({ spendableBudget = '900.00', collected, totalBudget = '1000.00' }) {
+function completeGate({ spendableBudget = '900.00', collected, totalBudget = '1000.00', reserveAmount = '100.00' }) {
   const required = collected.map((item) => ({
     category: item.category,
     targetAmount: '100.00',
@@ -36,7 +36,7 @@ function completeGate({ spendableBudget = '900.00', collected, totalBudget = '10
         totalBudget,
         spendableBudget,
         safetyReserve: {
-          amount: '100.00',
+          amount: reserveAmount,
           basis: 'USER_INPUT_DERIVED',
         },
       },
@@ -152,6 +152,25 @@ describe('affordability evaluation policy', () => {
     expect(evaluated.evaluation.evaluationPolicy.totalEvidenceRange).toEqual({
       amountMin: '925.00',
       amountMax: '1050.00',
+    });
+  });
+
+  it.each([
+    { totalBudget: '1000.00', spendableBudget: '950.00', reserveAmount: '100.00' },
+    { totalBudget: '1000.00', spendableBudget: '800.00', reserveAmount: '100.00' },
+    { totalBudget: '1000.00', spendableBudget: '900.00', reserveAmount: '0.01' },
+    { totalBudget: '1000.00', spendableBudget: '900.00', reserveAmount: 'invalid' },
+  ])('blocks inconsistent budget and reserve amounts %#', (budget) => {
+    const gate = completeGate({
+      ...budget,
+      collected: [collectedEvidence('FLIGHTS', '200.00', '250.00')],
+    });
+    const evaluated = evaluateAffordabilityEvidenceGate(gate);
+    expect(evaluated.evaluation).toMatchObject({
+      budgetFit: 'NOT_EVALUATED',
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+      evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
     });
   });
 
@@ -296,6 +315,7 @@ describe('affordability evaluation policy', () => {
     const gate = completeGate({
       spendableBudget: amount,
       totalBudget: amount,
+      reserveAmount: '0.00',
       collected: [collectedEvidence('FLIGHTS', amount, amount)],
     });
 
@@ -317,6 +337,8 @@ describe('affordability evaluation policy', () => {
 
     const invalidEvidence = completeGate({
       spendableBudget: amount,
+      totalBudget: amount,
+      reserveAmount: '0.00',
       collected: [collectedEvidence('FLIGHTS', amount, tooLarge)],
     });
     expect(evaluateAffordabilityEvidenceGate(invalidEvidence).evaluation.budgetFit).toBe(
