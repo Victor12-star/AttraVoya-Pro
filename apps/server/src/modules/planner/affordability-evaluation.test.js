@@ -19,7 +19,12 @@ function collectedEvidence(category, amountMin, amountMax, overrides = {}) {
   };
 }
 
-function completeGate({ spendableBudget = '900.00', collected, totalBudget = '1000.00', reserveAmount = '100.00' }) {
+function completeGate({
+  spendableBudget = '900.00',
+  collected,
+  totalBudget = '1000.00',
+  reserveAmount = '100.00',
+}) {
   const required = collected.map((item) => ({
     category: item.category,
     targetAmount: '100.00',
