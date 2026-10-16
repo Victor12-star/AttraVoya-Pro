@@ -88,6 +88,34 @@ describe('affordability evaluation policy', () => {
     expect(evaluateAffordabilityEvidenceGate(gate)).toBe(gate);
   });
 
+  it.each([
+    { affordabilityConfirmed: true },
+    { rankingEligible: true },
+    { budgetFit: 'COMFORTABLE' },
+    { evaluationPolicy: { status: 'EVALUATED' } },
+  ])('blocks stale affordability state for incomplete evidence %#', (stale) => {
+    const gate = {
+      evidence: { status: 'INSUFFICIENT_EVIDENCE' },
+      evaluation: {
+        budgetFit: 'NOT_EVALUATED',
+        rankingEligible: false,
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+        ...stale,
+      },
+      provenance: { statement: 'Awaiting evidence.' },
+    };
+    const evaluated = evaluateAffordabilityEvidenceGate(gate);
+    expect(evaluated.evaluation).toMatchObject({
+      budgetFit: 'NOT_EVALUATED',
+      rankingEligible: false,
+      affordabilityConfirmed: false,
+      evidenceReady: false,
+      evaluationPolicy: { status: 'BLOCKED', reason: 'INCOMPLETE_EVIDENCE' },
+    });
+    expect(evaluated.provenance.statement).toContain('blocked');
+  });
+
   it('confirms comfortable budget fit only when the full upper range fits spendable budget', () => {
     const gate = completeGate({
       collected: [
