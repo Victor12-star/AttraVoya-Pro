@@ -24,6 +24,9 @@ export function applyMarketPricingCollection(gate, category, collection) {
   if (!VERIFIED_COST_CATEGORIES.has(category)) {
     throw new TypeError('Verified cost collection category is not supported.');
   }
+  if (!gate.evidence.required.some((item) => item.category === category)) {
+    throw new TypeError('Pricing category is not required by the current plan.');
+  }
 
   if (collection.status === 'COLLECTED' && collection.evidence?.category !== category) {
     throw new TypeError('Collected pricing evidence category does not match the request.');
