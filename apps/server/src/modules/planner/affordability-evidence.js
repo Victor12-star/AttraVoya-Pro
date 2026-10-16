@@ -25,6 +25,10 @@ export function applyMarketPricingCollection(gate, category, collection) {
     throw new TypeError('Verified cost collection category is not supported.');
   }
 
+  if (collection.status === 'COLLECTED' && collection.evidence?.category !== category) {
+    throw new TypeError('Collected pricing evidence category does not match the request.');
+  }
+
   const collectedEvidence = collection.status === 'COLLECTED' ? collection.evidence : null;
   const required = gate.evidence.required.map((item) =>
     item.category === category ? { ...item, status: collection.status } : item,
