@@ -1,4 +1,5 @@
 const POLICY_KEY = 'attravoya-affordability-evidence-v1';
+const PRICING_COLLECTION_STATUSES = new Set(['COLLECTED', 'NOT_CONFIGURED', 'UNAVAILABLE', 'FAILED']);
 const VERIFIED_COST_CATEGORIES = new Set([
   'FLIGHTS',
   'ACCOMMODATION',
@@ -21,7 +22,7 @@ function evidenceStatus(required) {
 }
 
 export function applyMarketPricingCollection(gate, category, collection) {
-  if (!collection || typeof collection.status !== 'string' || !collection.status.trim()) {
+  if (!collection || !PRICING_COLLECTION_STATUSES.has(collection.status)) {
     throw new TypeError('Pricing collection status is invalid.');
   }
   if (!VERIFIED_COST_CATEGORIES.has(category)) {
