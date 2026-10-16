@@ -60,6 +60,7 @@ function sourceTimestamp(value) {
   const normalized = boundedText(value, 'sourceFetchedAt', 64);
   if (!isValidTimestamp(normalized)) throw new TypeError('sourceFetchedAt is invalid.');
   const parsed = new Date(normalized);
+  if (parsed.getTime() > Date.now()) throw new TypeError('sourceFetchedAt is invalid.');
   return parsed.toISOString();
 }
 
