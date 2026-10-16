@@ -135,6 +135,21 @@ describe('market pricing evidence normalization', () => {
     );
   });
 
+  it('rejects future-dated pricing timestamps at provider normalization', () => {
+    const sourceFetchedAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    for (const normalize of [
+      normalizeAccommodationPricingEvidence,
+      normalizeFlightPricingEvidence,
+    ]) {
+      expect(() => normalize(validEvidence({ sourceFetchedAt }), 'EUR')).toThrow(
+        'sourceFetchedAt is invalid',
+      );
+    }
+    expect(() =>
+      normalizePlannerCategoryPricingEvidence(validEvidence({ sourceFetchedAt }), 'EUR', 'FOOD'),
+    ).toThrow('sourceFetchedAt is invalid');
+  });
+
   it('normalizes explicitly zoned provider timestamps with valid leap-day dates', () => {
     const evidence = normalizeFlightPricingEvidence(
       validEvidence({ sourceFetchedAt: '2024-02-29T14:00:00+02:00' }),
