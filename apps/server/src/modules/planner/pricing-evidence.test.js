@@ -129,10 +129,10 @@ describe('market pricing evidence normalization', () => {
     '2026-09-06T24:00:00Z',
     '2026-09-06T12:60:00Z',
     '2026-09-06T12:00:00',
-  ])('rejects invalid provider source timestamp %s before normalizing evidence', (sourceFetchedAt) => {
-    expect(() =>
-      normalizeFlightPricingEvidence(validEvidence({ sourceFetchedAt }), 'EUR'),
-    ).toThrow('sourceFetchedAt is invalid');
+  ])('rejects invalid source timestamp %s', (sourceFetchedAt) => {
+    expect(() => normalizeFlightPricingEvidence(validEvidence({ sourceFetchedAt }), 'EUR')).toThrow(
+      'sourceFetchedAt is invalid',
+    );
   });
 
   it('normalizes explicitly zoned provider timestamps with valid leap-day dates', () => {
