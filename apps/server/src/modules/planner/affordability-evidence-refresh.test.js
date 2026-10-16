@@ -97,6 +97,7 @@ describe('affordability evidence collection refresh', () => {
       providerDataUsed: true,
       pricingDataUsed: true,
     });
+    expect(refreshed.provenance.statement).toContain('Verified cost evidence was collected');
   });
 
   it('removes pricing provenance if a failed refresh leaves no evidence', () => {
@@ -113,6 +114,7 @@ describe('affordability evidence collection refresh', () => {
       providerDataUsed: false,
       pricingDataUsed: false,
     });
+    expect(failed.provenance.statement).toContain('No current market pricing evidence');
   });
 
   it('clears stale category evidence when a refresh cannot collect prices', () => {
