@@ -82,6 +82,20 @@ describe('budget allocation exact arithmetic', () => {
     },
   );
 
+  it('rejects an inherited currency code instead of trusting the prototype', () => {
+    const record = {
+      id: 'inherited-currency',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+      budgetCurrency: Object.create({ code: 'EUR' }),
+    };
+
+    expect(() => buildBudgetEnvelope(record)).toThrow('Budget currency code is invalid.');
+    const valid = buildBudgetEnvelope({ ...record, budgetCurrency: { code: 'EUR' } });
+    expect(valid.currencyCode).toBe('EUR');
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
