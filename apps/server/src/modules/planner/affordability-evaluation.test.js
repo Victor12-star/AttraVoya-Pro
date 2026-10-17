@@ -151,6 +151,29 @@ describe('affordability evaluation policy', () => {
     },
   );
 
+  it.each(['budget', 'collected'])(
+    'blocks inherited %s currency codes in otherwise complete evidence',
+    (location) => {
+      const gate = completeGate({
+        collected: [collectedEvidence('FLIGHTS', '200.00', '250.00')],
+      });
+      if (location === 'budget') {
+        const { currencyCode, ...budget } = gate.searchContext.budget;
+        gate.searchContext.budget = Object.assign(Object.create({ currencyCode }), budget);
+      } else {
+        const { currencyCode, ...evidence } = gate.evidence.collected[0];
+        gate.evidence.collected[0] = Object.assign(Object.create({ currencyCode }), evidence);
+      }
+
+      expect(evaluateAffordabilityEvidenceGate(gate).evaluation).toMatchObject({
+        budgetFit: 'NOT_EVALUATED',
+        affordabilityConfirmed: false,
+        evidenceReady: false,
+        evaluationPolicy: { status: 'BLOCKED', reason: 'INVALID_COMPLETE_EVIDENCE' },
+      });
+    },
+  );
+
   it('confirms comfortable budget fit only when the full upper range fits spendable budget', () => {
     const gate = completeGate({
       collected: [
