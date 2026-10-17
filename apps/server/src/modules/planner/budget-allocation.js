@@ -20,6 +20,9 @@ function isNonNegativeDecimal(value) {
 }
 
 function decimalToScaledInteger(value, scaleDigits, label) {
+  if (typeof value !== 'string' && (typeof value !== 'number' || !Number.isFinite(value))) {
+    throw new TypeError(`${label} must be a non-negative decimal value.`);
+  }
   const normalized = String(value ?? '').trim();
   if (normalized.length > 64 || !isNonNegativeDecimal(normalized)) {
     throw new TypeError(`${label} must be a non-negative decimal value.`);
