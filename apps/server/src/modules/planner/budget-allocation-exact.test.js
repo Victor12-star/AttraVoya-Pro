@@ -38,6 +38,35 @@ describe('budget allocation exact arithmetic', () => {
     );
   });
 
+  it('rejects fractional budget and reserve amounts beyond supported precision', () => {
+    const record = {
+      id: 'precision-budget',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+      budgetCurrency: { code: 'EUR' },
+    };
+
+    for (const budgetAmount of ['1000.001', '1000.005', '1000.000']) {
+      expect(() => buildBudgetEnvelope({ ...record, budgetAmount })).toThrow(
+        'Budget amount cannot have more than 2 decimal places.',
+      );
+    }
+    for (const safetyReservePercent of ['10.001', '10.005', '10.000']) {
+      expect(() => buildBudgetEnvelope({ ...record, safetyReservePercent })).toThrow(
+        'Safety reserve percent cannot have more than 2 decimal places.',
+      );
+    }
+
+    const valid = buildBudgetEnvelope({
+      ...record,
+      budgetAmount: '1000.01',
+      safetyReservePercent: '10.01',
+    });
+    expect(valid.totalBudget).toBe('1000.01');
+    expect(valid.safetyReserve.percentOfTotal).toBe('10.01');
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
