@@ -26,6 +26,9 @@ function decimalToScaledInteger(value, scaleDigits, label) {
   }
 
   const [whole, fraction = ''] = normalized.split('.');
+  if (fraction.length > scaleDigits) {
+    throw new TypeError(`${label} cannot have more than ${scaleDigits} decimal places.`);
+  }
   const scale = 10n ** BigInt(scaleDigits);
   const paddedFraction = `${fraction}${'0'.repeat(scaleDigits)}`.slice(0, scaleDigits);
   let scaled = BigInt(whole) * scale + BigInt(paddedFraction || '0');
