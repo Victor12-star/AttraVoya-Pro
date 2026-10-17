@@ -67,6 +67,21 @@ describe('budget allocation exact arithmetic', () => {
     expect(valid.safetyReserve.percentOfTotal).toBe('10.01');
   });
 
+  it.each(['', 'eur', 'EURO', 'E1R', 'EUR ', '__proto__', null, undefined])(
+    'rejects malformed budget currency code %s',
+    (code) => {
+      const record = {
+        id: 'currency-budget',
+        budgetAmount: '1000.00',
+        safetyReservePercent: '10.00',
+        childrenAges: [],
+        budgetCurrency: { code },
+      };
+
+      expect(() => buildBudgetEnvelope(record)).toThrow('Budget currency code is invalid.');
+    },
+  );
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',

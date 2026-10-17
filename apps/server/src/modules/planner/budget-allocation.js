@@ -84,6 +84,10 @@ function buildTargets({ spendableCents, hasChildren }) {
 }
 
 export function buildBudgetEnvelope(record) {
+  const currencyCode = record?.budgetCurrency?.code;
+  if (typeof currencyCode !== 'string' || !/^[A-Z]{3}$/.test(currencyCode)) {
+    throw new TypeError('Budget currency code is invalid.');
+  }
   const totalCents = decimalToScaledInteger(record.budgetAmount, 2, 'Budget amount');
   const reserveBasisPoints = decimalToScaledInteger(
     record.safetyReservePercent,
