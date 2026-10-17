@@ -98,6 +98,7 @@ function validateCompleteEvidence(gate) {
     !Array.isArray(missingCategories) ||
     missingCategories.length !== 0 ||
     !budget ||
+    !Object.hasOwn(budget, 'currencyCode') ||
     typeof budget.currencyCode !== 'string' ||
     !/^[A-Z]{3}$/.test(budget.currencyCode)
   ) {
@@ -155,6 +156,7 @@ function validateCompleteEvidence(gate) {
       amountMinCents === null ||
       amountMaxCents === null ||
       amountMaxCents < amountMinCents ||
+      !Object.hasOwn(item, 'currencyCode') ||
       item.currencyCode !== budget.currencyCode ||
       !ACCEPTED_PRICING_BASES.has(item.pricingBasis) ||
       !ACCEPTED_CONFIDENCE.has(item.confidence) ||
