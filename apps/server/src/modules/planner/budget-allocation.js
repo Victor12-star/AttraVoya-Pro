@@ -21,7 +21,7 @@ function isNonNegativeDecimal(value) {
 
 function decimalToScaledInteger(value, scaleDigits, label) {
   const normalized = String(value ?? '').trim();
-  if (!isNonNegativeDecimal(normalized)) {
+  if (normalized.length > 64 || !isNonNegativeDecimal(normalized)) {
     throw new TypeError(`${label} must be a non-negative decimal value.`);
   }
 
