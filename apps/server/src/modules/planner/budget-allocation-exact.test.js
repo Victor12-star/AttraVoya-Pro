@@ -20,6 +20,24 @@ describe('budget allocation exact arithmetic', () => {
     expect(() => buildBudgetEnvelope(invalidRecord)).toThrow(RangeError);
   });
 
+  it('rejects oversized budget and reserve inputs before BigInt parsing', () => {
+    const record = {
+      id: 'oversized-budget',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+      budgetCurrency: { code: 'EUR' },
+    };
+    const oversized = '9'.repeat(100_000);
+
+    expect(() => buildBudgetEnvelope({ ...record, budgetAmount: oversized })).toThrow(
+      'Budget amount must be a non-negative decimal value.',
+    );
+    expect(() => buildBudgetEnvelope({ ...record, safetyReservePercent: oversized })).toThrow(
+      'Safety reserve percent must be a non-negative decimal value.',
+    );
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
