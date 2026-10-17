@@ -92,9 +92,8 @@ describe('budget allocation exact arithmetic', () => {
     };
 
     expect(() => buildBudgetEnvelope(record)).toThrow('Budget currency code is invalid.');
-    expect(
-      buildBudgetEnvelope({ ...record, budgetCurrency: { code: 'EUR' } }).currencyCode,
-    ).toBe('EUR');
+    const valid = buildBudgetEnvelope({ ...record, budgetCurrency: { code: 'EUR' } });
+    expect(valid.currencyCode).toBe('EUR');
   });
 
   it('preserves cents at large supported budgets without floating-point drift', () => {
