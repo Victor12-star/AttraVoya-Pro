@@ -82,6 +82,28 @@ describe('budget allocation exact arithmetic', () => {
     },
   );
 
+  it('rejects coerced and nonfinite budget inputs before decimal parsing', () => {
+    const record = {
+      id: 'coerced-budget',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+      budgetCurrency: { code: 'EUR' },
+    };
+    const invalid = [{ toString: () => '1000.00' }, ['1000.00'], NaN, Infinity, -Infinity];
+
+    for (const value of invalid) {
+      expect(() => buildBudgetEnvelope({ ...record, budgetAmount: value })).toThrow(
+        'Budget amount must be a non-negative decimal value.',
+      );
+      expect(() => buildBudgetEnvelope({ ...record, safetyReservePercent: value })).toThrow(
+        'Safety reserve percent must be a non-negative decimal value.',
+      );
+    }
+
+    expect(buildBudgetEnvelope({ ...record, budgetAmount: 1000 }).totalBudget).toBe('1000.00');
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
