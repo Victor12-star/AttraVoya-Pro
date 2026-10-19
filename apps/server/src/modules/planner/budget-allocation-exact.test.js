@@ -118,6 +118,27 @@ describe('budget allocation exact arithmetic', () => {
     expect(buildBudgetEnvelope({ ...record, budgetAmount: 1000 }).totalBudget).toBe('1000.00');
   });
 
+  it.each(['budgetAmount', 'safetyReservePercent'])(
+    'rejects inherited %s instead of using prototype financial input',
+    (field) => {
+      const record = {
+        id: 'prototype-budget',
+        budgetAmount: '1000.00',
+        safetyReservePercent: '10.00',
+        childrenAges: [],
+        budgetCurrency: { code: 'EUR' },
+      };
+      const inherited = Object.create({ [field]: record[field] });
+      Object.assign(inherited, { ...record });
+      delete inherited[field];
+
+      expect(() => buildBudgetEnvelope(inherited)).toThrow(
+        'Budget amount and safety reserve percent must be explicit inputs.',
+      );
+      expect(buildBudgetEnvelope(record).totalBudget).toBe('1000.00');
+    },
+  );
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',

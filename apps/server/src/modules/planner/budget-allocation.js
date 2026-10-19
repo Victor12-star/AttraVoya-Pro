@@ -96,6 +96,9 @@ export function buildBudgetEnvelope(record) {
   ) {
     throw new TypeError('Budget currency code is invalid.');
   }
+  if (!Object.hasOwn(record, 'budgetAmount') || !Object.hasOwn(record, 'safetyReservePercent')) {
+    throw new TypeError('Budget amount and safety reserve percent must be explicit inputs.');
+  }
   const totalCents = decimalToScaledInteger(record.budgetAmount, 2, 'Budget amount');
   const reserveBasisPoints = decimalToScaledInteger(
     record.safetyReservePercent,
