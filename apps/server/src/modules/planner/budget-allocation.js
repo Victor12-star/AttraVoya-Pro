@@ -99,9 +99,11 @@ export function buildBudgetEnvelope(record) {
   if (!Object.hasOwn(record, 'budgetAmount') || !Object.hasOwn(record, 'safetyReservePercent')) {
     throw new TypeError('Budget amount and safety reserve percent must be explicit inputs.');
   }
-  const totalCents = decimalToScaledInteger(record.budgetAmount, 2, 'Budget amount');
+  const budgetAmount = record.budgetAmount;
+  const safetyReservePercent = record.safetyReservePercent;
+  const totalCents = decimalToScaledInteger(budgetAmount, 2, 'Budget amount');
   const reserveBasisPoints = decimalToScaledInteger(
-    record.safetyReservePercent,
+    safetyReservePercent,
     2,
     'Safety reserve percent',
   );
