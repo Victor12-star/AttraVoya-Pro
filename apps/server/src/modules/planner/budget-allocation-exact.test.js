@@ -160,6 +160,29 @@ describe('budget allocation exact arithmetic', () => {
     },
   );
 
+  it('reads each financial input once before calculating the budget envelope', () => {
+    const reads = { budgetAmount: 0, safetyReservePercent: 0 };
+    const record = {
+      id: 'stable-inputs',
+      budgetCurrency: { code: 'EUR' },
+      childrenAges: [],
+      get budgetAmount() {
+        reads.budgetAmount += 1;
+        return reads.budgetAmount === 1 ? '1000.00' : '2000.00';
+      },
+      get safetyReservePercent() {
+        reads.safetyReservePercent += 1;
+        return reads.safetyReservePercent === 1 ? '10.00' : '20.00';
+      },
+    };
+
+    const result = buildBudgetEnvelope(record);
+    expect(result.totalBudget).toBe('1000.00');
+    expect(result.safetyReserve.percentOfTotal).toBe('10.00');
+    expect(result.safetyReserve.amount).toBe('100.00');
+    expect(reads).toEqual({ budgetAmount: 1, safetyReservePercent: 1 });
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
