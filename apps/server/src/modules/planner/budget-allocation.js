@@ -118,7 +118,7 @@ export function buildBudgetEnvelope(record) {
 
   return {
     requestId: record.id,
-    currencyCode: record.budgetCurrency.code,
+    currencyCode,
     totalBudget: formatScaledInteger(totalCents, 2),
     safetyReserve: {
       category: 'SAFETY_RESERVE',
