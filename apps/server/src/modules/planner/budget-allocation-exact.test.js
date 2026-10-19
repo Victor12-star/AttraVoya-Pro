@@ -96,6 +96,27 @@ describe('budget allocation exact arithmetic', () => {
     expect(valid.currencyCode).toBe('EUR');
   });
 
+  it('uses the validated currency code without reading a mutable getter twice', () => {
+    let reads = 0;
+    const budgetCurrency = {
+      get code() {
+        reads += 1;
+        return reads === 1 ? 'EUR' : 'USD';
+      },
+    };
+    const record = {
+      id: 'stable-currency',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+      budgetCurrency,
+    };
+
+    const result = buildBudgetEnvelope(record);
+    expect(result.currencyCode).toBe('EUR');
+    expect(reads).toBe(1);
+  });
+
   it('rejects coerced and nonfinite budget inputs before decimal parsing', () => {
     const record = {
       id: 'coerced-budget',
