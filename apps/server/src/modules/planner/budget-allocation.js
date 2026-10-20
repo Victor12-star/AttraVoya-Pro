@@ -90,6 +90,8 @@ export function buildBudgetEnvelope(record) {
   const budgetCurrency = record?.budgetCurrency;
   const currencyCode = budgetCurrency?.code;
   if (
+    !record ||
+    !Object.hasOwn(record, 'budgetCurrency') ||
     !budgetCurrency ||
     !Object.hasOwn(budgetCurrency, 'code') ||
     typeof currencyCode !== 'string' ||
