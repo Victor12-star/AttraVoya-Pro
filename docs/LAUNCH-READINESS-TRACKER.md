@@ -1,57 +1,111 @@
-# AttraVoya Pro — Launch readiness tracker
+# AttraVoya Pro — Launch Readiness Tracker
 
-Status baseline: 2026-10-20. Evidence commit: `996ae5f2314baeb4d71926a18b474b53b047b516` (independent five-job push CI passed in run 39472214975).
+Baseline: 2026-10-20.
 
-> **Do not confuse implementation with launch verification.** A green CI build establishes repository checks, not a working public booking/payment flow or successful Google Play release. This is an evidence-oriented checklist, not a calculated project-completion percentage.
+Evidence: `develop` commit `996ae5f2314baeb4d71926a18b474b53b047b516`; independent five-job push run `39472214975` passed.
 
-## Current snapshot
+> Green CI verifies repository checks, not production bookings, deployed services, payment settlement, or a published Play Store app. Do not infer completion percentage from commit counts.
 
-- **Engineering baseline:** Web, server, admin and Android workspaces are present, with automated quality, database, security, production-build and no-cost-provider checks.
-- **Launch status:** **Not release-ready.** Deployment, live inventory/prices, real billing flows, signed mobile delivery and manual production testing have not been independently verified.
-- **PR discipline:** No new slice until prior merge's exact `develop` push SHA is independently 5/5 green.
-- **Public domain:** `vikwora.com` is owned, but domain ownership is *not* proof DNS, HTTPS or live app deployment are configured. See [production domain readiness](PRODUCTION-DOMAIN-READINESS.md).
+## Release status
 
-## How to update progress without false precision
+**Not release-ready.** Web, server, admin, and Android workspaces exist with automated quality, database, dependency, build, and free-provider checks. Production launch gates below require separate evidence.
 
-For each release gate below, set one of **Implemented / Verified / Blocked / Not started / Not checked**, attach evidence (commit, CI run, production URL verification, receipt, or Play test report) and the responsible owner. Count a gate as **Verified** only when its specified acceptance evidence exists. Do **not** convert a count of PRs or green jobs into a launch-completion percentage.
+## Launch gates
 
-| Gate | Current state | Evidence needed to mark Verified | Owner |
-| --- | --- | --- | --- |
-| Automated source and production build checks | **Verified on baseline only** | Five successful jobs on the exact final `develop` commit | Engineering |
-| Web budget planner, trip management and family requirements | **Implemented / production unverified** | Browser end-to-end journeys, budget reconciliation, child/family profiles and error/empty states on production | Engineering + QA |
-| Destination news/safety awareness | **Implemented / production unverified** | Freshness labels, source publication dates, no unsupported safety claims, provider failure tests and traveller-facing UX check | Engineering + QA |
-| Real flight prices and booking inventory | **Blocked** | Approved commercial provider, account/configuration, contractual permission, live price/availability provenance and real booking-path tests | Owner + engineering |
-| Real accommodation prices and availability | **Blocked** | Inventory provider integration, verified pricing, taxes/fees/cancellation and no invented availability | Owner + engineering |
-| Production web/API/admin and custom domains | **Blocked** | Confirmed hosting targets, DNS, valid TLS, live health/routes, authentication, CORS/callbacks, policy pages | Owner + operations |
-| Transactional authentication email | **Not checked in production** | Verified sender and successful register/verify/reset delivery with audit-safe evidence | Owner + operations |
-| Stripe web checkout and entitlement lifecycles | **Implemented / production unverified** | Live-configured checkout, verified webhook events, refund/cancel/renewal flows and reconciliation | Owner + engineering |
-| Google Play / RevenueCat Android subscriptions | **Not verified for release** | Production products, webhook and ownership verification, purchase/restore/renewal/cancel/revoke tests, no client-authoritative entitlement | Owner + engineering |
-| Data privacy, retention, security and incident response | **Implemented / production unverified** | Deployment-specific GDPR/privacy review, backup restore drill, monitoring/alerting, access control and security signoff | Owner + operations |
-| Android signed release and Play listing | **Blocked** | Approved artwork, EAS signed AAB, Play Console declarations, internal test on physical devices, staged rollout plan | Owner + QA |
-| Final end-to-end and accessibility release gate | **Not verified** | Real-device web/Android regression, screen readers, network outages, recovery, load/soak and rollback evidence | QA + owner |
+Use **Verified**, **Implemented / unverified**, **Blocked**, or **Not checked** for each gate. A gate is only Verified after the listed acceptance evidence exists.
 
-## Prioritized release milestones
+### 1. Engineering CI
 
-1. **Testable staging:** Identify hosting accounts, provision staging web/API/admin and database; verify HTTPS, real sign-in and email, health checks, error monitoring and safe rollback. Keep production credentials out of Git.
-2. **Truthful core travel journey:** Validate family budget planning and destination safety/news freshness. Select and integrate approved providers for *real* flight fares and accommodation room inventory; clearly separate estimates and live prices.
-3. **Revenue and data integrity:** Test web Stripe billing and Android RevenueCat/Google Play lifecycle against real provider sandbox/test accounts; confirm server-authoritative entitlements.
-4. **Production and store gate:** Configure `vikwora.com` hostnames, policies/support contacts, final Android icon/assets, store declarations, EAS signing, Play internal testing and staged release.
-5. **Operate safely:** Verify backup restore, observability, alerts, privacy/GDPR disclosures, accessibility, crash recovery and incident process before public access widens.
+- Status: **Verified on baseline commit only**.
+- Owner: Engineering.
+- Evidence: all five independent canonical checks passed on the exact production candidate `develop` SHA.
 
-## Operator handoff (when a gate requires owner action)
+### 2. Family budget planner and trip journeys
 
-Provide the exact provider website/dashboard, reason, non-secret configuration steps and post-configuration test. Never ask for a password, API secret, service-account JSON or signing key in chat. Confirm real values in the provider's secret manager and evidence separately before marking a gate verified.
+- Status: **Implemented / unverified in production**.
+- Owner: Engineering and QA.
+- Evidence: real browser journeys, budget reconciliation, child/family handling, network failures, and persisted plan recovery.
 
-## Related source-of-truth checklists
+### 3. Traveller news and destination safety awareness
+
+- Status: **Implemented / unverified in production**.
+- Owner: Engineering and QA.
+- Evidence: visible publication timestamps and freshness limits, source attribution, neutral awareness wording, graceful provider failures, and no unsupported claims.
+
+### 4. Live flights and booking inventory
+
+- Status: **Blocked**.
+- Owner: Product owner and engineering.
+- Evidence: approved provider contract and configuration, real fares/availability, source provenance, booking link or flow, and no invented live prices.
+
+### 5. Live accommodation availability and pricing
+
+- Status: **Blocked**.
+- Owner: Product owner and engineering.
+- Evidence: approved room-inventory provider, verified prices, taxes, fees, cancellation terms, and availability provenance. Place search alone does not prove bookable rooms.
+
+### 6. Production web, API, admin, and custom domains
+
+- Status: **Blocked**.
+- Owner: Product owner and operations.
+- Evidence: exact hosting services, validated DNS and HTTPS for `vikwora.com` and required subdomains, health checks, CORS, callback settings, secure admin access, and policy pages.
+
+### 7. Authentication email
+
+- Status: **Not checked in production**.
+- Owner: Product owner and operations.
+- Evidence: verified sending domain plus successful account verification and password-reset delivery.
+
+### 8. Stripe web payments
+
+- Status: **Implemented / unverified in production**.
+- Owner: Product owner and engineering.
+- Evidence: real test transactions, signed webhooks, account ownership, renewals, cancellations, refunds, and server-authoritative entitlement reconciliation.
+
+### 9. RevenueCat and Google Play Android subscriptions
+
+- Status: **Not verified for release**.
+- Owner: Product owner and engineering.
+- Evidence: active Play products, correct RevenueCat mapping, signed webhooks, purchase and restore, renewals, revocations, and ownership tests.
+
+### 10. Privacy, resilience, and operations
+
+- Status: **Implemented / unverified in production**.
+- Owner: Product owner and operations.
+- Evidence: privacy and GDPR review for final data flows, backup/restore drill, access audit, alerts, security checks, and documented rollback.
+
+### 11. Android release and Play listing
+
+- Status: **Blocked**.
+- Owner: Product owner and QA.
+- Evidence: approved app icon, signed EAS Android App Bundle, Play Console declarations, test release installed on physical devices, and verified support/privacy URLs.
+
+### 12. End-to-end release acceptance
+
+- Status: **Not verified**.
+- Owner: QA and product owner.
+- Evidence: production-like web and Android tests, accessibility including TalkBack, offline recovery, load and restart behavior, critical-path checks, and staged rollout signoff.
+
+## Priorities
+
+1. Establish secure, observable staging for web, API, admin, database, authentication email, and mobile API routing.
+2. Verify the family budget journey, truthful destination news, and commercial flight/accommodation providers.
+3. Test web Stripe and Android RevenueCat/Play billing against real test accounts and server entitlements.
+4. Connect the owned `vikwora.com` domain, complete release policies, approve Android artwork, and run Google Play internal testing.
+5. Validate accessibility, real-device behavior, monitoring, backups, incident procedures, and staged rollout.
+
+## Owner actions
+
+At each external account or domain step, provide the provider dashboard URL, why it is needed, secure configuration instructions, and a verification checklist. Do not request passwords, API secrets, signing keys, or service-account JSON in chat.
+
+## Reference documents
 
 - [Google Play release checklist](GOOGLE-PLAY-RELEASE-CHECKLIST.md)
 - [Production domain readiness](PRODUCTION-DOMAIN-READINESS.md)
-- [External providers and truthfulness boundaries](external-services.md)
+- [External provider integration](external-services.md)
 - [Deployment](deployment.md)
-- [Current-work release invariant](CURRENT-WORK.md)
+- [Current workflow](CURRENT-WORK.md)
 
-## Release updates
+## Evidence log
 
-| Date | Change | Evidence |
-| --- | --- | --- |
-| 2026-10-20 | Baseline tracker created; no public launch gate claimed complete without production evidence | Exact `develop` `996ae5f2314baeb4d71926a18b474b53b047b516`, push CI 39472214975 (5/5 green) |
+- 2026-10-20: Baseline set at `996ae5f2314baeb4d71926a18b474b53b047b516` with independent successful run `39472214975`. No production launch gate is claimed verified without production evidence.
