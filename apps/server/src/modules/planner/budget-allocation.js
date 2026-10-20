@@ -91,13 +91,11 @@ export function buildBudgetEnvelope(record) {
     throw new TypeError('Budget currency code is invalid.');
   }
   const budgetCurrency = record.budgetCurrency;
-  const currencyCode = budgetCurrency?.code;
-  if (
-    !budgetCurrency ||
-    !Object.hasOwn(budgetCurrency, 'code') ||
-    typeof currencyCode !== 'string' ||
-    !/^[A-Z]{3}$/.test(currencyCode)
-  ) {
+  if (!budgetCurrency || !Object.hasOwn(budgetCurrency, 'code')) {
+    throw new TypeError('Budget currency code is invalid.');
+  }
+  const currencyCode = budgetCurrency.code;
+  if (typeof currencyCode !== 'string' || !/^[A-Z]{3}$/.test(currencyCode)) {
     throw new TypeError('Budget currency code is invalid.');
   }
   if (!Object.hasOwn(record, 'budgetAmount') || !Object.hasOwn(record, 'safetyReservePercent')) {
