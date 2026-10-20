@@ -1,55 +1,62 @@
 # Staging Deployment Evidence — AttraVoya Pro
 
-This checklist turns [launch readiness](LAUNCH-READINESS-TRACKER.md) into a concrete staging acceptance gate. It records no assumptions about provider accounts, live hostnames, credentials, or completed deployment.
+Staging is **not verified**. This checklist does not assert that an external account, hostname, credential, or deployment already exists.
 
-## Staging must be separate from production
+## Staging isolation
 
-Use dedicated staging configuration for the web, API, admin interface and PostgreSQL database. Protect staging with access controls where appropriate. Do not reuse production user records, payment transactions, encryption keys or provider secrets. Keep the public custom domain `vikwora.com` unchanged until provider-assigned staging URLs have been verified.
+Use dedicated staging configuration for web, API, admin, and PostgreSQL. Protect staging with appropriate access controls. Do not reuse production personal data, payment transactions, encryption keys, or credentials.
 
-## Non-secret inventory to fill in during deployment
+Keep `vikwora.com` unchanged until provider-assigned staging URLs are verified.
 
-| Component | Provider/project reference | Provider-assigned staging URL | Verified |
-| --- | --- | --- | --- |
-| Web frontend | Not provided | Not verified | No |
-| API server | Not provided | Not verified | No |
-| Admin frontend | Not provided | Not verified | No |
-| PostgreSQL database | Not provided | Internal service, not public | No |
-| Transactional email | Not provided | Sender domain not verified | No |
-| Error monitoring | Not provided | Monitoring dashboard not verified | No |
+## Operator inventory
 
-Do not store connection strings, private dashboard links containing tokens, service credentials, personal data, or provider secrets in the repository.
+Record the provider, non-secret project identifier, staging URL (where applicable), and verification date for each component:
 
-## Operator setup sequence
+- Web frontend: **Not verified**.
+- API server: **Not verified**.
+- Admin frontend: **Not verified**.
+- PostgreSQL database: **Not verified**; no public database URL.
+- Transactional email: **Not verified**; sender domain unconfirmed.
+- Error monitoring: **Not verified**.
 
-1. Identify the actual deployment provider, project name, intended region, and whether staging already exists for web, API, admin and database. Record non-secret identifiers only.
-2. Deploy an exact independently five-job-verified `develop` commit to staging; record the SHA and immutable build identifiers.
-3. Populate required staging environment settings in the provider's secret manager. Use staging-only database, cryptographic secrets, payment testing mode and email configuration. Never copy `.env` secrets into GitHub.
-4. Verify PostgreSQL migrations and restricted application connection permissions. Confirm backups, retention, and a restore rehearsal using non-production data.
-5. Verify the staging API health/readiness behavior over HTTPS. Ensure private operational endpoints and administration cannot be reached anonymously.
-6. Verify staging web/admin use the intended API, cookie scope, Cross-Origin Resource Sharing (CORS) origin allowlists and authentication callback URLs.
-7. Exercise registration, verification email, login, logout, password reset, account deletion and recovery; confirm no real paid provider call is presented as simulated live pricing.
-8. Exercise a family budget journey, destination news freshness/provenance, empty provider responses, network timeouts and device/browser error recovery.
-9. Verify server errors, saturation alerts, incident notification and deployment rollback from a deliberately failed staging release.
-10. Record dated evidence and owner signoff before changing production DNS, mobile release configuration or payment enablement.
+Never commit connection strings, credentials, private tokenized URLs, or personal data.
 
-## Acceptance matrix
+## Deployment and verification sequence
 
-| Acceptance gate | Evidence required | State |
-| --- | --- | --- |
-| Source integrity | Exact deployed commit and five-job independent CI link | Not verified |
-| HTTPS and health | Provider-assigned staging URLs, certificate and health proof | Not verified |
-| Database resilience | Migration status, backup and completed restore drill | Not verified |
-| Authentication | Non-production registration/verify/reset/delete test report | Not verified |
-| API/client isolation | Verified admin access, CORS, cookies and callback settings | Not verified |
-| Provider truthfulness | Live-versus-estimate labels and failure recovery test report | Not verified |
-| Monitoring | Real alert trigger and safe incident response evidence | Not verified |
-| Rollback | Completed rollback drill, prior release restored | Not verified |
-| Stakeholder acceptance | Owner/QA review of staging critical paths | Not verified |
+1. Identify actual hosting providers, projects, regions, and any existing staging environments.
+2. Deploy an exact independently five-job-verified `develop` commit; record its SHA and build identifier.
+3. Configure staging-only database, encryption secrets, payment testing, and email through provider secret managers.
+4. Verify database migration status, restricted access, backups, retention, and a restore drill with non-production data.
+5. Check API HTTPS health/readiness and ensure administrative/operational endpoints reject unauthenticated access.
+6. Confirm web and admin API routing, cookie scope, Cross-Origin Resource Sharing (CORS), and authentication callbacks.
+7. Exercise registration, email verification, login, logout, password reset, account deletion, and session recovery.
+8. Test family budgets, news timestamps and attribution, provider empty responses, timeouts, and safe error recovery.
+9. Verify error monitoring, saturation alerts, incident response, and rollback to an earlier staging release.
+10. Record evidence and owner approval before production DNS changes, mobile releases, or live payments.
 
-## External decisions that require the product owner
+## Acceptance gates
 
-Before any environment can be configured, confirm the real **hosting platforms** for web, API, admin and PostgreSQL, the existing projects versus new staging instances, and where DNS for `vikwora.com` is managed. Also confirm the support/contact email domain and approved external integrations. Ask for provider names and non-secret project identifiers, never credentials.
+Every gate below is **Not verified** until the specified evidence is attached.
 
-When provider facts are known, give the operator the provider-specific dashboard link, exact safe UI steps and test commands. Do not invent DNS targets, announce a deployment, or mark evidence verified from a passing CI build alone.
+- **Source integrity:** exact deployed SHA, build identifier, and independently successful five-job CI run.
+- **HTTPS and health:** staging hostnames, certificate, HTTPS, and health/readiness evidence.
+- **Database resilience:** migrations, backup schedule, and successful restoration report.
+- **Authentication:** non-production register, verify, reset, delete, and recovery test report.
+- **Client isolation:** admin authorization, CORS, cookies, and callbacks validated.
+- **Provider accuracy:** verified live-versus-estimate labeling and safe provider failure handling.
+- **Monitoring:** test alert, notification, and incident response proof.
+- **Rollback:** completed drill restoring a prior known-good release.
+- **Acceptance:** owner and quality-assurance signoff on key web and Android flows.
 
-Related references: [production domain readiness](PRODUCTION-DOMAIN-READINESS.md), [release tracker](LAUNCH-READINESS-TRACKER.md), [deployment guide](deployment.md), and [production reliability runbook](DEPLOYMENT-RELIABILITY-RUNBOOK.md).
+## Actions requiring the product owner
+
+Confirm the actual hosting platforms for web, API, admin, and database; which projects exist; where DNS for `vikwora.com` is managed; and the intended support email domain.
+
+After providers are identified, use their official dashboard instructions and record verification evidence. Never request passwords, signing keys, secret tokens, or service-account JSON in chat. Never invent DNS records or claim a deployment is live without verification.
+
+## Related guidance
+
+- [Launch readiness tracker](LAUNCH-READINESS-TRACKER.md)
+- [Production domain readiness](PRODUCTION-DOMAIN-READINESS.md)
+- [Deployment guide](deployment.md)
+- [Deployment reliability runbook](DEPLOYMENT-RELIABILITY-RUNBOOK.md)
