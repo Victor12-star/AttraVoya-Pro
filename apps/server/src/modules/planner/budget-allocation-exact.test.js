@@ -222,20 +222,16 @@ describe('budget allocation exact arithmetic', () => {
       safetyReservePercent: '0',
       budgetCurrency: { code: 'EUR' },
     });
+    const categoryAmount = (envelope, category) =>
+      envelope.targets.find((target) => target.category === category)?.amount;
 
     const withoutOwnAges = buildBudgetEnvelope(record);
-    expect(
-      withoutOwnAges.targets.find((target) => target.category === 'CHILDREN_ACTIVITIES')?.amount,
-    ).toBe('0.00');
-    expect(withoutOwnAges.targets.find((target) => target.category === 'ACTIVITIES')?.amount).toBe(
-      '100.00',
-    );
+    expect(categoryAmount(withoutOwnAges, 'CHILDREN_ACTIVITIES')).toBe('0.00');
+    expect(categoryAmount(withoutOwnAges, 'ACTIVITIES')).toBe('100.00');
 
     const withOwnAges = buildBudgetEnvelope({ ...record, childrenAges: [8] });
-    expect(withOwnAges.targets.find((target) => target.category === 'CHILDREN_ACTIVITIES')?.amount).toBe(
-      '30.00',
-    );
-    expect(withOwnAges.targets.find((target) => target.category === 'ACTIVITIES')?.amount).toBe('70.00');
+    expect(categoryAmount(withOwnAges, 'CHILDREN_ACTIVITIES')).toBe('30.00');
+    expect(categoryAmount(withOwnAges, 'ACTIVITIES')).toBe('70.00');
   });
 
   it('preserves cents at large supported budgets without floating-point drift', () => {
