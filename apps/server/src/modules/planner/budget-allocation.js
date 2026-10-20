@@ -118,7 +118,10 @@ export function buildBudgetEnvelope(record) {
   const spendableCents = totalCents - reserveCents;
   const targets = buildTargets({
     spendableCents,
-    hasChildren: Array.isArray(record.childrenAges) && record.childrenAges.length > 0,
+    hasChildren:
+      Object.hasOwn(record, 'childrenAges') &&
+      Array.isArray(record.childrenAges) &&
+      record.childrenAges.length > 0,
   });
 
   return {
