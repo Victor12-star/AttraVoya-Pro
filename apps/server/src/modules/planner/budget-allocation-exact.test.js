@@ -215,6 +215,23 @@ describe('budget allocation exact arithmetic', () => {
     expect(reads).toEqual({ budgetAmount: 1, safetyReservePercent: 1 });
   });
 
+  it('does not infer children from inherited ages when allocating budget targets', () => {
+    const record = Object.assign(Object.create({ childrenAges: [8] }), {
+      id: 'inherited-ages',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '0',
+      budgetCurrency: { code: 'EUR' },
+    });
+
+    const withoutOwnAges = buildBudgetEnvelope(record);
+    expect(withoutOwnAges.targets.find((target) => target.category === 'CHILDREN_ACTIVITIES').amount).toBe('0.00');
+    expect(withoutOwnAges.targets.find((target) => target.category === 'ACTIVITIES').amount).toBe('100.00');
+
+    const withOwnAges = buildBudgetEnvelope({ ...record, childrenAges: [8] });
+    expect(withOwnAges.targets.find((target) => target.category === 'CHILDREN_ACTIVITIES').amount).toBe('30.00');
+    expect(withOwnAges.targets.find((target) => target.category === 'ACTIVITIES').amount).toBe('70.00');
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
