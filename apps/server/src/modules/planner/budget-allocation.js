@@ -87,11 +87,12 @@ function buildTargets({ spendableCents, hasChildren }) {
 }
 
 export function buildBudgetEnvelope(record) {
-  const budgetCurrency = record?.budgetCurrency;
+  if (!record || !Object.hasOwn(record, 'budgetCurrency')) {
+    throw new TypeError('Budget currency code is invalid.');
+  }
+  const budgetCurrency = record.budgetCurrency;
   const currencyCode = budgetCurrency?.code;
   if (
-    !record ||
-    !Object.hasOwn(record, 'budgetCurrency') ||
     !budgetCurrency ||
     !Object.hasOwn(budgetCurrency, 'code') ||
     typeof currencyCode !== 'string' ||
