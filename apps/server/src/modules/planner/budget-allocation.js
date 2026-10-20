@@ -116,12 +116,10 @@ export function buildBudgetEnvelope(record) {
 
   const reserveCents = Number((BigInt(totalCents) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n);
   const spendableCents = totalCents - reserveCents;
+  const childrenAges = Object.hasOwn(record, 'childrenAges') ? record.childrenAges : undefined;
   const targets = buildTargets({
     spendableCents,
-    hasChildren:
-      Object.hasOwn(record, 'childrenAges') &&
-      Array.isArray(record.childrenAges) &&
-      record.childrenAges.length > 0,
+    hasChildren: Array.isArray(childrenAges) && childrenAges.length > 0,
   });
 
   return {
