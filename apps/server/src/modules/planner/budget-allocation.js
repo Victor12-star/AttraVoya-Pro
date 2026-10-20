@@ -87,10 +87,11 @@ function buildTargets({ spendableCents, hasChildren }) {
 }
 
 export function buildBudgetEnvelope(record) {
-  const currencyCode = record?.budgetCurrency?.code;
+  const budgetCurrency = record?.budgetCurrency;
+  const currencyCode = budgetCurrency?.code;
   if (
-    !record?.budgetCurrency ||
-    !Object.hasOwn(record.budgetCurrency, 'code') ||
+    !budgetCurrency ||
+    !Object.hasOwn(budgetCurrency, 'code') ||
     typeof currencyCode !== 'string' ||
     !/^[A-Z]{3}$/.test(currencyCode)
   ) {
