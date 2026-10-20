@@ -96,6 +96,25 @@ describe('budget allocation exact arithmetic', () => {
     expect(valid.currencyCode).toBe('EUR');
   });
 
+  it('rejects an inherited budget currency getter without evaluating it', () => {
+    let reads = 0;
+    const prototype = {
+      get budgetCurrency() {
+        reads += 1;
+        return { code: 'EUR' };
+      },
+    };
+    const record = Object.assign(Object.create(prototype), {
+      id: 'inherited-currency-getter',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '10.00',
+      childrenAges: [],
+    });
+
+    expect(() => buildBudgetEnvelope(record)).toThrow('Budget currency code is invalid.');
+    expect(reads).toBe(0);
+  });
+
   it('rejects an inherited currency code instead of trusting the prototype', () => {
     const record = {
       id: 'inherited-currency',
