@@ -234,6 +234,27 @@ describe('budget allocation exact arithmetic', () => {
     expect(categoryAmount(withOwnAges, 'ACTIVITIES')).toBe('70.00');
   });
 
+  it('reads the explicit children ages only once when allocating targets', () => {
+    let reads = 0;
+    const record = {
+      id: 'stable-children-ages',
+      budgetAmount: '1000.00',
+      safetyReservePercent: '0',
+      budgetCurrency: { code: 'EUR' },
+      get childrenAges() {
+        reads += 1;
+        return reads === 1 ? [8] : undefined;
+      },
+    };
+
+    const result = buildBudgetEnvelope(record);
+    const childrenTarget = result.targets.find(
+      (target) => target.category === 'CHILDREN_ACTIVITIES',
+    );
+    expect(childrenTarget?.amount).toBe('30.00');
+    expect(reads).toBe(1);
+  });
+
   it('preserves cents at large supported budgets without floating-point drift', () => {
     const record = {
       id: 'large-budget',
