@@ -1,0 +1,88 @@
+name: Staging database migration (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Inspect pending migrations or explicitly apply them"
+        required: true
+        type: choice
+        default: status
+        options:
+          - status
+          - apply
+      confirmation:
+        description: "For apply only: type APPLY-ATTRAVOYA-STAGING-MIGRATIONS"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: attravoya-staging-database-migration
+  cancel-in-progress: false
+
+jobs:
+  prisma-migrations:
+    name: Inspect or apply staging Prisma migrations
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Validate operator confirmation
+        env:
+          OPERATION: ${{ inputs.operation }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          if [ "$OPERATION" = "apply" ] && [ "$CONFIRMATION" != "APPLY-ATTRAVOYA-STAGING-MIGRATIONS" ]; then
+            echo "::error::Migration apply requires the exact confirmation phrase."
+            exit 1
+          fi
+
+      - name: Check staging connection secret is configured
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Configure repository secret NEON_STAGING_DATABASE_URL before running."
+            exit 1
+          fi
+
+      - name: Checkout reviewed develop branch
+        uses: actions/checkout@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Inspect existing migration state
+        if: inputs.operation == 'status'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database migrate:status
+
+      - name: Apply reviewed Prisma migrations to staging
+        if: inputs.operation == 'apply'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database migrate:deploy
+
+      - name: Verify migration status after application
+        if: inputs.operation == 'apply'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database migrate:status
