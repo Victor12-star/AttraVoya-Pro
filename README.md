@@ -1,1 +1,1 @@
-# AttraVoya-Pro
+AttraVoya Pro is an intelligent travel planning platform that helps individuals and families discover destinations, plan trips within their budgets, explore accommodation and activities, and stay informed through up-to-date travel and safety information.# AttraVoya-Pro
