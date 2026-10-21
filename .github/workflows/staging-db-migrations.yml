@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: "Inspect pending migrations or explicitly apply them"
+        description: 'Inspect pending migrations or explicitly apply them'
         required: true
         type: choice
         default: status
@@ -12,7 +12,7 @@ on:
           - status
           - apply
       confirmation:
-        description: "For apply only: type APPLY-ATTRAVOYA-STAGING-MIGRATIONS"
+        description: 'For apply only: type APPLY-ATTRAVOYA-STAGING-MIGRATIONS'
         required: false
         type: string
 
