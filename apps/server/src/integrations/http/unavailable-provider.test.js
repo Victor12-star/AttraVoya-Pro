@@ -9,6 +9,7 @@ import { NEWS_PROVIDER_REGISTRY } from '../news/news-provider.registry.js';
 import { PLACES_PROVIDER_REGISTRY } from '../places/places-provider.registry.js';
 
 describe('explicitly disabled staging integrations', () => {
+  /** @type {Array<[ { none: () => Record<string, (...args: any[]) => Promise<unknown>> }, string[] ]>} */
   const providers = [
     [PLACES_PROVIDER_REGISTRY, ['autocomplete', 'searchNearby']],
     [MAPS_PROVIDER_REGISTRY, ['geocode', 'reverseGeocode', 'route']],
