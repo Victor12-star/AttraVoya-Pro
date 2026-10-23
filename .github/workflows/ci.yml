@@ -211,6 +211,9 @@ jobs:
       - name: Test HTTP load harness
         run: pnpm load:harness:test
 
+      - name: Verify aggregate SLO evaluator
+        run: node --test scripts/slo-evaluator.test.js
+
       - name: Run unit tests
         run: pnpm test
 
