@@ -120,6 +120,38 @@ jobs:
 
           NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL=privacy@attravoya.app NODE_ENV=production pnpm env:check
 
+      - name: Verify production replica metrics topology contract
+        env:
+          WEB_URL: https://app.attravoya.app
+          ADMIN_URL: https://admin.attravoya.app
+          API_URL: https://api.attravoya.app
+          NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL: privacy@attravoya.app
+          MAPS_PROVIDER: none
+          PLACES_PROVIDER: none
+          GEOCODING_PROVIDER: none
+          ROUTING_PROVIDER: none
+          ACCOMMODATION_PROVIDER: none
+          EVENTS_PROVIDER: none
+          NEWS_PROVIDER: none
+          IMAGE_PROVIDER: none
+          EMAIL_PROVIDER: none
+        run: |
+          set -euo pipefail
+          if API_REPLICA_COUNT=2 METRICS_AGGREGATION_MODE=process_local NODE_ENV=production pnpm env:check; then
+            echo "Unsafe multi-replica local metrics unexpectedly passed."
+            exit 1
+          fi
+          if API_REPLICA_COUNT=0 NODE_ENV=production pnpm env:check; then
+            echo "Invalid replica count unexpectedly passed."
+            exit 1
+          fi
+          if API_REPLICA_COUNT=2 METRICS_AGGREGATION_MODE=external NODE_ENV=production pnpm env:check; then
+            echo "External metrics without instance ID unexpectedly passed."
+            exit 1
+          fi
+          API_REPLICA_COUNT=1 METRICS_AGGREGATION_MODE=process_local NODE_ENV=production pnpm env:check
+          API_REPLICA_COUNT=2 METRICS_AGGREGATION_MODE=external METRICS_INSTANCE_ID=api-replica-1 NODE_ENV=production pnpm env:check
+
       - name: Verify production provider credential contract
         env:
           WEB_URL: https://app.attravoya.app
