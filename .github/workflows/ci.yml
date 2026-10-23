@@ -57,6 +57,9 @@ jobs:
     # Avoid slow apt downloads that exhausted the previous 20-minute job deadline.
     container:
       image: mcr.microsoft.com/playwright:v1.62.1-noble
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 20
 
     steps:
