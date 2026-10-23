@@ -297,7 +297,7 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
       currentWindow?.speechSynthesis?.cancel?.();
       if (capabilityTimer !== undefined) currentWindow?.clearTimeout?.(capabilityTimer);
     };
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (!showToLocalItem) return undefined;
