@@ -187,11 +187,13 @@ jobs:
 
       - name: Run web browser smoke and accessibility tests
         env:
+          HOME: /root
           NODE_ENV: development
         run: pnpm --filter @attravoya/web test:e2e:ci
 
       - name: Run admin browser accessibility smoke tests
         env:
+          HOME: /root
           NODE_ENV: development
         run: pnpm --filter @attravoya/admin test:e2e:ci
 
