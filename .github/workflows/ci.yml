@@ -120,11 +120,6 @@ jobs:
 
           NEXT_PUBLIC_PRIVACY_CONTACT_EMAIL=privacy@attravoya.app NODE_ENV=production pnpm env:check
 
-      - name: Diagnose exact Prettier diff for replica preflight
-        run: |
-          pnpm exec prettier scripts/validate-env.js > /tmp/validate-env.formatted.js
-          diff -u scripts/validate-env.js /tmp/validate-env.formatted.js || true
-
       - name: Verify production replica metrics topology contract
         env:
           WEB_URL: https://app.attravoya.app
