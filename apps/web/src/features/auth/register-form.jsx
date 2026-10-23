@@ -13,7 +13,8 @@ export function RegisterForm({ messages, recoveryMessages }) {
 
   async function submit(event) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const password = String(form.get('password') ?? '');
     const confirmPassword = String(form.get('confirmPassword') ?? '');
 
@@ -30,7 +31,7 @@ export function RegisterForm({ messages, recoveryMessages }) {
         email: String(form.get('email') ?? '').trim(),
         password,
       });
-      event.currentTarget.reset();
+      formElement.reset();
       setSuccess(messages.registered);
     } catch {
       setError(messages.registerFailed);

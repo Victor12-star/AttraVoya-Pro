@@ -53,6 +53,13 @@ jobs:
   quality:
     name: Code quality and unit tests
     runs-on: ubuntu-24.04
+    # The pinned Playwright image includes Chromium, Firefox, WebKit and OS libraries.
+    # Avoid slow apt downloads that exhausted the previous 20-minute job deadline.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 20
 
     steps:
@@ -73,6 +80,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Trust checked-out workspace inside browser container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Validate environment contract
         run: pnpm env:check
@@ -172,22 +182,18 @@ jobs:
       - name: Run unit tests
         run: pnpm test
 
-      - name: Install Playwright browsers
-        run: |
-          # GitHub's Ubuntu image includes an unrelated Google Chrome apt source.
-          # Playwright installs its own browser binaries; disabling this runner-only
-          # source avoids external Chrome-repository index races without skipping
-          # Playwright's Ubuntu dependency installation or browser coverage.
-          sudo rm -f /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources
-          pnpm --filter @attravoya/web exec playwright install --with-deps chromium firefox webkit
+      - name: Verify Playwright browser version
+        run: pnpm --filter @attravoya/web exec playwright --version
 
       - name: Run web browser smoke and accessibility tests
         env:
+          HOME: /root
           NODE_ENV: development
         run: pnpm --filter @attravoya/web test:e2e:ci
 
       - name: Run admin browser accessibility smoke tests
         env:
+          HOME: /root
           NODE_ENV: development
         run: pnpm --filter @attravoya/admin test:e2e:ci
 
