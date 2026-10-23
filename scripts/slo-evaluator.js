@@ -32,7 +32,7 @@ export function evaluateSloSnapshot(snapshot) {
 
   const observedRatio = requests === 0 ? null : (requests - errors) / requests;
   const errorBudgetConsumedRatio =
-    requests === 0 ? null : (errors / requests) / (1 - PRODUCTION_SLO.availabilityTargetRatio);
+    requests === 0 ? null : errors / requests / (1 - PRODUCTION_SLO.availabilityTargetRatio);
 
   return {
     scope: 'AGGREGATE_WINDOW_ONLY',
