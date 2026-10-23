@@ -211,13 +211,6 @@ jobs:
       - name: Test HTTP load harness
         run: pnpm load:harness:test
 
-      - name: Diagnose exact SLO Prettier differences
-        run: |
-          pnpm exec prettier scripts/slo-evaluator.js > /tmp/slo-evaluator-formatted.js
-          pnpm exec prettier scripts/slo-evaluator.test.js > /tmp/slo-evaluator-test-formatted.js
-          diff -u scripts/slo-evaluator.js /tmp/slo-evaluator-formatted.js || true
-          diff -u scripts/slo-evaluator.test.js /tmp/slo-evaluator-test-formatted.js || true
-
       - name: Verify aggregate SLO evaluator
         run: node --test scripts/slo-evaluator.test.js
 
