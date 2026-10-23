@@ -249,13 +249,19 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
 
   useEffect(() => {
     let active = true;
-    const fallbackCountries = listCountryOptions(locale).map(({ code, name }) => ({ iso2: code, name }));
+    const fallbackCountries = listCountryOptions(locale).map(({ code, name }) => ({
+      iso2: code,
+      name,
+    }));
     void apiClient
       .getCountries()
       .then((response) => {
         if (!active) return;
         const countries = normalizeCountries(response);
-        setCountriesState({ status: 'success', data: countries.length ? countries : fallbackCountries });
+        setCountriesState({
+          status: 'success',
+          data: countries.length ? countries : fallbackCountries,
+        });
       })
       .catch(() => {
         if (active) setCountriesState({ status: 'success', data: fallbackCountries });
