@@ -66,6 +66,11 @@ jobs:
           DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
         run: pnpm --filter @attravoya/database migrate:status
 
+      - name: Generate Prisma Client for seed runtime
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database generate
+
       - name: Seed idempotent roles permissions and localization references
         env:
           DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
