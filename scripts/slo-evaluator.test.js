@@ -39,7 +39,11 @@ test('short window cannot justify production claims', () => {
 
 test('zero traffic or latency samples remain unknown', () => {
   const result = evaluateSloSnapshot(
-    snapshot({ userRequests: 0, serverErrors: 0, nonProviderLatency: { sampleCount: 0, p95Ms: 0 } }),
+    snapshot({
+      userRequests: 0,
+      serverErrors: 0,
+      nonProviderLatency: { sampleCount: 0, p95Ms: 0 },
+    }),
   );
   assert.equal(result.productionClaimEligible, false);
   assert.equal(result.availability.status, 'INSUFFICIENT_DATA');
