@@ -152,10 +152,7 @@ if (env.NODE_ENV?.trim().toLowerCase() === 'production') {
     );
   }
 
-  if (
-    metricsAggregationMode === 'external' &&
-    !isValidMetricsInstanceId(env.METRICS_INSTANCE_ID)
-  ) {
+  if (metricsAggregationMode === 'external' && !isValidMetricsInstanceId(env.METRICS_INSTANCE_ID)) {
     errors.push(
       'METRICS_INSTANCE_ID must be a valid one-to-64-character identifier when external aggregation is selected.',
     );
