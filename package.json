@@ -37,6 +37,8 @@
     "capacity:check": "node scripts/http-capacity-check.js",
     "resilience:check": "node scripts/http-resilience-load-check.js",
     "load:harness:test": "node --test scripts/http-load-test.test.js scripts/http-capacity-check.test.js scripts/http-resilience-load-check.test.js",
+    "slo:test": "node --test scripts/slo-evaluator.test.js",
+    "slo:evaluate": "node scripts/slo-evaluator.js",
     "api:restart:check": "node scripts/api-restart-recovery-check.js",
     "api:database-outage:check": "node scripts/api-database-outage-recovery-check.js",
     "format": "prettier --write .",
