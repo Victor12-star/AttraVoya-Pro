@@ -81,6 +81,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Trust checked-out workspace inside browser container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Validate environment contract
         run: pnpm env:check
 
