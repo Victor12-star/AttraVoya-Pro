@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { listCountryOptions } from '@attravoya/localization';
 import {
   ArrowRightLeft,
   Languages,
@@ -248,15 +249,16 @@ export function TravelCompanionPage({ locale = 'en', messages }) {
 
   useEffect(() => {
     let active = true;
+    const fallbackCountries = listCountryOptions(locale).map(({ code, name }) => ({ iso2: code, name }));
     void apiClient
       .getCountries()
       .then((response) => {
         if (!active) return;
         const countries = normalizeCountries(response);
-        setCountriesState({ status: countries.length ? 'success' : 'error', data: countries });
+        setCountriesState({ status: 'success', data: countries.length ? countries : fallbackCountries });
       })
       .catch(() => {
-        if (active) setCountriesState({ status: 'error', data: [] });
+        if (active) setCountriesState({ status: 'success', data: fallbackCountries });
       });
 
     void apiClient
