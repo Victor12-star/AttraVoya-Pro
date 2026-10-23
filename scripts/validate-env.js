@@ -83,7 +83,7 @@ function isPositiveIntegerString(value) {
 
 function parseReplicaCount(value) {
   const normalized = value?.trim() || '1';
-  if (!/^\\d+$/.test(normalized)) return null;
+  if (!/^[0-9]+$/.test(normalized)) return null;
   const parsed = Number(normalized);
   return Number.isSafeInteger(parsed) && parsed >= 1 && parsed <= 100 ? parsed : null;
 }
