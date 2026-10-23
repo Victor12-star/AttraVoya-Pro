@@ -107,6 +107,21 @@ describe('TravelCompanionPage', () => {
     delete currentWindow.speechSynthesis;
   });
 
+  it('lists reference countries when the API is unavailable', async () => {
+    mocks.getCountries.mockRejectedValue(new Error('Network unavailable'));
+    render(<TravelCompanionPage locale="en" messages={messages} />);
+    const selector = await screen.findByRole('combobox', { name: 'Choose country' });
+    await waitFor(() => expect(selector).toHaveValue(''));
+    expect(screen.getByRole('option', { name: 'Sweden' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Nigeria' })).toBeInTheDocument();
+  });
+
+  it('lists reference countries when API returns an empty list', async () => {
+    mocks.getCountries.mockResolvedValue({ countries: [] });
+    render(<TravelCompanionPage locale="en" messages={messages} />);
+    expect(await screen.findByRole('option', { name: 'Sweden' })).toBeInTheDocument();
+  });
+
   it('uses destination-aware quick phrases and sends English to the selected local language by default', async () => {
     render(<TravelCompanionPage locale="en" messages={messages} />);
     await chooseSweden();
