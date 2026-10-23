@@ -1,0 +1,72 @@
+name: Seed AttraVoya staging references (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type SEED-ATTRAVOYA-STAGING-REFERENCES'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: attravoya-staging-database-migration
+  cancel-in-progress: false
+
+jobs:
+  seed-staging:
+    name: Seed stable reference data only
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Verify explicit operator confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          if [ "$CONFIRMATION" != 'SEED-ATTRAVOYA-STAGING-REFERENCES' ]; then
+            echo "::error::Explicit staging-only confirmation is required."
+            exit 1
+          fi
+
+      - name: Verify staging database secret
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::NEON_STAGING_DATABASE_URL is not configured."
+            exit 1
+          fi
+
+      - name: Check out reviewed staging seed source
+        uses: actions/checkout@v5
+        with:
+          ref: bbec1fff553e4f3db9dd43069dd4a933cc62cbc9
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24.20.0
+          cache: pnpm
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Confirm schema is up to date
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database migrate:status
+
+      - name: Seed idempotent roles permissions and localization references
+        env:
+          DATABASE_URL: ${{ secrets.NEON_STAGING_DATABASE_URL }}
+        run: pnpm --filter @attravoya/database seed
