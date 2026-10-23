@@ -1,6 +1,7 @@
 import { ApiClientError } from './errors.js';
 
 const DEFAULT_TIMEOUT_MS = 12_000;
+const REGISTRATION_TIMEOUT_MS = 45_000;
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
 /** @type {Set<string>} */
@@ -294,7 +295,12 @@ export function createApiClient(options) {
     getCountries: (requestOptions = {}) =>
       request('/api/v1/countries', { cache: 'force-cache', ...requestOptions }),
     getLanguages: () => request('/api/v1/languages', { cache: 'force-cache' }),
-    register: (body) => request('/api/v1/auth/register', { method: 'POST', body }),
+    register: (body) =>
+      request('/api/v1/auth/register', {
+        method: 'POST',
+        body,
+        timeoutMs: REGISTRATION_TIMEOUT_MS,
+      }),
     login: (body) => request('/api/v1/auth/login', { method: 'POST', body }),
     refresh: () => request('/api/v1/auth/refresh', { method: 'POST' }),
     logout: () => request('/api/v1/auth/logout', { method: 'POST' }),
