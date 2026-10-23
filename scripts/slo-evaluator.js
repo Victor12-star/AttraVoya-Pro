@@ -22,7 +22,10 @@ export function evaluateSloSnapshot(snapshot) {
   const windowSeconds = measurement(snapshot?.observationWindowSeconds, 'observationWindowSeconds');
   const requests = count(snapshot?.userRequests, 'userRequests');
   const errors = count(snapshot?.serverErrors, 'serverErrors');
-  const samples = count(snapshot?.nonProviderLatency?.sampleCount, 'nonProviderLatency.sampleCount');
+  const samples = count(
+    snapshot?.nonProviderLatency?.sampleCount,
+    'nonProviderLatency.sampleCount',
+  );
   const p95Ms = measurement(snapshot?.nonProviderLatency?.p95Ms, 'nonProviderLatency.p95Ms');
 
   if (errors > requests) throw new TypeError('serverErrors cannot exceed userRequests.');
