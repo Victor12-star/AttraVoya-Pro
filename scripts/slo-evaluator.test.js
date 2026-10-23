@@ -19,7 +19,9 @@ test('evaluates healthy aggregate evidence without claiming deployment health', 
   assert.equal(result.productionClaimEligible, true);
   assert.equal(result.availability.status, 'MEETS_TARGET');
   assert.equal(result.nonProviderLatency.status, 'MEETS_TARGET');
-  assert.ok(Math.abs(result.availability.errorBudgetConsumedRatio - 0.5) < 1e-9);
+  const consumed = result.availability.errorBudgetConsumedRatio;
+  if (consumed === null) assert.fail('Expected a numeric error-budget ratio.');
+  assert.ok(Math.abs(consumed - 0.5) < 1e-9);
 });
 
 test('identifies availability and latency failures', () => {
