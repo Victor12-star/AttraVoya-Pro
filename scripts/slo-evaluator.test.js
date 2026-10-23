@@ -51,10 +51,7 @@ test('invalid or unsafe aggregate observations fail closed', () => {
   assert.throws(() => evaluateSloSnapshot(snapshot({ userRequests: 5, serverErrors: 6 })));
   assert.throws(() => evaluateSloSnapshot(snapshot({ userRequests: 1.5 })));
   assert.throws(() => evaluateSloSnapshot(snapshot({ observationWindowSeconds: -1 })));
-  assert.throws(
-    () =>
-      evaluateSloSnapshot(
-        snapshot({ nonProviderLatency: { sampleCount: -1, p95Ms: 400 } }),
-      ),
+  assert.throws(() =>
+    evaluateSloSnapshot(snapshot({ nonProviderLatency: { sampleCount: -1, p95Ms: 400 } })),
   );
 });
