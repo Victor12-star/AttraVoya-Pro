@@ -82,7 +82,10 @@ function translationResponse(overrides = {}) {
 async function chooseSweden() {
   const countrySelect = await screen.findByRole('combobox', { name: 'Choose country' });
   fireEvent.change(countrySelect, { target: { value: 'SE' } });
-  expect(await screen.findByText('Hello.')).toBeInTheDocument();
+  // Wait for the destination phrasebook to finish rendering under parallel CI load.
+  expect(
+    await screen.findByRole('button', { name: 'Hello.' }, { timeout: 5000 }),
+  ).toBeInTheDocument();
 }
 
 describe('TravelCompanionPage', () => {
