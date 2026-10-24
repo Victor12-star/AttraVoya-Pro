@@ -55,7 +55,11 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
   useEffect(() => {
     let active = true;
 
-    if (!analyticsClient) return () => { active = false; };
+    if (!analyticsClient) {
+      return () => {
+        active = false;
+      };
+    }
 
     analyticsClient
       .getUserAnalytics({ days })
