@@ -6,6 +6,7 @@ import { createAuthController } from './auth.controller.js';
 import { createAuthService } from './auth.service.js';
 
 function createVerificationRepository() {
+  /** @type {{ id: string, email: string, deletedAt: null, emailVerifiedAt: Date | null }} */
   const user = {
     id: 'user-1',
     email: 'traveller@example.test',
@@ -48,6 +49,7 @@ describe('email verification resend lifecycle', () => {
     const first = await service.resendVerification('traveller@example.test');
     const second = await service.resendVerification('traveller@example.test');
 
+    if (!first.verificationToken || !second.verificationToken) throw new Error('Expected verification tokens');
     expect(first.verificationToken).not.toBe(second.verificationToken);
     expect(repository.snapshots).toHaveLength(2);
     for (const { tokenHash, expiresAt } of repository.snapshots) {
@@ -95,6 +97,7 @@ describe('email verification resend lifecycle', () => {
       service,
       env: {},
       onVerificationRequested: delivery,
+      onPasswordResetRequested: undefined,
     });
     const reply = createReply();
 
