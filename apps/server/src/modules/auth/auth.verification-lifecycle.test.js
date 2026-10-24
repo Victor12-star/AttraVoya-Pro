@@ -49,7 +49,9 @@ describe('email verification resend lifecycle', () => {
     const first = await service.resendVerification('traveller@example.test');
     const second = await service.resendVerification('traveller@example.test');
 
-    if (!first.verificationToken || !second.verificationToken) throw new Error('Expected verification tokens');
+    if (!first.verificationToken || !second.verificationToken) {
+      throw new Error('Expected verification tokens');
+    }
     expect(first.verificationToken).not.toBe(second.verificationToken);
     expect(repository.snapshots).toHaveLength(2);
     for (const { tokenHash, expiresAt } of repository.snapshots) {
@@ -108,7 +110,8 @@ describe('email verification resend lifecycle', () => {
 
     expect(delivery).toHaveBeenCalledTimes(1);
     expect(reply.send).toHaveBeenCalledWith({
-      message: 'If the account exists and still needs verification, a new verification email will be sent.',
+      message:
+        'If the account exists and still needs verification, a new verification email will be sent.',
     });
     expect(log.warn).toHaveBeenCalledTimes(1);
     expect(repository.snapshots).toHaveLength(1);
