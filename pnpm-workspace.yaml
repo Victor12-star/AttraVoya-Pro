@@ -16,6 +16,7 @@ allowBuilds:
 overrides:
   # Temporary security pins for transitive dependencies. Keep these here (not
   # package.json) because pnpm 11 reads workspace settings from pnpm-workspace.yaml.
+  '@expo/cli>zod': '4.6.6'
   '@fastify/static': '10.1.1'
   'fast-uri@>=3.0.0 <4.0.0': '3.1.8'
   'fast-uri@>=4.0.0 <5.0.0': '4.2.1'
