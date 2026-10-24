@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@expo/cli>zod': 4.6.6
   '@fastify/static': 10.1.1
   fast-uri@>=3.0.0 <4.0.0: 3.1.8
   fast-uri@>=4.0.0 <5.0.0: 4.2.1
@@ -8137,9 +8138,6 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.6.6:
     resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
@@ -8927,7 +8925,7 @@ snapshots:
       toqr: 0.1.1
       wrap-ansi: 7.0.0
       ws: 8.21.3
-      zod: 3.25.76
+      zod: 4.6.6
     optionalDependencies:
       expo-router: 57.0.17(50118b44dde7f99423f4f2373115647d)
       react-native: 0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.18)(react@19.2.3)(supports-color@8.1.1)
@@ -16889,6 +16887,5 @@ snapshots:
     dependencies:
       zod: 4.6.6
 
-  zod@3.25.76: {}
 
   zod@4.6.6: {}
