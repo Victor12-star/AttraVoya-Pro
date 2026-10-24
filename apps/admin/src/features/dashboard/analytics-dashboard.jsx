@@ -33,23 +33,29 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
   const [days, setDays] = useState(7);
   const [summary, setSummary] = useState(/** @type {AnalyticsSummary | null} */ (null));
   const [requestVersion, setRequestVersion] = useState(0);
-  const [state, setState] = useState('loading');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [state, setState] = useState(analyticsClient ? 'loading' : 'error');
+  const [errorMessage, setErrorMessage] = useState(
+    analyticsClient ? '' : 'Analytics are not configured for this Admin deployment.',
+  );
+
+  function requestAgain() {
+    setSummary(null);
+    setErrorMessage('');
+    setState('loading');
+    setRequestVersion((value) => value + 1);
+  }
+
+  function changeDays(nextDays) {
+    setDays(nextDays);
+    setSummary(null);
+    setErrorMessage('');
+    setState('loading');
+  }
 
   useEffect(() => {
     let active = true;
 
-    setState('loading');
-    setErrorMessage('');
-
-    if (!analyticsClient) {
-      setSummary(null);
-      setErrorMessage('Analytics are not configured for this Admin deployment.');
-      setState('error');
-      return () => {
-        active = false;
-      };
-    }
+    if (!analyticsClient) return () => { active = false; };
 
     analyticsClient
       .getUserAnalytics({ days })
@@ -85,7 +91,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
           <select
             aria-label="Analytics window"
             value={days}
-            onChange={(event) => setDays(Number(event.target.value))}
+            onChange={(event) => changeDays(Number(event.target.value))}
           >
             {WINDOW_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -105,7 +111,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
       {state === 'error' ? (
         <div className="admin-analytics-error" role="alert">
           <p>{errorMessage}</p>
-          <button type="button" onClick={() => setRequestVersion((value) => value + 1)}>
+          <button type="button" onClick={requestAgain}>
             Retry
           </button>
         </div>
