@@ -2,6 +2,8 @@
 
 This is the authoritative development handoff for `Victor12-star/AttraVoya-Pro`.
 
+**Verified live checkpoint:** See [24 October 2026 development checkpoint](VERIFIED-DEVELOPMENT-CHECKPOINT-2026-10-24.md) for the latest confirmed `develop` commit, five-check post-merge evidence, reconciled pull requests and outstanding staging acceptance blocker. Historical phase and release snapshots below must not be treated as the latest GitHub state.
+
 ## Release invariant
 
 Every feature slice must follow this sequence without shortcuts:
