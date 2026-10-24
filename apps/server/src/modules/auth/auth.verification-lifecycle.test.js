@@ -103,10 +103,7 @@ describe('email verification resend lifecycle', () => {
     });
     const reply = createReply();
 
-    await controller.resendVerification(
-      { body: { email: 'traveller@example.test' }, log },
-      reply,
-    );
+    await controller.resendVerification({ body: { email: 'traveller@example.test' }, log }, reply);
 
     expect(delivery).toHaveBeenCalledTimes(1);
     expect(reply.send).toHaveBeenCalledWith({
