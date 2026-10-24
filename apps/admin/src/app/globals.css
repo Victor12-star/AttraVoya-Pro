@@ -120,3 +120,86 @@ textarea {
     padding-top: 1rem;
   }
 }
+
+
+.admin-analytics-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-analytics-window {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 150px;
+  color: #465168;
+  font-size: 0.9rem;
+}
+
+.admin-analytics-window select {
+  min-height: 42px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+}
+
+.admin-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.admin-analytics-metric {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid #e3e7ee;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.admin-analytics-metric strong {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1;
+}
+
+.admin-analytics-footnote {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+}
+
+.admin-analytics-error {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #f4c7c7;
+  border-radius: 12px;
+  background: #fff7f7;
+}
+
+.admin-analytics-error p {
+  margin-top: 0;
+}
+
+.admin-analytics-error button {
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #b42318;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #912018;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .admin-analytics-heading {
+    flex-direction: column;
+  }
+
+  .admin-analytics-window {
+    width: 100%;
+  }
+}
