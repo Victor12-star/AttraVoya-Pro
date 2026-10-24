@@ -27,7 +27,7 @@ export default function ScaffoldScreen({ children, description, eyebrow, title }
         contentInsetAdjustmentBehavior="automatic"
       >
         <View style={styles.content}>
-          <View accessibilityRole="summary" style={styles.statusBadge}>
+          <View accessible accessibilityRole="summary" style={styles.statusBadge}>
             <View style={styles.statusDot} />
             <Text style={styles.statusLabel}>Feature foundation</Text>
           </View>
