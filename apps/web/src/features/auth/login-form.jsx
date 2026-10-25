@@ -23,6 +23,9 @@ export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
         email: String(form.get('email') ?? '').trim(),
         password: String(form.get('password') ?? ''),
       });
+      // A successful password response alone does not prove that the browser
+      // retained the HttpOnly session cookie after the first-party proxy.
+      await apiClient.listAuthSessions();
       window.dispatchEvent(new Event('attravoya:auth-changed'));
       router.push(returnTo);
       router.refresh();
