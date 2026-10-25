@@ -23,6 +23,7 @@ export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
         email: String(form.get('email') ?? '').trim(),
         password: String(form.get('password') ?? ''),
       });
+      window.dispatchEvent(new Event('attravoya:auth-changed'));
       router.push(returnTo);
       router.refresh();
     } catch {

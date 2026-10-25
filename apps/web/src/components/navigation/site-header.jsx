@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes';
 
 import { UI_LOCALES } from '@attravoya/localization';
 
+import { apiClient } from '../../lib/api-client.js';
 import { readPreferences, savePreferences } from '../../lib/preferences.js';
 import { Brand } from '../common/brand.jsx';
 
@@ -35,10 +36,29 @@ export function SiteHeader({
   const { resolvedTheme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currency, setCurrency] = useState(defaultCurrency);
+  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
     const stored = readPreferences();
     if (stored.currency) setCurrency(stored.currency);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    async function checkSession() {
+      try {
+        await apiClient.listAuthSessions();
+        if (active) setAuthenticated(true);
+      } catch {
+        if (active) setAuthenticated(false);
+      }
+    }
+    void checkSession();
+    window.addEventListener('attravoya:auth-changed', checkSession);
+    return () => {
+      active = false;
+      window.removeEventListener('attravoya:auth-changed', checkSession);
+    };
   }, []);
 
   const navigation = [
@@ -113,8 +133,11 @@ export function SiteHeader({
             {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <Link className="button button--compact button--dark desktop-signin" href="/login">
-            {messages.navigation.signIn}
+          <Link
+            className="button button--compact button--dark desktop-signin"
+            href={authenticated ? '/profile' : '/login'}
+          >
+            {authenticated ? 'Account' : messages.navigation.signIn}
           </Link>
 
           <button
@@ -164,10 +187,10 @@ export function SiteHeader({
             </div>
             <Link
               className="button button--dark"
-              href="/login"
+              href={authenticated ? '/profile' : '/login'}
               onClick={() => setMobileOpen(false)}
             >
-              {messages.navigation.signIn}
+              {authenticated ? 'Account' : messages.navigation.signIn}
             </Link>
           </nav>
         </div>
