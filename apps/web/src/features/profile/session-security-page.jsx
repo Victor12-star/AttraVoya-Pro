@@ -172,6 +172,23 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
     }
   }
 
+  async function signOutCurrentSession() {
+    if (actionLockRef.current) return;
+    actionLockRef.current = true;
+    setFeedback(null);
+    setAction({ kind: 'current', sessionId: null });
+    try {
+      await apiClient.logout();
+      window.dispatchEvent(new Event('attravoya:auth-changed'));
+      router.replace('/login');
+      router.refresh();
+    } catch {
+      actionLockRef.current = false;
+      setAction({ kind: 'idle', sessionId: null });
+      setFeedback({ kind: 'error', text: copy.currentFailed });
+    }
+  }
+
   async function revokeAllSessions() {
     if (actionLockRef.current) return;
     actionLockRef.current = true;
@@ -180,6 +197,7 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
 
     try {
       await apiClient.revokeAllAuthSessions();
+      window.dispatchEvent(new Event('attravoya:auth-changed'));
       router.replace('/login');
       router.refresh();
     } catch {
@@ -306,6 +324,22 @@ export function SessionSecurityPage({ locale = 'en', copy, common, signInLabel }
             <Clock3 size={17} aria-hidden="true" />
             {copy.revokeHint}
           </p>
+
+          <section className={styles.signOutAll} aria-label={copy.signOutCurrent}>
+            <div>
+              <h2>{copy.signOutCurrent}</h2>
+              <p>{copy.signOutCurrentHint}</p>
+            </div>
+            <button
+              className="button button--secondary"
+              type="button"
+              disabled={busy}
+              onClick={() => void signOutCurrentSession()}
+            >
+              <LogOut size={17} aria-hidden="true" />
+              {action.kind === 'current' ? copy.signingOut : copy.signOutCurrent}
+            </button>
+          </section>
 
           <section className={styles.signOutAll} aria-labelledby="sign-out-everywhere-title">
             <div>

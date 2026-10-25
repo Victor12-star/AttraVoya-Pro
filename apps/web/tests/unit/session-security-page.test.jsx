@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   listAuthSessions: vi.fn(),
   revokeAuthSession: vi.fn(),
   revokeAllAuthSessions: vi.fn(),
+  logout: vi.fn(),
   replace: vi.fn(),
   refresh: vi.fn(),
 }));
@@ -18,6 +19,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
     listAuthSessions: mocks.listAuthSessions,
     revokeAuthSession: mocks.revokeAuthSession,
     revokeAllAuthSessions: mocks.revokeAllAuthSessions,
+    logout: mocks.logout,
   },
 }));
 
@@ -54,11 +56,13 @@ describe('SessionSecurityPage', () => {
     mocks.listAuthSessions.mockReset();
     mocks.revokeAuthSession.mockReset();
     mocks.revokeAllAuthSessions.mockReset();
+    mocks.logout.mockReset();
     mocks.replace.mockReset();
     mocks.refresh.mockReset();
     mocks.listAuthSessions.mockResolvedValue({ sessions: [session()] });
     mocks.revokeAuthSession.mockResolvedValue(null);
     mocks.revokeAllAuthSessions.mockResolvedValue(null);
+    mocks.logout.mockResolvedValue(null);
   });
 
   it('renders only minimized, human-readable session metadata', async () => {
@@ -133,6 +137,26 @@ describe('SessionSecurityPage', () => {
       expect(screen.queryByRole('heading', { name: 'Chrome · Windows' })).not.toBeInTheDocument(),
     );
     expect(screen.getByText(/Session revoked\./)).toBeInTheDocument();
+  });
+
+  it('signs out only the current browser without revoking other sessions', async () => {
+    renderPage();
+    await screen.findByRole('heading', { name: 'Chrome · Windows' });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(mocks.logout).toHaveBeenCalledTimes(1));
+    expect(mocks.revokeAllAuthSessions).not.toHaveBeenCalled();
+    expect(mocks.replace).toHaveBeenCalledWith('/login');
+  });
+
+  it('keeps the account page open when signing out the current browser fails', async () => {
+    mocks.logout.mockRejectedValue(new Error('network down'));
+    renderPage();
+    await screen.findByRole('heading', { name: 'Chrome · Windows' });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Could not sign out this browser. Try again.',
+    );
+    expect(mocks.replace).not.toHaveBeenCalled();
   });
 
   it('requires explicit confirmation before revoking every session and redirects after success', async () => {
