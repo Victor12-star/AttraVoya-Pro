@@ -69,7 +69,11 @@ const nextConfig = {
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
     const destination = new URL(apiUrl);
-    if (!['http:', 'https:'].includes(destination.protocol) || destination.username || destination.password) {
+    if (
+      !['http:', 'https:'].includes(destination.protocol) ||
+      destination.username ||
+      destination.password
+    ) {
       throw new Error('NEXT_PUBLIC_API_BASE_URL must be an HTTP(S) origin.');
     }
     const apiOrigin = destination.origin;
