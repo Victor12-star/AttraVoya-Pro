@@ -56,6 +56,25 @@ describe('authenticated session controls', () => {
     expect(response.json()).toMatchObject({ error: { code: 'AUTHENTICATION_REQUIRED' } });
   });
 
+  it('rejects unauthenticated individual and global session revocation', async () => {
+    const revoked = [];
+    const repository = {
+      findAuthorizationContextByUserId: async (userId) => activeAuth(userId),
+      revokeOwnedSession: async (input) => revoked.push(input),
+      revokeAllActiveSessionsForUser: async (userId) => revoked.push(userId),
+    };
+    const app = await createSessionApp(repository);
+
+    for (const url of ['/api/v1/auth/sessions/session-1', '/api/v1/auth/sessions']) {
+      const response = await app.inject({ method: 'DELETE', url });
+      expect(response.statusCode).toBe(401);
+      expect(response.json()).toMatchObject({
+        error: { code: 'AUTHENTICATION_REQUIRED' },
+      });
+    }
+    expect(revoked).toEqual([]);
+  });
+
   it('returns only minimized active-session metadata with a private no-store contract', async () => {
     const calls = [];
     const repository = {
