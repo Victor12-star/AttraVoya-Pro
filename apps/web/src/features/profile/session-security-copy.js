@@ -22,7 +22,8 @@ const COPY = Object.freeze({
     revokeFailed: 'This session could not be revoked. Try again.',
     revokeHint: 'Revoking one session does not sign out your other sessions.',
     signOutCurrent: 'Sign out',
-    signOutCurrentHint: 'End only this browser session. Other devices remain signed in.',
+    signOutCurrentHint:
+      'End only this browser session. Other devices remain signed in.',
     currentFailed: 'Could not sign out this browser. Try again.',
     signOutAll: 'Sign out everywhere',
     signOutAllHint:
@@ -53,7 +54,8 @@ const COPY = Object.freeze({
     revokeFailed: 'Sessionen kunde inte återkallas. Försök igen.',
     revokeHint: 'Att återkalla en session loggar inte ut dina andra sessioner.',
     signOutCurrent: 'Logga ut',
-    signOutCurrentHint: 'Avsluta bara sessionen i den här webbläsaren. Andra enheter förblir inloggade.',
+    signOutCurrentHint:
+      'Avsluta bara sessionen i den här webbläsaren. Andra enheter förblir inloggade.',
     currentFailed: 'Det gick inte att logga ut från den här webbläsaren. Försök igen.',
     signOutAll: 'Logga ut överallt',
     signOutAllHint:
