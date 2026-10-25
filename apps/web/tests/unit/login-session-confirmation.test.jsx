@@ -56,10 +56,21 @@ describe('LoginForm browser session confirmation', () => {
     expect(mocks.listAuthSessions).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps the credential failure message generic when the login request itself fails', async () => {
+    mocks.login.mockRejectedValue({ status: 401 });
+    submit();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign in.');
+    expect(mocks.listAuthSessions).not.toHaveBeenCalled();
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
   it('shows an error instead of redirecting when the browser session was not retained', async () => {
     mocks.listAuthSessions.mockRejectedValue({ status: 401 });
     submit();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign in.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Sign-in was accepted, but this browser could not confirm your session.',
+    );
+    expect(mocks.login).toHaveBeenCalledTimes(1);
     expect(mocks.push).not.toHaveBeenCalled();
   });
 });
