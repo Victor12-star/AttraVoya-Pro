@@ -174,6 +174,23 @@ describe('SessionSecurityPage', () => {
     expect(mocks.replace).not.toHaveBeenCalled();
   });
 
+  it('keeps the user on the account page when sign out everywhere fails', async () => {
+    mocks.revokeAllAuthSessions.mockRejectedValue(new Error('private server response'));
+
+    renderPage();
+    await screen.findByRole('heading', { name: 'Chrome · Windows' });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign out everywhere' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm sign out everywhere' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'We could not sign out all sessions. Try again.',
+    );
+    expect(mocks.replace).not.toHaveBeenCalled();
+    expect(mocks.logout).not.toHaveBeenCalled();
+    expect(screen.queryByText('private server response')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Chrome · Windows' })).toBeInTheDocument();
+  });
+
   it('requires explicit confirmation before revoking every session and redirects after success', async () => {
     renderPage();
     await screen.findByRole('heading', { name: 'Chrome · Windows' });
