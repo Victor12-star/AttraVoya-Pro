@@ -65,6 +65,29 @@ describe('authentication and authorization hooks', () => {
     });
   });
 
+  it('rejects an expired access token even when the account remains active', async () => {
+    const app = await createProtectedApp({
+      id: 'user-1',
+      email: 'user@example.test',
+      status: 'ACTIVE',
+      emailVerifiedAt: new Date(),
+      roles: [ROLES.USER],
+      permissions: [PERMISSIONS.USERS_READ],
+    });
+    const token = app.jwt.sign({ sub: 'user-1', exp: Math.floor(Date.now() / 1000) - 60 });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/protected',
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.json()).toMatchObject({
+      error: { code: 'AUTHENTICATION_REQUIRED' },
+    });
+  });
+
   it('uses current database permissions instead of trusting role claims in the token', async () => {
     const app = await createProtectedApp({
       id: 'user-1',
