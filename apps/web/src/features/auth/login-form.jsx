@@ -25,7 +25,16 @@ export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
       });
       // A successful password response alone does not prove that the browser
       // retained the HttpOnly session cookie after the first-party proxy.
-      await apiClient.listAuthSessions();
+      try {
+        await apiClient.listAuthSessions();
+      } catch {
+        // The password request completed, but the browser has not proved it
+        // can use its HttpOnly session. Avoid falsely blaming credentials.
+        setError(
+          'Sign-in was accepted, but this browser could not confirm your session. Check that cookies are allowed, then try again.',
+        );
+        return;
+      }
       window.dispatchEvent(new Event('attravoya:auth-changed'));
       router.push(returnTo);
       router.refresh();
