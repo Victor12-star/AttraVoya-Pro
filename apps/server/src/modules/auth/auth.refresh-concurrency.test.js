@@ -18,6 +18,45 @@ beforeEach(() => {
 });
 
 describe('refresh-session concurrency', () => {
+  it('revokes an individual session only when its owner and active expiry match', async () => {
+    const revokedAt = new Date('2026-10-25T12:00:00.000Z');
+    updateMany.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 });
+
+    await expect(
+      authRepository.revokeOwnedSession({ userId: 'user-1', sessionId: 'session-1', revokedAt }),
+    ).resolves.toBe(true);
+    expect(updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'session-1',
+        userId: 'user-1',
+        revokedAt: null,
+        expiresAt: { gt: revokedAt },
+      },
+      data: { revokedAt },
+    });
+
+    await expect(
+      authRepository.revokeOwnedSession({ userId: 'user-1', sessionId: 'session-1', revokedAt }),
+    ).resolves.toBe(false);
+  });
+
+  it('revokes all sessions only for the authenticated user', async () => {
+    const revokedAt = new Date('2026-10-25T12:00:00.000Z');
+    updateMany.mockResolvedValue({ count: 2 });
+
+    await expect(
+      authRepository.revokeAllActiveSessionsForUser('user-1', revokedAt),
+    ).resolves.toEqual({ count: 2 });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-1',
+        revokedAt: null,
+        expiresAt: { gt: revokedAt },
+      },
+      data: { revokedAt },
+    });
+  });
+
   it('uses the current refresh hash as an atomic compare-and-swap condition', async () => {
     const lastUsedAt = new Date('2026-09-10T12:00:00.000Z');
     updateMany.mockResolvedValue({ count: 1 });
