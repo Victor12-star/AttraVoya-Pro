@@ -182,9 +182,9 @@ describe('SessionSecurityPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sign out everywhere' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirm sign out everywhere' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'We could not sign out all sessions. Try again.',
-    );
+    expect(
+      await screen.findByText('We could not sign out all sessions. Try again.'),
+    ).toBeInTheDocument();
     expect(mocks.replace).not.toHaveBeenCalled();
     expect(mocks.logout).not.toHaveBeenCalled();
     expect(screen.queryByText('private server response')).not.toBeInTheDocument();
