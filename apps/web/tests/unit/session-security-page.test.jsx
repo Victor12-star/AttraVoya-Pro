@@ -139,6 +139,21 @@ describe('SessionSecurityPage', () => {
     expect(screen.getByText(/Session revoked\./)).toBeInTheDocument();
   });
 
+  it('retains the session card and shows a generic error if targeted revocation fails', async () => {
+    mocks.revokeAuthSession.mockRejectedValue(new Error('private backend failure'));
+
+    renderPage();
+    await screen.findByRole('heading', { name: 'Chrome · Windows' });
+    fireEvent.click(screen.getByRole('button', { name: 'Revoke session: Chrome · Windows' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'This session could not be revoked. Try again.',
+    );
+    expect(screen.getByRole('heading', { name: 'Chrome · Windows' })).toBeInTheDocument();
+    expect(mocks.replace).not.toHaveBeenCalled();
+    expect(screen.queryByText('private backend failure')).not.toBeInTheDocument();
+  });
+
   it('signs out only the current browser without revoking other sessions', async () => {
     renderPage();
     await screen.findByRole('heading', { name: 'Chrome · Windows' });
