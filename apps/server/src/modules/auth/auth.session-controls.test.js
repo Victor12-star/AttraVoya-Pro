@@ -59,6 +59,7 @@ describe('authenticated session controls', () => {
   it('rejects unauthenticated individual and global session revocation', async () => {
     const revoked = [];
     const repository = {
+      findAuthorizationContextByUserId: async (userId) => activeAuth(userId),
       revokeOwnedSession: async (input) => revoked.push(input),
       revokeAllActiveSessionsForUser: async (userId) => revoked.push(userId),
     };
