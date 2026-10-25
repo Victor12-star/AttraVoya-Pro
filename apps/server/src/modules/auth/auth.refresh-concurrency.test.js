@@ -95,6 +95,34 @@ describe('refresh-session concurrency', () => {
     ).resolves.toBe(false);
   });
 
+  it('rejects absent, expired, revoked or inactive refresh sessions without rotating', async () => {
+    const rotateSession = vi.fn();
+    const findActiveSessionByRefreshHash = vi.fn().mockResolvedValue(null);
+    const service = createAuthService({
+      repository: { findActiveSessionByRefreshHash, rotateSession },
+      issueAccessToken: () => 'must-not-issue',
+    });
+
+    await expect(service.refresh(null)).rejects.toMatchObject({
+      statusCode: 401,
+      code: 'AUTHENTICATION_REQUIRED',
+    });
+    await expect(service.refresh('revoked-or-expired-token')).rejects.toMatchObject({
+      statusCode: 401,
+      code: 'AUTHENTICATION_REQUIRED',
+    });
+
+    findActiveSessionByRefreshHash.mockResolvedValue({
+      id: 'inactive-session',
+      auth: { status: 'DISABLED' },
+    });
+    await expect(service.refresh('inactive-user-token')).rejects.toMatchObject({
+      statusCode: 401,
+      code: 'AUTHENTICATION_REQUIRED',
+    });
+    expect(rotateSession).not.toHaveBeenCalled();
+  });
+
   it('allows exactly one of two concurrent refreshes using the same token to succeed', async () => {
     const session = {
       id: 'session-1',
