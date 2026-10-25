@@ -21,6 +21,9 @@ const COPY = Object.freeze({
       'Session revoked. It can no longer renew access; a short-lived sign-in may remain active briefly.',
     revokeFailed: 'This session could not be revoked. Try again.',
     revokeHint: 'Revoking one session does not sign out your other sessions.',
+    signOutCurrent: 'Sign out',
+    signOutCurrentHint: 'End only this browser session. Other devices remain signed in.',
+    currentFailed: 'Could not sign out this browser. Try again.',
     signOutAll: 'Sign out everywhere',
     signOutAllHint:
       'Revoke every active session, including this browser, and return to the sign-in page.',
@@ -49,6 +52,9 @@ const COPY = Object.freeze({
       'Sessionen har återkallats. Den kan inte längre förnya åtkomsten; en kortvarig inloggning kan fortsätta en liten stund.',
     revokeFailed: 'Sessionen kunde inte återkallas. Försök igen.',
     revokeHint: 'Att återkalla en session loggar inte ut dina andra sessioner.',
+    signOutCurrent: 'Logga ut',
+    signOutCurrentHint: 'Avsluta bara sessionen i den här webbläsaren. Andra enheter förblir inloggade.',
+    currentFailed: 'Det gick inte att logga ut från den här webbläsaren. Försök igen.',
     signOutAll: 'Logga ut överallt',
     signOutAllHint:
       'Återkalla alla aktiva sessioner, inklusive den här webbläsaren, och gå tillbaka till inloggningen.',
