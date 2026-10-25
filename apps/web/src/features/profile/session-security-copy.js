@@ -511,5 +511,5 @@ export const SESSION_SECURITY_COPY_LOCALES = Object.freeze(Object.keys(COPY));
 
 export function getSessionSecurityCopy(locale) {
   const normalized = normalizeLocale(locale);
-  return COPY[normalized] ?? COPY[DEFAULT_UI_LOCALE];
+  return { ...COPY[DEFAULT_UI_LOCALE], ...(COPY[normalized] ?? {}) };
 }
