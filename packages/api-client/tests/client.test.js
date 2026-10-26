@@ -12,10 +12,13 @@ describe('API client', () => {
       const fetchImpl = vi.fn((_url, options) =>
         new Promise((resolve, reject) => {
           const timer = setTimeout(
-            () => resolve(new Response(JSON.stringify({ message: 'ok' }), {
-              status: 200,
-              headers: { 'content-type': 'application/json' },
-            })),
+            () =>
+              resolve(
+                new Response(JSON.stringify({ message: 'ok' }), {
+                  status: 200,
+                  headers: { 'content-type': 'application/json' },
+                }),
+              ),
             15_000,
           );
           options.signal.addEventListener('abort', () => {
