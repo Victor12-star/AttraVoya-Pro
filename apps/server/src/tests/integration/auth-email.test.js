@@ -77,4 +77,81 @@ describe('authentication email recovery routes', () => {
     expect(onVerificationRequested).not.toHaveBeenCalled();
     expect(response.json().message).toContain('If the account exists');
   });
+  it('keeps recovery requests indistinguishable for existing and unknown accounts', async () => {
+    const onPasswordResetRequested = vi.fn().mockResolvedValue(undefined);
+    const tokenStorage = vi.fn().mockResolvedValue(undefined);
+    const repository = baseRepository({
+      findUserIdByEmail: async (email) =>
+        email === 'traveller@example.test' ? 'user-1' : null,
+      createPasswordResetToken: tokenStorage,
+    });
+    const app = await buildApp({ logger: false, authRepository: repository, onPasswordResetRequested });
+    apps.push(app);
+
+    const existing = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/forgot-password',
+      payload: { email: 'traveller@example.test' },
+    });
+    const unknown = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/forgot-password',
+      payload: { email: 'unknown@example.test' },
+    });
+
+    expect(existing.statusCode).toBe(200);
+    expect(unknown.statusCode).toBe(200);
+    expect(existing.json()).toEqual(unknown.json());
+    expect(JSON.stringify(existing.json())).not.toContain('token');
+    expect(tokenStorage).toHaveBeenCalledTimes(1);
+    expect(onPasswordResetRequested).toHaveBeenCalledTimes(1);
+    const storedToken = tokenStorage.mock.calls[0][0];
+    const mailedToken = onPasswordResetRequested.mock.calls[0][0];
+    expect(storedToken.userId).toBe('user-1');
+    expect(storedToken.tokenHash).not.toBe(mailedToken.token);
+    expect(mailedToken.email).toBe('traveller@example.test');
+    expect(mailedToken.token.length).toBeGreaterThan(20);
+  });
+
+  it('does not reveal an email delivery failure or expose the reset token', async () => {
+    const onPasswordResetRequested = vi.fn().mockRejectedValue(new Error('delivery unavailable'));
+    const repository = baseRepository({
+      findUserIdByEmail: async () => 'user-1',
+      createPasswordResetToken: async () => null,
+    });
+    const app = await buildApp({ logger: false, authRepository: repository, onPasswordResetRequested });
+    apps.push(app);
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/forgot-password',
+      payload: { email: 'traveller@example.test' },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().message).toContain('If an account exists');
+    expect(JSON.stringify(response.json())).not.toContain('token');
+    expect(onPasswordResetRequested).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects expired or reused reset tokens without changing a password', async () => {
+    const resetPasswordByTokenHash = vi.fn().mockResolvedValue(null);
+    const app = await buildApp({
+      logger: false,
+      authRepository: baseRepository({ resetPasswordByTokenHash }),
+    });
+    apps.push(app);
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/reset-password',
+      payload: { token: 'test-reset-token-with-sufficient-length-1234', password: 'UpdatedSafePassword123!' },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error.code).toBe('INVALID_OR_EXPIRED_TOKEN');
+    expect(resetPasswordByTokenHash).toHaveBeenCalledTimes(1);
+    expect(resetPasswordByTokenHash.mock.calls[0][0].tokenHash).not.toBe(
+      'test-reset-token-with-sufficient-length-1234',
+    );
+  });
+
 });
