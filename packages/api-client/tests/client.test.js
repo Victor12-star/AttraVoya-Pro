@@ -3,19 +3,17 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiClientError, createApiClient } from '../src/index.js';
 
 describe('API client', () => {
-  it.each([
-    ['login', { email: 'test@example.com', password: 'example-value' }],
-    ['forgotPassword', 'test@example.com'],
-  ])('handles %s cold starts', async (method, payload) => {
+  it('allows login to finish after the ordinary 12-second deadline', async () => {
     vi.useFakeTimers();
     try {
-      const fetchImpl = vi.fn((_url, options) =>
-        new Promise((resolve, reject) => {
+      const fetchImpl = vi.fn((_url, options) => {
+        expect(options.method).toBe('POST');
+        return new Promise((resolve, reject) => {
           const timer = setTimeout(
             () =>
               resolve(
-                new Response(JSON.stringify({ message: 'ok' }), {
-                  status: 200,
+                new Response(JSON.stringify({ message: 'Account created.' }), {
+                  status: 201,
                   headers: { 'content-type': 'application/json' },
                 }),
               ),
@@ -25,10 +23,11 @@ describe('API client', () => {
             clearTimeout(timer);
             reject(new DOMException('aborted', 'AbortError'));
           });
-        }),
-      );
+        });
+      });
       const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
-      const assertion = expect(client[method](payload)).resolves.toMatchObject({ message: 'ok' });
+      const pending = client.login({ email: 'test@example.com', password: 'example-value' });
+      const assertion = expect(pending).resolves.toMatchObject({ message: 'Account created.' });
       await vi.advanceTimersByTimeAsync(15_000);
       await assertion;
       expect(fetchImpl).toHaveBeenCalledTimes(1);
@@ -36,7 +35,38 @@ describe('API client', () => {
       vi.useRealTimers();
     }
   });
-
+  it('allows password recovery to finish after the ordinary 12-second deadline', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchImpl = vi.fn((_url, options) => {
+        expect(options.method).toBe('POST');
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(
+            () =>
+              resolve(
+                new Response(JSON.stringify({ message: 'Account created.' }), {
+                  status: 201,
+                  headers: { 'content-type': 'application/json' },
+                }),
+              ),
+            15_000,
+          );
+          options.signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            reject(new DOMException('aborted', 'AbortError'));
+          });
+        });
+      });
+      const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+      const pending = client.forgotPassword('test@example.com');
+      const assertion = expect(pending).resolves.toMatchObject({ message: 'Account created.' });
+      await vi.advanceTimersByTimeAsync(15_000);
+      await assertion;
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('allows registration to finish after the ordinary 12-second deadline', async () => {
     vi.useFakeTimers();
     try {
