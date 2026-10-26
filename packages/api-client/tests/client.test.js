@@ -3,6 +3,37 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiClientError, createApiClient } from '../src/index.js';
 
 describe('API client', () => {
+  it.each([
+    ['login', { email: 'test@example.com', password: 'example-value' }],
+    ['forgotPassword', 'test@example.com'],
+  ])('allows %s to finish during a 15-second backend cold start', async (method, payload) => {
+    vi.useFakeTimers();
+    try {
+      const fetchImpl = vi.fn((_url, options) =>
+        new Promise((resolve, reject) => {
+          const timer = setTimeout(
+            () => resolve(new Response(JSON.stringify({ message: 'ok' }), {
+              status: 200,
+              headers: { 'content-type': 'application/json' },
+            })),
+            15_000,
+          );
+          options.signal.addEventListener('abort', () => {
+            clearTimeout(timer);
+            reject(new DOMException('aborted', 'AbortError'));
+          });
+        }),
+      );
+      const client = createApiClient({ baseUrl: 'http://localhost:5000', fetchImpl });
+      const assertion = expect(client[method](payload)).resolves.toMatchObject({ message: 'ok' });
+      await vi.advanceTimersByTimeAsync(15_000);
+      await assertion;
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('allows registration to finish after the ordinary 12-second deadline', async () => {
     vi.useFakeTimers();
     try {
