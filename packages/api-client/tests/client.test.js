@@ -6,7 +6,7 @@ describe('API client', () => {
   it.each([
     ['login', { email: 'test@example.com', password: 'example-value' }],
     ['forgotPassword', 'test@example.com'],
-  ])('allows %s to finish during a 15-second backend cold start', async (method, payload) => {
+  ])('handles %s cold starts', async (method, payload) => {
     vi.useFakeTimers();
     try {
       const fetchImpl = vi.fn((_url, options) =>
