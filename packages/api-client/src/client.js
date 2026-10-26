@@ -1,7 +1,7 @@
 import { ApiClientError } from './errors.js';
 
 const DEFAULT_TIMEOUT_MS = 12_000;
-const REGISTRATION_TIMEOUT_MS = 45_000;
+const AUTH_COLD_START_TIMEOUT_MS = 45_000;
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9._~:-]{8,128}$/;
 /** @type {Set<string>} */
@@ -299,9 +299,14 @@ export function createApiClient(options) {
       request('/api/v1/auth/register', {
         method: 'POST',
         body,
-        timeoutMs: REGISTRATION_TIMEOUT_MS,
+        timeoutMs: AUTH_COLD_START_TIMEOUT_MS,
       }),
-    login: (body) => request('/api/v1/auth/login', { method: 'POST', body }),
+    login: (body) =>
+      request('/api/v1/auth/login', {
+        method: 'POST',
+        body,
+        timeoutMs: AUTH_COLD_START_TIMEOUT_MS,
+      }),
     refresh: () => request('/api/v1/auth/refresh', { method: 'POST' }),
     logout: () => request('/api/v1/auth/logout', { method: 'POST' }),
     listAuthSessions: () => request('/api/v1/auth/sessions', { cache: 'no-store' }),
@@ -358,7 +363,11 @@ export function createApiClient(options) {
     resendVerification: (email) =>
       request('/api/v1/auth/resend-verification', { method: 'POST', body: { email } }),
     forgotPassword: (email) =>
-      request('/api/v1/auth/forgot-password', { method: 'POST', body: { email } }),
+      request('/api/v1/auth/forgot-password', {
+        method: 'POST',
+        body: { email },
+        timeoutMs: AUTH_COLD_START_TIMEOUT_MS,
+      }),
     resetPassword: (body) => request('/api/v1/auth/reset-password', { method: 'POST', body }),
     searchDestinations: (query, requestOptions) =>
       request(`/api/v1/destinations/search?${toSearchParams(query)}`, requestOptions),
