@@ -74,7 +74,7 @@ describe('authentication and authorization hooks', () => {
       roles: [ROLES.USER],
       permissions: [PERMISSIONS.USERS_READ],
     });
-    const token = app.jwt.sign({ sub: 'user-1', exp: Math.floor(Date.now() / 1000) - 60 });
+    const token = app.jwt.sign({ sub: 'user-1' }, { expiresIn: -60 });
 
     const response = await app.inject({
       method: 'GET',
