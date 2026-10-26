@@ -124,7 +124,11 @@ describe('authentication email recovery routes', () => {
       findUserIdByEmail: async () => 'user-1',
       createPasswordResetToken: async () => null,
     });
-    const app = await buildApp({ logger: false, authRepository: repository, onPasswordResetRequested });
+    const app = await buildApp({
+      logger: false,
+      authRepository: repository,
+      onPasswordResetRequested,
+    });
     apps.push(app);
     const response = await app.inject({
       method: 'POST',
