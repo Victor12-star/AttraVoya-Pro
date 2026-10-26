@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ArrowRight, LockKeyhole, Mail } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { authRequestErrorMessage } from './auth-request-error.js';
 
 export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
   const router = useRouter();
@@ -41,13 +42,13 @@ export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
     } catch (error) {
       // Only genuine credential failures use the generic sign-in message.
       // A blocked or unavailable API must not be presented as a bad password.
-      if (error?.status === 429) {
-        setError('Too many sign-in attempts. Please try again later.');
-      } else if (!error?.status || error.status >= 500 || error.status === 404) {
-        setError('Sign-in service is unavailable. Please try again later.');
-      } else {
-        setError(messages.loginFailed);
-      }
+      setError(
+        authRequestErrorMessage(error, {
+          generic: messages.loginFailed,
+          unavailable: 'Sign-in service is unavailable. Please try again later.',
+          throttled: 'Too many sign-in attempts. Please try again later.',
+        }),
+      );
     } finally {
       setPending(false);
     }
