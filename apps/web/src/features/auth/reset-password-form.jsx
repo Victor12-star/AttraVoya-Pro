@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ArrowRight, LockKeyhole } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { authRequestErrorMessage } from './auth-request-error.js';
 
 export function ResetPasswordForm({ authMessages, messages }) {
   const searchParams = useSearchParams();
@@ -38,8 +39,14 @@ export function ResetPasswordForm({ authMessages, messages }) {
       await apiClient.resetPassword({ token, password });
       setSuccess(messages.resetSuccess);
       formElement.reset();
-    } catch {
-      setError(messages.resetInvalid);
+    } catch (error) {
+      setError(
+        authRequestErrorMessage(error, {
+          generic: messages.resetInvalid,
+          unavailable: 'Password reset service is unavailable. Please try again later.',
+          throttled: 'Too many reset attempts. Please try again later.',
+        }),
+      );
     } finally {
       setPending(false);
     }
