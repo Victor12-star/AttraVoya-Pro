@@ -21,7 +21,8 @@ export function ResetPasswordForm({ authMessages, messages }) {
       return;
     }
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const password = String(form.get('password') ?? '');
     const confirmPassword = String(form.get('confirmPassword') ?? '');
     if (password !== confirmPassword) {
@@ -36,7 +37,7 @@ export function ResetPasswordForm({ authMessages, messages }) {
     try {
       await apiClient.resetPassword({ token, password });
       setSuccess(messages.resetSuccess);
-      event.currentTarget.reset();
+      formElement.reset();
     } catch {
       setError(messages.resetInvalid);
     } finally {
