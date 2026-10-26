@@ -28,17 +28,19 @@ function submit() {
 describe('password reset request error handling', () => {
   beforeEach(() => mocks.forgotPassword.mockReset());
 
-  it.each([
-    [{ code: 'NETWORK_ERROR' }, 'Password recovery service is unavailable.'],
-    [{ status: 502 }, 'Password recovery service is unavailable.'],
-    [{ status: 429 }, 'Too many reset requests.'],
-    [{ status: 400 }, 'Could not request password reset.'],
-  ])('shows a safe, useful request error', async (failure, message) => {
-    mocks.forgotPassword.mockRejectedValue(failure);
-    submit();
-    expect(await screen.findByRole('alert')).toHaveTextContent(message);
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-  });
+  for (const [name, failure, message] of [
+    ['network', { code: 'NETWORK_ERROR' }, 'Password recovery service is unavailable.'],
+    ['server', { status: 502 }, 'Password recovery service is unavailable.'],
+    ['rate limit', { status: 429 }, 'Too many reset requests.'],
+    ['validation', { status: 400 }, 'Could not request password reset.'],
+  ]) {
+    it(`shows a safe ${name} request error`, async () => {
+      mocks.forgotPassword.mockRejectedValue(failure);
+      submit();
+      expect(await screen.findByRole('alert')).toHaveTextContent(message);
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+  }
 
   it('keeps the success text generic for account privacy', async () => {
     mocks.forgotPassword.mockResolvedValue({});
