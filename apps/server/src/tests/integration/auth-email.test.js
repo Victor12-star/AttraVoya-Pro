@@ -77,6 +77,7 @@ describe('authentication email recovery routes', () => {
     expect(onVerificationRequested).not.toHaveBeenCalled();
     expect(response.json().message).toContain('If the account exists');
   });
+
   it('keeps recovery requests indistinguishable for existing and unknown accounts', async () => {
     const onPasswordResetRequested = vi.fn().mockResolvedValue(undefined);
     const tokenStorage = vi.fn().mockResolvedValue(undefined);
@@ -85,7 +86,11 @@ describe('authentication email recovery routes', () => {
         email === 'traveller@example.test' ? 'user-1' : null,
       createPasswordResetToken: tokenStorage,
     });
-    const app = await buildApp({ logger: false, authRepository: repository, onPasswordResetRequested });
+    const app = await buildApp({
+      logger: false,
+      authRepository: repository,
+      onPasswordResetRequested,
+    });
     apps.push(app);
 
     const existing = await app.inject({
@@ -143,7 +148,10 @@ describe('authentication email recovery routes', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/reset-password',
-      payload: { token: 'test-reset-token-with-sufficient-length-1234', password: 'UpdatedSafePassword123!' },
+      payload: {
+        token: 'test-reset-token-with-sufficient-length-1234',
+        password: 'UpdatedSafePassword123!',
+      },
     });
 
     expect(response.statusCode).toBe(400);
@@ -153,5 +161,4 @@ describe('authentication email recovery routes', () => {
       'test-reset-token-with-sufficient-length-1234',
     );
   });
-
 });
