@@ -64,6 +64,18 @@ describe('LoginForm browser session confirmation', () => {
     expect(mocks.push).not.toHaveBeenCalled();
   });
 
+  it.each([
+    [{ code: 'NETWORK_ERROR' }, 'Sign-in service is unavailable.'],
+    [{ status: 503 }, 'Sign-in service is unavailable.'],
+    [{ status: 429 }, 'Too many sign-in attempts.'],
+  ])('distinguishes a service problem from incorrect credentials', async (failure, message) => {
+    mocks.login.mockRejectedValue(failure);
+    submit();
+    expect(await screen.findByRole('alert')).toHaveTextContent(message);
+    expect(mocks.listAuthSessions).not.toHaveBeenCalled();
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
   it('shows an error instead of redirecting when the browser session was not retained', async () => {
     mocks.listAuthSessions.mockRejectedValue({ status: 401 });
     submit();
