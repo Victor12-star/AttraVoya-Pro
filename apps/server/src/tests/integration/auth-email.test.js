@@ -143,6 +143,34 @@ describe('authentication email recovery routes', () => {
     expect(onPasswordResetRequested).toHaveBeenCalledTimes(1);
   });
 
+  it('accepts a valid reset token and clears existing browser session cookies', async () => {
+    const resetPasswordByTokenHash = vi.fn().mockResolvedValue({
+      id: 'user-1',
+      email: 'traveller@example.test',
+    });
+    const app = await buildApp({
+      logger: false,
+      authRepository: baseRepository({ resetPasswordByTokenHash }),
+    });
+    apps.push(app);
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/reset-password',
+      payload: {
+        token: 'valid-reset-token-with-sufficient-length-1234',
+        password: 'UpdatedSafePassword123!',
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().message).toContain('Please sign in again');
+    expect(JSON.stringify(response.json())).not.toContain('token');
+    expect(resetPasswordByTokenHash).toHaveBeenCalledTimes(1);
+    const cookies = response.headers['set-cookie'];
+    expect(cookies).toBeDefined();
+    expect(JSON.stringify(cookies)).toContain('Max-Age=0');
+  });
+
   it('rejects expired or reused reset tokens without changing a password', async () => {
     const resetPasswordByTokenHash = vi.fn().mockResolvedValue(null);
     const app = await buildApp({
