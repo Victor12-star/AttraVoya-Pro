@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ArrowRight, Mail } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { authRequestErrorMessage } from './auth-request-error.js';
 
 export function ForgotPasswordForm({ authMessages, messages }) {
   const [pending, setPending] = useState(false);
@@ -23,8 +24,14 @@ export function ForgotPasswordForm({ authMessages, messages }) {
       // The API deliberately returns the same response whether the account
       // exists or not, preventing account enumeration from this screen.
       setStatus(messages.resetSent);
-    } catch {
-      setError(messages.resetFailed);
+    } catch (error) {
+      setError(
+        authRequestErrorMessage(error, {
+          generic: messages.resetFailed,
+          unavailable: 'Password recovery service is unavailable. Please try again later.',
+          throttled: 'Too many reset requests. Please try again later.',
+        }),
+      );
     } finally {
       setPending(false);
     }
