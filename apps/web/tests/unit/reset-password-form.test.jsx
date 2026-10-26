@@ -46,6 +46,7 @@ describe('password reset form', () => {
     expect(inputs[0].value).toBe('');
     expect(inputs[1].value).toBe('');
   });
+
   it.each([
     [429, 'Too many reset attempts. Please try again later.'],
     [503, 'Password reset service is unavailable. Please try again later.'],
@@ -61,5 +62,4 @@ describe('password reset form', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(expected);
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
-
 });
