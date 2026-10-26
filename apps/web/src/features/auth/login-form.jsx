@@ -38,10 +38,16 @@ export function LoginForm({ messages, recoveryMessages, returnTo = '/trips' }) {
       window.dispatchEvent(new Event('attravoya:auth-changed'));
       router.push(returnTo);
       router.refresh();
-    } catch {
-      // Authentication responses stay generic so the UI does not help attackers
-      // determine whether an email address is registered.
-      setError(messages.loginFailed);
+    } catch (error) {
+      // Only genuine credential failures use the generic sign-in message.
+      // A blocked or unavailable API must not be presented as a bad password.
+      if (error?.status === 429) {
+        setError('Too many sign-in attempts. Please try again later.');
+      } else if (!error?.status || error.status >= 500 || error.status === 404) {
+        setError('Sign-in service is unavailable. Please try again later.');
+      } else {
+        setError(messages.loginFailed);
+      }
     } finally {
       setPending(false);
     }
