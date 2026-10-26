@@ -82,8 +82,7 @@ describe('authentication email recovery routes', () => {
     const onPasswordResetRequested = vi.fn().mockResolvedValue(undefined);
     const tokenStorage = vi.fn().mockResolvedValue(undefined);
     const repository = baseRepository({
-      findUserIdByEmail: async (email) =>
-        email === 'traveller@example.test' ? 'user-1' : null,
+      findUserIdByEmail: async (email) => email === 'traveller@example.test' ? 'user-1' : null,
       createPasswordResetToken: tokenStorage,
     });
     const app = await buildApp({
