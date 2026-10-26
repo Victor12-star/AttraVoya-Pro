@@ -23,8 +23,14 @@ export function ForgotPasswordForm({ authMessages, messages }) {
       // The API deliberately returns the same response whether the account
       // exists or not, preventing account enumeration from this screen.
       setStatus(messages.resetSent);
-    } catch {
-      setError(messages.resetFailed);
+    } catch (error) {
+      if (error?.status === 429) {
+        setError('Too many reset requests. Please try again later.');
+      } else if (!error?.status || error.status >= 500 || error.status === 404) {
+        setError('Password recovery service is unavailable. Please try again later.');
+      } else {
+        setError(messages.resetFailed);
+      }
     } finally {
       setPending(false);
     }
