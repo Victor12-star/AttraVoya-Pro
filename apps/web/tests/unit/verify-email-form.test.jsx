@@ -4,10 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   verifyEmail: vi.fn(),
   resendVerification: vi.fn(),
+  token: 'test-verification-token',
 }));
 
 vi.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams({ token: 'test-verification-token' }),
+  useSearchParams: () => new URLSearchParams({ token: mocks.token }),
 }));
 
 vi.mock('../../src/lib/api-client.js', () => ({
@@ -32,6 +33,7 @@ describe('email verification error feedback', () => {
   beforeEach(() => {
     mocks.verifyEmail.mockReset();
     mocks.resendVerification.mockReset();
+    mocks.token = 'test-verification-token';
   });
 
   it.each([
@@ -59,5 +61,24 @@ describe('email verification error feedback', () => {
       'Too many requests. Please try again later.',
     );
     expect(mocks.resendVerification).toHaveBeenCalledWith('person@example.test');
+  });
+
+  it('prevents verification when the link has no token', () => {
+    mocks.token = '';
+    render(<VerifyEmailForm authMessages={authMessages} messages={messages} />);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Invalid verification link.');
+    expect(screen.getByRole('button', { name: 'Verify email' })).toBeDisabled();
+    expect(mocks.verifyEmail).not.toHaveBeenCalled();
+  });
+
+  it('confirms verification once and disables repeat submissions', async () => {
+    mocks.verifyEmail.mockResolvedValue({});
+    render(<VerifyEmailForm authMessages={authMessages} messages={messages} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Verify email' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Verified.');
+    expect(screen.getByRole('button', { name: 'Verify email' })).toBeDisabled();
+    expect(mocks.verifyEmail).toHaveBeenCalledTimes(1);
   });
 });
