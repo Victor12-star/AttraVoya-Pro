@@ -12,6 +12,7 @@ export async function tripsRoutes(app, options = {}) {
 
   // Saved trips contain private travel dates and destination intent. Companion
   // context is therefore owner-scoped and never cached by shared intermediaries.
+  app.get('/', { ...authenticated, schema: tripsSchemas.listOwned }, controller.listOwnedTrips);
   app.get(
     '/companion-context',
     { ...authenticated, schema: tripsSchemas.companionContext },
