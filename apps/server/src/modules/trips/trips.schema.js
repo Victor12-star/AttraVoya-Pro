@@ -23,7 +23,23 @@ const companionContextResponseSchema = z.object({
   }),
 });
 
+const ownedTripSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: z.enum(['DRAFT', 'PLANNED', 'ACTIVE', 'COMPLETED', 'CANCELED']),
+  startDate: z.string(),
+  endDate: z.string(),
+  destination: z.object({
+    id: z.string(),
+    slug: z.string(),
+    name: z.string(),
+  }),
+});
+
 export const tripsSchemas = Object.freeze({
+  listOwned: {
+    response: { 200: z.object({ trips: z.array(ownedTripSchema).max(50) }) },
+  },
   companionContext: {
     response: { 200: companionContextResponseSchema },
   },
