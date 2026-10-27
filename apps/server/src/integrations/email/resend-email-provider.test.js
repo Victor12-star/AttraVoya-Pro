@@ -53,6 +53,29 @@ describe('Resend email adapter', () => {
     expect(options.body.text).toContain('expires in 1 hour');
   });
 
+  it('escapes special characters in password-reset HTML links', async () => {
+    const http = { requestJson: vi.fn().mockResolvedValue({ id: 'email-reset-safe' }) };
+    const provider = createResendEmailProvider({
+      http,
+      apiKey: 'test-resend-key',
+      from: 'AttraVoya Pro <hello@example.test>',
+      webUrl: 'https://attravoya.example',
+    });
+
+    await provider.sendPasswordResetEmail({
+      to: 'traveller@example.test',
+      token: 'reset-token&extra="<script>',
+    });
+
+    const options = http.requestJson.mock.calls[0][1];
+    const expectedUrl = new URL('/reset-password', 'https://attravoya.example');
+    expectedUrl.searchParams.set('token', 'reset-token&extra="<script>');
+
+    expect(options.body.text).toContain(expectedUrl.toString());
+    expect(options.body.html).toContain(expectedUrl.toString().replaceAll('&', '&amp;'));
+    expect(options.body.html).not.toContain('<script>');
+  });
+
   it('fails safely when the API key is missing', async () => {
     const http = { requestJson: vi.fn() };
     const provider = createResendEmailProvider({
