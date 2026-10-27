@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ArrowRight, Mail } from 'lucide-react';
 
 import { apiClient } from '../../lib/api-client.js';
+import { authRequestErrorMessage } from './auth-request-error.js';
 
 export function VerifyEmailForm({ authMessages, messages }) {
   const searchParams = useSearchParams();
@@ -32,8 +33,14 @@ export function VerifyEmailForm({ authMessages, messages }) {
       // prevents React development double-effects from consuming a one-time token twice.
       await apiClient.verifyEmail(token);
       setVerifySuccess(messages.verifySuccess);
-    } catch {
-      setVerifyError(messages.verifyInvalid);
+    } catch (error) {
+      setVerifyError(
+        authRequestErrorMessage(error, {
+          generic: messages.verifyInvalid,
+          unavailable: 'Email verification service is unavailable. Please try again later.',
+          throttled: 'Too many verification attempts. Please try again later.',
+        }),
+      );
     } finally {
       setVerifyPending(false);
     }
@@ -51,8 +58,14 @@ export function VerifyEmailForm({ authMessages, messages }) {
       // The response is intentionally generic so this form cannot reveal
       // whether an address is registered or already verified.
       setResendStatus(messages.resendSent);
-    } catch {
-      setResendError(messages.resendFailed);
+    } catch (error) {
+      setResendError(
+        authRequestErrorMessage(error, {
+          generic: messages.resendFailed,
+          unavailable: 'Email service is unavailable. Please try again later.',
+          throttled: 'Too many requests. Please try again later.',
+        }),
+      );
     } finally {
       setResendPending(false);
     }
