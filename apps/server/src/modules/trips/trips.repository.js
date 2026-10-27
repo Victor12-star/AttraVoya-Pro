@@ -37,8 +37,8 @@ export function createTripsRepository(prismaClient) {
           userId,
           destinationId: input.destinationId,
           title: input.title,
-          startDate: new Date(input.startDate + 'T00:00:00.000Z'),
-          endDate: new Date(input.endDate + 'T00:00:00.000Z'),
+          startDate: new Date(`${input.startDate}T00:00:00.000Z`),
+          endDate: new Date(`${input.endDate}T00:00:00.000Z`),
           status: 'DRAFT',
         },
         select: {
