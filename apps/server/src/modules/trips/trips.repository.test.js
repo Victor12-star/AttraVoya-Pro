@@ -40,6 +40,7 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
+
   it('uses the authenticated user as owner and creates a draft trip', async () => {
     const create = vi.fn().mockResolvedValue({});
     const repository = createTripsRepository({ trip: { create } });
@@ -75,5 +76,4 @@ describe('Trips repository companion context', () => {
       select: { id: true },
     });
   });
-
 });
