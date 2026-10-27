@@ -23,6 +23,30 @@ const companionTripSelect = {
 // this repository without mocking away relation loading.
 export function createTripsRepository(prismaClient) {
   return {
+    async findPublishedDestination(destinationId) {
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
+      return client.destination.findFirst({
+        where: { id: destinationId, status: 'PUBLISHED' },
+        select: { id: true },
+      });
+    },
+    async createOwnedTrip({ userId, input }) {
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
+      return client.trip.create({
+        data: {
+          userId,
+          destinationId: input.destinationId,
+          title: input.title,
+          startDate: new Date(input.startDate + 'T00:00:00.000Z'),
+          endDate: new Date(input.endDate + 'T00:00:00.000Z'),
+          status: 'DRAFT',
+        },
+        select: {
+          id: true, title: true, status: true, startDate: true, endDate: true,
+          destination: { select: { id: true, slug: true, city: { select: { name: true } } } },
+        },
+      });
+    },
     async listOwnedTrips({ userId, limit = 50 }) {
       const client = prismaClient ?? (await import('@attravoya/database')).prisma;
       return client.trip.findMany({
