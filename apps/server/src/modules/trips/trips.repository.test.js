@@ -40,4 +40,40 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
+  it('uses the authenticated user as owner and creates a draft trip', async () => {
+    const create = vi.fn().mockResolvedValue({});
+    const repository = createTripsRepository({ trip: { create } });
+    await repository.createOwnedTrip({
+      userId: 'logged-in-user',
+      input: {
+        destinationId: 'destination-1',
+        title: 'Stockholm visit',
+        startDate: '2026-11-05',
+        endDate: '2026-11-07',
+      },
+    });
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: {
+          userId: 'logged-in-user',
+          destinationId: 'destination-1',
+          title: 'Stockholm visit',
+          startDate: new Date('2026-11-05T00:00:00.000Z'),
+          endDate: new Date('2026-11-07T00:00:00.000Z'),
+          status: 'DRAFT',
+        },
+      }),
+    );
+  });
+
+  it('requires a published destination before trip creation', async () => {
+    const findFirst = vi.fn().mockResolvedValue(null);
+    const repository = createTripsRepository({ destination: { findFirst } });
+    await repository.findPublishedDestination('destination-1');
+    expect(findFirst).toHaveBeenCalledWith({
+      where: { id: 'destination-1', status: 'PUBLISHED' },
+      select: { id: true },
+    });
+  });
+
 });
