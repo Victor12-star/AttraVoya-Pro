@@ -27,6 +27,7 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
+
   it('restricts saved trip listing to the authenticated owner and caps results', async () => {
     const findMany = vi.fn().mockResolvedValue([]);
     const repository = createTripsRepository({ trip: { findMany } });
@@ -39,5 +40,4 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
-
 });
