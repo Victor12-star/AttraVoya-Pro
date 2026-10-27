@@ -42,7 +42,11 @@ export function createTripsRepository(prismaClient) {
           status: 'DRAFT',
         },
         select: {
-          id: true, title: true, status: true, startDate: true, endDate: true,
+          id: true,
+          title: true,
+          status: true,
+          startDate: true,
+          endDate: true,
           destination: { select: { id: true, slug: true, city: { select: { name: true } } } },
         },
       });
