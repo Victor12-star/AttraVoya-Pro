@@ -27,4 +27,17 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
+  it('restricts saved trip listing to the authenticated owner and caps results', async () => {
+    const findMany = vi.fn().mockResolvedValue([]);
+    const repository = createTripsRepository({ trip: { findMany } });
+    await repository.listOwnedTrips({ userId: 'owner-123', limit: 50 });
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId: 'owner-123' },
+        orderBy: [{ startDate: 'desc' }, { id: 'asc' }],
+        take: 50,
+      }),
+    );
+  });
+
 });
