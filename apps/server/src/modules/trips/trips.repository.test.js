@@ -76,4 +76,17 @@ describe('Trips repository companion context', () => {
       select: { id: true },
     });
   });
+  it('retrieves a single saved trip only when its owner matches', async () => {
+    const findFirst = vi.fn().mockResolvedValue(null);
+    const repository = createTripsRepository({ trip: { findFirst } });
+
+    await repository.getOwnedTrip({ userId: 'owner-123', tripId: 'trip-456' });
+
+    expect(findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'trip-456', userId: 'owner-123' },
+      }),
+    );
+  });
+
 });
