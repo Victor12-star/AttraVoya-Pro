@@ -36,7 +36,32 @@ const ownedTripSchema = z.object({
   }),
 });
 
+const calendarDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((value) => {
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  }, 'A valid calendar date is required.');
+
+const createTripBodySchema = z
+  .object({
+    destinationId: z.string().min(1).max(128),
+    title: z.string().trim().min(1).max(240),
+    startDate: calendarDate,
+    endDate: calendarDate,
+  })
+  .strict()
+  .refine((trip) => trip.endDate >= trip.startDate, {
+    message: 'End date must not precede start date.',
+    path: ['endDate'],
+  });
+
 export const tripsSchemas = Object.freeze({
+  create: {
+    body: createTripBodySchema,
+    response: { 201: z.object({ trip: ownedTripSchema }) },
+  },
   listOwned: {
     response: { 200: z.object({ trips: z.array(ownedTripSchema).max(50) }) },
   },
