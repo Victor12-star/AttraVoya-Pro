@@ -76,6 +76,7 @@ describe('Trips repository companion context', () => {
       select: { id: true },
     });
   });
+
   it('retrieves a single saved trip only when its owner matches', async () => {
     const findFirst = vi.fn().mockResolvedValue(null);
     const repository = createTripsRepository({ trip: { findFirst } });
@@ -88,5 +89,4 @@ describe('Trips repository companion context', () => {
       }),
     );
   });
-
 });
