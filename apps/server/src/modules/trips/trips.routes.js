@@ -14,6 +14,7 @@ export async function tripsRoutes(app, options = {}) {
   // context is therefore owner-scoped and never cached by shared intermediaries.
   app.post('/', { ...authenticated, schema: tripsSchemas.create }, controller.createTrip);
   app.get('/', { ...authenticated, schema: tripsSchemas.listOwned }, controller.listOwnedTrips);
+  app.get('/:tripId', { ...authenticated, schema: tripsSchemas.getOwned }, controller.getOwnedTrip);
   app.get(
     '/companion-context',
     { ...authenticated, schema: tripsSchemas.companionContext },
