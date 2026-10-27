@@ -9,6 +9,14 @@ function sendPrivate(reply, payload) {
 
 export function createTripsController(service) {
   return {
+    async createTrip(request, reply) {
+      const trip = await service.createTrip({
+        userId: authenticatedUserId(request),
+        input: request.body,
+      });
+      reply.header('Cache-Control', 'private, no-store');
+      return reply.code(201).send({ trip });
+    },
     async listOwnedTrips(request, reply) {
       const trips = await service.listOwnedTrips({ userId: authenticatedUserId(request) });
       return sendPrivate(reply, { trips });
