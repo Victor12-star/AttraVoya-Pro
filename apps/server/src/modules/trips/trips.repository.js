@@ -31,7 +31,9 @@ export function createTripsRepository(prismaClient) {
           status: { in: ['ACTIVE', 'PLANNED'] },
           endDate: { gte: today },
         },
-        orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+        // Prioritize ACTIVE trips before PLANNED before applying the ten-trip cap.
+        // Within ACTIVE, ascending start dates select current trips before future ones.
+        orderBy: [{ status: 'asc' }, { startDate: 'asc' }, { id: 'asc' }],
         take: limit,
         select: companionTripSelect,
       });
