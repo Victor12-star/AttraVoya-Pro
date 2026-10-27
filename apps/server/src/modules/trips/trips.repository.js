@@ -51,6 +51,22 @@ export function createTripsRepository(prismaClient) {
         },
       });
     },
+    async getOwnedTrip({ userId, tripId }) {
+      const client = prismaClient ?? (await import('@attravoya/database')).prisma;
+      return client.trip.findFirst({
+        where: { id: tripId, userId },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+          destination: {
+            select: { id: true, slug: true, city: { select: { name: true } } },
+          },
+        },
+      });
+    },
     async listOwnedTrips({ userId, limit = 50 }) {
       const client = prismaClient ?? (await import('@attravoya/database')).prisma;
       return client.trip.findMany({

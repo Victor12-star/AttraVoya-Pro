@@ -62,6 +62,10 @@ export const tripsSchemas = Object.freeze({
     body: createTripBodySchema,
     response: { 201: z.object({ trip: ownedTripSchema }) },
   },
+  getOwned: {
+    params: z.object({ tripId: z.string().min(1).max(128) }),
+    response: { 200: z.object({ trip: ownedTripSchema }) },
+  },
   listOwned: {
     response: { 200: z.object({ trips: z.array(ownedTripSchema).max(50) }) },
   },

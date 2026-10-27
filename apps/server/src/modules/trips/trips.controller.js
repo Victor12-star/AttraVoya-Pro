@@ -17,6 +17,13 @@ export function createTripsController(service) {
       reply.header('Cache-Control', 'private, no-store');
       return reply.code(201).send({ trip });
     },
+    async getOwnedTrip(request, reply) {
+      const trip = await service.getOwnedTrip({
+        userId: authenticatedUserId(request),
+        tripId: request.params.tripId,
+      });
+      return sendPrivate(reply, { trip });
+    },
     async listOwnedTrips(request, reply) {
       const trips = await service.listOwnedTrips({ userId: authenticatedUserId(request) });
       return sendPrivate(reply, { trips });

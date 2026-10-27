@@ -34,6 +34,11 @@ export function createTripsService(repository, options = {}) {
       const record = await repository.createOwnedTrip({ userId, input });
       return mapSavedTrip(record);
     },
+    async getOwnedTrip({ userId, tripId }) {
+      const record = await repository.getOwnedTrip({ userId, tripId });
+      if (!record) throw new NotFoundError('The requested trip was not found.');
+      return mapSavedTrip(record);
+    },
     async listOwnedTrips({ userId }) {
       const records = await repository.listOwnedTrips({ userId, limit: 50 });
       return records.map(mapSavedTrip);
