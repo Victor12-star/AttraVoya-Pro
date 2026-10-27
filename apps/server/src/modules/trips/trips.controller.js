@@ -9,6 +9,10 @@ function sendPrivate(reply, payload) {
 
 export function createTripsController(service) {
   return {
+    async listOwnedTrips(request, reply) {
+      const trips = await service.listOwnedTrips({ userId: authenticatedUserId(request) });
+      return sendPrivate(reply, { trips });
+    },
     async getCompanionContext(request, reply) {
       const tripContext = await service.getCompanionContext({
         userId: authenticatedUserId(request),
