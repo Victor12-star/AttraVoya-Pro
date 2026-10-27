@@ -30,6 +30,7 @@ const messages = {
 describe('password reset form', () => {
   beforeEach(() => {
     mocks.resetPassword.mockReset();
+    mocks.token = 'test-reset-token';
   });
 
   it('preserves the form element after the request completes', async () => {
@@ -62,4 +63,24 @@ describe('password reset form', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(expected);
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
+  it('rejects mismatched passwords without calling the API', async () => {
+    render(<ResetPasswordForm authMessages={authMessages} messages={messages} />);
+    const inputs = document.querySelectorAll('input[type="password"]');
+    fireEvent.change(inputs[0], { target: { value: 'new-password-123' } });
+    fireEvent.change(inputs[1], { target: { value: 'different-password-123' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Passwords do not match.');
+    expect(mocks.resetPassword).not.toHaveBeenCalled();
+  });
+
+  it('blocks reset submissions without a recovery token', () => {
+    mocks.token = '';
+    render(<ResetPasswordForm authMessages={authMessages} messages={messages} />);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Invalid link.');
+    expect(screen.getByRole('button', { name: 'Reset password' })).toBeDisabled();
+    expect(mocks.resetPassword).not.toHaveBeenCalled();
+  });
+
 });
