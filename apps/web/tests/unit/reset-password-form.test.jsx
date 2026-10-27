@@ -63,6 +63,7 @@ describe('password reset form', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(expected);
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
+
   it('rejects mismatched passwords without calling the API', async () => {
     render(<ResetPasswordForm authMessages={authMessages} messages={messages} />);
     const inputs = document.querySelectorAll('input[type="password"]');
@@ -82,5 +83,4 @@ describe('password reset form', () => {
     expect(screen.getByRole('button', { name: 'Reset password' })).toBeDisabled();
     expect(mocks.resetPassword).not.toHaveBeenCalled();
   });
-
 });
