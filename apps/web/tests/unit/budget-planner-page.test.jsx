@@ -161,7 +161,7 @@ describe('BudgetPlannerPage', () => {
     expect(screen.queryByRole('button', { name: 'Italy' })).not.toBeInTheDocument();
   });
 
-  it('ranks country names starting with the search term ahead of substring matches', async () => {
+  it('ranks country prefixes before substring matches', async () => {
     mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
