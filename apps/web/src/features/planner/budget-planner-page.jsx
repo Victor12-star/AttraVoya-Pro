@@ -142,7 +142,7 @@ export function BudgetPlannerPage({
   const [selectedCity, setSelectedCity] = useState('');
   const [citySearch, setCitySearch] = useState('');
   const [cityOptions, setCityOptions] = useState(
-    /** @type {{ id: string, name: string }[]} */ ([]),
+    /** @type {{ id: string, name: string, destinationId: string }[]} */ ([]),
   );
   const [cityLookupState, setCityLookupState] = useState('idle');
   const [scopedLookup, setScopedLookup] = useState(
@@ -210,6 +210,7 @@ export function BudgetPlannerPage({
             cities.set(destination.cityId, {
               id: destination.cityId,
               name: destination.name,
+              destinationId: destination.id,
             });
           }
         }
@@ -267,12 +268,25 @@ export function BudgetPlannerPage({
 
   async function submit(event) {
     event.preventDefault();
-    if (destinationMode !== 'OPEN') return;
+    if (destinationMode === 'COUNTRY') return;
+    const chosenCity = cityOptions.find((city) => city.id === selectedCity);
+    if (destinationMode === 'CITY' && (!selectedCountry || !chosenCity)) return;
     const form = new FormData(event.currentTarget);
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
 
+    /**
+     * @type {Record<string, unknown> & {
+     *   fixedDeparture?: string,
+     *   fixedReturn?: string,
+     *   earliestDeparture?: string,
+     *   latestReturn?: string
+     * }}
+     */
     const raw = {
+      ...(destinationMode === 'CITY' && chosenCity
+        ? { targetDestinationId: chosenCity.destinationId }
+        : {}),
       originLabel: String(form.get('originLabel') ?? '').trim(),
       flexibleDates: dateMode === 'flexible',
       minNights: Number(form.get('minNights')),
@@ -483,9 +497,13 @@ export function BudgetPlannerPage({
                     </div>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
-                    {countryCityPreviewNotice}
+                    {destinationMode === 'CITY'
+                      ? 'A selected published city can now be saved as a planning brief. No prices, availability, or itinerary are generated yet.'
+                      : countryCityPreviewNotice}
                   </p>
-                  <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
+                  {destinationMode === 'COUNTRY' ? (
+                    <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
+                  ) : null}
                   {draftState === 'success' && drafts.length > 0 ? (
                     <button
                       className="button button--secondary button--compact"
@@ -770,7 +788,12 @@ export function BudgetPlannerPage({
             <button
               className="button button--dark"
               type="submit"
-              disabled={submitting || destinationMode !== 'OPEN'}
+              disabled={
+                submitting ||
+                destinationMode === 'COUNTRY' ||
+                (destinationMode === 'CITY' &&
+                  !cityOptions.some((city) => city.id === selectedCity))
+              }
             >
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
