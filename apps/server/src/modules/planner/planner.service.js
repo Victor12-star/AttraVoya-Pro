@@ -314,6 +314,7 @@ export function createPlannerService(repository, options = {}) {
       };
     },
 
+    /** @param {{ userId: string, requestId: string, countryCode: string, cityId?: string }} options */
     async getOwnedCountryCityCandidates({ userId, requestId, countryCode, cityId }) {
       const request = await repository.findOwnedRequestById({ userId, requestId });
       if (!request) throw new NotFoundError('The planning request was not found.');
