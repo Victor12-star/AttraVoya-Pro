@@ -592,7 +592,11 @@ export function BudgetPlannerPage({
               </div>
             ) : null}
 
-            <button className="button button--dark" type="submit" disabled={submitting || destinationMode !== 'OPEN'}>
+            <button
+              className="button button--dark"
+              type="submit"
+              disabled={submitting || destinationMode !== 'OPEN'}
+            >
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
               ) : (
