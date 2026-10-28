@@ -29,7 +29,15 @@ const candidateEvidenceParamsSchema = z
   })
   .strict();
 
+const countryCityQuerySchema = z
+  .object({
+    countryCode: z.string().regex(/^[A-Z]{2}$/),
+    cityId: z.string().trim().min(1).max(128).optional(),
+  })
+  .strict();
+
 export const plannerSchemas = Object.freeze({
+  countryCityCandidates: { querystring: countryCityQuerySchema },
   createRequest: { headers: idempotencyHeadersSchema, body: createBudgetPlanRequestSchema },
   listRequests: { querystring: listRequestsQuerySchema },
   getRequest: { params: requestIdParamsSchema },

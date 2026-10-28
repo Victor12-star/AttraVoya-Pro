@@ -49,6 +49,14 @@ export function createPlannerController(service) {
       return sendPrivate(reply, { allocation });
     },
 
+    async getCountryCityCandidates(request, reply) {
+      const result = await service.getCountryCityCandidates({
+        countryCode: request.query.countryCode,
+        cityId: request.query.cityId,
+      });
+      return sendPrivate(reply, result);
+    },
+
     async getDestinationCandidates(request, reply) {
       const destinationCandidates = await service.getDestinationCandidates({
         userId: authenticatedUserId(request),
