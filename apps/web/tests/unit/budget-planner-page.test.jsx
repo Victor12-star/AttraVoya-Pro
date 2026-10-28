@@ -84,7 +84,7 @@ describe('BudgetPlannerPage', () => {
     expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
-    expect(screen.getByLabelText('Destination country (two-letter country code)')).toBeVisible();
+    expect(screen.getByLabelText('Destination country')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
     expect(screen.getByText(/Country and city selection is a preview/)).toBeVisible();
 
@@ -105,9 +105,10 @@ describe('BudgetPlannerPage', () => {
     });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
-    fireEvent.change(screen.getByLabelText('Destination country (two-letter country code)'), {
-      target: { value: 'it' },
+    fireEvent.change(screen.getByLabelText('Destination country'), {
+      target: { value: 'Ita' },
     });
+    fireEvent.click(screen.getByRole('button', { name: 'Italy' }));
     const preview = await screen.findByRole('button', { name: 'Preview matching destinations' });
     fireEvent.click(preview);
     await waitFor(() =>
@@ -117,6 +118,19 @@ describe('BudgetPlannerPage', () => {
     );
     expect(await screen.findByText('Rome')).toBeInTheDocument();
     expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+  });
+
+  it('suggests country names and selects their two-letter codes', async () => {
+    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
+    fireEvent.change(screen.getByLabelText('Destination country'), {
+      target: { value: 'Ita' },
+    });
+    expect(screen.getByRole('button', { name: 'Italy' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Italy' }));
+    expect(screen.getByLabelText('Destination country')).toHaveValue('Italy');
+    expect(screen.queryByRole('button', { name: 'Italy' })).not.toBeInTheDocument();
   });
 
   it('renders the open-destination planner honestly and loads an empty private draft list', async () => {

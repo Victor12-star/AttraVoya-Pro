@@ -20,6 +20,7 @@ import { createBudgetPlanRequestSchema } from '@attravoya/validation';
 
 import { apiClient } from '../../lib/api-client.js';
 import { getBudgetAccommodationCopy } from './budget-accommodation-copy.js';
+import { suggestCountries } from './country-autocomplete.js';
 import styles from './budget-planner-page.module.css';
 
 /**
@@ -133,6 +134,11 @@ export function BudgetPlannerPage({
   const accommodationCopy = getBudgetAccommodationCopy(locale);
   const [destinationMode, setDestinationMode] = useState('OPEN');
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
+  const countrySuggestions = useMemo(
+    () => suggestCountries(countrySearch, locale),
+    [countrySearch, locale],
+  );
   const [selectedCity, setSelectedCity] = useState('');
   const [scopedLookup, setScopedLookup] = useState(
     /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
@@ -354,20 +360,41 @@ export function BudgetPlannerPage({
               </div>
               {destinationMode !== 'OPEN' ? (
                 <div className={styles.destinationDetails}>
-                  <label className={styles.fieldFull}>
-                    <span>Destination country (two-letter country code)</span>
+                  <div className={styles.fieldFull}>
+                    <label htmlFor="planner-country-search">Destination country</label>
                     <input
+                      id="planner-country-search"
                       type="text"
-                      maxLength={2}
-                      value={selectedCountry}
+                      autoComplete="off"
+                      value={countrySearch}
                       onChange={(event) => {
-                        setSelectedCountry(event.target.value.toUpperCase());
+                        setCountrySearch(event.target.value);
+                        setSelectedCountry('');
                         setSelectedCity('');
                       }}
-                      placeholder="IT"
+                      placeholder="Type at least two letters, e.g. Ita"
                       aria-describedby="planner-scope-hint"
+                      aria-controls="planner-country-options"
                     />
-                  </label>
+                    {countrySearch.trim().length >= 2 && !selectedCountry ? (
+                      <ul id="planner-country-options" aria-label="Country suggestions">
+                        {countrySuggestions.map((country) => (
+                          <li key={country.code}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCountry(country.code);
+                                setCountrySearch(country.name);
+                                setSelectedCity('');
+                              }}
+                            >
+                              {country.name}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
                   {destinationMode === 'CITY' ? (
                     <label className={styles.fieldFull}>
                       <span>Destination city</span>
