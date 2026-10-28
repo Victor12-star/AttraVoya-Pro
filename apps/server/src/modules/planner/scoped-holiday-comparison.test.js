@@ -44,7 +44,9 @@ describe('scoped holiday comparison', () => {
   });
 
   it('keeps destinations with missing evidence unranked', () => {
-    const result = compareScopedHolidayCandidates(candidates, [evidence('rome-a', '500.00', '700.00')]);
+    const result = compareScopedHolidayCandidates(candidates, [
+      evidence('rome-a', '500.00', '700.00'),
+    ]);
     expect(result.rankingApplied).toBe(false);
     expect(result.unranked).toEqual([{ destinationId: 'rome-b', reason: 'UNVERIFIED_EVIDENCE' }]);
   });
