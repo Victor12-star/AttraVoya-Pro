@@ -75,13 +75,35 @@ describe('BudgetPlannerPage', () => {
     mocks.createBudgetPlanRequest.mockResolvedValue({ planRequest: savedRequest() });
   });
 
+  it('keeps open destination saving available and guards unconnected scoped choices', async () => {
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    expect(screen.getByRole('radio', { name: 'Destination is open' })).toBeChecked();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
+    expect(screen.getByLabelText('Destination country (two-letter country code)')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+    expect(screen.getByText(/Country and city selection is a preview/)).toBeVisible();
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific city' }));
+    expect(screen.getByLabelText('Destination city')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Destination is open' }));
+    expect(screen.queryByLabelText('Destination city')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+  });
+
   it('renders the open-destination planner honestly and loads an empty private draft list', async () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
 
     expect(
       screen.getByRole('heading', { name: 'Plan the trip around your budget', level: 1 }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Destination is open', { selector: 'span' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Destination is open', level: 2 }),
+    ).toBeInTheDocument();
     expect(await screen.findByText('No saved planning briefs yet.')).toBeInTheDocument();
     expect(mocks.listBudgetPlanRequests).toHaveBeenCalledTimes(1);
     expect(
