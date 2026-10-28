@@ -135,9 +135,10 @@ export function BudgetPlannerPage({
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [scopedLookup, setScopedLookup] = useState(
-    /** @type {{status: string, destinations: {id: string, name: string}[]}} */ (
-      { status: 'idle', destinations: [] }
-    ),
+    /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
+      status: 'idle',
+      destinations: [],
+    }),
   );
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
@@ -381,9 +382,7 @@ export function BudgetPlannerPage({
                   <p id="planner-scope-hint" className={styles.privacy}>
                     {countryCityPreviewNotice}
                   </p>
-                  <p className={styles.privacy}>
-                    {scopedReadOnlyNotice}
-                  </p>
+                  <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
                   {draftState === 'success' && drafts.length > 0 ? (
                     <button
                       className="button button--secondary button--compact"
@@ -414,8 +413,8 @@ export function BudgetPlannerPage({
                   {scopedLookup.status === 'success' ? (
                     <div role="status">
                       <p>
-                        {scopedLookup.destinations.length} published destinations found.
-                        Prices and availability have not been evaluated.
+                        {scopedLookup.destinations.length} published destinations found. Prices and
+                        availability have not been evaluated.
                       </p>
                       <ul>
                         {scopedLookup.destinations.map((destination) => (
