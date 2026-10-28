@@ -25,10 +25,10 @@ export async function plannerRoutes(app, options = {}) {
   // Planner drafts contain private travel intent and budget information. Persisted
   // requests therefore require current authenticated account state, even though
   // public destination browsing remains available without an account.
-  // Additive discovery for country/city choices; existing open-destination flow stays intact.
+  // Published catalog geography is public; private planning briefs still require authentication.
   app.get(
     '/country-city-candidates',
-    { ...authenticated, schema: plannerSchemas.countryCityCandidates },
+    { schema: plannerSchemas.countryCityCandidates },
     controller.getCountryCityCandidates,
   );
   app.post(

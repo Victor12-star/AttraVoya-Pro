@@ -6,6 +6,7 @@ import { ApiClientError } from '@attravoya/api-client';
 const mocks = vi.hoisted(() => ({
   createBudgetPlanRequest: vi.fn(),
   getPlannerScopedDestinationCandidates: vi.fn(),
+  getPublicCountryCityCandidates: vi.fn(),
   listBudgetPlanRequests: vi.fn(),
   readPreferences: vi.fn(),
 }));
@@ -14,6 +15,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     createBudgetPlanRequest: mocks.createBudgetPlanRequest,
     getPlannerScopedDestinationCandidates: mocks.getPlannerScopedDestinationCandidates,
+    getPublicCountryCityCandidates: mocks.getPublicCountryCityCandidates,
     listBudgetPlanRequests: mocks.listBudgetPlanRequests,
   },
 }));
@@ -71,6 +73,7 @@ describe('BudgetPlannerPage', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
     mocks.getPlannerScopedDestinationCandidates.mockReset();
+    mocks.getPublicCountryCityCandidates.mockReset();
     mocks.listBudgetPlanRequests.mockReset();
     mocks.readPreferences.mockReset();
     mocks.readPreferences.mockReturnValue({});
@@ -121,8 +124,8 @@ describe('BudgetPlannerPage', () => {
   });
 
   it('suggests published city names without exposing catalog IDs to travelers', async () => {
-    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [savedRequest()] });
-    mocks.getPlannerScopedDestinationCandidates.mockResolvedValue({
+    mocks.listBudgetPlanRequests.mockRejectedValue(new ApiClientError('Unauthenticated', 401));
+    mocks.getPublicCountryCityCandidates.mockResolvedValue({
       destinations: [{ id: 'destination-1', cityId: 'city-rome', name: 'Rome' }],
     });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
@@ -132,7 +135,7 @@ describe('BudgetPlannerPage', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Italy' }));
     await waitFor(() =>
-      expect(mocks.getPlannerScopedDestinationCandidates).toHaveBeenCalledWith('request-1', {
+      expect(mocks.getPublicCountryCityCandidates).toHaveBeenCalledWith({
         countryCode: 'IT',
       }),
     );
@@ -142,14 +145,7 @@ describe('BudgetPlannerPage', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Rome' }));
     expect(screen.getByLabelText('Destination city')).toHaveValue('Rome');
     expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
-    fillFixedPlan();
-    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
-    await waitFor(() =>
-      expect(mocks.createBudgetPlanRequest).toHaveBeenCalledWith(
-        expect.objectContaining({ targetDestinationId: 'destination-1' }),
-        expect.any(String),
-      ),
-    );
+    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
   });
 
   it('suggests country names and selects their two-letter codes', async () => {

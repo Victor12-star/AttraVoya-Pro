@@ -411,6 +411,14 @@ export function createApiClient(options) {
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/allocation`),
     getPlannerDestinationCandidates: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/destination-candidates`),
+    /** @param {{ countryCode: string, cityId?: string }} options */
+    getPublicCountryCityCandidates: ({ countryCode, cityId }) => {
+      if (!/^[A-Z]{2}$/.test(countryCode)) {
+        throw new TypeError('Country code must be two uppercase letters.');
+      }
+      const params = toSearchParams({ countryCode, cityId });
+      return request(`/api/v1/planner/requests/country-city-candidates?${params}`);
+    },
     /** @param {string} requestId @param {{ countryCode: string, cityId?: string }} options */
     getPlannerScopedDestinationCandidates: (requestId, { countryCode, cityId }) => {
       if (typeof countryCode !== 'string' || !/^[A-Z]{2}$/.test(countryCode)) {

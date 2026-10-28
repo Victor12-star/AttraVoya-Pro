@@ -197,11 +197,10 @@ export function BudgetPlannerPage({
   }, []);
 
   useEffect(() => {
-    const requestId = drafts[0]?.id;
-    if (destinationMode !== 'CITY' || !selectedCountry || !requestId) return;
+    if (destinationMode !== 'CITY' || !selectedCountry) return;
     let active = true;
     apiClient
-      .getPlannerScopedDestinationCandidates(requestId, { countryCode: selectedCountry })
+      .getPublicCountryCityCandidates({ countryCode: selectedCountry })
       .then((response) => {
         if (!active) return;
         const cities = new Map();
@@ -225,7 +224,7 @@ export function BudgetPlannerPage({
     return () => {
       active = false;
     };
-  }, [destinationMode, selectedCountry, drafts]);
+  }, [destinationMode, selectedCountry]);
 
   async function previewScopedDestinations() {
     const requestId = drafts[0]?.id;
@@ -427,7 +426,11 @@ export function BudgetPlannerPage({
                       aria-controls="planner-country-options"
                     />
                     {countrySearch.trim().length >= 2 && !selectedCountry ? (
-                      <ul id="planner-country-options" aria-label="Country suggestions">
+                      <ul
+                        id="planner-country-options"
+                        className={styles.suggestionList}
+                        aria-label="Country suggestions"
+                      >
                         {countrySuggestions.map((country) => (
                           <li key={country.code}>
                             <button
@@ -470,7 +473,7 @@ export function BudgetPlannerPage({
                       {cityLookupState === 'success' &&
                       citySearch.trim().length >= 2 &&
                       !selectedCity ? (
-                        <ul aria-label="City suggestions">
+                        <ul className={styles.suggestionList} aria-label="City suggestions">
                           {cityOptions
                             .filter((city) =>
                               city.name.toLowerCase().includes(citySearch.trim().toLowerCase()),
@@ -491,8 +494,8 @@ export function BudgetPlannerPage({
                             ))}
                         </ul>
                       ) : null}
-                      {selectedCountry && draftState !== 'success' ? (
-                        <p>Sign in to load cities from the published destination catalog.</p>
+                      {!selectedCountry ? (
+                        <p>Select a country to browse published destination cities.</p>
                       ) : null}
                     </div>
                   ) : null}
