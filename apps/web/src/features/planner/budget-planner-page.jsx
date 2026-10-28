@@ -117,6 +117,9 @@ function formatDateRange(request, copy) {
   return fixed.length === 2 ? `${fixed[0]} – ${fixed[1]}` : copy.fixedSummary;
 }
 
+const countryCityPreviewNotice =
+  'Country and city selection is a preview. The existing saved-brief submission still uses the open-destination planner until scoped persistence is connected. Prices and availability are not confirmed.';
+
 export function BudgetPlannerPage({
   copy,
   defaultCurrency = 'SEK',
@@ -346,9 +349,7 @@ export function BudgetPlannerPage({
                     </label>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
-                    Country and city selection is a preview. The existing saved-brief
-                    submission still uses the open-destination planner until scoped
-                    persistence is connected. Prices and availability are not confirmed.
+                    {countryCityPreviewNotice}
                   </p>
                 </div>
               ) : null}
