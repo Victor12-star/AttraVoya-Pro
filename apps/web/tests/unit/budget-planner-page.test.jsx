@@ -171,8 +171,10 @@ describe('BudgetPlannerPage', () => {
     const suggestions = screen.getAllByRole('button').filter((button) =>
       ['Nicaragua', 'Niger', 'Nigeria'].includes(button.textContent?.trim() ?? ''),
     );
-    const names = suggestions.map((button) => button.textContent?.trim());
-    expect(names).toEqual(['Nicaragua', 'Niger', 'Nigeria']);
+    expect(suggestions).toHaveLength(3);
+    expect(suggestions[0]).toHaveTextContent('Nicaragua');
+    expect(suggestions[1]).toHaveTextContent('Niger');
+    expect(suggestions[2]).toHaveTextContent('Nigeria');
   });
 
   it('renders the open-destination planner honestly and loads an empty private draft list', async () => {
