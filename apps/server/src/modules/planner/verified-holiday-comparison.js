@@ -5,7 +5,7 @@
  * may enter the ranking. Incomplete/unevaluated entries remain unranked.
  */
 function moneyInCents(value) {
-  if (typeof value !== 'string' || !/^\\d+\\.\\d{2}$/.test(value)) return null;
+  if (typeof value !== 'string' || !/^\d+\.\d{2}$/.test(value)) return null;
   const [whole, fraction] = value.split('.');
   const cents = BigInt(whole) * 100n + BigInt(fraction);
   return cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) : null;
