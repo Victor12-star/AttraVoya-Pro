@@ -42,6 +42,11 @@ export async function plannerRoutes(app, options = {}) {
   );
   app.get('/', { ...authenticated, schema: plannerSchemas.listRequests }, controller.listRequests);
   app.get(
+    '/:requestId/country-city-candidates',
+    { ...authenticated, schema: plannerSchemas.ownedCountryCityCandidates },
+    controller.getOwnedCountryCityCandidates,
+  );
+  app.get(
     '/:requestId/allocation',
     { ...authenticated, schema: plannerSchemas.getRequest },
     controller.getAllocation,

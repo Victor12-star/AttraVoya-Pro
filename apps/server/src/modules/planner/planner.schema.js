@@ -38,6 +38,10 @@ const countryCityQuerySchema = z
 
 export const plannerSchemas = Object.freeze({
   countryCityCandidates: { querystring: countryCityQuerySchema },
+  ownedCountryCityCandidates: {
+    params: requestIdParamsSchema,
+    querystring: countryCityQuerySchema,
+  },
   createRequest: { headers: idempotencyHeadersSchema, body: createBudgetPlanRequestSchema },
   listRequests: { querystring: listRequestsQuerySchema },
   getRequest: { params: requestIdParamsSchema },

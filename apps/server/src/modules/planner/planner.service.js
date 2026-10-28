@@ -314,6 +314,34 @@ export function createPlannerService(repository, options = {}) {
       };
     },
 
+    /** @param {{ userId: string, requestId: string, countryCode: string, cityId?: string }} options */
+    async getOwnedCountryCityCandidates({ userId, requestId, countryCode, cityId }) {
+      const request = await repository.findOwnedRequestById({ userId, requestId });
+      if (!request) throw new NotFoundError('The planning request was not found.');
+
+      const records = await repository.listPublishedDestinationsInCountry({
+        countryCode,
+        cityId,
+        limit: 20,
+      });
+      const scoped = request.targetDestinationId
+        ? records.filter((item) => item.id === request.targetDestinationId)
+        : records.filter((item) => item.cityId !== request.originCityId);
+      return {
+        requestId,
+        scope: cityId ? 'SPECIFIC_CITY' : 'SPECIFIC_COUNTRY',
+        countryCode,
+        cityId: cityId ?? null,
+        destinations: scoped.map(mapDestinationCandidate),
+        evaluation: {
+          budgetFit: 'NOT_EVALUATED',
+          rankingApplied: false,
+          priceDataAvailable: false,
+          availabilityDataUsed: false,
+        },
+      };
+    },
+
     async getDestinationCandidates({ userId, requestId }) {
       const record = await repository.findOwnedRequestById({ userId, requestId });
       if (!record) throw new NotFoundError('The planning request was not found.');
