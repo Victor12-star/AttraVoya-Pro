@@ -489,9 +489,13 @@ export function BudgetPlannerPage({
                     </div>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
-                    {countryCityPreviewNotice}
+                    {destinationMode === 'CITY'
+                      ? 'A selected published city can now be saved as a planning brief. No prices, availability, or itinerary are generated yet.'
+                      : countryCityPreviewNotice}
                   </p>
-                  <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
+                  {destinationMode === 'COUNTRY' ? (
+                    <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
+                  ) : null}
                   {draftState === 'success' && drafts.length > 0 ? (
                     <button
                       className="button button--secondary button--compact"
