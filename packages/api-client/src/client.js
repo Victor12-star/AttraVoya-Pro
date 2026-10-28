@@ -412,6 +412,10 @@ export function createApiClient(options) {
     getPlannerDestinationCandidates: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/destination-candidates`),
     getPlannerScopedDestinationCandidates: (requestId, { countryCode, cityId } = {}) => {
+      if (typeof countryCode !== 'string' || !/^[A-Z]{2}$/.test(countryCode)) {
+        throw new TypeError('Destination country code must contain two uppercase letters.');
+      }
+      if (cityId !== undefined) normalizeOpaqueId(cityId, 'Destination city ID');
       const params = toSearchParams({ countryCode, cityId });
       return request(
         `/api/v1/planner/requests/${encodeURIComponent(normalizeOpaqueId(requestId, 'Planning request ID'))}/country-city-candidates?${params}`,
