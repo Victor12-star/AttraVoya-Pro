@@ -140,6 +140,11 @@ export function BudgetPlannerPage({
     [countrySearch, locale],
   );
   const [selectedCity, setSelectedCity] = useState('');
+  const [citySearch, setCitySearch] = useState('');
+  const [cityOptions, setCityOptions] = useState(
+    /** @type {{ id: string, name: string }[]} */ ([]),
+  );
+  const [cityLookupState, setCityLookupState] = useState('idle');
   const [scopedLookup, setScopedLookup] = useState(
     /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
       status: 'idle',
@@ -190,6 +195,41 @@ export function BudgetPlannerPage({
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    const requestId = drafts[0]?.id;
+    if (destinationMode !== 'CITY' || !selectedCountry || !requestId) {
+      setCityOptions([]);
+      setCityLookupState('idle');
+      return;
+    }
+    let active = true;
+    setCityLookupState('loading');
+    apiClient
+      .getPlannerScopedDestinationCandidates(requestId, { countryCode: selectedCountry })
+      .then((response) => {
+        if (!active) return;
+        const cities = new Map();
+        for (const destination of response?.destinations ?? []) {
+          if (typeof destination.cityId === 'string' && destination.name) {
+            cities.set(destination.cityId, {
+              id: destination.cityId,
+              name: destination.name,
+            });
+          }
+        }
+        setCityOptions([...cities.values()]);
+        setCityLookupState('success');
+      })
+      .catch(() => {
+        if (!active) return;
+        setCityOptions([]);
+        setCityLookupState('error');
+      });
+    return () => {
+      active = false;
+    };
+  }, [destinationMode, selectedCountry, drafts]);
 
   async function previewScopedDestinations() {
     const requestId = drafts[0]?.id;
@@ -371,6 +411,7 @@ export function BudgetPlannerPage({
                         setCountrySearch(event.target.value);
                         setSelectedCountry('');
                         setSelectedCity('');
+                        setCitySearch('');
                       }}
                       placeholder="Type at least two letters, e.g. Ita"
                       aria-describedby="planner-scope-hint"
@@ -386,6 +427,7 @@ export function BudgetPlannerPage({
                                 setSelectedCountry(country.code);
                                 setCountrySearch(country.name);
                                 setSelectedCity('');
+                                setCitySearch('');
                               }}
                             >
                               {country.name}
@@ -396,15 +438,54 @@ export function BudgetPlannerPage({
                     ) : null}
                   </div>
                   {destinationMode === 'CITY' ? (
-                    <label className={styles.fieldFull}>
-                      <span>Destination city</span>
+                    <div className={styles.fieldFull}>
+                      <label htmlFor="planner-city-search">Destination city</label>
                       <input
+                        id="planner-city-search"
                         type="text"
-                        value={selectedCity}
-                        onChange={(event) => setSelectedCity(event.target.value)}
-                        placeholder="City ID from destination catalog"
+                        autoComplete="off"
+                        value={citySearch}
+                        onChange={(event) => {
+                          setCitySearch(event.target.value);
+                          setSelectedCity('');
+                        }}
+                        placeholder="Type at least two letters, e.g. Rom"
+                        disabled={!selectedCountry || cityLookupState === 'loading'}
                       />
-                    </label>
+                      {cityLookupState === 'loading' ? (
+                        <p role="status">Loading available cities…</p>
+                      ) : null}
+                      {cityLookupState === 'error' ? (
+                        <p role="alert">City suggestions could not be loaded.</p>
+                      ) : null}
+                      {cityLookupState === 'success' &&
+                      citySearch.trim().length >= 2 &&
+                      !selectedCity ? (
+                        <ul aria-label="City suggestions">
+                          {cityOptions
+                            .filter((city) =>
+                              city.name.toLowerCase().includes(citySearch.trim().toLowerCase()),
+                            )
+                            .slice(0, 8)
+                            .map((city) => (
+                              <li key={city.id}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCity(city.id);
+                                    setCitySearch(city.name);
+                                  }}
+                                >
+                                  {city.name}
+                                </button>
+                              </li>
+                            ))}
+                        </ul>
+                      ) : null}
+                      {selectedCountry && draftState !== 'success' ? (
+                        <p>Sign in to load cities from the published destination catalog.</p>
+                      ) : null}
+                    </div>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
                     {countryCityPreviewNotice}
