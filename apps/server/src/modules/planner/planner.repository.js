@@ -192,7 +192,7 @@ export function createPlannerRepository(prismaClient) {
       });
     },
 
-    async listPublishedDestinationsInCountry({ countryCode, cityId, limit = 20 }) {
+    async listPublishedDestinationsInCountry({ countryCode, cityId = undefined, limit = 20 }) {
       const prisma = await getPrisma();
       return prisma.destination.findMany({
         where: {
