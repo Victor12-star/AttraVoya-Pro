@@ -275,7 +275,14 @@ export function BudgetPlannerPage({
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
 
-    /** @type {Record<string, unknown> & { fixedDeparture?: string, fixedReturn?: string, earliestDeparture?: string, latestReturn?: string }} */
+    /**
+     * @type {Record<string, unknown> & {
+     *   fixedDeparture?: string,
+     *   fixedReturn?: string,
+     *   earliestDeparture?: string,
+     *   latestReturn?: string
+     * }}
+     */
     const raw = {
       ...(destinationMode === 'CITY' && chosenCity
         ? { targetDestinationId: chosenCity.destinationId }
@@ -784,7 +791,8 @@ export function BudgetPlannerPage({
               disabled={
                 submitting ||
                 destinationMode === 'COUNTRY' ||
-                (destinationMode === 'CITY' && !cityOptions.some((city) => city.id === selectedCity))
+                (destinationMode === 'CITY' &&
+                  !cityOptions.some((city) => city.id === selectedCity))
               }
             >
               {submitting ? (
