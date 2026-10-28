@@ -31,6 +31,10 @@ export function suggestCountries(query, locale = 'en') {
       ({ code, name }) =>
         name.toLocaleLowerCase(locale).includes(term) || code.toLowerCase() === term,
     )
-    .sort((a, b) => a.name.localeCompare(b.name, locale))
+    .sort((a, b) => {
+      const aPrefix = a.name.toLocaleLowerCase(locale).startsWith(term) ? 0 : 1;
+      const bPrefix = b.name.toLocaleLowerCase(locale).startsWith(term) ? 0 : 1;
+      return aPrefix - bPrefix || a.name.localeCompare(b.name, locale);
+    })
     .slice(0, 8);
 }
