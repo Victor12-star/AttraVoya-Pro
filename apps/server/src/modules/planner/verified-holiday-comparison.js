@@ -73,7 +73,12 @@ export function compareVerifiedHolidayRanges(entries) {
     ordering: 'LOWEST_VERIFIED_UPPER_BOUND_FIRST',
     priceDataAvailable: eligible.length > 0,
     rankingApplied: eligible.length > 1,
-    ranked: eligible.map(({ upperBoundCents, lowerBoundCents, ...value }) => value),
+    ranked: eligible.map((item) => ({
+      destinationId: item.destinationId,
+      currencyCode: item.currencyCode,
+      amountMin: item.amountMin,
+      amountMax: item.amountMax,
+    })),
     unranked,
     disclaimer:
       'Verified price ranges are compared by their upper bounds; overlapping ranges do not establish which holiday will actually be cheapest. These are not bookings or live availability.',
