@@ -131,7 +131,11 @@ export function BudgetPlannerPage({
   const [destinationMode, setDestinationMode] = useState('OPEN');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-  const [scopedLookup, setScopedLookup] = useState({ status: 'idle', destinations: [] });
+  const [scopedLookup, setScopedLookup] = useState(
+    /** @type {{status: string, destinations: {id: string, name: string}[]}} */ (
+      { status: 'idle', destinations: [] }
+    ),
+  );
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
   const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
