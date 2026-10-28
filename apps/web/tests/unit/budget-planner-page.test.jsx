@@ -161,6 +161,23 @@ describe('BudgetPlannerPage', () => {
     expect(screen.queryByRole('button', { name: 'Italy' })).not.toBeInTheDocument();
   });
 
+  it('ranks country names starting with the search term ahead of substring matches', async () => {
+    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
+    fireEvent.change(screen.getByLabelText('Destination country'), {
+      target: { value: 'ni' },
+    });
+    const suggestions = screen.getAllByRole('button').filter((button) =>
+      ['Nicaragua', 'Niger', 'Nigeria'].includes(button.textContent?.trim() ?? ''),
+    );
+    expect(suggestions.map((button) => button.textContent?.trim())).toEqual([
+      'Nicaragua',
+      'Niger',
+      'Nigeria',
+    ]);
+  });
+
   it('renders the open-destination planner honestly and loads an empty private draft list', async () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
 
