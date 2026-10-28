@@ -198,13 +198,8 @@ export function BudgetPlannerPage({
 
   useEffect(() => {
     const requestId = drafts[0]?.id;
-    if (destinationMode !== 'CITY' || !selectedCountry || !requestId) {
-      setCityOptions([]);
-      setCityLookupState('idle');
-      return;
-    }
+    if (destinationMode !== 'CITY' || !selectedCountry || !requestId) return;
     let active = true;
-    setCityLookupState('loading');
     apiClient
       .getPlannerScopedDestinationCandidates(requestId, { countryCode: selectedCountry })
       .then((response) => {
