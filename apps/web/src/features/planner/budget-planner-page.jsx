@@ -125,6 +125,9 @@ export function BudgetPlannerPage({
   locale = 'en',
 }) {
   const accommodationCopy = getBudgetAccommodationCopy(locale);
+  const [destinationMode, setDestinationMode] = useState('OPEN');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
   const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
@@ -293,6 +296,62 @@ export function BudgetPlannerPage({
                 <p>{copy.openDestinationHint}</p>
               </div>
             </div>
+
+            <fieldset className={styles.fieldset}>
+              <legend>Choose how to plan your destination</legend>
+              <div className={styles.destinationModes}>
+                {[
+                  { value: 'OPEN', label: copy.openDestination },
+                  { value: 'COUNTRY', label: 'Specific country' },
+                  { value: 'CITY', label: 'Specific city' },
+                ].map((mode) => (
+                  <label key={mode.value} className={styles.destinationOption}>
+                    <input
+                      type="radio"
+                      name="destinationMode"
+                      value={mode.value}
+                      checked={destinationMode === mode.value}
+                      onChange={() => setDestinationMode(mode.value)}
+                    />
+                    <span>{mode.label}</span>
+                  </label>
+                ))}
+              </div>
+              {destinationMode !== 'OPEN' ? (
+                <div className={styles.destinationDetails}>
+                  <label className={styles.fieldFull}>
+                    <span>Destination country (two-letter country code)</span>
+                    <input
+                      type="text"
+                      maxLength={2}
+                      value={selectedCountry}
+                      onChange={(event) => {
+                        setSelectedCountry(event.target.value.toUpperCase());
+                        setSelectedCity('');
+                      }}
+                      placeholder="IT"
+                      aria-describedby="planner-scope-hint"
+                    />
+                  </label>
+                  {destinationMode === 'CITY' ? (
+                    <label className={styles.fieldFull}>
+                      <span>Destination city</span>
+                      <input
+                        type="text"
+                        value={selectedCity}
+                        onChange={(event) => setSelectedCity(event.target.value)}
+                        placeholder="City name"
+                      />
+                    </label>
+                  ) : null}
+                  <p id="planner-scope-hint" className={styles.privacy}>
+                    Country and city selection is a preview. The existing saved-brief submission still
+                    uses the open-destination planner until scoped persistence is connected. Prices and
+                    availability are not confirmed.
+                  </p>
+                </div>
+              ) : null}
+            </fieldset>
 
             <label className={styles.fieldFull}>
               <span>{copy.origin}</span>
