@@ -421,3 +421,41 @@
   gap: 14px;
   margin-top: 14px;
 }
+
+.suggestionList {
+  display: grid;
+  gap: 4px;
+  max-height: 248px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.suggestionList li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestionList button {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.suggestionList button:hover,
+.suggestionList button:focus-visible {
+  background: var(--surface-muted);
+}
