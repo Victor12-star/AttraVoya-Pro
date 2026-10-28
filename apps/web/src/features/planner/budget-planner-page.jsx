@@ -426,7 +426,11 @@ export function BudgetPlannerPage({
                       aria-controls="planner-country-options"
                     />
                     {countrySearch.trim().length >= 2 && !selectedCountry ? (
-                      <ul id="planner-country-options" className={styles.suggestionList} aria-label="Country suggestions">
+                      <ul
+                        id="planner-country-options"
+                        className={styles.suggestionList}
+                        aria-label="Country suggestions"
+                      >
                         {countrySuggestions.map((country) => (
                           <li key={country.code}>
                             <button
