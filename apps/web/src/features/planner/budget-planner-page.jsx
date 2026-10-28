@@ -192,6 +192,7 @@ export function BudgetPlannerPage({
 
   async function submit(event) {
     event.preventDefault();
+    if (destinationMode !== 'OPEN') return;
     const form = new FormData(event.currentTarget);
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
@@ -590,7 +591,7 @@ export function BudgetPlannerPage({
               </div>
             ) : null}
 
-            <button className="button button--dark" type="submit" disabled={submitting}>
+            <button className="button button--dark" type="submit" disabled={submitting || destinationMode !== 'OPEN'}>
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
               ) : (
