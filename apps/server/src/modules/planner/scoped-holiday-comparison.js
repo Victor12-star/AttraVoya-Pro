@@ -26,8 +26,8 @@ export function compareScopedHolidayCandidates(candidateEnvelope, evaluatedEvide
   }
 
   const comparison = compareVerifiedHolidayRanges(
-    candidateEnvelope.destinations.map((candidate) =>
-      evidenceByDestination.get(candidate.id) ?? { destinationId: candidate.id },
+    candidateEnvelope.destinations.map(
+      (candidate) => evidenceByDestination.get(candidate.id) ?? { destinationId: candidate.id },
     ),
   );
   const rankedIds = new Set(comparison.ranked.map((item) => item.destinationId));
@@ -39,7 +39,9 @@ export function compareScopedHolidayCandidates(candidateEnvelope, evaluatedEvide
     ...comparison,
     ranked: comparison.ranked.map((item) => ({
       ...item,
-      destination: candidateEnvelope.destinations.find((candidate) => candidate.id === item.destinationId),
+      destination: candidateEnvelope.destinations.find(
+        (candidate) => candidate.id === item.destinationId,
+      ),
     })),
     unranked: comparison.unranked.filter((item) => !rankedIds.has(item.destinationId)),
     availabilityDataUsed: false,
