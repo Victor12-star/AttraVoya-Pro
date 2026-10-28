@@ -135,7 +135,10 @@ export function BudgetPlannerPage({
   const [destinationMode, setDestinationMode] = useState('OPEN');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [countrySearch, setCountrySearch] = useState('');
-  const countrySuggestions = useMemo(() => suggestCountries(countrySearch, locale), [countrySearch, locale]);
+  const countrySuggestions = useMemo(
+    () => suggestCountries(countrySearch, locale),
+    [countrySearch, locale],
+  );
   const [selectedCity, setSelectedCity] = useState('');
   const [scopedLookup, setScopedLookup] = useState(
     /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
