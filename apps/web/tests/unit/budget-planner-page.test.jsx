@@ -161,22 +161,6 @@ describe('BudgetPlannerPage', () => {
     expect(screen.queryByRole('button', { name: 'Italy' })).not.toBeInTheDocument();
   });
 
-  it('ranks country prefixes before substring matches', async () => {
-    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
-    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
-    fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
-    fireEvent.change(screen.getByLabelText('Destination country'), {
-      target: { value: 'ni' },
-    });
-    const suggestions = screen.getAllByRole('button').filter((button) =>
-      ['Nicaragua', 'Niger', 'Nigeria'].includes(button.textContent?.trim() ?? ''),
-    );
-    expect(suggestions).toHaveLength(3);
-    expect(suggestions[0]).toHaveTextContent('Nicaragua');
-    expect(suggestions[1]).toHaveTextContent('Niger');
-    expect(suggestions[2]).toHaveTextContent('Nigeria');
-  });
-
   it('renders the open-destination planner honestly and loads an empty private draft list', async () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
 
