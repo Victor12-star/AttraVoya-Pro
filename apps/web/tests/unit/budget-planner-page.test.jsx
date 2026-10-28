@@ -5,6 +5,7 @@ import { ApiClientError } from '@attravoya/api-client';
 
 const mocks = vi.hoisted(() => ({
   createBudgetPlanRequest: vi.fn(),
+  getPlannerScopedDestinationCandidates: vi.fn(),
   listBudgetPlanRequests: vi.fn(),
   readPreferences: vi.fn(),
 }));
@@ -12,6 +13,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     createBudgetPlanRequest: mocks.createBudgetPlanRequest,
+    getPlannerScopedDestinationCandidates: mocks.getPlannerScopedDestinationCandidates,
     listBudgetPlanRequests: mocks.listBudgetPlanRequests,
   },
 }));
@@ -68,6 +70,7 @@ function fillFixedPlan({ budget = '25000' } = {}) {
 describe('BudgetPlannerPage', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
+    mocks.getPlannerScopedDestinationCandidates.mockReset();
     mocks.listBudgetPlanRequests.mockReset();
     mocks.readPreferences.mockReset();
     mocks.readPreferences.mockReturnValue({});
@@ -92,6 +95,27 @@ describe('BudgetPlannerPage', () => {
     fireEvent.click(screen.getByRole('radio', { name: 'Destination is open' }));
     expect(screen.queryByLabelText('Destination city')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+  });
+
+  it('loads only owner-scoped country destinations from an existing saved brief', async () => {
+    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [savedRequest()] });
+    mocks.getPlannerScopedDestinationCandidates.mockResolvedValue({
+      destinations: [{ id: 'destination-1', name: 'Rome' }],
+    });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
+    fireEvent.change(screen.getByLabelText('Destination country (two-letter country code)'), {
+      target: { value: 'it' },
+    });
+    const preview = await screen.findByRole('button', { name: 'Preview matching destinations' });
+    fireEvent.click(preview);
+    await waitFor(() =>
+      expect(mocks.getPlannerScopedDestinationCandidates).toHaveBeenCalledWith('request-1', {
+        countryCode: 'IT',
+      }),
+    );
+    expect(await screen.findByText('Rome')).toBeInTheDocument();
     expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
   });
 
