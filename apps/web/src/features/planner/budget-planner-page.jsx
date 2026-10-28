@@ -346,9 +346,9 @@ export function BudgetPlannerPage({
                     </label>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
-                    Country and city selection is a preview. The existing saved-brief submission still
-                    uses the open-destination planner until scoped persistence is connected. Prices and
-                    availability are not confirmed.
+                    Country and city selection is a preview. The existing saved-brief
+                    submission still uses the open-destination planner until scoped
+                    persistence is connected. Prices and availability are not confirmed.
                   </p>
                 </div>
               ) : null}
