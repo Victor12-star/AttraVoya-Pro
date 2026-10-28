@@ -117,6 +117,9 @@ function formatDateRange(request, copy) {
   return fixed.length === 2 ? `${fixed[0]} – ${fixed[1]}` : copy.fixedSummary;
 }
 
+const scopedReadOnlyNotice =
+  'This read-only preview uses your most recent saved planning brief. It does not save the selected country or city, estimate costs, or change that brief.';
+
 const countryCityPreviewNotice =
   'Country and city selection is a preview. The existing saved-brief submission still uses the open-destination planner until scoped persistence is connected. Prices and availability are not confirmed.';
 
@@ -131,6 +134,12 @@ export function BudgetPlannerPage({
   const [destinationMode, setDestinationMode] = useState('OPEN');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const [scopedLookup, setScopedLookup] = useState(
+    /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
+      status: 'idle',
+      destinations: [],
+    }),
+  );
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
   const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
@@ -175,6 +184,28 @@ export function BudgetPlannerPage({
       active = false;
     };
   }, []);
+
+  async function previewScopedDestinations() {
+    const requestId = drafts[0]?.id;
+    if (!requestId || !/^[A-Z]{2}$/.test(selectedCountry)) return;
+    if (destinationMode === 'CITY' && !selectedCity.trim()) return;
+    setScopedLookup({ status: 'loading', destinations: [] });
+    try {
+      const response = await apiClient.getPlannerScopedDestinationCandidates(requestId, {
+        countryCode: selectedCountry,
+        ...(destinationMode === 'CITY' ? { cityId: selectedCity.trim() } : {}),
+      });
+      setScopedLookup({
+        status: 'success',
+        destinations: Array.isArray(response?.destinations) ? response.destinations : [],
+      });
+    } catch (error) {
+      setScopedLookup({
+        status: error instanceof ApiClientError && error.status === 401 ? 'auth' : 'error',
+        destinations: [],
+      });
+    }
+  }
 
   const selectedLodging = useMemo(() => new Set(lodgingTypes), [lodgingTypes]);
 
@@ -344,13 +375,54 @@ export function BudgetPlannerPage({
                         type="text"
                         value={selectedCity}
                         onChange={(event) => setSelectedCity(event.target.value)}
-                        placeholder="City name"
+                        placeholder="City ID from destination catalog"
                       />
                     </label>
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
                     {countryCityPreviewNotice}
                   </p>
+                  <p className={styles.privacy}>{scopedReadOnlyNotice}</p>
+                  {draftState === 'success' && drafts.length > 0 ? (
+                    <button
+                      className="button button--secondary button--compact"
+                      type="button"
+                      disabled={
+                        scopedLookup.status === 'loading' ||
+                        !/^[A-Z]{2}$/.test(selectedCountry) ||
+                        (destinationMode === 'CITY' && !selectedCity.trim())
+                      }
+                      onClick={() => void previewScopedDestinations()}
+                    >
+                      Preview matching destinations
+                    </button>
+                  ) : (
+                    <p className={styles.privacy}>
+                      Sign in and save an open-destination planning brief to preview destinations.
+                    </p>
+                  )}
+                  {scopedLookup.status === 'loading' ? (
+                    <p role="status">Looking up destinations…</p>
+                  ) : null}
+                  {scopedLookup.status === 'error' ? (
+                    <p role="alert">Destinations could not be loaded. Try again.</p>
+                  ) : null}
+                  {scopedLookup.status === 'auth' ? (
+                    <p role="alert">Please sign in again to view private planning results.</p>
+                  ) : null}
+                  {scopedLookup.status === 'success' ? (
+                    <div role="status">
+                      <p>
+                        {scopedLookup.destinations.length} published destinations found. Prices and
+                        availability have not been evaluated.
+                      </p>
+                      <ul>
+                        {scopedLookup.destinations.map((destination) => (
+                          <li key={destination.id}>{destination.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </fieldset>
