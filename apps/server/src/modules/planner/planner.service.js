@@ -294,6 +294,26 @@ export function createPlannerService(repository, options = {}) {
       return buildBudgetEnvelope(record);
     },
 
+    async getCountryCityCandidates({ countryCode, cityId }) {
+      const records = await repository.listPublishedDestinationsInCountry({
+        countryCode,
+        cityId,
+        limit: 20,
+      });
+      return {
+        scope: cityId ? 'SPECIFIC_CITY' : 'SPECIFIC_COUNTRY',
+        countryCode,
+        cityId: cityId ?? null,
+        destinations: records.map(mapDestinationCandidate),
+        evaluation: {
+          budgetFit: 'NOT_EVALUATED',
+          rankingApplied: false,
+          priceDataAvailable: false,
+          availabilityDataUsed: false,
+        },
+      };
+    },
+
     async getDestinationCandidates({ userId, requestId }) {
       const record = await repository.findOwnedRequestById({ userId, requestId });
       if (!record) throw new NotFoundError('The planning request was not found.');
