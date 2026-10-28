@@ -105,7 +105,7 @@ describe('BudgetPlannerPage', () => {
     });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
-    fireEvent.change(screen.getByLabelText('Destination country (two-letter country code)'), {
+    fireEvent.change(screen.getByLabelText('Destination country'), {
       target: { value: 'Ita' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Italy' }));
