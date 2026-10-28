@@ -117,6 +117,9 @@ function formatDateRange(request, copy) {
   return fixed.length === 2 ? `${fixed[0]} – ${fixed[1]}` : copy.fixedSummary;
 }
 
+const scopedReadOnlyNotice =
+  'This read-only preview uses your most recent saved planning brief. It does not save the selected country or city, estimate costs, or change that brief.';
+
 const countryCityPreviewNotice =
   'Country and city selection is a preview. The existing saved-brief submission still uses the open-destination planner until scoped persistence is connected. Prices and availability are not confirmed.';
 
@@ -379,8 +382,7 @@ export function BudgetPlannerPage({
                     {countryCityPreviewNotice}
                   </p>
                   <p className={styles.privacy}>
-                    This read-only preview uses your most recent saved planning brief. It does
-                    not save the selected country or city, estimate costs, or change that brief.
+                    {scopedReadOnlyNotice}
                   </p>
                   {draftState === 'success' && drafts.length > 0 ? (
                     <button
@@ -422,7 +424,6 @@ export function BudgetPlannerPage({
                       </ul>
                     </div>
                   ) : null}
-
                 </div>
               ) : null}
             </fieldset>
