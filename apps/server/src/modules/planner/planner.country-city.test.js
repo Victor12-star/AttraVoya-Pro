@@ -14,7 +14,7 @@ describe('Country and city candidate discovery', () => {
 
   it('limits published catalog candidates to the selected country', async () => {
     const findMany = vi.fn().mockResolvedValue([]);
-    const repository = createPlannerRepository({ destination: { findMany } });
+    const repository = createPlannerRepository(/** @type {any} */ ({ destination: { findMany } }));
     await repository.listPublishedDestinationsInCountry({ countryCode: 'IT', limit: 20 });
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -29,7 +29,7 @@ describe('Country and city candidate discovery', () => {
 
   it('limits a specific city to that city in the selected country', async () => {
     const findMany = vi.fn().mockResolvedValue([]);
-    const repository = createPlannerRepository({ destination: { findMany } });
+    const repository = createPlannerRepository(/** @type {any} */ ({ destination: { findMany } }));
     await repository.listPublishedDestinationsInCountry({
       countryCode: 'IT',
       cityId: 'rome-id',
