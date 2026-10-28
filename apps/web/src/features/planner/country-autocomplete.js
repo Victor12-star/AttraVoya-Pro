@@ -13,7 +13,9 @@ const ISO_COUNTRY_CODES = [
   'SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK',
   'TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI',
   'VN VU WF WS YE YT ZA ZM ZW',
-].join(' ').split(' ');
+]
+  .join(' ')
+  .split(' ');
 
 /**
  * @param {string} query
