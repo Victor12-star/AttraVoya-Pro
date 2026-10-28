@@ -192,6 +192,22 @@ export function createPlannerRepository(prismaClient) {
       });
     },
 
+    async listPublishedDestinationsInCountry({ countryCode, cityId, limit = 20 }) {
+      const prisma = await getPrisma();
+      return prisma.destination.findMany({
+        where: {
+          status: 'PUBLISHED',
+          city: {
+            country: { iso2: countryCode },
+            ...(cityId ? { id: cityId } : {}),
+          },
+        },
+        orderBy: [{ publishedAt: 'desc' }, { slug: 'asc' }],
+        take: limit,
+        select: destinationCandidateSelect,
+      });
+    },
+
     async listPublishedDestinationCandidates(options = {}) {
       const { excludeCityId, limit = 20 } = options;
       const prisma = await getPrisma();
