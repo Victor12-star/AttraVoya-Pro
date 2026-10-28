@@ -172,9 +172,7 @@ describe('BudgetPlannerPage', () => {
       ['Nicaragua', 'Niger', 'Nigeria'].includes(button.textContent?.trim() ?? ''),
     );
     expect(suggestions.map((button) => button.textContent?.trim())).toEqual([
-      'Nicaragua',
-      'Niger',
-      'Nigeria',
+      'Nicaragua', 'Niger', 'Nigeria',
     ]);
   });
 
