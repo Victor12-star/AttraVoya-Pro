@@ -141,7 +141,15 @@ describe('BudgetPlannerPage', () => {
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Rome' }));
     expect(screen.getByLabelText('Destination city')).toHaveValue('Rome');
-    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    fillFixedPlan();
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    await waitFor(() =>
+      expect(mocks.createBudgetPlanRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ targetDestinationId: 'destination-1' }),
+        expect.any(String),
+      ),
+    );
   });
 
   it('suggests country names and selects their two-letter codes', async () => {
