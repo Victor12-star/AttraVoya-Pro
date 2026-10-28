@@ -101,7 +101,9 @@ describe('BudgetPlannerPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Plan the trip around your budget', level: 1 }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Destination is open', level: 2 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Destination is open', level: 2 }),
+    ).toBeInTheDocument();
     expect(await screen.findByText('No saved planning briefs yet.')).toBeInTheDocument();
     expect(mocks.listBudgetPlanRequests).toHaveBeenCalledTimes(1);
     expect(
