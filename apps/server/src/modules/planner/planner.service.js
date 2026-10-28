@@ -95,6 +95,7 @@ function mapPlannerRequest(record) {
 function mapDestinationCandidate(record) {
   return {
     id: record.id,
+    cityId: record.cityId,
     slug: record.slug,
     name: record.city.name,
     regionName: record.city.regionName,
