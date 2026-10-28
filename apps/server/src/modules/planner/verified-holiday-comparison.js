@@ -42,12 +42,13 @@ export function compareVerifiedHolidayRanges(entries) {
       min !== null &&
       max !== null &&
       max >= min;
-    const basis = valid
-      ? `${key}:${currency}:${policy.spendableBudget}:${signature}`
-      : null;
+    const basis = valid ? `${key}:${currency}:${policy.spendableBudget}:${signature}` : null;
 
     if (!valid || (reference !== null && reference !== basis)) {
-      unranked.push({ destinationId: entry?.destinationId ?? null, reason: valid ? 'INCOMPARABLE_BASIS' : 'UNVERIFIED_EVIDENCE' });
+      unranked.push({
+        destinationId: entry?.destinationId ?? null,
+        reason: valid ? 'INCOMPARABLE_BASIS' : 'UNVERIFIED_EVIDENCE',
+      });
       continue;
     }
 
