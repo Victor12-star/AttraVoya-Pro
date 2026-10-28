@@ -392,3 +392,32 @@
     animation: none;
   }
 }
+
+.destinationModes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.destinationOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-muted);
+  cursor: pointer;
+}
+
+.destinationOption:focus-within {
+  outline: 2px solid var(--brand-secondary);
+  outline-offset: 2px;
+}
+
+.destinationDetails {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
