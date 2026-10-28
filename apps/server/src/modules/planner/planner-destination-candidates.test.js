@@ -127,6 +127,7 @@ describe('planner destination candidates', () => {
         destinations: [
           {
             id: 'destination-lisbon',
+            cityId: 'city-lisbon',
             slug: 'lisbon-portugal',
             name: 'Lisbon',
             regionName: 'Lisbon District',

@@ -120,6 +120,30 @@ describe('BudgetPlannerPage', () => {
     expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
   });
 
+  it('suggests published city names without exposing catalog IDs to travelers', async () => {
+    mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [savedRequest()] });
+    mocks.getPlannerScopedDestinationCandidates.mockResolvedValue({
+      destinations: [{ id: 'destination-1', cityId: 'city-rome', name: 'Rome' }],
+    });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific city' }));
+    fireEvent.change(screen.getByLabelText('Destination country'), {
+      target: { value: 'Ita' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Italy' }));
+    await waitFor(() =>
+      expect(mocks.getPlannerScopedDestinationCandidates).toHaveBeenCalledWith('request-1', {
+        countryCode: 'IT',
+      }),
+    );
+    fireEvent.change(screen.getByLabelText('Destination city'), {
+      target: { value: 'Rom' },
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Rome' }));
+    expect(screen.getByLabelText('Destination city')).toHaveValue('Rome');
+    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+  });
+
   it('suggests country names and selects their two-letter codes', async () => {
     mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);

@@ -162,6 +162,7 @@ describe('planner affordability evidence gate', () => {
     expect(payload.requestId).toBe('plan-request-1');
     expect(payload.destination).toEqual({
       id: 'destination-lisbon',
+      cityId: 'city-lisbon',
       slug: 'lisbon-portugal',
       name: 'Lisbon',
       regionName: 'Lisbon District',
