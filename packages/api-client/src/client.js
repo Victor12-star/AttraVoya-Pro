@@ -411,7 +411,8 @@ export function createApiClient(options) {
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/allocation`),
     getPlannerDestinationCandidates: (requestId) =>
       request(`/api/v1/planner/requests/${encodeURIComponent(requestId)}/destination-candidates`),
-    getPlannerScopedDestinationCandidates: (requestId, { countryCode, cityId } = {}) => {
+    /** @param {string} requestId @param {{ countryCode: string, cityId?: string }} options */
+    getPlannerScopedDestinationCandidates: (requestId, { countryCode, cityId }) => {
       if (typeof countryCode !== 'string' || !/^[A-Z]{2}$/.test(countryCode)) {
         throw new TypeError('Destination country code must contain two uppercase letters.');
       }
