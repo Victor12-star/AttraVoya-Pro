@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   createBudgetPlanRequest: vi.fn(),
+  autocompletePlaces: vi.fn(),
   listBudgetPlanRequests: vi.fn(),
 }));
 
 vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     createBudgetPlanRequest: mocks.createBudgetPlanRequest,
+    autocompletePlaces: mocks.autocompletePlaces,
     listBudgetPlanRequests: mocks.listBudgetPlanRequests,
   },
 }));
@@ -61,6 +63,8 @@ function fillRequiredPlan() {
 describe('BudgetPlannerPage accommodation range', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
+    mocks.autocompletePlaces.mockReset();
+    mocks.autocompletePlaces.mockResolvedValue({ places: [] });
     mocks.listBudgetPlanRequests.mockReset();
     mocks.listBudgetPlanRequests.mockResolvedValue({ requests: [] });
     mocks.createBudgetPlanRequest.mockResolvedValue({ planRequest: savedRequest() });
