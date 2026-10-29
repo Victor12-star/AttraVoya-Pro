@@ -568,6 +568,7 @@ export function BudgetPlannerPage({
                                 setSelectedCountry(country.code);
                                 setCountrySearch(country.name);
                                 setSelectedCity('');
+                                setSelectedRealCity('');
                                 setCitySearch('');
                               }}
                             >
@@ -589,6 +590,7 @@ export function BudgetPlannerPage({
                         onChange={(event) => {
                           setCitySearch(event.target.value);
                           setSelectedCity('');
+                          setSelectedRealCity('');
                           setRealCityOptions([]);
                           setRealCityLookupState('idle');
                         }}
