@@ -501,8 +501,7 @@ export function BudgetPlannerPage({
                           className={styles.suggestionList}
                           aria-label="City suggestions"
                         >
-                          {citySuggestions
-                            .map((city) => (
+                          {citySuggestions.map((city) => (
                               <li key={city.id}>
                                 <button
                                   type="button"
