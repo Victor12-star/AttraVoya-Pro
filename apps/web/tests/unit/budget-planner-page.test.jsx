@@ -5,7 +5,7 @@ import { ApiClientError } from '@attravoya/api-client';
 
 const mocks = vi.hoisted(() => ({
   createBudgetPlanRequest: vi.fn(),
-  autocompletePlaces: vi.fn(),
+  searchOriginCities: vi.fn(),
   getPlannerScopedDestinationCandidates: vi.fn(),
   getPublicCountryCityCandidates: vi.fn(),
   listBudgetPlanRequests: vi.fn(),
@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     createBudgetPlanRequest: mocks.createBudgetPlanRequest,
-    autocompletePlaces: mocks.autocompletePlaces,
+    searchOriginCities: mocks.searchOriginCities,
     getPlannerScopedDestinationCandidates: mocks.getPlannerScopedDestinationCandidates,
     getPublicCountryCityCandidates: mocks.getPublicCountryCityCandidates,
     listBudgetPlanRequests: mocks.listBudgetPlanRequests,
@@ -74,8 +74,8 @@ function fillFixedPlan({ budget = '25000' } = {}) {
 describe('BudgetPlannerPage', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
-    mocks.autocompletePlaces.mockReset();
-    mocks.autocompletePlaces.mockResolvedValue({ places: [] });
+    mocks.searchOriginCities.mockReset();
+    mocks.searchOriginCities.mockResolvedValue({ places: [] });
     mocks.getPlannerScopedDestinationCandidates.mockReset();
     mocks.getPublicCountryCityCandidates.mockReset();
     mocks.listBudgetPlanRequests.mockReset();
