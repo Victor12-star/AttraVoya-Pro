@@ -145,6 +145,19 @@ export function BudgetPlannerPage({
     /** @type {{ id: string, name: string, destinationId: string }[]} */ ([]),
   );
   const [cityLookupState, setCityLookupState] = useState('idle');
+  const citySuggestions = useMemo(() => {
+    const term = citySearch.trim().toLowerCase();
+    if (term.length < 2) return [];
+    return cityOptions
+      .filter((city) => city.name.toLowerCase().includes(term))
+      .sort((a, b) => {
+        const aPrefix = a.name.toLowerCase().startsWith(term) ? 0 : 1;
+        const bPrefix = b.name.toLowerCase().startsWith(term) ? 0 : 1;
+        return aPrefix - bPrefix || a.name.localeCompare(b.name);
+      })
+      .slice(0, 8);
+  }, [cityOptions, citySearch]);
+
   const [scopedLookup, setScopedLookup] = useState(
     /** @type {{ status: string, destinations: { id: string, name: string }[] }} */ ({
       status: 'idle',
@@ -481,43 +494,39 @@ export function BudgetPlannerPage({
                       ) : null}
                       {cityLookupState === 'success' &&
                       citySearch.trim().length >= 2 &&
-                      !selectedCity ? (
+                      !selectedCity &&
+                      citySuggestions.length > 0 ? (
                         <ul
                           id="planner-city-options"
                           className={styles.suggestionList}
                           aria-label="City suggestions"
                         >
-                          {cityOptions
-                            .filter((city) =>
-                              city.name.toLowerCase().includes(citySearch.trim().toLowerCase()),
-                            )
-                            .sort((a, b) => {
-                              const term = citySearch.trim().toLowerCase();
-                              const aPrefix = a.name.toLowerCase().startsWith(term) ? 0 : 1;
-                              const bPrefix = b.name.toLowerCase().startsWith(term) ? 0 : 1;
-                              return aPrefix - bPrefix || a.name.localeCompare(b.name);
-                            })
-                            .slice(0, 8)
-                            .map((city) => (
-                              <li key={city.id}>
-                                <button
-                                  type="button"
-                                  onKeyDown={(event) => {
-                                    if (event.key === 'Escape') {
-                                      event.preventDefault();
-                                      document.getElementById('planner-city-search')?.focus();
-                                    }
-                                  }}
-                                  onClick={() => {
-                                    setSelectedCity(city.id);
-                                    setCitySearch(city.name);
-                                  }}
-                                >
-                                  {city.name}
-                                </button>
-                              </li>
-                            ))}
+                          {citySuggestions.map((city) => (
+                            <li key={city.id}>
+                              <button
+                                type="button"
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Escape') {
+                                    event.preventDefault();
+                                    document.getElementById('planner-city-search')?.focus();
+                                  }
+                                }}
+                                onClick={() => {
+                                  setSelectedCity(city.id);
+                                  setCitySearch(city.name);
+                                }}
+                              >
+                                {city.name}
+                              </button>
+                            </li>
+                          ))}
                         </ul>
+                      ) : null}
+                      {cityLookupState === 'success' &&
+                      citySearch.trim().length >= 2 &&
+                      !selectedCity &&
+                      citySuggestions.length === 0 ? (
+                        <p role="status">No matching published cities. Try another search.</p>
                       ) : null}
                       {!selectedCountry ? (
                         <p>Select a country to browse published destination cities.</p>
