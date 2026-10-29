@@ -377,8 +377,9 @@ export function BudgetPlannerPage({
     event.preventDefault();
     if (destinationMode === 'COUNTRY') return;
     const chosenCity = cityOptions.find((city) => city.id === selectedCity);
-    if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity)))
+    if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) {
       return;
+    }
     const form = new FormData(event.currentTarget);
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
