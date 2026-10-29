@@ -43,6 +43,20 @@ export const createBudgetPlanRequestSchema = z
   })
   .strict()
   .superRefine((data, context) => {
+    if (Boolean(data.destinationCityName) !== Boolean(data.destinationCountryCode)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'City name and country code must be provided together',
+        path: ['destinationCityName'],
+      });
+    }
+    if (data.targetDestinationId && data.destinationCityName) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Choose either a published destination or an independent city',
+        path: ['targetDestinationId'],
+      });
+    }
     if (data.minNights > data.maxNights) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
