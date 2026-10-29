@@ -164,6 +164,38 @@ export function BudgetPlannerPage({
       destinations: [],
     }),
   );
+  const [originSearch, setOriginSearch] = useState(initialOrigin);
+  const [originSelected, setOriginSelected] = useState(false);
+  const [originSuggestions, setOriginSuggestions] = useState(/** @type {string[]} */ ([]));
+  const [originLookupState, setOriginLookupState] = useState('idle');
+
+  useEffect(() => {
+    const query = originSearch.trim();
+    if (query.length < 2 || originSelected) return;
+    let active = true;
+    const timer = setTimeout(() => {
+      apiClient
+        .autocompletePlaces({ query, limit: 8, language: 'en' })
+        .then((response) => {
+          if (!active) return;
+          const names = (response?.places ?? [])
+            .map((place) => place.formatted ?? place.name ?? '')
+            .filter((name) => typeof name === 'string' && name.trim().length > 0);
+          setOriginSuggestions([...new Set(names)].slice(0, 8));
+          setOriginLookupState('success');
+        })
+        .catch(() => {
+          if (!active) return;
+          setOriginSuggestions([]);
+          setOriginLookupState('error');
+        });
+    }, 300);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [originSearch, originSelected]);
+
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
   const [lodgingStrategy, setLodgingStrategy] = useState('CUSTOM');
@@ -593,10 +625,40 @@ export function BudgetPlannerPage({
                 minLength={2}
                 maxLength={160}
                 placeholder={copy.originPlaceholder}
-                autoComplete="address-level2"
-                defaultValue={initialOrigin}
+                autoComplete="off"
+                value={originSearch}
+                onChange={(event) => {
+                  setOriginSearch(event.target.value);
+                  setOriginSelected(false);
+                  setOriginLookupState('idle');
+                  setOriginSuggestions([]);
+                }}
                 required
               />
+              {originLookupState === 'success' && originSuggestions.length > 0 ? (
+                <ul className={styles.suggestionList} aria-label="Origin suggestions">
+                  {originSuggestions.map((name) => (
+                    <li key={name}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOriginSearch(name);
+                          setOriginSelected(true);
+                          setOriginSuggestions([]);
+                          setOriginLookupState('idle');
+                        }}
+                      >
+                        {name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {originLookupState === 'error' ? (
+                <span className={styles.hint}>
+                  Origin suggestions are unavailable. You can still type your departure city.
+                </span>
+              ) : null}
             </label>
 
             <fieldset className={styles.fieldset}>
