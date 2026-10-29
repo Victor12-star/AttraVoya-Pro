@@ -502,24 +502,24 @@ export function BudgetPlannerPage({
                           aria-label="City suggestions"
                         >
                           {citySuggestions.map((city) => (
-                              <li key={city.id}>
-                                <button
-                                  type="button"
-                                  onKeyDown={(event) => {
-                                    if (event.key === 'Escape') {
-                                      event.preventDefault();
-                                      document.getElementById('planner-city-search')?.focus();
-                                    }
-                                  }}
-                                  onClick={() => {
-                                    setSelectedCity(city.id);
-                                    setCitySearch(city.name);
-                                  }}
-                                >
-                                  {city.name}
-                                </button>
-                              </li>
-                            ))}
+                            <li key={city.id}>
+                              <button
+                                type="button"
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Escape') {
+                                    event.preventDefault();
+                                    document.getElementById('planner-city-search')?.focus();
+                                  }
+                                }}
+                                onClick={() => {
+                                  setSelectedCity(city.id);
+                                  setCitySearch(city.name);
+                                }}
+                              >
+                                {city.name}
+                              </button>
+                            </li>
+                          ))}
                         </ul>
                       ) : null}
                       {cityLookupState === 'success' &&
