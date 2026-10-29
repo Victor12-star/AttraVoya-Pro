@@ -166,9 +166,7 @@ export function BudgetPlannerPage({
   );
   const [originSearch, setOriginSearch] = useState(initialOrigin);
   const [originSelected, setOriginSelected] = useState(false);
-  const [originSuggestions, setOriginSuggestions] = useState(
-    /** @type {string[]} */ ([]),
-  );
+  const [originSuggestions, setOriginSuggestions] = useState(/** @type {string[]} */ ([]));
   const [originLookupState, setOriginLookupState] = useState('idle');
 
   useEffect(() => {
@@ -657,7 +655,9 @@ export function BudgetPlannerPage({
                 </ul>
               ) : null}
               {originLookupState === 'error' ? (
-                <span className={styles.hint}>Origin suggestions are unavailable. You can still type your departure city.</span>
+                <span className={styles.hint}>
+                  Origin suggestions are unavailable. You can still type your departure city.
+                </span>
               ) : null}
             </label>
 
