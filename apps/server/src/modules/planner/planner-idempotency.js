@@ -81,6 +81,8 @@ function comparableStoredRequest(record) {
     originCityId: record.originCityId ?? null,
     originAirportId: record.originAirportId ?? null,
     targetDestinationId: record.targetDestinationId ?? null,
+    destinationCityName: record.destinationCityName ?? null,
+    destinationCountryCode: record.destinationCountryCode ?? null,
     earliestDeparture: toDateString(record.earliestDeparture),
     latestReturn: toDateString(record.latestReturn),
     fixedDeparture: toDateString(record.fixedDeparture),
