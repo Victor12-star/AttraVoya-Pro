@@ -107,6 +107,13 @@ describe('BudgetPlannerPage', () => {
     );
   });
 
+  it('identifies invalid fields instead of showing only a generic save error', async () => {
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/Check:/);
+    expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
+  });
+
   it('keeps open destination saving available and guards unconnected scoped choices', async () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     expect(screen.getByRole('radio', { name: 'Destination is open' })).toBeChecked();

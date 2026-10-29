@@ -421,7 +421,30 @@ export function BudgetPlannerPage({
 
     const parsed = createBudgetPlanRequestSchema.safeParse(raw);
     if (!parsed.success) {
-      setSubmitState({ type: 'error', message: copy.invalid });
+      const fieldNames = {
+        originLabel: 'Departure location',
+        budgetAmount: 'Budget',
+        adults: 'Adults',
+        minNights: 'Minimum nights',
+        maxNights: 'Maximum nights',
+        fixedDeparture: 'Departure date',
+        fixedReturn: 'Return date',
+        earliestDeparture: 'Earliest departure',
+        latestReturn: 'Latest return',
+        safetyReservePercent: 'Safety reserve',
+        childrenAges: 'Children ages',
+        interests: 'Interests',
+        accommodation: 'Accommodation preferences',
+      };
+      const issues = parsed.error.issues.slice(0, 3).map((issue) => {
+        const field = String(issue.path[0] ?? 'Planning details');
+        return fieldNames[field] ?? field;
+      });
+      const fields = [...new Set(issues)].join(', ');
+      setSubmitState({
+        type: 'error',
+        message: fields ? `${copy.invalid} Check: ${fields}.` : copy.invalid,
+      });
       return;
     }
 
