@@ -285,7 +285,13 @@ export function BudgetPlannerPage({
 
   useEffect(() => {
     const query = citySearch.trim();
-    if (destinationMode !== 'CITY' || !selectedCountry || selectedCity || selectedRealCity || query.length < 2) {
+    if (
+      destinationMode !== 'CITY' ||
+      !selectedCountry ||
+      selectedCity ||
+      selectedRealCity ||
+      query.length < 2
+    ) {
       return;
     }
     let active = true;
@@ -371,7 +377,8 @@ export function BudgetPlannerPage({
     event.preventDefault();
     if (destinationMode === 'COUNTRY') return;
     const chosenCity = cityOptions.find((city) => city.id === selectedCity);
-    if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) return;
+    if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity)))
+      return;
     const form = new FormData(event.currentTarget);
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
@@ -653,7 +660,10 @@ export function BudgetPlannerPage({
                       ) : null}
                       {showRealCities ? (
                         <div>
-                          <p>Real cities found for saving a planning brief (not published or bookable):</p>
+                          <p>
+                            Real cities found for saving a planning brief (not published or
+                            bookable):
+                          </p>
                           <ul aria-label="Real city search results">
                             {unpublishedCities.map((city) => (
                               <li key={city.id}>

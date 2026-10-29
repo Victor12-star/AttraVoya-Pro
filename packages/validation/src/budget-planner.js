@@ -20,7 +20,10 @@ export const createBudgetPlanRequestSchema = z
     originAirportId: z.string().trim().min(1).optional(),
     targetDestinationId: z.string().trim().min(1).optional(),
     destinationCityName: z.string().trim().min(2).max(160).optional(),
-    destinationCountryCode: z.string().regex(/^[A-Z]{2}$/).optional(),
+    destinationCountryCode: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .optional(),
     fixedDeparture: isoDate.optional(),
     fixedReturn: isoDate.optional(),
     earliestDeparture: isoDate.optional(),
