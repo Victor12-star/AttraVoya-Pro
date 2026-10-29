@@ -461,6 +461,15 @@ export function BudgetPlannerPage({
                           setCitySearch(event.target.value);
                           setSelectedCity('');
                         }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'ArrowDown') {
+                            const first = document.querySelector('#planner-city-options button');
+                            if (first instanceof HTMLElement) {
+                              event.preventDefault();
+                              first.focus();
+                            }
+                          }
+                        }}
                         placeholder="Type at least two letters, e.g. Rom"
                         disabled={!selectedCountry || cityLookupState === 'loading'}
                       />
@@ -473,7 +482,17 @@ export function BudgetPlannerPage({
                       {cityLookupState === 'success' &&
                       citySearch.trim().length >= 2 &&
                       !selectedCity ? (
-                        <ul className={styles.suggestionList} aria-label="City suggestions">
+                        <ul
+                          id="planner-city-options"
+                          className={styles.suggestionList}
+                          aria-label="City suggestions"
+                          onKeyDown={(event) => {
+                            if (event.key === 'Escape') {
+                              event.preventDefault();
+                              document.getElementById('planner-city-search')?.focus();
+                            }
+                          }}
+                        >
                           {cityOptions
                             .filter((city) =>
                               city.name.toLowerCase().includes(citySearch.trim().toLowerCase()),
