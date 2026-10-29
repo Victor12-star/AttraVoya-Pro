@@ -149,6 +149,14 @@ export function BudgetPlannerPage({
     /** @type {{ id: string, name: string }[]} */ ([]),
   );
   const [realCityLookupState, setRealCityLookupState] = useState('idle');
+  const unpublishedCities = realCityOptions.filter(
+    (city) =>
+      !cityOptions.some(
+        (published) => published.name.toLowerCase() === city.name.toLowerCase(),
+      ),
+  );
+  const showRealCities =
+    citySearch.trim().length >= 2 && !selectedCity && unpublishedCities.length > 0;
   const citySuggestions = useMemo(() => {
     const term = citySearch.trim().toLowerCase();
     if (term.length < 2) return [];
@@ -611,21 +619,13 @@ export function BudgetPlannerPage({
                       citySuggestions.length === 0 ? (
                         <p role="status">No matching published destinations. Checking real cities…</p>
                       ) : null}
-                      {citySearch.trim().length >= 2 && !selectedCity && realCityOptions.length ? (
+                      {showRealCities ? (
                         <div>
                           <p>Real cities found (not yet published as bookable destinations):</p>
                           <ul aria-label="Real city search results">
-                            {realCityOptions
-                              .filter(
-                                (city) =>
-                                  !cityOptions.some(
-                                    (published) =>
-                                      published.name.toLowerCase() === city.name.toLowerCase(),
-                                  ),
-                              )
-                              .map((city) => (
-                                <li key={city.id}>{city.name} — not yet available to save</li>
-                              ))}
+                            {unpublishedCities.map((city) => (
+                              <li key={city.id}>{city.name} — not yet available to save</li>
+                            ))}
                           </ul>
                         </div>
                       ) : null}
