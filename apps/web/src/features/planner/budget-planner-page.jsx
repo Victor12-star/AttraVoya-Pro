@@ -284,13 +284,23 @@ export function BudgetPlannerPage({
 
   useEffect(() => {
     const query = citySearch.trim();
-    if (destinationMode !== 'CITY' || !selectedCountry || selectedCity || query.length < 2) {
+    if (
+      destinationMode !== 'CITY' ||
+      !selectedCountry ||
+      selectedCity ||
+      query.length < 2
+    ) {
       return;
     }
     let active = true;
     const timer = setTimeout(() => {
       apiClient
-        .autocompletePlaces({ query, countryCode: selectedCountry, limit: 8, language: 'en' })
+        .autocompletePlaces({
+          query,
+          countryCode: selectedCountry,
+          limit: 8,
+          language: 'en',
+        })
         .then((response) => {
           if (!active) return;
           const results = response?.places?.results;
