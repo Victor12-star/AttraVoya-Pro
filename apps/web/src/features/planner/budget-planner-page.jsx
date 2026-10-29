@@ -690,7 +690,7 @@ export function BudgetPlannerPage({
                   ) : null}
                   <p id="planner-scope-hint" className={styles.privacy}>
                     {destinationMode === 'CITY'
-                      ? 'A selected published city can now be saved as a planning brief. No prices, availability, or itinerary are generated yet.'
+                      ? 'A selected geographic city can be saved as a planning brief. This does not mean the destination is published or bookable, and no live prices or availability are provided.'
                       : countryCityPreviewNotice}
                   </p>
                   {destinationMode === 'COUNTRY' ? (
