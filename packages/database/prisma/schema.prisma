@@ -644,6 +644,8 @@ model TravelPlanRequest {
   originAirportId     String?
   originLabel         String
   targetDestinationId String?
+  destinationCityName String?
+  destinationCountryCode String?             @db.VarChar(2)
   earliestDeparture   DateTime?            @db.Date
   latestReturn        DateTime?            @db.Date
   fixedDeparture      DateTime?            @db.Date
