@@ -616,7 +616,9 @@ export function BudgetPlannerPage({
                       citySearch.trim().length >= 2 &&
                       !selectedCity &&
                       citySuggestions.length === 0 ? (
-                        <p role="status">No matching published destinations. Checking real cities…</p>
+                        <p role="status">
+                          No matching published destinations. Checking real cities…
+                        </p>
                       ) : null}
                       {showRealCities ? (
                         <div>
@@ -637,7 +639,9 @@ export function BudgetPlannerPage({
                       citySuggestions.length === 0 &&
                       realCityOptions.length === 0 &&
                       citySearch.trim().length >= 2 ? (
-                        <p role="status">No matching real cities were returned for this country.</p>
+                        <p role="status">
+                          No matching real cities were returned for this country.
+                        </p>
                       ) : null}
                       {!selectedCountry ? (
                         <p>Select a country to browse published destination cities.</p>
