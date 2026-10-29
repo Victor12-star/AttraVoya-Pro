@@ -57,6 +57,15 @@ function mapPlannerRequest(record) {
       cityId: record.originCityId,
       airportId: record.originAirportId,
     },
+    geographicDestination:
+      record.destinationCityName && record.destinationCountryCode
+        ? {
+            cityName: record.destinationCityName,
+            countryCode: record.destinationCountryCode,
+            source: 'USER_SELECTED_PLACE',
+            published: false,
+          }
+        : null,
     targetDestination: record.targetDestination
       ? {
           id: record.targetDestination.id,

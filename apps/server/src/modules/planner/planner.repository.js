@@ -5,6 +5,8 @@ const plannerRequestSelect = {
   originAirportId: true,
   originLabel: true,
   targetDestinationId: true,
+  destinationCityName: true,
+  destinationCountryCode: true,
   earliestDeparture: true,
   latestReturn: true,
   fixedDeparture: true,
