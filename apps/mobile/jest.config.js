@@ -6,10 +6,9 @@ const config = {
   resetMocks: true,
   restoreMocks: true,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  // Allow Jest/Babel to transform the ESM-only patched URI decoder used by Expo Router.
-  // Keep Expo and React Native's regular transform allowlist intact for pnpm layouts.
+  // Use Expo's pnpm-compatible transform allowlist, including the patched ESM decoder.
   transformIgnorePatterns: [
-    'node_modules/(?!\\.pnpm/decode-uri-component@|decode-uri-component/|((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg))',
+    'node_modules/(?!(\\.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|decode-uri-component))',
   ],
   testMatch: [
     '<rootDir>/src/**/*.test.js',
