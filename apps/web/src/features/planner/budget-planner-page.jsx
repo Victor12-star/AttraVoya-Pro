@@ -140,6 +140,7 @@ export function BudgetPlannerPage({
     [countrySearch, locale],
   );
   const [selectedCity, setSelectedCity] = useState('');
+  const [selectedRealCity, setSelectedRealCity] = useState('');
   const [citySearch, setCitySearch] = useState('');
   const [cityOptions, setCityOptions] = useState(
     /** @type {{ id: string, name: string, destinationId: string }[]} */ ([]),
@@ -153,7 +154,7 @@ export function BudgetPlannerPage({
   const unpublishedCities = realCityOptions.filter(
     (city) => !publishedCityNames.has(city.name.toLowerCase()),
   );
-  const cityQueryReady = citySearch.trim().length >= 2 && !selectedCity;
+  const cityQueryReady = citySearch.trim().length >= 2 && !selectedCity && !selectedRealCity;
   const showRealCities = cityQueryReady && unpublishedCities.length > 0;
   const citySuggestions = useMemo(() => {
     const term = citySearch.trim().toLowerCase();
@@ -284,7 +285,7 @@ export function BudgetPlannerPage({
 
   useEffect(() => {
     const query = citySearch.trim();
-    if (destinationMode !== 'CITY' || !selectedCountry || selectedCity || query.length < 2) {
+    if (destinationMode !== 'CITY' || !selectedCountry || selectedCity || selectedRealCity || query.length < 2) {
       return;
     }
     let active = true;
@@ -325,7 +326,7 @@ export function BudgetPlannerPage({
       active = false;
       clearTimeout(timer);
     };
-  }, [destinationMode, selectedCountry, selectedCity, citySearch]);
+  }, [destinationMode, selectedCountry, selectedCity, selectedRealCity, citySearch]);
 
   async function previewScopedDestinations() {
     const requestId = drafts[0]?.id;
@@ -370,7 +371,7 @@ export function BudgetPlannerPage({
     event.preventDefault();
     if (destinationMode === 'COUNTRY') return;
     const chosenCity = cityOptions.find((city) => city.id === selectedCity);
-    if (destinationMode === 'CITY' && (!selectedCountry || !chosenCity)) return;
+    if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) return;
     const form = new FormData(event.currentTarget);
     const maxNightlyAmount = String(form.get('maxNightlyAmount') ?? '').trim();
     const maxTotalStayAmount = String(form.get('maxTotalStayAmount') ?? '').trim();
@@ -386,6 +387,9 @@ export function BudgetPlannerPage({
     const raw = {
       ...(destinationMode === 'CITY' && chosenCity
         ? { targetDestinationId: chosenCity.destinationId }
+        : {}),
+      ...(destinationMode === 'CITY' && selectedRealCity && !chosenCity
+        ? { destinationCityName: selectedRealCity, destinationCountryCode: selectedCountry }
         : {}),
       originLabel: String(form.get('originLabel') ?? '').trim(),
       flexibleDates: dateMode === 'flexible',
@@ -543,6 +547,7 @@ export function BudgetPlannerPage({
                         setCountrySearch(event.target.value);
                         setSelectedCountry('');
                         setSelectedCity('');
+                        setSelectedRealCity('');
                         setCitySearch('');
                       }}
                       placeholder="Type at least two letters, e.g. Ita"
@@ -626,6 +631,7 @@ export function BudgetPlannerPage({
                                 }}
                                 onClick={() => {
                                   setSelectedCity(city.id);
+                                  setSelectedRealCity('');
                                   setCitySearch(city.name);
                                 }}
                               >
@@ -645,10 +651,21 @@ export function BudgetPlannerPage({
                       ) : null}
                       {showRealCities ? (
                         <div>
-                          <p>Real cities found (not yet published as bookable destinations):</p>
+                          <p>Real cities found for saving a planning brief (not published or bookable):</p>
                           <ul aria-label="Real city search results">
                             {unpublishedCities.map((city) => (
-                              <li key={city.id}>{city.name} — not yet available to save</li>
+                              <li key={city.id}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCity('');
+                                    setSelectedRealCity(city.name);
+                                    setCitySearch(city.name);
+                                  }}
+                                >
+                                  {city.name}
+                                </button>
+                              </li>
                             ))}
                           </ul>
                         </div>
@@ -995,6 +1012,7 @@ export function BudgetPlannerPage({
                 submitting ||
                 destinationMode === 'COUNTRY' ||
                 (destinationMode === 'CITY' &&
+                  !selectedRealCity &&
                   !cityOptions.some((city) => city.id === selectedCity))
               }
             >
