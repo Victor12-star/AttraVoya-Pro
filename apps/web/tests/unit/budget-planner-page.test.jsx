@@ -149,6 +149,37 @@ describe('BudgetPlannerPage', () => {
     expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
   });
 
+  it('shows provider cities without treating them as published destination IDs', async () => {
+    mocks.getPublicCountryCityCandidates.mockResolvedValue({ destinations: [] });
+    mocks.autocompletePlaces.mockResolvedValue({
+      places: {
+        results: [{
+          externalId: 'geoapify-barcelona',
+          name: 'Barcelona',
+          countryCode: 'ES',
+          resultType: 'city',
+        }],
+      },
+    });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Specific city' }));
+    fireEvent.change(screen.getByLabelText('Destination country'), {
+      target: { value: 'Spa' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Spain' }));
+    fireEvent.change(screen.getByLabelText('Destination city'), {
+      target: { value: 'bar' },
+    });
+    expect(await screen.findByText(/Barcelona — not yet available to save/)).toBeVisible();
+    expect(mocks.autocompletePlaces).toHaveBeenCalledWith({
+      query: 'bar',
+      countryCode: 'ES',
+      limit: 8,
+      language: 'en',
+    });
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+  });
+
   it('suggests published city names without exposing catalog IDs to travelers', async () => {
     mocks.listBudgetPlanRequests.mockRejectedValue(new ApiClientError('Unauthenticated', 401));
     mocks.getPublicCountryCityCandidates.mockResolvedValue({
