@@ -611,7 +611,9 @@ export function BudgetPlannerPage({
                       citySuggestions.length === 0 ? (
                         <p role="status">No matching published destinations. Checking real cities…</p>
                       ) : null}
-                      {citySearch.trim().length >= 2 && !selectedCity && realCityOptions.length > 0 ? (
+                      {citySearch.trim().length >= 2 &&
+                      !selectedCity &&
+                      realCityOptions.length > 0 ? (
                         <div>
                           <p>Real cities found (not yet published as bookable destinations):</p>
                           <ul aria-label="Real city search results">
@@ -630,7 +632,9 @@ export function BudgetPlannerPage({
                         </div>
                       ) : null}
                       {realCityLookupState === 'error' && citySearch.trim().length >= 2 ? (
-                        <p role="status">Live city search is unavailable. Published destinations remain selectable.</p>
+                        <p role="status">
+                          Live city search is unavailable. Published destinations remain selectable.
+                        </p>
                       ) : null}
                       {realCityLookupState === 'success' &&
                       citySuggestions.length === 0 &&
