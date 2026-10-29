@@ -165,6 +165,7 @@ export function BudgetPlannerPage({
     }),
   );
   const [originSearch, setOriginSearch] = useState(initialOrigin);
+  const [originSelected, setOriginSelected] = useState(false);
   const [originSuggestions, setOriginSuggestions] = useState(
     /** @type {string[]} */ ([]),
   );
@@ -172,7 +173,7 @@ export function BudgetPlannerPage({
 
   useEffect(() => {
     const query = originSearch.trim();
-    if (query.length < 2) return;
+    if (query.length < 2 || originSelected) return;
     let active = true;
     const timer = setTimeout(() => {
       apiClient
@@ -195,7 +196,7 @@ export function BudgetPlannerPage({
       active = false;
       clearTimeout(timer);
     };
-  }, [originSearch]);
+  }, [originSearch, originSelected]);
 
   const [dateMode, setDateMode] = useState('flexible');
   const [currency, setCurrency] = useState(defaultCurrency);
@@ -630,6 +631,7 @@ export function BudgetPlannerPage({
                 value={originSearch}
                 onChange={(event) => {
                   setOriginSearch(event.target.value);
+                  setOriginSelected(false);
                   setOriginLookupState('idle');
                   setOriginSuggestions([]);
                 }}
@@ -643,6 +645,7 @@ export function BudgetPlannerPage({
                         type="button"
                         onClick={() => {
                           setOriginSearch(name);
+                          setOriginSelected(true);
                           setOriginSuggestions([]);
                           setOriginLookupState('idle');
                         }}
