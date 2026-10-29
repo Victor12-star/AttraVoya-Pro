@@ -153,12 +153,14 @@ describe('BudgetPlannerPage', () => {
     mocks.getPublicCountryCityCandidates.mockResolvedValue({ destinations: [] });
     mocks.autocompletePlaces.mockResolvedValue({
       places: {
-        results: [{
-          externalId: 'geoapify-barcelona',
-          name: 'Barcelona',
-          countryCode: 'ES',
-          resultType: 'city',
-        }],
+        results: [
+          {
+            externalId: 'geoapify-barcelona',
+            name: 'Barcelona',
+            countryCode: 'ES',
+            resultType: 'city',
+          },
+        ],
       },
     });
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
