@@ -478,6 +478,12 @@ export function BudgetPlannerPage({
                             .filter((city) =>
                               city.name.toLowerCase().includes(citySearch.trim().toLowerCase()),
                             )
+                            .sort((a, b) => {
+                              const term = citySearch.trim().toLowerCase();
+                              const aPrefix = a.name.toLowerCase().startsWith(term) ? 0 : 1;
+                              const bPrefix = b.name.toLowerCase().startsWith(term) ? 0 : 1;
+                              return aPrefix - bPrefix || a.name.localeCompare(b.name);
+                            })
                             .slice(0, 8)
                             .map((city) => (
                               <li key={city.id}>
