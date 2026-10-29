@@ -156,7 +156,7 @@ describe('BudgetPlannerPage', () => {
     expect(mocks.createBudgetPlanRequest).not.toHaveBeenCalled();
   });
 
-  it('shows provider cities without treating them as published destination IDs', async () => {
+  it('allows selecting provider cities without inventing published destination IDs', async () => {
     mocks.getPublicCountryCityCandidates.mockResolvedValue({ destinations: [] });
     mocks.autocompletePlaces.mockResolvedValue({
       places: {
@@ -179,14 +179,26 @@ describe('BudgetPlannerPage', () => {
     fireEvent.change(screen.getByLabelText('Destination city'), {
       target: { value: 'bar' },
     });
-    expect(await screen.findByText(/Barcelona — not yet available to save/)).toBeVisible();
+    expect(await screen.findByRole('button', { name: 'Barcelona' })).toBeVisible();
     expect(mocks.autocompletePlaces).toHaveBeenCalledWith({
       query: 'bar',
       countryCode: 'ES',
       limit: 8,
       language: 'en',
     });
-    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Barcelona' }));
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    fillFixedPlan();
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    await waitFor(() =>
+      expect(mocks.createBudgetPlanRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          destinationCityName: 'Barcelona',
+          destinationCountryCode: 'ES',
+        }),
+        expect.any(String),
+      ),
+    );
   });
 
   it('suggests published city names without exposing catalog IDs to travelers', async () => {
