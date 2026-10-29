@@ -1,0 +1,35 @@
+name: Temporary planner Prettier fix
+on:
+  push:
+    branches:
+      - feat/planner-provider-city-discovery
+    paths:
+      - .github/workflows/temp-planner-prettier.yml
+permissions:
+  contents: write
+jobs:
+  format-planner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Format planner component
+        run: pnpm exec prettier --write apps/web/src/features/planner/budget-planner-page.jsx
+      - name: Commit formatted file if needed
+        run: |
+          if ! git diff --quiet -- apps/web/src/features/planner/budget-planner-page.jsx; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add apps/web/src/features/planner/budget-planner-page.jsx
+            git commit -m "style(planner): apply repository Prettier formatter"
+            git push
+          fi
