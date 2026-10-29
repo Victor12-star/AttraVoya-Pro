@@ -526,9 +526,7 @@ export function BudgetPlannerPage({
                       citySearch.trim().length >= 2 &&
                       !selectedCity &&
                       citySuggestions.length === 0 ? (
-                        <p role="status">
-                          No matching published cities. Try another search.
-                        </p>
+                        <p role="status">No matching published cities. Try another search.</p>
                       ) : null}
                       {!selectedCountry ? (
                         <p>Select a country to browse published destination cities.</p>
