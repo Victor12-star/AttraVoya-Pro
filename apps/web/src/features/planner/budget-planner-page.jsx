@@ -145,6 +145,10 @@ export function BudgetPlannerPage({
     /** @type {{ id: string, name: string, destinationId: string }[]} */ ([]),
   );
   const [cityLookupState, setCityLookupState] = useState('idle');
+  const [realCityOptions, setRealCityOptions] = useState(
+    /** @type {{ id: string, name: string }[]} */ ([]),
+  );
+  const [realCityLookupState, setRealCityLookupState] = useState('idle');
   const citySuggestions = useMemo(() => {
     const term = citySearch.trim().toLowerCase();
     if (term.length < 2) return [];
@@ -271,6 +275,50 @@ export function BudgetPlannerPage({
       active = false;
     };
   }, [destinationMode, selectedCountry]);
+
+  useEffect(() => {
+    const query = citySearch.trim();
+    if (destinationMode !== 'CITY' || !selectedCountry || selectedCity || query.length < 2) {
+      return;
+    }
+    let active = true;
+    const timer = setTimeout(() => {
+      apiClient
+        .autocompletePlaces({ query, countryCode: selectedCountry, limit: 8, language: 'en' })
+        .then((response) => {
+          if (!active) return;
+          const results = response?.places?.results;
+          const seen = new Set();
+          const cities = (Array.isArray(results) ? results : [])
+            .filter(
+              (place) =>
+                place &&
+                place.countryCode === selectedCountry &&
+                ['city', 'town', 'village', 'municipality'].includes(place.resultType) &&
+                typeof place.name === 'string' &&
+                place.name.toLowerCase().includes(query.toLowerCase()),
+            )
+            .map((place) => ({ id: place.externalId ?? place.name, name: place.name }))
+            .filter((place) => {
+              const key = place.name.toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          setRealCityOptions(cities);
+          setRealCityLookupState('success');
+        })
+        .catch(() => {
+          if (!active) return;
+          setRealCityOptions([]);
+          setRealCityLookupState('error');
+        });
+    }, 300);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [destinationMode, selectedCountry, selectedCity, citySearch]);
 
   async function previewScopedDestinations() {
     const requestId = drafts[0]?.id;
@@ -506,6 +554,8 @@ export function BudgetPlannerPage({
                         onChange={(event) => {
                           setCitySearch(event.target.value);
                           setSelectedCity('');
+                          setRealCityOptions([]);
+                          setRealCityLookupState('idle');
                         }}
                         onKeyDown={(event) => {
                           if (event.key === 'ArrowDown') {
@@ -517,7 +567,7 @@ export function BudgetPlannerPage({
                           }
                         }}
                         placeholder="Type at least two letters, e.g. Rom"
-                        disabled={!selectedCountry || cityLookupState === 'loading'}
+                        disabled={!selectedCountry}
                       />
                       {cityLookupState === 'loading' ? (
                         <p role="status">Loading available cities…</p>
@@ -559,7 +609,34 @@ export function BudgetPlannerPage({
                       citySearch.trim().length >= 2 &&
                       !selectedCity &&
                       citySuggestions.length === 0 ? (
-                        <p role="status">No matching published cities. Try another search.</p>
+                        <p role="status">No matching published destinations. Checking real cities…</p>
+                      ) : null}
+                      {citySearch.trim().length >= 2 && !selectedCity && realCityOptions.length > 0 ? (
+                        <div>
+                          <p>Real cities found (not yet published as bookable destinations):</p>
+                          <ul aria-label="Real city search results">
+                            {realCityOptions
+                              .filter(
+                                (city) =>
+                                  !cityOptions.some(
+                                    (published) =>
+                                      published.name.toLowerCase() === city.name.toLowerCase(),
+                                  ),
+                              )
+                              .map((city) => (
+                                <li key={city.id}>{city.name} — not yet available to save</li>
+                              ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {realCityLookupState === 'error' && citySearch.trim().length >= 2 ? (
+                        <p role="status">Live city search is unavailable. Published destinations remain selectable.</p>
+                      ) : null}
+                      {realCityLookupState === 'success' &&
+                      citySuggestions.length === 0 &&
+                      realCityOptions.length === 0 &&
+                      citySearch.trim().length >= 2 ? (
+                        <p role="status">No matching real cities were returned for this country.</p>
                       ) : null}
                       {!selectedCountry ? (
                         <p>Select a country to browse published destination cities.</p>
