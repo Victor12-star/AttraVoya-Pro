@@ -178,8 +178,9 @@ export function BudgetPlannerPage({
         .autocompletePlaces({ query, limit: 8, language: 'en' })
         .then((response) => {
           if (!active) return;
-          const names = (response?.places ?? [])
-            .map((place) => place.formatted ?? place.name ?? '')
+          const results = response?.places?.results;
+          const names = (Array.isArray(results) ? results : [])
+            .map((place) => place.formattedAddress ?? place.name ?? '')
             .filter((name) => typeof name === 'string' && name.trim().length > 0);
           setOriginSuggestions([...new Set(names)].slice(0, 8));
           setOriginLookupState('success');

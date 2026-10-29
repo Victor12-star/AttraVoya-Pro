@@ -85,6 +85,28 @@ describe('BudgetPlannerPage', () => {
     mocks.createBudgetPlanRequest.mockResolvedValue({ planRequest: savedRequest() });
   });
 
+  it('displays normalized Geoapify origin suggestions from the API response', async () => {
+    mocks.autocompletePlaces.mockResolvedValue({
+      places: {
+        provider: 'geoapify',
+        results: [
+          { name: 'Stockholm', formattedAddress: 'Stockholm, Sweden' },
+          { name: 'Stockholm', formattedAddress: 'Stockholm, Sweden' },
+        ],
+      },
+    });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    fireEvent.change(screen.getByLabelText('Where are you travelling from?'), {
+      target: { value: 'sto' },
+    });
+    expect(await screen.findByRole('button', { name: 'Stockholm, Sweden' })).toBeVisible();
+    expect(screen.queryByText(/Origin suggestions are unavailable/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Stockholm, Sweden' }));
+    expect(screen.getByLabelText('Where are you travelling from?')).toHaveValue(
+      'Stockholm, Sweden',
+    );
+  });
+
   it('keeps open destination saving available and guards unconnected scoped choices', async () => {
     render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
     expect(screen.getByRole('radio', { name: 'Destination is open' })).toBeChecked();
