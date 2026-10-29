@@ -441,7 +441,10 @@ export function BudgetPlannerPage({
         return fieldNames[field] ?? field;
       });
       const fields = [...new Set(issues)].join(', ');
-      setSubmitState({ type: 'error', message: fields ? `${copy.invalid} Check: ${fields}.` : copy.invalid });
+      setSubmitState({
+        type: 'error',
+        message: fields ? `${copy.invalid} Check: ${fields}.` : copy.invalid,
+      });
       return;
     }
 
