@@ -55,6 +55,8 @@ function comparableInput(input) {
     originCityId: input.originCityId ?? null,
     originAirportId: input.originAirportId ?? null,
     targetDestinationId: input.targetDestinationId ?? null,
+    destinationCityName: input.destinationCityName ?? null,
+    destinationCountryCode: input.destinationCountryCode ?? null,
     earliestDeparture: input.earliestDeparture ?? null,
     latestReturn: input.latestReturn ?? null,
     fixedDeparture: input.fixedDeparture ?? null,
