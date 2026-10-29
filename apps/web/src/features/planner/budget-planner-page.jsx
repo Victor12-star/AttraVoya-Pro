@@ -149,14 +149,12 @@ export function BudgetPlannerPage({
     /** @type {{ id: string, name: string }[]} */ ([]),
   );
   const [realCityLookupState, setRealCityLookupState] = useState('idle');
+  const publishedCityNames = new Set(cityOptions.map((city) => city.name.toLowerCase()));
   const unpublishedCities = realCityOptions.filter(
-    (city) =>
-      !cityOptions.some(
-        (published) => published.name.toLowerCase() === city.name.toLowerCase(),
-      ),
+    (city) => !publishedCityNames.has(city.name.toLowerCase()),
   );
-  const showRealCities =
-    citySearch.trim().length >= 2 && !selectedCity && unpublishedCities.length > 0;
+  const cityQueryReady = citySearch.trim().length >= 2 && !selectedCity;
+  const showRealCities = cityQueryReady && unpublishedCities.length > 0;
   const citySuggestions = useMemo(() => {
     const term = citySearch.trim().toLowerCase();
     if (term.length < 2) return [];
