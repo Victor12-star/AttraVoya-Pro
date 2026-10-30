@@ -17,6 +17,7 @@ test('evaluates healthy aggregate evidence without claiming deployment health', 
   const result = evaluateSloSnapshot(snapshot());
   assert.equal(result.scope, 'AGGREGATE_WINDOW_ONLY');
   assert.equal(result.productionClaimEligible, true);
+  assert.equal(result.productionTargetsMet, true);
   assert.equal(result.availability.status, 'MEETS_TARGET');
   assert.equal(result.nonProviderLatency.status, 'MEETS_TARGET');
   const consumed = result.availability.errorBudgetConsumedRatio;
@@ -28,6 +29,8 @@ test('identifies availability and latency failures', () => {
   const result = evaluateSloSnapshot(
     snapshot({ serverErrors: 200, nonProviderLatency: { sampleCount: 2, p95Ms: 500 } }),
   );
+  assert.equal(result.productionClaimEligible, true);
+  assert.equal(result.productionTargetsMet, false);
   assert.equal(result.availability.status, 'BREACH');
   assert.equal(result.nonProviderLatency.status, 'BREACH');
 });
@@ -35,6 +38,7 @@ test('identifies availability and latency failures', () => {
 test('short window cannot justify production claims', () => {
   const result = evaluateSloSnapshot(snapshot({ observationWindowSeconds: 3600 }));
   assert.equal(result.productionClaimEligible, false);
+  assert.equal(result.productionTargetsMet, false);
 });
 
 test('zero traffic or latency samples remain unknown', () => {
@@ -48,6 +52,7 @@ test('zero traffic or latency samples remain unknown', () => {
   assert.equal(result.productionClaimEligible, false);
   assert.equal(result.availability.status, 'INSUFFICIENT_DATA');
   assert.equal(result.nonProviderLatency.status, 'INSUFFICIENT_DATA');
+  assert.equal(result.productionTargetsMet, false);
   assert.equal(result.availability.observedRatio, null);
 });
 
