@@ -1099,9 +1099,19 @@ export function BudgetPlannerPage({
                   return (
                     <li className={styles.draft} key={request.id}>
                       <div className={styles.draftTop}>
-                        <strong>{request.origin?.label ?? copy.openDestination}</strong>
+                        <strong>
+                          {request.geographicDestination?.cityName
+                            ? `${request.geographicDestination.cityName}, ${request.geographicDestination.countryCode}`
+                            : request.targetDestination?.name ?? copy.openDestination}
+                        </strong>
                         <span>{request.status}</span>
                       </div>
+                      <p className={styles.privacy}>
+                        Leaving from {request.origin?.label ?? 'an unspecified departure point'}.
+                        {request.geographicDestination
+                          ? ' This is a saved geographic destination, not a bookable offer.'
+                          : ' This brief does not confirm prices or bookings.'}
+                      </p>
                       <div className={styles.draftMeta}>
                         <span>
                           <CircleDollarSign size={15} />
