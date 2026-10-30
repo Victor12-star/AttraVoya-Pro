@@ -112,7 +112,7 @@ Status: Phase 6A + 6B provider batch implemented and verified through CI.
 
 ## Phase 7 — Customer website vertical slices
 
-Status: next active phase.
+Status: historic starting point recorded at Phase 6B; several later Phase 7–10 slices exist.\nCompletion remains subject to a feature-by-feature audit, not this historic status.
 
 Build each feature end-to-end instead of creating disconnected pages:
 
@@ -173,7 +173,7 @@ A feature is complete only when the applicable items are true:
 - automated tests;
 - no exposed secrets or unresolved critical errors.
 
-## Current checkpoint — Phase 6B complete
+## Current checkpoint — Phase 10 reliability verification (30 October 2026)\n\nThe historic Phase 6B checkpoint below is retained for traceability. The integration\nbranch is now at `d5377b3e5daf315cc0a20be63fee21db05af5504` (PR #484), with\nindependently confirmed 5/5 post-merge CI run #2067. Current work remains in\nPhase 10: inspect aggregate SLO evidence, security and operational readiness,\nthen reconcile remaining earlier-phase gaps before declaring any phase complete.\nThe saved Budget Planner brief is not a generated or priced holiday; full\nbudget-based holiday construction remains an unverified Phase 7 requirement.\nNo public launch has been approved. Do not infer a green release gate from CI alone.\n\n## Historical checkpoint — Phase 6B complete
 
 The planned no-cost development provider layer is now complete: Geoapify,
 Open-Meteo, Frankfurter, LibreTranslate, Ticketmaster, NewsData.io, Pexels and
