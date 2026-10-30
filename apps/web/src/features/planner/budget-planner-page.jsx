@@ -27,6 +27,8 @@ import styles from './budget-planner-page.module.css';
  * @typedef {object} PlannerDraft
  * @property {string} id
  * @property {{label?: string|null}|null|undefined} origin
+ * @property {{cityName: string, countryCode: string}|null|undefined} geographicDestination
+ * @property {{name?: string}|null|undefined} targetDestination
  * @property {{flexible?: boolean, fixedDeparture?: string|null, fixedReturn?: string|null, earliestDeparture?: string|null, latestReturn?: string|null}|null|undefined} dates
  * @property {{amount?: string|null, currencyCode?: string|null}|null|undefined} budget
  * @property {{adults?: number, childrenAges?: number[]}|null|undefined} travellers
