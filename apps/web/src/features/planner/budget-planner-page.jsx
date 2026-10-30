@@ -380,7 +380,8 @@ export function BudgetPlannerPage({
     if (destinationMode === 'COUNTRY') {
       setSubmitState({
         type: 'error',
-        message: 'Country-only planning is not yet supported. Choose a specific city or Destination is open.',
+        message:
+          'Country-only planning is not yet supported. Choose a specific city or Destination is open.',
       });
       return;
     }
@@ -388,7 +389,8 @@ export function BudgetPlannerPage({
     if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) {
       setSubmitState({
         type: 'error',
-        message: 'Select a country and then click a city suggestion before saving your holiday brief.',
+        message:
+          'Select a country and then click a city suggestion before saving your holiday brief.',
       });
       return;
     }
@@ -1030,11 +1032,7 @@ export function BudgetPlannerPage({
               </div>
             ) : null}
 
-            <button
-              className="button button--dark"
-              type="submit"
-              disabled={submitting}
-            >
+            <button className="button button--dark" type="submit" disabled={submitting}>
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
               ) : (
@@ -1108,7 +1106,7 @@ export function BudgetPlannerPage({
                         <strong>
                           {request.geographicDestination?.cityName
                             ? `${request.geographicDestination.cityName}, ${request.geographicDestination.countryCode}`
-                            : request.targetDestination?.name ?? copy.openDestination}
+                            : (request.targetDestination?.name ?? copy.openDestination)}
                         </strong>
                         <span>{request.status}</span>
                       </div>

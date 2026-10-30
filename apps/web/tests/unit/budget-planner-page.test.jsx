@@ -142,7 +142,9 @@ describe('BudgetPlannerPage', () => {
     expect(screen.getByLabelText('Destination country')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
-    expect(screen.getByRole('alert')).toHaveTextContent(/Country-only planning is not yet supported/);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      /Country-only planning is not yet supported/,
+    );
     expect(screen.getByText(/Country and city selection is a preview/)).toBeVisible();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Specific city' }));
