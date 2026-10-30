@@ -1,0 +1,35 @@
+name: Temporary format planner brief files
+on:
+  push:
+    branches:
+      - feat/planner-saved-holiday-summary
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/planner-saved-holiday-summary
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.20.0'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Format changed planner files
+        run: pnpm exec prettier --write apps/web/src/features/planner/budget-planner-page.jsx apps/web/tests/unit/budget-planner-page.test.jsx
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/features/planner/budget-planner-page.jsx apps/web/tests/unit/budget-planner-page.test.jsx
+          if ! git diff --cached --quiet; then
+            git commit -m "style(planner): format saving interaction"
+            git push
+          fi
