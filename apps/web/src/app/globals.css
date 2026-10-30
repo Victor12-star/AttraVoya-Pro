@@ -208,7 +208,6 @@ img {
   height: 1px;
   background: var(--brand-primary);
   transform: scaleX(0);
-  transition: transform 180ms ease;
 }
 .desktop-nav a:hover::after {
   transform: scaleX(1);
@@ -519,8 +518,8 @@ img {
   padding-block: 40px 104px;
 }
 .section--tools {
-  background: #0b2b30;
-  color: #fff;
+  background: #f6f2ea;
+  color: #24364c;
 }
 .section--safety {
   padding-block: 80px 110px;
@@ -562,10 +561,10 @@ img {
   text-transform: uppercase;
 }
 .section-heading--light .eyebrow {
-  color: #a9d2cd;
+  color: #735e42;
 }
 .section-heading--light h2 {
-  color: #fff;
+  color: #24364c;
 }
 
 .budget-quick-form {
@@ -781,32 +780,51 @@ img {
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.14);
+  gap: 14px;
 }
 .tool-grid a {
-  min-height: 155px;
+  min-height: 175px;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: 1fr auto;
-  align-items: start;
-  gap: 22px;
+  gap: 20px;
   padding: 26px;
-  background: #0b2b30;
-  color: #fff;
-  transition: background 180ms ease;
+  border: 1px solid #e6e1d9;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #24364c;
+  transition: transform 180ms ease;
 }
 .tool-grid a:hover {
-  background: #123b40;
+  border-color: #b9c9de;
 }
 .tool-grid a > svg:first-child {
-  color: #a9d2cd;
+  padding: 10px;
+  border-radius: 12px;
+  background: #edf3fb;
+  color: #3a5f99;
+}
+.tool-grid a:nth-child(6n + 2) > svg:first-child {
+  background: #e9f4ee;
+  color: #397b62;
+}
+.tool-grid a:nth-child(6n + 3) > svg:first-child {
+  background: #f6ecf9;
+  color: #8661a0;
+}
+.tool-grid a:nth-child(6n + 4) > svg:first-child {
+  background: #fff0e4;
+  color: #b26d3f;
+}
+.tool-grid a:nth-child(6n + 5) > svg:first-child {
+  background: #eaf3f4;
+  color: #377d88;
+}
+.tool-grid a:nth-child(6n + 6) > svg:first-child {
+  background: #f8edec;
+  color: #b6676d;
 }
 .tool-grid a > svg:last-child {
-  width: 18px;
+  color: #3a5f99;
 }
 .tool-grid strong {
   align-self: end;
