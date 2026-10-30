@@ -27,6 +27,8 @@ import styles from './budget-planner-page.module.css';
  * @typedef {object} PlannerDraft
  * @property {string} id
  * @property {{label?: string|null}|null|undefined} origin
+ * @property {{cityName: string, countryCode: string}|null|undefined} geographicDestination
+ * @property {{name?: string}|null|undefined} targetDestination
  * @property {{flexible?: boolean, fixedDeparture?: string|null, fixedReturn?: string|null, earliestDeparture?: string|null, latestReturn?: string|null}|null|undefined} dates
  * @property {{amount?: string|null, currencyCode?: string|null}|null|undefined} budget
  * @property {{adults?: number, childrenAges?: number[]}|null|undefined} travellers
@@ -375,9 +377,21 @@ export function BudgetPlannerPage({
 
   async function submit(event) {
     event.preventDefault();
-    if (destinationMode === 'COUNTRY') return;
+    if (destinationMode === 'COUNTRY') {
+      setSubmitState({
+        type: 'error',
+        message:
+          'Country-only planning is not yet supported. Choose a specific city or Destination is open.',
+      });
+      return;
+    }
     const chosenCity = cityOptions.find((city) => city.id === selectedCity);
     if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) {
+      setSubmitState({
+        type: 'error',
+        message:
+          'Select a country and then click a city suggestion before saving your holiday brief.',
+      });
       return;
     }
     const form = new FormData(event.currentTarget);
@@ -1018,17 +1032,7 @@ export function BudgetPlannerPage({
               </div>
             ) : null}
 
-            <button
-              className="button button--dark"
-              type="submit"
-              disabled={
-                submitting ||
-                destinationMode === 'COUNTRY' ||
-                (destinationMode === 'CITY' &&
-                  !selectedRealCity &&
-                  !cityOptions.some((city) => city.id === selectedCity))
-              }
-            >
+            <button className="button button--dark" type="submit" disabled={submitting}>
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
               ) : (
@@ -1099,9 +1103,19 @@ export function BudgetPlannerPage({
                   return (
                     <li className={styles.draft} key={request.id}>
                       <div className={styles.draftTop}>
-                        <strong>{request.origin?.label ?? copy.openDestination}</strong>
+                        <strong>
+                          {request.geographicDestination?.cityName
+                            ? `${request.geographicDestination.cityName}, ${request.geographicDestination.countryCode}`
+                            : (request.targetDestination?.name ?? copy.openDestination)}
+                        </strong>
                         <span>{request.status}</span>
                       </div>
+                      <p className={styles.privacy}>
+                        Leaving from {request.origin?.label ?? 'an unspecified departure point'}.
+                        {request.geographicDestination
+                          ? ' This is a saved geographic destination, not a bookable offer.'
+                          : ' This brief does not confirm prices or bookings.'}
+                      </p>
                       <div className={styles.draftMeta}>
                         <span>
                           <CircleDollarSign size={15} />
