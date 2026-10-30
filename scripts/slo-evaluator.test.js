@@ -64,3 +64,39 @@ test('invalid or unsafe aggregate observations fail closed', () => {
     evaluateSloSnapshot(snapshot({ nonProviderLatency: { sampleCount: -1, p95Ms: 400 } })),
   );
 });
+
+test('availability exactly at target passes while latency exactly at boundary fails', () => {
+  const result = evaluateSloSnapshot(
+    snapshot({ serverErrors: 100, nonProviderLatency: { sampleCount: 100, p95Ms: 500 } }),
+  );
+  assert.equal(result.availability.status, 'MEETS_TARGET');
+  assert.equal(result.nonProviderLatency.status, 'BREACH');
+  assert.equal(result.productionClaimEligible, true);
+  assert.equal(result.productionTargetsMet, false);
+});
+
+test('full observation window boundary is eligible only with both evidence types', () => {
+  const atBoundary = evaluateSloSnapshot(
+    snapshot({ observationWindowSeconds: PRODUCTION_SLO.rollingWindowSeconds }),
+  );
+  assert.equal(atBoundary.productionClaimEligible, true);
+  const belowBoundary = evaluateSloSnapshot(
+    snapshot({ observationWindowSeconds: PRODUCTION_SLO.rollingWindowSeconds - 1 }),
+  );
+  assert.equal(belowBoundary.productionClaimEligible, false);
+  assert.equal(belowBoundary.productionTargetsMet, false);
+  const noLatencyEvidence = evaluateSloSnapshot(
+    snapshot({ nonProviderLatency: { sampleCount: 0, p95Ms: 0 } }),
+  );
+  assert.equal(noLatencyEvidence.availability.status, 'MEETS_TARGET');
+  assert.equal(noLatencyEvidence.nonProviderLatency.status, 'INSUFFICIENT_DATA');
+  assert.equal(noLatencyEvidence.productionTargetsMet, false);
+});
+
+test('independent availability breach cannot be masked by fast latency', () => {
+  const result = evaluateSloSnapshot(snapshot({ serverErrors: 101 }));
+  assert.equal(result.availability.status, 'BREACH');
+  assert.equal(result.nonProviderLatency.status, 'MEETS_TARGET');
+  assert.equal(result.productionClaimEligible, true);
+  assert.equal(result.productionTargetsMet, false);
+});
