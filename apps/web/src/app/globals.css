@@ -795,7 +795,6 @@ img {
   border-radius: 20px;
   background: #ffffff;
   color: #24364c;
-  box-shadow: 0 8px 24px rgba(36, 54, 76, 0.04);
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -804,7 +803,6 @@ img {
 .tool-grid a:hover {
   transform: translateY(-3px);
   border-color: #b9c9de;
-  box-shadow: 0 14px 32px rgba(36, 54, 76, 0.1);
 }
 .tool-grid a > svg:first-child {
   width: 42px;
