@@ -1,18 +1,18 @@
 :root {
-  --background: #f8f5f0;
+  --background: #ffffff;
   --surface: #ffffff;
   --surface-elevated: #ffffff;
-  --surface-muted: #f0f8f6;
+  --surface-muted: #eff6ff;
   --text-primary: #101717;
   --text-secondary: #536161;
   --text-muted: #6c7978;
-  --brand-primary: #0b2b30;
-  --brand-secondary: #2b6a6c;
-  --brand-accent: #dd684c;
-  --brand-accent-hover: #c65339;
+  --brand-primary: #3a5f99;
+  --brand-secondary: #2563eb;
+  --brand-accent: #2563eb;
+  --brand-accent-hover: #1d4ed8;
   --border-subtle: #e8eceb;
   --border-strong: #aeb8b6;
-  --focus-ring: #3d8483;
+  --focus-ring: #2563eb;
   --success: #247a54;
   --warning: #a66618;
   --danger: #b83a3a;
@@ -147,6 +147,28 @@ img {
   background: color-mix(in srgb, var(--background) 91%, transparent);
   backdrop-filter: blur(18px) saturate(130%);
 }
+/* Customer light theme: slate-blue navigation with accessible white links. */
+:root:not([data-theme='dark']) .site-header {
+  background: #3a5f99;
+  border-bottom-color: #315180;
+  color: #ffffff;
+}
+:root:not([data-theme='dark']) .site-header .desktop-nav,
+:root:not([data-theme='dark']) .site-header .desktop-nav a,
+:root:not([data-theme='dark']) .site-header .mobile-menu-button {
+  color: #ffffff;
+}
+:root:not([data-theme='dark']) .site-header .desktop-nav a::after {
+  background: #ffffff;
+}
+:root:not([data-theme='dark']) .mobile-nav-panel {
+  background: #3a5f99;
+  color: #ffffff;
+}
+:root:not([data-theme='dark']) .mobile-nav > a:not(.button) {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
 .site-header__inner {
   min-height: 72px;
   display: flex;
@@ -298,7 +320,7 @@ img {
 }
 .button--dark {
   color: #fff;
-  background: #0b2b30;
+  background: #2563eb;
 }
 [data-theme='dark'] .button--dark {
   color: #071315;
@@ -884,8 +906,8 @@ img {
 
 .site-footer {
   padding: 72px 0 24px;
-  background: #071b1f;
-  color: rgba(255, 255, 255, 0.72);
+  background: #3a5f99;
+  color: rgba(255, 255, 255, 0.92);
 }
 .site-footer__grid {
   display: grid;
