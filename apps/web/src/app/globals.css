@@ -153,6 +153,16 @@ img {
   border-bottom-color: #315180;
   color: #ffffff;
 }
+:root:not([data-theme='dark']) .site-header .brand {
+  color: #ffffff;
+}
+:root:not([data-theme='dark']) .site-header .brand__mark {
+  background: #ffffff;
+  color: #3a5f99;
+}
+:root:not([data-theme='dark']) .site-header .brand__wordmark strong {
+  color: #ffffff;
+}
 :root:not([data-theme='dark']) .site-header .desktop-nav,
 :root:not([data-theme='dark']) .site-header .desktop-nav a,
 :root:not([data-theme='dark']) .site-header .mobile-menu-button {
