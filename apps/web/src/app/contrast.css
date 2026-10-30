@@ -1,11 +1,11 @@
 :root {
   /* Keep small text and white-on-accent controls above WCAG AA's 4.5:1 contrast threshold. */
   --text-muted: #62706f;
-  --brand-accent: #bd5037;
-  --brand-accent-hover: #a9432f;
+  --brand-accent: #2563eb;
+  --brand-accent-hover: #1d4ed8;
   /* Wordmarks sit on both light shell and dark inverse surfaces, so keep dedicated AA-safe tones. */
-  --brand-wordmark-accent: #a9432f;
-  --brand-wordmark-accent-inverse: #dd684c;
+  --brand-wordmark-accent: #1d4ed8;
+  --brand-wordmark-accent-inverse: #ffffff;
 }
 
 [data-theme='dark'] {
