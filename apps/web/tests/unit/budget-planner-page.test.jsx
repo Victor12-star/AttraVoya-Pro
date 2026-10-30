@@ -85,6 +85,25 @@ describe('BudgetPlannerPage', () => {
     mocks.createBudgetPlanRequest.mockResolvedValue({ planRequest: savedRequest() });
   });
 
+  it('shows the saved geographic destination and departure in recent briefs', async () => {
+    mocks.listBudgetPlanRequests.mockResolvedValue({
+      requests: [
+        savedRequest({
+          geographicDestination: {
+            cityName: 'Barcelona',
+            countryCode: 'ES',
+            source: 'USER_SELECTED_PLACE',
+            published: false,
+          },
+        }),
+      ],
+    });
+    render(<BudgetPlannerPage copy={copy} defaultCurrency="SEK" />);
+    expect(await screen.findByText('Barcelona, ES')).toBeVisible();
+    expect(screen.getByText(/Leaving from Stockholm/)).toBeVisible();
+    expect(screen.getByText(/not a bookable offer/)).toBeVisible();
+  });
+
   it('displays normalized Geoapify origin suggestions from the API response', async () => {
     mocks.autocompletePlaces.mockResolvedValue({
       places: {
@@ -121,12 +140,16 @@ describe('BudgetPlannerPage', () => {
 
     fireEvent.click(screen.getByRole('radio', { name: 'Specific country' }));
     expect(screen.getByLabelText('Destination country')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/Country-only planning is not yet supported/);
     expect(screen.getByText(/Country and city selection is a preview/)).toBeVisible();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Specific city' }));
     expect(screen.getByLabelText('Destination city')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save planning brief' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Save planning brief' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/click a city suggestion/);
 
     fireEvent.click(screen.getByRole('radio', { name: 'Destination is open' }));
     expect(screen.queryByLabelText('Destination city')).not.toBeInTheDocument();
