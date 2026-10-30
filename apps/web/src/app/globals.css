@@ -208,7 +208,6 @@ img {
   height: 1px;
   background: var(--brand-primary);
   transform: scaleX(0);
-  transition: transform 180ms ease;
 }
 .desktop-nav a:hover::after {
   transform: scaleX(1);
@@ -780,15 +779,13 @@ img {
 
 .tool-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 .tool-grid a {
   min-height: 175px;
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: 1fr auto;
-  align-items: start;
   gap: 20px;
   padding: 26px;
   border: 1px solid #e6e1d9;
@@ -798,12 +795,9 @@ img {
   transition: transform 180ms ease;
 }
 .tool-grid a:hover {
-  transform: translateY(-3px);
   border-color: #b9c9de;
 }
 .tool-grid a > svg:first-child {
-  width: 42px;
-  height: 42px;
   padding: 10px;
   border-radius: 12px;
   background: #edf3fb;
@@ -830,20 +824,11 @@ img {
   color: #b6676d;
 }
 .tool-grid a > svg:last-child {
-  width: 18px;
   color: #3a5f99;
 }
 .tool-grid strong {
   align-self: end;
   font-size: 17px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .tool-grid a {
-    transition: none;
-  }
-  .tool-grid a:hover {
-    transform: none;
-  }
 }
 
 .safety-panel {
