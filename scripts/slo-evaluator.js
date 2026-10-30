@@ -38,6 +38,7 @@ export function evaluateSloSnapshot(snapshot) {
     windowSeconds >= PRODUCTION_SLO.rollingWindowSeconds && requests > 0 && samples > 0;
   const productionTargetsMet =
     productionClaimEligible &&
+    observedRatio !== null &&
     observedRatio >= PRODUCTION_SLO.availabilityTargetRatio &&
     p95Ms < PRODUCTION_SLO.nonProviderP95TargetMs;
 
