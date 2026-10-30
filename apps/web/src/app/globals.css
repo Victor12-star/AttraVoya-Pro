@@ -134,6 +134,9 @@ img {
 .brand--inverse {
   color: #fff;
 }
+.brand--inverse .brand__wordmark strong {
+  color: #ffffff;
+}
 .brand--inverse .brand__mark {
   background: #fff;
   color: #0b2b30;
