@@ -375,9 +375,19 @@ export function BudgetPlannerPage({
 
   async function submit(event) {
     event.preventDefault();
-    if (destinationMode === 'COUNTRY') return;
+    if (destinationMode === 'COUNTRY') {
+      setSubmitState({
+        type: 'error',
+        message: 'Country-only planning is not yet supported. Choose a specific city or Destination is open.',
+      });
+      return;
+    }
     const chosenCity = cityOptions.find((city) => city.id === selectedCity);
     if (destinationMode === 'CITY' && (!selectedCountry || (!chosenCity && !selectedRealCity))) {
+      setSubmitState({
+        type: 'error',
+        message: 'Select a country and then click a city suggestion before saving your holiday brief.',
+      });
       return;
     }
     const form = new FormData(event.currentTarget);
@@ -1021,13 +1031,7 @@ export function BudgetPlannerPage({
             <button
               className="button button--dark"
               type="submit"
-              disabled={
-                submitting ||
-                destinationMode === 'COUNTRY' ||
-                (destinationMode === 'CITY' &&
-                  !selectedRealCity &&
-                  !cityOptions.some((city) => city.id === selectedCity))
-              }
+              disabled={submitting}
             >
               {submitting ? (
                 <LoaderCircle className={styles.spin} size={18} aria-hidden="true" />
