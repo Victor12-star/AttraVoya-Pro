@@ -34,10 +34,17 @@ export function evaluateSloSnapshot(snapshot) {
   const errorBudgetConsumedRatio =
     requests === 0 ? null : errors / requests / (1 - PRODUCTION_SLO.availabilityTargetRatio);
 
+  const productionClaimEligible =
+    windowSeconds >= PRODUCTION_SLO.rollingWindowSeconds && requests > 0 && samples > 0;
+  const productionTargetsMet =
+    productionClaimEligible &&
+    observedRatio >= PRODUCTION_SLO.availabilityTargetRatio &&
+    p95Ms < PRODUCTION_SLO.nonProviderP95TargetMs;
+
   return {
     scope: 'AGGREGATE_WINDOW_ONLY',
-    productionClaimEligible:
-      windowSeconds >= PRODUCTION_SLO.rollingWindowSeconds && requests > 0 && samples > 0,
+    productionClaimEligible,
+    productionTargetsMet,
     observationWindowSeconds: windowSeconds,
     availability: {
       targetRatio: PRODUCTION_SLO.availabilityTargetRatio,
