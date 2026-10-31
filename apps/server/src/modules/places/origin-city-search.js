@@ -4,6 +4,7 @@ const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
  * Origin suggestions are informational place names, not bookable airports.
  * This public provider keeps departure search independent of Geoapify quotas.
  */
+/** @param {{ query?: string, limit?: number, language?: string, countryCode?: string }} options */
 export async function searchOriginCities({ query, limit = 8, language = 'en', countryCode } = {}) {
   const name = String(query ?? '').trim();
   if (name.length < 2 || name.length > 100) return [];
