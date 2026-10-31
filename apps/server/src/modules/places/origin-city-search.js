@@ -14,7 +14,7 @@ export async function searchOriginCities({ query, limit = 8, language = 'en', co
   url.searchParams.set('count', String(count));
   url.searchParams.set('language', /^[a-z]{2}$/.test(language) ? language : 'en');
   if (/^[A-Z]{2}$/.test(String(countryCode ?? ''))) {
-    url.searchParams.set('countryCode', countryCode);
+    url.searchParams.set('countryCode', String(countryCode));
   }
 
   const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
