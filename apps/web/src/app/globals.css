@@ -744,8 +744,13 @@ img {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(22, 19, 15, 0.08), rgba(22, 19, 15, 0.68) 63%),
-    url('https://images.pexels.com/photos/1128318/pexels-photo-1128318.jpeg?auto=compress&cs=tinysrgb&w=1800')
+    linear-gradient(
+      90deg,
+      rgba(12, 28, 38, 0.06) 0%,
+      rgba(12, 28, 38, 0.12) 42%,
+      rgba(12, 28, 38, 0.64) 100%
+    ),
+    url('https://images.pexels.com/photos/7978485/pexels-photo-7978485.jpeg?auto=compress&cs=tinysrgb&w=1800')
       center / cover no-repeat;
 }
 .family-band__content {
