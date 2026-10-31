@@ -11,7 +11,17 @@ describe('origin city geocoding', () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        results: [{ id: 123, name: 'Stockholm', admin1: 'Stockholm', country: 'Sweden', country_code: 'SE', latitude: 59.33, longitude: 18.06 }],
+        results: [
+          {
+            id: 123,
+            name: 'Stockholm',
+            admin1: 'Stockholm',
+            country: 'Sweden',
+            country_code: 'SE',
+            latitude: 59.33,
+            longitude: 18.06,
+          },
+        ],
       }),
     });
     vi.stubGlobal('fetch', mockFetch);
