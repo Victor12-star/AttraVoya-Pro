@@ -6,6 +6,7 @@ import { ApiClientError } from '@attravoya/api-client';
 const mocks = vi.hoisted(() => ({
   createBudgetPlanRequest: vi.fn(),
   autocompletePlaces: vi.fn(),
+  searchOriginCities: vi.fn(),
   getPlannerScopedDestinationCandidates: vi.fn(),
   getPublicCountryCityCandidates: vi.fn(),
   listBudgetPlanRequests: vi.fn(),
@@ -16,6 +17,7 @@ vi.mock('../../src/lib/api-client.js', () => ({
   apiClient: {
     createBudgetPlanRequest: mocks.createBudgetPlanRequest,
     autocompletePlaces: mocks.autocompletePlaces,
+    searchOriginCities: mocks.searchOriginCities,
     getPlannerScopedDestinationCandidates: mocks.getPlannerScopedDestinationCandidates,
     getPublicCountryCityCandidates: mocks.getPublicCountryCityCandidates,
     listBudgetPlanRequests: mocks.listBudgetPlanRequests,
@@ -75,6 +77,8 @@ describe('BudgetPlannerPage', () => {
   beforeEach(() => {
     mocks.createBudgetPlanRequest.mockReset();
     mocks.autocompletePlaces.mockReset();
+    mocks.searchOriginCities.mockReset();
+    mocks.searchOriginCities.mockResolvedValue({ places: { results: [] } });
     mocks.autocompletePlaces.mockResolvedValue({ places: [] });
     mocks.getPlannerScopedDestinationCandidates.mockReset();
     mocks.getPublicCountryCityCandidates.mockReset();
@@ -104,10 +108,10 @@ describe('BudgetPlannerPage', () => {
     expect(screen.getByText(/not a bookable offer/)).toBeVisible();
   });
 
-  it('displays normalized Geoapify origin suggestions from the API response', async () => {
-    mocks.autocompletePlaces.mockResolvedValue({
+  it('displays normalized independent origin city suggestions from the API response', async () => {
+    mocks.searchOriginCities.mockResolvedValue({
       places: {
-        provider: 'geoapify',
+        provider: 'open-meteo-geocoding',
         results: [
           { name: 'Stockholm', formattedAddress: 'Stockholm, Sweden' },
           { name: 'Stockholm', formattedAddress: 'Stockholm, Sweden' },

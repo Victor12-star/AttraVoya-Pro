@@ -188,7 +188,7 @@ export function BudgetPlannerPage({
     let active = true;
     const timer = setTimeout(() => {
       apiClient
-        .autocompletePlaces({ query, limit: 8, language: 'en' })
+        .searchOriginCities({ query, limit: 8, language: 'en' })
         .then((response) => {
           if (!active) return;
           const results = response?.places?.results;

@@ -6,6 +6,7 @@ import { createPlacesProvider } from '../../integrations/places/places-provider.
 import { createPlacesController } from './places.controller.js';
 import { placesSchemas } from './places.schema.js';
 import { createPlacesService } from './places.service.js';
+import { searchOriginCities } from './origin-city-search.js';
 
 export async function placesRoutes(app, options = {}) {
   const provider = options.provider ?? createPlacesProvider();
@@ -16,6 +17,15 @@ export async function placesRoutes(app, options = {}) {
     schema: placesSchemas.autocomplete,
     config: { rateLimit: PROVIDER_SEARCH_RATE_LIMIT },
     handler: controller.autocomplete,
+  });
+  app.get('/origin-cities', {
+    schema: placesSchemas.autocomplete,
+    config: { rateLimit: PROVIDER_SEARCH_RATE_LIMIT },
+    async handler(request, reply) {
+      const results = await searchOriginCities(request.query);
+      reply.header('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+      return reply.send({ places: { provider: 'open-meteo-geocoding', results } });
+    },
   });
   app.get('/nearby', {
     schema: placesSchemas.nearby,
