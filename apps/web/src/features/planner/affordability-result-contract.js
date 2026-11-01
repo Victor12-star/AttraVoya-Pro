@@ -62,6 +62,7 @@ function getCompleteEvidenceTotals(evidence, expectedCurrency) {
       !isNonEmptyString(item.sourceExternalId) ||
       typeof item.sourceFetchedAt !== 'string' ||
       Number.isNaN(Date.parse(item.sourceFetchedAt)) ||
+      Date.parse(item.sourceFetchedAt) > Date.now() ||
       item.verifiedMarketEvidence !== true
     ) {
       return null;
