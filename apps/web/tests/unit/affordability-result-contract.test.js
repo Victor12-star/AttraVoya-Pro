@@ -173,6 +173,12 @@ describe('affordability result contract', () => {
     ).toBe(false);
   });
 
+  it('rejects future-dated market pricing evidence', () => {
+    const futureEvidence = completeEvidence();
+    futureEvidence.collected[0].sourceFetchedAt = '2099-01-01T00:00:00.000Z';
+    expect(isSafeAffordabilityEvaluation(futureEvidence, evaluation('COMFORTABLE'))).toBe(false);
+  });
+
   it('rejects currency or evidence-category tampering', () => {
     const wrongCurrency = completeEvidence();
     wrongCurrency.collected[0].currencyCode = 'USD';
