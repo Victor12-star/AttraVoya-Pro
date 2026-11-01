@@ -157,10 +157,15 @@ test.describe('public home page', () => {
 
     expect(offlineNavigationFailed).toBe(true);
 
-    const response = await page.goto('/plan-by-budget?origin=Stockholm&budget=10000&currency=SEK');
+    // The interrupted offline navigation may still finish after Firefox reconnects.
+    // A fresh page in the same recovered context avoids racing that navigation.
+    const recoveredPage = await context.newPage();
+    const response = await recoveredPage.goto(
+      '/plan-by-budget?origin=Stockholm&budget=10000&currency=SEK',
+    );
 
     expect(response?.ok()).toBe(true);
-    const plannerForm = page.locator('main form');
+    const plannerForm = recoveredPage.locator('main form');
     await expect(
       plannerForm.getByRole('textbox', { name: 'Where are you travelling from?' }),
     ).toHaveValue('Stockholm');
