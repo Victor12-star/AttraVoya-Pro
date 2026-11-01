@@ -210,6 +210,24 @@ describe('BudgetAllocationSection', () => {
     expect(await screen.findByText('1,000.00 SEK')).toBeInTheDocument();
   });
 
+  it.each([
+    ['an inconsistent safety reserve', { spendableBudget: '901.00' }],
+    ['an inconsistent category sum', { targets: allocation().targets.map((target) =>
+      target.category === 'FOOD' ? { ...target, amount: '136.00' } : target) }],
+    ['an unsafe numeric total', { totalBudget: '999999999999999.99' }],
+  ])('rejects %s rather than showing misleading allocation amounts', async (_label, overrides) => {
+    mocks.getBudgetAllocation.mockResolvedValue({ allocation: allocation(overrides) });
+    render(<BudgetAllocationSection copy={copy} locale="en" plannerCopy={plannerCopy} />);
+    await screen.findByText('Choose a saved planning brief to view its allocation targets.');
+    fireEvent.change(screen.getByLabelText('Saved planning brief'), {
+      target: { value: 'request-1' },
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'This budget allocation could not be loaded right now.',
+    );
+    expect(screen.queryByText(copy.provenance)).not.toBeInTheDocument();
+  });
+
   it('refuses to label provider-backed data as a planning-only envelope', async () => {
     mocks.getBudgetAllocation.mockResolvedValue({
       allocation: allocation({
