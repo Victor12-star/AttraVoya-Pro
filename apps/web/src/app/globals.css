@@ -183,7 +183,7 @@ img {
 }
 
 .site-header__inner {
-  min-height: 82px;
+  min-height: 88px;
   display: flex;
   align-items: center;
   gap: 28px;
@@ -193,8 +193,8 @@ img {
   align-items: center;
   gap: 25px;
   margin-inline: auto;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text-secondary);
 }
 .desktop-nav a {
