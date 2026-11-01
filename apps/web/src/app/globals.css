@@ -183,7 +183,7 @@ img {
 }
 
 .site-header__inner {
-  min-height: 88px;
+  min-height: 94px;
   display: flex;
   align-items: center;
   gap: 28px;
