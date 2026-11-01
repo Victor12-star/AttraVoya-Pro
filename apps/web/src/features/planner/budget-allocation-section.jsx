@@ -88,12 +88,17 @@ function isBudgetAllocation(value, requestId) {
   const total = moneyToCents(value.totalBudget);
   const reserveAmount = moneyToCents(reserve.amount);
   const spendable = moneyToCents(value.spendableBudget);
+  const reserveBasisPoints = moneyToCents(reserve.percentOfTotal);
   if (
     total === null ||
     reserveAmount === null ||
     spendable === null ||
+    reserveBasisPoints === null ||
+    reserveBasisPoints > 10_000 ||
     !Number.isSafeInteger(reserveAmount + spendable) ||
-    reserveAmount + spendable !== total
+    reserveAmount + spendable !== total ||
+    BigInt(reserveAmount) !==
+      (BigInt(total) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n
   ) {
     return false;
   }
