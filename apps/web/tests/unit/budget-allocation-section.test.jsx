@@ -220,6 +220,8 @@ describe('BudgetAllocationSection', () => {
         ),
       },
     ],
+    ['a mismatched reserve percentage', { safetyReserve: { ...allocation().safetyReserve, percentOfTotal: '20.00' } }],
+    ['an out-of-range reserve percentage', { safetyReserve: { ...allocation().safetyReserve, percentOfTotal: '101.00' } }],
     ['an unsafe numeric total', { totalBudget: '999999999999999.99' }],
   ])('rejects %s rather than showing misleading allocation amounts', async (_label, overrides) => {
     mocks.getBudgetAllocation.mockResolvedValue({ allocation: allocation(overrides) });
