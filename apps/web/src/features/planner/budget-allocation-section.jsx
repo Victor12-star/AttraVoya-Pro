@@ -96,12 +96,13 @@ function isBudgetAllocation(value, requestId) {
     reserveBasisPoints === null ||
     reserveBasisPoints > 10_000 ||
     !Number.isSafeInteger(reserveAmount + spendable) ||
-    reserveAmount + spendable !== total ||
-    BigInt(reserveAmount) !==
-      (BigInt(total) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n
+    reserveAmount + spendable !== total
   ) {
     return false;
   }
+
+  const expectedReserve = (BigInt(total) * BigInt(reserveBasisPoints) + 5_000n) / 10_000n;
+  if (BigInt(reserveAmount) !== expectedReserve) return false;
 
   const categories = new Set();
   let targetTotal = 0;
