@@ -9,6 +9,34 @@ function moneyToCents(value) {
   return Number.isSafeInteger(cents) ? cents : null;
 }
 
+function isValidEvidenceTimestamp(value) {
+  if (typeof value !== 'string') return false;
+  const match =
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.exec(
+      value,
+    );
+  if (!match) return false;
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > daysInMonth[month - 1] ||
+    Number(hourText) > 23 ||
+    Number(minuteText) > 59 ||
+    Number(secondText) > 59
+  ) {
+    return false;
+  }
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp <= Date.now();
+}
+
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
@@ -60,9 +88,7 @@ function getCompleteEvidenceTotals(evidence, expectedCurrency) {
       !CONFIDENCE.has(item.confidence) ||
       !isNonEmptyString(item.sourceProvider) ||
       !isNonEmptyString(item.sourceExternalId) ||
-      typeof item.sourceFetchedAt !== 'string' ||
-      Number.isNaN(Date.parse(item.sourceFetchedAt)) ||
-      Date.parse(item.sourceFetchedAt) > Date.now() ||
+      !isValidEvidenceTimestamp(item.sourceFetchedAt) ||
       item.verifiedMarketEvidence !== true
     ) {
       return null;

@@ -179,6 +179,18 @@ describe('affordability result contract', () => {
     expect(isSafeAffordabilityEvaluation(futureEvidence, evaluation('COMFORTABLE'))).toBe(false);
   });
 
+  it.each([
+    '2026-02-30T16:00:00.000Z',
+    '2026-13-06T16:00:00.000Z',
+    '2026-09-06T25:00:00.000Z',
+    '2026-09-06T16:00:00',
+    'not-a-date',
+  ])('rejects malformed market evidence timestamp %s', (timestamp) => {
+    const evidence = completeEvidence();
+    evidence.collected[0].sourceFetchedAt = timestamp;
+    expect(isSafeAffordabilityEvaluation(evidence, evaluation('COMFORTABLE'))).toBe(false);
+  });
+
   it('rejects currency or evidence-category tampering', () => {
     const wrongCurrency = completeEvidence();
     wrongCurrency.collected[0].currencyCode = 'USD';
