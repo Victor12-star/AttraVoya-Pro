@@ -173,7 +173,33 @@ A feature is complete only when the applicable items are true:
 - automated tests;
 - no exposed secrets or unresolved critical errors.
 
-## Current checkpoint — Phase 10 reliability verification (30 October 2026)\n\nThe historic Phase 6B checkpoint below is retained for traceability. The integration\nbranch is now at `d5377b3e5daf315cc0a20be63fee21db05af5504` (PR #484), with\nindependently confirmed 5/5 post-merge CI run #2067. Current work remains in\nPhase 10: inspect aggregate SLO evidence, security and operational readiness,\nthen reconcile remaining earlier-phase gaps before declaring any phase complete.\nThe saved Budget Planner brief is not a generated or priced holiday; full\nbudget-based holiday construction remains an unverified Phase 7 requirement.\nNo public launch has been approved. Do not infer a green release gate from CI alone.\n\n## Historical checkpoint — Phase 6B complete
+## Current checkpoint — Phase 10 reliability and product-gap verification (1 November 2026)
+
+The integration branch is at `fd6f7760df5bf6c033e388c8c9c684e340c694e3`
+(PR #496). Independent post-merge GitHub Actions CI #2110 passed all five
+required jobs for this exact SHA, and Vercel web staging reported READY for
+that same commit. This proves a verified integration and web staging checkpoint,
+**not** that the product is ready for public release or Google Play.
+
+Recent verified slices include separate origin-city geocoding in Budget Planner
+(PR #492), responsive family imagery and incremental navigation refinements
+(PRs #493–496). They must still be checked as real user journeys on staging,
+including origin and destination selection, saved planning briefs, errors, mobile
+reflow and keyboard access.
+
+The **next product gate** is the budget-first holiday-construction gap:
+the saved planning brief is not yet proof of a complete itinerary with
+provider-backed transport, accommodation availability, full-trip pricing and
+booking. Where suppliers or estimates are unavailable, the customer interface
+must say so rather than invent prices or availability.
+
+Before a public release, audit the full Phase 7 feature matrix, Phase 8 owner
+dashboard metrics and access controls, Phase 9 Android device readiness,
+Phase 10 security/performance evidence, and Phase 11 privacy, provider terms,
+monitoring, incident response and store listing requirements. Do not infer
+release readiness from a CI green result or a READY staging deployment.
+
+## Historical checkpoint — Phase 6B complete
 
 The planned no-cost development provider layer is now complete: Geoapify,
 Open-Meteo, Frankfurter, LibreTranslate, Ticketmaster, NewsData.io, Pexels and
