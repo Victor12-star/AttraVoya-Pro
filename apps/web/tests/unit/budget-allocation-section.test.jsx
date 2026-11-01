@@ -212,8 +212,14 @@ describe('BudgetAllocationSection', () => {
 
   it.each([
     ['an inconsistent safety reserve', { spendableBudget: '901.00' }],
-    ['an inconsistent category sum', { targets: allocation().targets.map((target) =>
-      target.category === 'FOOD' ? { ...target, amount: '136.00' } : target) }],
+    [
+      'an inconsistent category sum',
+      {
+        targets: allocation().targets.map((target) =>
+          target.category === 'FOOD' ? { ...target, amount: '136.00' } : target,
+        ),
+      },
+    ],
     ['an unsafe numeric total', { totalBudget: '999999999999999.99' }],
   ])('rejects %s rather than showing misleading allocation amounts', async (_label, overrides) => {
     mocks.getBudgetAllocation.mockResolvedValue({ allocation: allocation(overrides) });
