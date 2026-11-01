@@ -55,6 +55,19 @@ describe('Verified holiday comparison', () => {
     expect(result.disclaimer).toContain('not bookings');
   });
 
+  it('does not rank the same destination more than once', () => {
+    const result = compareVerifiedHolidayRanges([
+      example('rome', '500.00', '700.00'),
+      example('rome', '100.00', '200.00'),
+      example('paris', '600.00', '850.00'),
+    ]);
+    expect(result.ranked.map((item) => item.destinationId)).toEqual(['rome', 'paris']);
+    expect(result.unranked).toContainEqual({
+      destinationId: 'rome',
+      reason: 'DUPLICATE_DESTINATION',
+    });
+  });
+
   it('returns no ranking for empty evidence', () => {
     const result = compareVerifiedHolidayRanges([]);
     expect(result.ranked).toEqual([]);
