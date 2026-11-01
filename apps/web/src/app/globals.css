@@ -183,7 +183,7 @@ img {
 }
 
 .site-header__inner {
-  min-height: 72px;
+  min-height: 82px;
   display: flex;
   align-items: center;
   gap: 28px;
@@ -193,7 +193,7 @@ img {
   align-items: center;
   gap: 25px;
   margin-inline: auto;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -384,8 +384,7 @@ img {
 .hero-section__image {
   position: absolute;
   inset: 0;
-  background: url('https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg?auto=compress&cs=tinysrgb&w=2000')
-    center 45% / cover no-repeat;
+  background: url('/images/family-adventure-by-the-lake.png') center 44% / cover no-repeat;
 }
 .hero-section__veil {
   position: absolute;
