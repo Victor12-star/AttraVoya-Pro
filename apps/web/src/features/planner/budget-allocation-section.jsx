@@ -89,10 +89,14 @@ function isBudgetAllocation(value, requestId) {
   const reserveAmount = moneyToCents(reserve.amount);
   const spendable = moneyToCents(value.spendableBudget);
   if (
-    total === null || reserveAmount === null || spendable === null ||
+    total === null ||
+    reserveAmount === null ||
+    spendable === null ||
     !Number.isSafeInteger(reserveAmount + spendable) ||
     reserveAmount + spendable !== total
-  ) return false;
+  ) {
+    return false;
+  }
 
   const categories = new Set();
   let targetTotal = 0;
