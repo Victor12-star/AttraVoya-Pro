@@ -57,6 +57,13 @@ function isMoney(value) {
   return typeof value === 'string' && /^\d+\.\d{2}$/.test(value);
 }
 
+function moneyToCents(value) {
+  if (!isMoney(value)) return null;
+  const [whole, fraction] = value.split('.');
+  const cents = Number(whole) * 100 + Number(fraction);
+  return Number.isSafeInteger(cents) ? cents : null;
+}
+
 function isBudgetAllocation(value, requestId) {
   if (!value || typeof value !== 'object') return false;
   if (value.requestId !== requestId || !/^[A-Z]{3}$/.test(value.currencyCode ?? '')) {
@@ -78,7 +85,21 @@ function isBudgetAllocation(value, requestId) {
   if (!Array.isArray(value.targets) || value.targets.length !== TARGET_CATEGORIES.size) {
     return false;
   }
+  const total = moneyToCents(value.totalBudget);
+  const reserveAmount = moneyToCents(reserve.amount);
+  const spendable = moneyToCents(value.spendableBudget);
+  if (
+    total === null ||
+    reserveAmount === null ||
+    spendable === null ||
+    !Number.isSafeInteger(reserveAmount + spendable) ||
+    reserveAmount + spendable !== total
+  ) {
+    return false;
+  }
+
   const categories = new Set();
+  let targetTotal = 0;
   for (const target of value.targets) {
     if (
       !target ||
@@ -89,9 +110,12 @@ function isBudgetAllocation(value, requestId) {
     ) {
       return false;
     }
+    const amount = moneyToCents(target.amount);
+    if (amount === null || !Number.isSafeInteger(targetTotal + amount)) return false;
+    targetTotal += amount;
     categories.add(target.category);
   }
-  if (categories.size !== TARGET_CATEGORIES.size) return false;
+  if (categories.size !== TARGET_CATEGORIES.size || targetTotal !== spendable) return false;
 
   const provenance = value.provenance;
   return Boolean(
