@@ -58,7 +58,7 @@ describe('admin analytics dashboard', () => {
     };
 
     render(<AnalyticsDashboard client={client} />);
-    await screen.findByText('100');
+    expect(await screen.findAllByText('100')).toHaveLength(2);
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Analytics window' }), '30');
 
