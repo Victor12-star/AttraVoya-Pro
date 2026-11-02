@@ -40,6 +40,25 @@ export function createAnalyticsRepository(prismaClient = prisma) {
             trips: { some: { createdAt: { gte: createdAfter, lte: createdThrough } } },
           },
         }),
+        prismaClient.user.count({
+          where: {
+            deletedAt: null,
+            OR: [
+              { trips: { some: { createdAt: { gte: createdAfter, lte: createdThrough } } } },
+              {
+                travelPlanRequests: {
+                  some: { createdAt: { gte: createdAfter, lte: createdThrough } },
+                },
+              },
+              {
+                recentSearches: {
+                  some: { lastUsedAt: { gte: createdAfter, lte: createdThrough } },
+                },
+              },
+              { favorites: { some: { createdAt: { gte: createdAfter, lte: createdThrough } } } },
+            ],
+          },
+        }),
       ]);
 
       return {
@@ -49,6 +68,7 @@ export function createAnalyticsRepository(prismaClient = prisma) {
         recentlyLoggedIn: counts[3],
         tripsCreated: counts[4],
         uniqueTripCreators: counts[5],
+        recordedActiveUsers: counts[6],
       };
     },
   };
