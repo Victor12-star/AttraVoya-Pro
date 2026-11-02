@@ -35,6 +35,13 @@ function tripCreatorShareLabel(users) {
   return `${percentage.toFixed(1)}%`;
 }
 
+function tripsPerCreatorLabel(users) {
+  if (typeof users.tripsCreated !== 'number') return '—';
+  if (typeof users.uniqueTripCreators !== 'number') return '—';
+  if (users.uniqueTripCreators <= 0) return '—';
+  return (users.tripsCreated / users.uniqueTripCreators).toFixed(1);
+}
+
 /**
  * @param {{
  *   apiBaseUrl?: string | null,
@@ -171,6 +178,10 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
                   ? summary.users.tripsCreated.toLocaleString()
                   : '—'}
               </strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Average saved trips per trip creator</span>
+              <strong>{tripsPerCreatorLabel(summary.users)}</strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">New registrations</span>
