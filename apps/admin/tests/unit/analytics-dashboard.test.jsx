@@ -39,6 +39,7 @@ describe('admin analytics dashboard', () => {
     expect(screen.getByText(/not daily active users/i)).toBeInTheDocument();
     expect(screen.getByText('1.0%')).toBeInTheDocument();
     expect(screen.getByText('26.0%')).toBeInTheDocument();
+    expect(screen.getByText('0.1%')).toBeInTheDocument();
     expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();
     expect(client.getUserAnalytics).toHaveBeenCalledWith({ days: 7 });
   });
@@ -46,7 +47,7 @@ describe('admin analytics dashboard', () => {
   it('shows no registration share when no users are registered', async () => {
     const client = { getUserAnalytics: vi.fn().mockResolvedValue(summary(7, 0, 0)) };
     render(<AnalyticsDashboard client={client} />);
-    expect(await screen.findByText('—')).toBeInTheDocument();
+    expect((await screen.findAllByText('—')).length).toBeGreaterThan(0);
   });
 
   it('does not imply a percentage trend when prior registrations are zero', async () => {
