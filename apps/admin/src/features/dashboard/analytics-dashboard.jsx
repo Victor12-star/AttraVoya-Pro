@@ -27,6 +27,14 @@ function registrationChangeLabel(users) {
   return `${percentage.toFixed(1)}%`;
 }
 
+function tripCreatorShareLabel(users) {
+  if (typeof users.uniqueTripCreators !== 'number') return '—';
+  if (users.totalRegistered <= 0) return '—';
+  const creators = Math.min(users.uniqueTripCreators, users.totalRegistered);
+  const percentage = (creators / users.totalRegistered) * 100;
+  return `${percentage.toFixed(1)}%`;
+}
+
 /**
  * @param {{
  *   apiBaseUrl?: string | null,
@@ -151,6 +159,10 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
                   ? summary.users.uniqueTripCreators.toLocaleString()
                   : '—'}
               </strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Registered users creating trips (%)</span>
+              <strong>{tripCreatorShareLabel(summary.users)}</strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Trips created in selected window</span>
