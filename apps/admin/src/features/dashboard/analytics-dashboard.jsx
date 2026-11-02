@@ -208,8 +208,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             caching. Recent logins count accounts by their latest successful sign-in, not daily
             active users or in-app activity. Trips created counts saved trip records, not unique
             travelers or overall engagement. Unique creators are distinct accounts that saved at
-            least one trip. Trip creator share uses all registered accounts as the denominator,
-            not just new registrations.
+            least one trip.
           </p>
         </>
       ) : null}
