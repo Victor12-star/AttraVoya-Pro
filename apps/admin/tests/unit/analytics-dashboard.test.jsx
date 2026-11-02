@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AnalyticsDashboard } from '../../src/features/dashboard/analytics-dashboard.jsx';
 
-function summary(days, totalRegistered, newRegistered) {
+function summary(days, totalRegistered, newRegistered, previousRegistered = 100) {
   return {
     window: {
       days,
@@ -14,6 +14,7 @@ function summary(days, totalRegistered, newRegistered) {
     users: {
       totalRegistered,
       newRegistered,
+      previousRegistered,
     },
   };
 }
@@ -30,6 +31,7 @@ describe('admin analytics dashboard', () => {
     expect(await screen.findByText('12,430')).toBeInTheDocument();
     expect(screen.getByText('126')).toBeInTheDocument();
     expect(screen.getByText('1.0%')).toBeInTheDocument();
+    expect(screen.getByText('26.0%')).toBeInTheDocument();
     expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();
     expect(client.getUserAnalytics).toHaveBeenCalledWith({ days: 7 });
   });
@@ -38,6 +40,12 @@ describe('admin analytics dashboard', () => {
     const client = { getUserAnalytics: vi.fn().mockResolvedValue(summary(7, 0, 0)) };
     render(<AnalyticsDashboard client={client} />);
     expect(await screen.findByText('—')).toBeInTheDocument();
+  });
+
+  it('does not imply a percentage trend when prior registrations are zero', async () => {
+    const client = { getUserAnalytics: vi.fn().mockResolvedValue(summary(7, 15, 3, 0)) };
+    render(<AnalyticsDashboard client={client} />);
+    expect(await screen.findByText('No comparable percentage')).toBeInTheDocument();
   });
 
   it('reloads analytics when the administrator changes the reporting window', async () => {
@@ -50,7 +58,7 @@ describe('admin analytics dashboard', () => {
     };
 
     render(<AnalyticsDashboard client={client} />);
-    await screen.findByText('100');
+    expect(await screen.findAllByText('100')).toHaveLength(2);
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Analytics window' }), '30');
 

@@ -23,6 +23,7 @@ export function createAnalyticsService(repository, options = {}) {
       const counts = await repository.readUserRegistrationCounts({
         createdAfter: windowStart,
         createdThrough: windowEnd,
+        previousStart: new Date(windowStart.getTime() - windowDays * DAY_MS),
       });
 
       return {
@@ -34,6 +35,7 @@ export function createAnalyticsService(repository, options = {}) {
         users: {
           totalRegistered: counts.totalRegistered,
           newRegistered: counts.newRegistered,
+          previousRegistered: counts.previousRegistered,
         },
       };
     },

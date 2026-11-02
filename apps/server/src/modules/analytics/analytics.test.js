@@ -68,6 +68,7 @@ function analyticsRepository() {
     readUserRegistrationCounts: vi.fn(async () => ({
       totalRegistered: 12430,
       newRegistered: 126,
+      previousRegistered: 104,
     })),
   };
 }
@@ -120,6 +121,7 @@ describe('admin aggregate user analytics', () => {
     expect(response.headers['cache-control']).toBe('private, no-store');
     expect(repository.readUserRegistrationCounts).toHaveBeenCalledWith({
       createdAfter: new Date('2026-09-06T12:00:00.000Z'),
+      previousStart: new Date('2026-08-07T12:00:00.000Z'),
       createdThrough: new Date('2026-10-06T12:00:00.000Z'),
     });
     expect(response.json()).toEqual({
@@ -131,6 +133,7 @@ describe('admin aggregate user analytics', () => {
       users: {
         totalRegistered: 12430,
         newRegistered: 126,
+        previousRegistered: 104,
       },
     });
     expect(response.body).not.toContain('email');

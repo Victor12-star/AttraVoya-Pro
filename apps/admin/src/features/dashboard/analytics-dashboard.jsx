@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -17,6 +17,14 @@ function analyticsErrorMessage(error) {
   if (error?.status === 401) return 'Sign in with an administrator account to view analytics.';
   if (error?.status === 403) return 'Your account does not have permission to view analytics.';
   return 'Analytics are temporarily unavailable. Please try again.';
+}
+
+function registrationChangeLabel(users) {
+  if (typeof users.previousRegistered !== 'number') return '—';
+  if (users.previousRegistered === 0) return 'No comparable percentage';
+  const percentage =
+    ((users.newRegistered - users.previousRegistered) / users.previousRegistered) * 100;
+  return `${percentage.toFixed(1)}%`;
 }
 
 /**
@@ -131,6 +139,20 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             <article className="admin-analytics-metric">
               <span className="admin-muted">New registrations</span>
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">
+                Registrations in previous {summary.window.days} days
+              </span>
+              <strong>
+                {typeof summary.users.previousRegistered === 'number'
+                  ? summary.users.previousRegistered.toLocaleString()
+                  : '—'}
+              </strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Change from previous period</span>
+              <strong>{registrationChangeLabel(summary.users)}</strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Registrations in selected window (%)</span>
