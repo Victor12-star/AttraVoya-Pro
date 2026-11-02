@@ -29,7 +29,8 @@ function registrationChangeLabel(users) {
 
 function tripCreatorShareLabel(users) {
   if (typeof users.uniqueTripCreators !== 'number' || users.totalRegistered <= 0) return '—';
-  const share = (Math.min(users.uniqueTripCreators, users.totalRegistered) / users.totalRegistered) * 100;
+  const share =
+    (Math.min(users.uniqueTripCreators, users.totalRegistered) / users.totalRegistered) * 100;
   return `${share.toFixed(1)}%`;
 }
 
