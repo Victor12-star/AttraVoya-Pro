@@ -29,8 +29,15 @@ describe('admin analytics dashboard', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading analytics');
     expect(await screen.findByText('12,430')).toBeInTheDocument();
     expect(screen.getByText('126')).toBeInTheDocument();
+    expect(screen.getByText('1.0%')).toBeInTheDocument();
     expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();
     expect(client.getUserAnalytics).toHaveBeenCalledWith({ days: 7 });
+  });
+
+  it('shows no registration share when no users are registered', async () => {
+    const client = { getUserAnalytics: vi.fn().mockResolvedValue(summary(7, 0, 0)) };
+    render(<AnalyticsDashboard client={client} />);
+    expect(await screen.findByText('—')).toBeInTheDocument();
   });
 
   it('reloads analytics when the administrator changes the reporting window', async () => {
