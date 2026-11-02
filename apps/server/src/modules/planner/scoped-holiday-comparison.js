@@ -15,19 +15,23 @@ export function compareScopedHolidayCandidates(candidateEnvelope, evaluatedEvide
 
   const allowed = new Set(candidateEnvelope.destinations.map((candidate) => candidate.id));
   const evidenceByDestination = new Map();
+  const conflictingDestinations = new Set();
   for (const entry of evaluatedEvidence) {
-    if (
-      typeof entry?.destinationId === 'string' &&
-      allowed.has(entry.destinationId) &&
-      !evidenceByDestination.has(entry.destinationId)
-    ) {
-      evidenceByDestination.set(entry.destinationId, entry);
+    const destinationId = entry?.destinationId;
+    if (typeof destinationId !== 'string' || !allowed.has(destinationId)) continue;
+    if (evidenceByDestination.has(destinationId)) {
+      conflictingDestinations.add(destinationId);
+    } else {
+      evidenceByDestination.set(destinationId, entry);
     }
   }
 
+  // Conflicting records cannot prove a reliable price range, regardless of order.
   const comparison = compareVerifiedHolidayRanges(
-    candidateEnvelope.destinations.map(
-      (candidate) => evidenceByDestination.get(candidate.id) ?? { destinationId: candidate.id },
+    candidateEnvelope.destinations.map((candidate) =>
+      conflictingDestinations.has(candidate.id)
+        ? { destinationId: candidate.id }
+        : (evidenceByDestination.get(candidate.id) ?? { destinationId: candidate.id }),
     ),
   );
   const rankedIds = new Set(comparison.ranked.map((item) => item.destinationId));

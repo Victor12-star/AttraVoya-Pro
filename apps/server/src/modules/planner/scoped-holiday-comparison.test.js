@@ -51,6 +51,24 @@ describe('scoped holiday comparison', () => {
     expect(result.unranked).toEqual([{ destinationId: 'rome-b', reason: 'UNVERIFIED_EVIDENCE' }]);
   });
 
+  it('disqualifies conflicting records for one destination regardless of their order', () => {
+    const first = evidence('rome-a', '500.00', '700.00');
+    const conflicting = evidence('rome-a', '100.00', '200.00');
+    const other = evidence('rome-b', '600.00', '900.00');
+    for (const records of [
+      [first, conflicting, other],
+      [conflicting, first, other],
+    ]) {
+      const result = compareScopedHolidayCandidates(candidates, records);
+      expect(result.ranked.map((item) => item.destinationId)).toEqual(['rome-b']);
+      expect(result.unranked).toContainEqual({
+        destinationId: 'rome-a',
+        reason: 'UNVERIFIED_EVIDENCE',
+      });
+      expect(result.rankingApplied).toBe(false);
+    }
+  });
+
   it('does not produce prices or rankings without evidence', () => {
     const result = compareScopedHolidayCandidates(candidates);
     expect(result.ranked).toEqual([]);
