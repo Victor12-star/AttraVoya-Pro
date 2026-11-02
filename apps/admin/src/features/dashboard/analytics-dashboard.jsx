@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number, tripsCreated?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -145,6 +145,14 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               </strong>
             </article>
             <article className="admin-analytics-metric">
+              <span className="admin-muted">Trips created in selected window</span>
+              <strong>
+                {typeof summary.users.tripsCreated === 'number'
+                  ? summary.users.tripsCreated.toLocaleString()
+                  : '—'}
+              </strong>
+            </article>
+            <article className="admin-analytics-metric">
               <span className="admin-muted">New registrations</span>
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
             </article>
@@ -178,7 +186,8 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
           <p className="admin-muted admin-analytics-footnote">
             Window: last {summary.window.days} days. Data is aggregate-only and loaded with no-store
             caching. Recent logins count accounts by their latest successful sign-in, not daily
-            active users or in-app activity.
+            active users or in-app activity. Trips created counts saved trip records, not unique
+            travelers or overall engagement.
           </p>
         </>
       ) : null}

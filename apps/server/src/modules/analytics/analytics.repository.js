@@ -3,7 +3,7 @@ import { prisma } from '@attravoya/database';
 export function createAnalyticsRepository(prismaClient = prisma) {
   return {
     async readUserRegistrationCounts({ createdAfter, createdThrough, previousStart }) {
-      const [totalRegistered, newRegistered, previousRegistered, recentlyLoggedIn] =
+      const [totalRegistered, newRegistered, previousRegistered, recentlyLoggedIn, tripsCreated] =
         await prismaClient.$transaction([
           prismaClient.user.count({
             where: { deletedAt: null },
@@ -29,9 +29,15 @@ export function createAnalyticsRepository(prismaClient = prisma) {
               lastLoginAt: { gte: createdAfter, lte: createdThrough },
             },
           }),
+          prismaClient.trip.count({
+            where: {
+              createdAt: { gte: createdAfter, lte: createdThrough },
+              user: { deletedAt: null },
+            },
+          }),
         ]);
 
-      return { totalRegistered, newRegistered, previousRegistered, recentlyLoggedIn };
+      return { totalRegistered, newRegistered, previousRegistered, recentlyLoggedIn, tripsCreated };
     },
   };
 }
