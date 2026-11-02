@@ -17,8 +17,14 @@ export function compareVerifiedHolidayRanges(entries) {
   const eligible = [];
   const unranked = [];
   let reference = null;
+  const seenDestinations = new Set();
 
   for (const entry of entries) {
+    if (typeof entry?.destinationId === 'string' && seenDestinations.has(entry.destinationId)) {
+      unranked.push({ destinationId: entry.destinationId, reason: 'DUPLICATE_DESTINATION' });
+      continue;
+    }
+    if (typeof entry?.destinationId === 'string') seenDestinations.add(entry.destinationId);
     const policy = entry?.evaluation?.evaluationPolicy;
     const range = policy?.totalEvidenceRange;
     const min = moneyInCents(range?.amountMin);
