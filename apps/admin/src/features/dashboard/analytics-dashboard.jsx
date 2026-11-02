@@ -195,8 +195,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             Window: last {summary.window.days} days. Data is aggregate-only and loaded with no-store
             caching. Recent logins count accounts by their latest successful sign-in, not daily
             active users or in-app activity. Trips created counts saved trip records, not unique
-            travelers or overall engagement. Unique trip creators counts distinct accounts that saved
-            at least one trip during the window.
+            travelers or overall engagement. Unique creators are distinct accounts that saved a trip.
           </p>
         </>
       ) : null}
