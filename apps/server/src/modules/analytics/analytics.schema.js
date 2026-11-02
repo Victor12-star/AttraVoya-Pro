@@ -18,6 +18,7 @@ const userRegistrationResponseSchema = z.object({
     previousRegistered: z.number().int().nonnegative(),
     recentlyLoggedIn: z.number().int().nonnegative(),
     tripsCreated: z.number().int().nonnegative(),
+    uniqueTripCreators: z.number().int().nonnegative(),
   }),
 });
 
