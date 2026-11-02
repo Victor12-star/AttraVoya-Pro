@@ -16,6 +16,7 @@ const userRegistrationResponseSchema = z.object({
     totalRegistered: z.number().int().nonnegative(),
     newRegistered: z.number().int().nonnegative(),
     previousRegistered: z.number().int().nonnegative(),
+    recentlyLoggedIn: z.number().int().nonnegative(),
   }),
 });
 

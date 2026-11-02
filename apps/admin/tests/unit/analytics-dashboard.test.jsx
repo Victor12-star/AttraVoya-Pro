@@ -15,6 +15,7 @@ function summary(days, totalRegistered, newRegistered, previousRegistered = 100)
       totalRegistered,
       newRegistered,
       previousRegistered,
+      recentlyLoggedIn: 81,
     },
   };
 }
@@ -30,6 +31,8 @@ describe('admin analytics dashboard', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading analytics');
     expect(await screen.findByText('12,430')).toBeInTheDocument();
     expect(screen.getByText('126')).toBeInTheDocument();
+    expect(screen.getByText('81')).toBeInTheDocument();
+    expect(screen.getByText(/not daily active users/i)).toBeInTheDocument();
     expect(screen.getByText('1.0%')).toBeInTheDocument();
     expect(screen.getByText('26.0%')).toBeInTheDocument();
     expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();

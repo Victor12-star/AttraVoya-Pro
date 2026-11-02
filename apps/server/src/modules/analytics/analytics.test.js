@@ -69,6 +69,7 @@ function analyticsRepository() {
       totalRegistered: 12430,
       newRegistered: 126,
       previousRegistered: 104,
+      recentlyLoggedIn: 81,
     })),
   };
 }
@@ -134,6 +135,7 @@ describe('admin aggregate user analytics', () => {
         totalRegistered: 12430,
         newRegistered: 126,
         previousRegistered: 104,
+        recentlyLoggedIn: 81,
       },
     });
     expect(response.body).not.toContain('email');

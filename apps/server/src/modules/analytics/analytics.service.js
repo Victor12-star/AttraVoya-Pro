@@ -36,6 +36,7 @@ export function createAnalyticsService(repository, options = {}) {
           totalRegistered: counts.totalRegistered,
           newRegistered: counts.newRegistered,
           previousRegistered: counts.previousRegistered,
+          recentlyLoggedIn: counts.recentlyLoggedIn,
         },
       };
     },
