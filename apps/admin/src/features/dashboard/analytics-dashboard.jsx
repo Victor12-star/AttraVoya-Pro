@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -137,6 +137,14 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               <strong>{summary.users.totalRegistered.toLocaleString()}</strong>
             </article>
             <article className="admin-analytics-metric">
+              <span className="admin-muted">Accounts with a recent login</span>
+              <strong>
+                {typeof summary.users.recentlyLoggedIn === 'number'
+                  ? summary.users.recentlyLoggedIn.toLocaleString()
+                  : '—'}
+              </strong>
+            </article>
+            <article className="admin-analytics-metric">
               <span className="admin-muted">New registrations</span>
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
             </article>
@@ -169,7 +177,8 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
           </div>
           <p className="admin-muted admin-analytics-footnote">
             Window: last {summary.window.days} days. Data is aggregate-only and loaded with no-store
-            caching.
+            caching. Recent logins count accounts by their latest successful sign-in, not daily
+            active users or in-app activity.
           </p>
         </>
       ) : null}
