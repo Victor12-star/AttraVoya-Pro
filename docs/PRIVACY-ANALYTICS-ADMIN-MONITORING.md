@@ -254,3 +254,18 @@ Implement this requirement as a dedicated, CI-gated production phase after the n
 8. documentation, retention jobs, monitoring, and release-readiness review
 
 Every slice must follow the repository's existing exact-head five-job CI rule. Tests, authorization, privacy controls, retention rules, or CI must never be weakened to make the analytics dashboard pass.
+
+## Initial recorded-activity metric (bounded implementation)
+
+The admin dashboard's **Active users (recorded actions)** count is distinct non-deleted
+accounts that created a saved trip, submitted a planning request, used a recorded
+recent search, or saved a favorite during the selected rolling 7, 30, or 90 days.
+It is a lower-bound indicator of *recorded meaningful actions*, not full DAU/WAU/MAU
+and not a measure of app opens, page views, or general engagement. Recent sign-ins
+are displayed separately and must never be relabeled as active users.
+
+This metric queries existing server-owned relational timestamps in aggregate only.
+It introduces no cookies, client analytics tracking, precise location logging,
+new event table, or new personal identifiers. A future genuine DAU/WAU/MAU
+implementation must separately review lawful basis, consent as applicable,
+retention and deletion behavior, and cross-device deduplication before release.
