@@ -40,7 +40,9 @@ export default function DashboardLayout({ children }) {
     <div className="admin-shell">
       <aside className="admin-sidebar" aria-label="Administration sidebar">
         <Link className="admin-brand" href="/dashboard">
-          <span className="admin-brand-mark" aria-hidden="true">A</span>
+          <span className="admin-brand-mark" aria-hidden="true">
+            A
+          </span>
           <span className="admin-brand-text">
             <strong>AttraVoya</strong>
             <small>PRO · ADMIN CONSOLE</small>
