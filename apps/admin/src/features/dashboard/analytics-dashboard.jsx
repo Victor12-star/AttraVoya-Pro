@@ -27,6 +27,12 @@ function registrationChangeLabel(users) {
   return `${percentage.toFixed(1)}%`;
 }
 
+function tripCreatorShareLabel(users) {
+  if (typeof users.uniqueTripCreators !== 'number' || users.totalRegistered <= 0) return '—';
+  const share = (Math.min(users.uniqueTripCreators, users.totalRegistered) / users.totalRegistered) * 100;
+  return `${share.toFixed(1)}%`;
+}
+
 /**
  * @param {{
  *   apiBaseUrl?: string | null,
@@ -153,6 +159,10 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               </strong>
             </article>
             <article className="admin-analytics-metric">
+              <span className="admin-muted">Registered users creating trips (%)</span>
+              <strong>{tripCreatorShareLabel(summary.users)}</strong>
+            </article>
+            <article className="admin-analytics-metric">
               <span className="admin-muted">Trips created in selected window</span>
               <strong>
                 {typeof summary.users.tripsCreated === 'number'
@@ -196,7 +206,8 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             caching. Recent logins count accounts by their latest successful sign-in, not daily
             active users or in-app activity. Trips created counts saved trip records, not unique
             travelers or overall engagement. Unique creators are distinct accounts that saved at
-            least one trip.
+            least one trip. The trip creator share compares these accounts with all current registered
+            accounts, not only newly registered users.
           </p>
         </>
       ) : null}
