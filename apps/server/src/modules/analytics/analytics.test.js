@@ -137,7 +137,7 @@ describe('admin aggregate user analytics', () => {
         newRegistered: 126,
         previousRegistered: 104,
         recentlyLoggedIn: 81,
-      tripsCreated: 39,
+        tripsCreated: 39,
       },
     });
     expect(response.body).not.toContain('email');
