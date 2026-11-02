@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -131,6 +131,28 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             <article className="admin-analytics-metric">
               <span className="admin-muted">New registrations</span>
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Registrations in previous {summary.window.days} days</span>
+              <strong>
+                {typeof summary.users.previousRegistered === 'number'
+                  ? summary.users.previousRegistered.toLocaleString()
+                  : '—'}
+              </strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Change from previous period</span>
+              <strong>
+                {typeof summary.users.previousRegistered !== 'number'
+                  ? '—'
+                  : summary.users.previousRegistered === 0
+                    ? 'No comparable percentage'
+                    : `${(
+                        ((summary.users.newRegistered - summary.users.previousRegistered) /
+                          summary.users.previousRegistered) *
+                        100
+                      ).toFixed(1)}%`}
+              </strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Registrations in selected window (%)</span>
