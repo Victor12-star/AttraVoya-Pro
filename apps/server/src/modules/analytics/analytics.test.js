@@ -133,6 +133,7 @@ describe('admin aggregate user analytics', () => {
       users: {
         totalRegistered: 12430,
         newRegistered: 126,
+        previousRegistered: 104,
       },
     });
     expect(response.body).not.toContain('email');
