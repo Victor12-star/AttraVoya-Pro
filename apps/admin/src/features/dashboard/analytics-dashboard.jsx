@@ -22,7 +22,8 @@ function analyticsErrorMessage(error) {
 function registrationChangeLabel(users) {
   if (typeof users.previousRegistered !== 'number') return '—';
   if (users.previousRegistered === 0) return 'No comparable percentage';
-  const percentage = ((users.newRegistered - users.previousRegistered) / users.previousRegistered) * 100;
+  const percentage =
+    ((users.newRegistered - users.previousRegistered) / users.previousRegistered) * 100;
   return `${percentage.toFixed(1)}%`;
 }
 
