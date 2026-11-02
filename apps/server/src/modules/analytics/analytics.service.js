@@ -38,6 +38,7 @@ export function createAnalyticsService(repository, options = {}) {
           previousRegistered: counts.previousRegistered,
           recentlyLoggedIn: counts.recentlyLoggedIn,
           tripsCreated: counts.tripsCreated,
+          uniqueTripCreators: counts.uniqueTripCreators,
         },
       };
     },

@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number, tripsCreated?: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number, tripsCreated?: number, uniqueTripCreators?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -145,6 +145,14 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               </strong>
             </article>
             <article className="admin-analytics-metric">
+              <span className="admin-muted">Unique travelers creating trips</span>
+              <strong>
+                {typeof summary.users.uniqueTripCreators === 'number'
+                  ? summary.users.uniqueTripCreators.toLocaleString()
+                  : '—'}
+              </strong>
+            </article>
+            <article className="admin-analytics-metric">
               <span className="admin-muted">Trips created in selected window</span>
               <strong>
                 {typeof summary.users.tripsCreated === 'number'
@@ -187,7 +195,8 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             Window: last {summary.window.days} days. Data is aggregate-only and loaded with no-store
             caching. Recent logins count accounts by their latest successful sign-in, not daily
             active users or in-app activity. Trips created counts saved trip records, not unique
-            travelers or overall engagement.
+            travelers or overall engagement. Unique creators are distinct accounts that saved at
+            least one trip.
           </p>
         </>
       ) : null}
