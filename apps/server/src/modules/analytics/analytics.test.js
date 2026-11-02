@@ -69,6 +69,7 @@ function analyticsRepository() {
       totalRegistered: 12430,
       newRegistered: 126,
       previousRegistered: 104,
+      recentlyLoggedIn: 81,
     })),
   };
 }
