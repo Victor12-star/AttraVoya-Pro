@@ -254,3 +254,14 @@ Implement this requirement as a dedicated, CI-gated production phase after the n
 8. documentation, retention jobs, monitoring, and release-readiness review
 
 Every slice must follow the repository's existing exact-head five-job CI rule. Tests, authorization, privacy controls, retention rules, or CI must never be weakened to make the analytics dashboard pass.
+
+## Recorded activity definition
+
+The initial **Active users (recorded actions)** metric counts distinct non-deleted
+users who created a saved trip, submitted a planning request, used a recorded
+recent search, or saved a favorite in the selected 7, 30, or 90 days.
+
+This is not complete daily, weekly, or monthly active-user measurement, and it
+does not count passive app opens. Recent sign-ins remain a separate metric.
+The count uses existing server records and exposes aggregate results only;
+no new client tracking, personal identifiers, or cookies are introduced.

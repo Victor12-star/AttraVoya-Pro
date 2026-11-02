@@ -9,7 +9,7 @@ const WINDOW_OPTIONS = [7, 30, 90];
 /**
  * @typedef {object} AnalyticsSummary
  * @property {{ days: number, start: string, end: string }} window
- * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number, tripsCreated?: number, uniqueTripCreators?: number }} users
+ * @property {{ totalRegistered: number, newRegistered: number, previousRegistered?: number, recentlyLoggedIn?: number, tripsCreated?: number, uniqueTripCreators?: number, recordedActiveUsers?: number }} users
  */
 
 /** @param {{ status?: number, code?: string } | null | undefined} error */
@@ -109,7 +109,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
         <div>
           <h1 id="analytics-title">Analytics</h1>
           <p className="admin-muted">
-            Privacy-safe aggregate registration metrics. No individual user activity is shown here.
+            Privacy-safe aggregate metrics. No individual user activity is shown here.
           </p>
         </div>
 
@@ -150,6 +150,14 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             <article className="admin-analytics-metric">
               <span className="admin-muted">Total registered users</span>
               <strong>{summary.users.totalRegistered.toLocaleString()}</strong>
+            </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Active users (recorded actions)</span>
+              <strong>
+                {typeof summary.users.recordedActiveUsers === 'number'
+                  ? summary.users.recordedActiveUsers.toLocaleString()
+                  : '—'}
+              </strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Accounts with a recent login</span>
@@ -219,7 +227,8 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             caching. Recent logins count accounts by their latest successful sign-in, not daily
             active users or in-app activity. Trips created counts saved trip records, not unique
             travelers or overall engagement. Unique creators are distinct accounts that saved at
-            least one trip.
+            least one trip. Active users count distinct accounts with recorded trip creations,
+            planning requests, recent searches, or saved favorites, not passive app opens.
           </p>
         </>
       ) : null}

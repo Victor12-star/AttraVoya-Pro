@@ -72,6 +72,7 @@ function analyticsRepository() {
       recentlyLoggedIn: 81,
       tripsCreated: 39,
       uniqueTripCreators: 17,
+      recordedActiveUsers: 32,
     })),
   };
 }
@@ -140,6 +141,7 @@ describe('admin aggregate user analytics', () => {
         recentlyLoggedIn: 81,
         tripsCreated: 39,
         uniqueTripCreators: 17,
+        recordedActiveUsers: 32,
       },
     });
     expect(response.body).not.toContain('email');
