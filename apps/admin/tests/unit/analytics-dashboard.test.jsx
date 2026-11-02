@@ -16,6 +16,7 @@ function summary(days, totalRegistered, newRegistered, previousRegistered = 100)
       newRegistered,
       previousRegistered,
       recentlyLoggedIn: 81,
+      tripsCreated: 39,
     },
   };
 }
@@ -32,6 +33,7 @@ describe('admin analytics dashboard', () => {
     expect(await screen.findByText('12,430')).toBeInTheDocument();
     expect(screen.getByText('126')).toBeInTheDocument();
     expect(screen.getByText('81')).toBeInTheDocument();
+    expect(screen.getByText('39')).toBeInTheDocument();
     expect(screen.getByText(/not daily active users/i)).toBeInTheDocument();
     expect(screen.getByText('1.0%')).toBeInTheDocument();
     expect(screen.getByText('26.0%')).toBeInTheDocument();
