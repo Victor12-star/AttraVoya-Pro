@@ -40,6 +40,7 @@ describe('admin analytics dashboard', () => {
     expect(screen.getByText('1.0%')).toBeInTheDocument();
     expect(screen.getByText('26.0%')).toBeInTheDocument();
     expect(screen.getByText('0.1%')).toBeInTheDocument();
+    expect(screen.getByText('2.3')).toBeInTheDocument();
     expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();
     expect(client.getUserAnalytics).toHaveBeenCalledWith({ days: 7 });
   });
@@ -48,6 +49,17 @@ describe('admin analytics dashboard', () => {
     const client = { getUserAnalytics: vi.fn().mockResolvedValue(summary(7, 0, 0)) };
     render(<AnalyticsDashboard client={client} />);
     expect((await screen.findAllByText('—')).length).toBeGreaterThan(0);
+  });
+
+  it('shows no trips-per-creator average when no travelers create trips', async () => {
+    const data = summary(7, 100, 5);
+    data.users.uniqueTripCreators = 0;
+    data.users.tripsCreated = 0;
+    const client = { getUserAnalytics: vi.fn().mockResolvedValue(data) };
+    render(<AnalyticsDashboard client={client} />);
+    expect(await screen.findByText('Average saved trips per trip creator')).toBeInTheDocument();
+    expect(screen.queryByText('NaN')).not.toBeInTheDocument();
+    expect(screen.queryByText('Infinity')).not.toBeInTheDocument();
   });
 
   it('does not imply a percentage trend when prior registrations are zero', async () => {
