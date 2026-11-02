@@ -43,7 +43,7 @@ describe('admin analytics dashboard', () => {
     expect(screen.getByText('26.0%')).toBeInTheDocument();
     expect(screen.getByText('0.1%')).toBeInTheDocument();
     expect(screen.getByText('2.3')).toBeInTheDocument();
-    expect(screen.getByText(/aggregate registration metrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/privacy-safe aggregate metrics/i)).toBeInTheDocument();
     expect(client.getUserAnalytics).toHaveBeenCalledWith({ days: 7 });
   });
 
