@@ -132,6 +132,18 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               <span className="admin-muted">New registrations</span>
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
             </article>
+            <article className="admin-analytics-metric">
+              <span className="admin-muted">Registrations in selected window (%)</span>
+              <strong>
+                {summary.users.totalRegistered > 0
+                  ? `${(
+                      (Math.min(summary.users.newRegistered, summary.users.totalRegistered) /
+                        summary.users.totalRegistered) *
+                      100
+                    ).toFixed(1)}%`
+                  : '—'}
+              </strong>
+            </article>
           </div>
           <p className="admin-muted admin-analytics-footnote">
             Window: last {summary.window.days} days. Data is aggregate-only and loaded with no-store
