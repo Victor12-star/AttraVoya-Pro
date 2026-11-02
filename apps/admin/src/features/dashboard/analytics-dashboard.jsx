@@ -141,7 +141,9 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
               <strong>{summary.users.newRegistered.toLocaleString()}</strong>
             </article>
             <article className="admin-analytics-metric">
-              <span className="admin-muted">Registrations in previous {summary.window.days} days</span>
+              <span className="admin-muted">
+                Registrations in previous {summary.window.days} days
+              </span>
               <strong>
                 {typeof summary.users.previousRegistered === 'number'
                   ? summary.users.previousRegistered.toLocaleString()
@@ -150,9 +152,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Change from previous period</span>
-              <strong>
-                {registrationChangeLabel(summary.users)}
-              </strong>
+              <strong>{registrationChangeLabel(summary.users)}</strong>
             </article>
             <article className="admin-analytics-metric">
               <span className="admin-muted">Registrations in selected window (%)</span>
