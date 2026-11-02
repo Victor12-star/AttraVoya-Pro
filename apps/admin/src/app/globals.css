@@ -275,7 +275,7 @@ textarea {
   text-transform: uppercase;
 }
 
-.admin-nav-link {
+.admin-nav .admin-nav-link {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -286,8 +286,8 @@ textarea {
   text-decoration: none;
 }
 
-.admin-nav-link:hover,
-.admin-nav-link:focus-visible {
+.admin-nav .admin-nav-link:hover,
+.admin-nav .admin-nav-link:focus-visible {
   background: #294873;
   color: #ffffff;
 }
