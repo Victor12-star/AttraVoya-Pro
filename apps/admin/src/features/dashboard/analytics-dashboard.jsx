@@ -19,6 +19,13 @@ function analyticsErrorMessage(error) {
   return 'Analytics are temporarily unavailable. Please try again.';
 }
 
+function registrationChangeLabel(users) {
+  if (typeof users.previousRegistered !== 'number') return '—';
+  if (users.previousRegistered === 0) return 'No comparable percentage';
+  const percentage = ((users.newRegistered - users.previousRegistered) / users.previousRegistered) * 100;
+  return `${percentage.toFixed(1)}%`;
+}
+
 /**
  * @param {{
  *   apiBaseUrl?: string | null,
@@ -143,15 +150,7 @@ export function AnalyticsDashboard({ apiBaseUrl = null, client }) {
             <article className="admin-analytics-metric">
               <span className="admin-muted">Change from previous period</span>
               <strong>
-                {typeof summary.users.previousRegistered !== 'number'
-                  ? '—'
-                  : summary.users.previousRegistered === 0
-                    ? 'No comparable percentage'
-                    : `${(
-                        ((summary.users.newRegistered - summary.users.previousRegistered) /
-                          summary.users.previousRegistered) *
-                        100
-                      ).toFixed(1)}%`}
+                {registrationChangeLabel(summary.users)}
               </strong>
             </article>
             <article className="admin-analytics-metric">
