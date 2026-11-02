@@ -142,7 +142,6 @@ describe('admin aggregate user analytics', () => {
         tripsCreated: 39,
         uniqueTripCreators: 17,
         recordedActiveUsers: 32,
-      recordedActiveUsers: 32,
       },
     });
     expect(response.body).not.toContain('email');
