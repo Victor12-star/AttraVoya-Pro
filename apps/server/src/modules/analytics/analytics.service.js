@@ -39,6 +39,7 @@ export function createAnalyticsService(repository, options = {}) {
           recentlyLoggedIn: counts.recentlyLoggedIn,
           tripsCreated: counts.tripsCreated,
           uniqueTripCreators: counts.uniqueTripCreators,
+          recordedActiveUsers: counts.recordedActiveUsers,
         },
       };
     },
