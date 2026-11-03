@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 const SECTIONS = [
+  ['Account security', '/dashboard/security'],
   ['Users', '/dashboard/users'],
   ['Subscriptions', '/dashboard/subscriptions'],
   ['Destinations', '/dashboard/destinations'],
