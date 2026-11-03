@@ -20,8 +20,9 @@ export function createAdminApiClient(options = {}) {
       );
       const result = await response.json();
       if (!response.ok) {
-        const error = new Error(result.error?.message ?? 'Analytics unavailable.');
-        error.status = response.status;
+        const error = Object.assign(new Error(result.error?.message ?? 'Analytics unavailable.'), {
+          status: response.status,
+        });
         throw error;
       }
       return result;
