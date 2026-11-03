@@ -32,7 +32,7 @@ describe('TOTP security primitives', () => {
         secret: RFC_SECRET,
         code: '287082',
         now: 60_000,
-        lastAcceptedCounter: matching,
+        lastAcceptedCounter: matching ?? -1,
       }),
     ).toBeNull();
     expect(verifyTotp({ secret: RFC_SECRET, code: '287082', now: 90_000 })).toBeNull();
