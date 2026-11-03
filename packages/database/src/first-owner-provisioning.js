@@ -9,7 +9,11 @@ export async function provisionFirstOwner(database, email) {
   if (!database || typeof database.$transaction !== 'function') {
     throw new TypeError('A database client is required.');
   }
-  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.length > 320) {
+  if (
+    typeof email !== 'string' ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+    email.length > 320
+  ) {
     throw new Error('A valid first-owner email is required.');
   }
   const normalizedEmail = email.trim().toLowerCase();
