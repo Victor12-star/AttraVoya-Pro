@@ -85,12 +85,7 @@ export function totpProvisioningUri({ secret, issuer, account }) {
  * a strictly increasing lastAcceptedCounter atomically with challenge use,
  * and MUST fail closed if that persistence fails.
  */
-export function verifyTotp({
-  secret,
-  code,
-  now = Date.now(),
-  lastAcceptedCounter = -1,
-}) {
+export function verifyTotp({ secret, code, now = Date.now(), lastAcceptedCounter = -1 }) {
   if (typeof code !== 'string' || !/^[0-9]{6}$/.test(code)) return null;
   if (!Number.isSafeInteger(now) || now < 0) throw new RangeError('Invalid TOTP time.');
   if (!Number.isSafeInteger(lastAcceptedCounter) || lastAcceptedCounter < -1) {
