@@ -2,6 +2,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { provisionFirstOwner } from './first-owner-provisioning.js';
 
+/**
+ * @param {{
+ *   alreadyExists?: boolean,
+ *   user?: {id: string, status: string, deletedAt: Date | null, emailVerifiedAt: Date | null} | null,
+ *   role?: {id: string} | null,
+ * }} [options]
+ */
 function createDatabase({
   alreadyExists = false,
   user = {
