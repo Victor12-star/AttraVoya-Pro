@@ -24,22 +24,20 @@ Status: design-only checkpoint. No routes, database tables, credentials, or acco
 
 ## Required integration tests before activation
 
-| Scenario | Expected result |
-| --- | --- |
-| Existing ordinary traveler without MFA | Existing login, mobile login, refresh, and password reset remain compatible |
-| Privileged user with active MFA enters valid password | MFA challenge only; no access JWT, refresh token, or active AuthSession |
-| Privileged user attempts direct mobile login | Identical server-side MFA gate |
-| Invalid, expired, reused, or replayed TOTP | Denied; no token or session |
-| Valid TOTP within documented clock tolerance | One-time challenge consumed; session issued exactly once |
-| Replayed or raced challenge | At most one successful issuance |
-| Password-only token tries an administrator API | Rejected for MFA-required privileged account |
-| Previously issued sessions after MFA becomes mandatory | Explicit invalidation or limited migration policy; no bypass |
-| Password reset or recovery-code login | No MFA disablement or silent privilege escalation |
-| Lost factor, rate-limit attack, or provider failure | Safe failure with auditable, reviewed recovery path |
-| Revoked admin role or disabled account | Privileged request rejected even with a previously valid access JWT |
-| Login cookie response before MFA completion | No authenticated cookies set |
-| Enrollment / secret display / recovery codes | Never logged, leaked to analytics, or persisted in plaintext |
-| Multiple active challenges | Independent, bounded, revocable, and single-use |
+- Ordinary traveler without MFA retains existing login, mobile login, refresh, and password reset.
+- Privileged user with active MFA receives only an MFA challenge after a valid password.
+- Direct mobile login cannot bypass the challenge.
+- Invalid, expired, reused, and replayed TOTP codes are rejected without issuing tokens.
+- Valid TOTP consumes the challenge once and issues exactly one session.
+- A raced or reused challenge cannot issue a second session.
+- Password-only access tokens cannot access MFA-required administrator APIs.
+- Previously issued privileged sessions are explicitly invalidated or covered by a limited, documented migration policy.
+- Password reset and recovery codes cannot disable MFA or silently escalate permissions.
+- Lost factors, rate-limit attacks, and provider failures use a fail-closed audited recovery path.
+- Suspended accounts and revoked administrator roles lose privileged access immediately.
+- Admin cookies are not set before MFA completion.
+- Enrollment secrets and recovery codes never appear in logs or analytics.
+- Concurrent challenges are bounded, revocable, and single-use.
 
 ## Token and session revocation follow-up
 
