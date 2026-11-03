@@ -18,17 +18,23 @@ afterEach(() => {
 
 describe('Owner session security controls', () => {
   it('lists active sessions without exposing private tokens', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: true,
-      json: async () => ({
-        sessions: [{
-          id: 'session-id', userAgent: 'Test Browser',
-          createdAt: '2026-11-01T12:00:00.000Z',
-          lastUsedAt: '2026-11-03T12:00:00.000Z',
-          expiresAt: '2026-12-01T12:00:00.000Z',
-        }],
-      }),
-    })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          sessions: [
+            {
+              id: 'session-id',
+              userAgent: 'Test Browser',
+              createdAt: '2026-11-01T12:00:00.000Z',
+              lastUsedAt: '2026-11-03T12:00:00.000Z',
+              expiresAt: '2026-12-01T12:00:00.000Z',
+            },
+          ],
+        }),
+      })),
+    );
     render(<SessionSecurityPanel />);
     expect(await screen.findByText('Test Browser')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Revoke session' })).toBeInTheDocument();
@@ -49,22 +55,27 @@ describe('Owner session security controls', () => {
     expect(submit).toBeDisabled();
     await user.type(screen.getByLabelText('Type SIGN OUT ALL to confirm'), 'SIGN OUT ALL');
     await user.click(submit);
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
-      '/api/admin/sessions',
-      expect.objectContaining({
-        method: 'DELETE',
-        credentials: 'same-origin',
-        body: JSON.stringify({ confirmation: 'SIGN OUT ALL' }),
-      }),
-    ));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/admin/sessions',
+        expect.objectContaining({
+          method: 'DELETE',
+          credentials: 'same-origin',
+          body: JSON.stringify({ confirmation: 'SIGN OUT ALL' }),
+        }),
+      ),
+    );
     expect(replace).toHaveBeenCalledWith('/login?sessionsRevoked=1');
   });
 
   it('reports backend errors without falsely claiming revocation succeeded', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: false,
-      json: async () => ({ error: 'Session expired. Please sign in again.' }),
-    })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        json: async () => ({ error: 'Session expired. Please sign in again.' }),
+      })),
+    );
     render(<SessionSecurityPanel />);
     expect(await screen.findByRole('alert')).toHaveTextContent('Session expired');
     expect(replace).not.toHaveBeenCalled();

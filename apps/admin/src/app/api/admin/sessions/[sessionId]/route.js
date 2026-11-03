@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-import { ACCESS_COOKIE, backendRequest, validSameOrigin } from '../../../../../lib/admin-backend.js';
+import {
+  ACCESS_COOKIE,
+  backendRequest,
+  validSameOrigin,
+} from '../../../../../lib/admin-backend.js';
 
 export async function DELETE(request, { params }) {
   if (!validSameOrigin(request)) {
@@ -18,14 +22,24 @@ export async function DELETE(request, { params }) {
       { method: 'DELETE', headers: { Authorization: `Bearer ${access}` } },
     );
     if (!response.ok) {
-      return NextResponse.json({
-        error: response.status === 401 ? 'Please sign in again.' : 'Could not revoke this session.',
-      }, { status: response.status === 401 ? 401 : 503 });
+      return NextResponse.json(
+        {
+          error:
+            response.status === 401 ? 'Please sign in again.' : 'Could not revoke this session.',
+        },
+        { status: response.status === 401 ? 401 : 503 },
+      );
     }
-    return NextResponse.json({ ok: true }, {
-      headers: { 'Cache-Control': 'private, no-store' },
-    });
+    return NextResponse.json(
+      { ok: true },
+      {
+        headers: { 'Cache-Control': 'private, no-store' },
+      },
+    );
   } catch {
-    return NextResponse.json({ error: 'Session service temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Session service temporarily unavailable.' },
+      { status: 503 },
+    );
   }
 }

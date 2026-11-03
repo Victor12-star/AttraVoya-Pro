@@ -23,7 +23,9 @@ export function SessionSecurityPanel() {
       setError('');
       try {
         const response = await fetch('/api/admin/sessions', {
-          credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
+          credentials: 'same-origin',
+          cache: 'no-store',
+          signal: controller.signal,
         });
         const data = await response.json();
         if (cancelled) return;
@@ -39,7 +41,10 @@ export function SessionSecurityPanel() {
       }
     }
     void fetchSessions();
-    return () => { cancelled = true; controller.abort(); };
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [refresh]);
 
   async function revokeSession(sessionId) {
@@ -49,13 +54,17 @@ export function SessionSecurityPanel() {
     setMessage('');
     try {
       const response = await fetch(`/api/admin/sessions/${encodeURIComponent(sessionId)}`, {
-        method: 'DELETE', credentials: 'same-origin', cache: 'no-store',
+        method: 'DELETE',
+        credentials: 'same-origin',
+        cache: 'no-store',
       });
       const result = await response.json();
       if (!response.ok) {
         setError(result.error ?? 'Unable to revoke this session.');
       } else {
-        setMessage('Session revoked. Previously issued access tokens may remain valid until expiration.');
+        setMessage(
+          'Session revoked. Previously issued access tokens may remain valid until expiration.',
+        );
         setRefresh((value) => value + 1);
       }
     } catch {
@@ -72,7 +81,9 @@ export function SessionSecurityPanel() {
     setError('');
     try {
       const response = await fetch('/api/admin/sessions', {
-        method: 'DELETE', credentials: 'same-origin', cache: 'no-store',
+        method: 'DELETE',
+        credentials: 'same-origin',
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirmation }),
       });
@@ -95,25 +106,35 @@ export function SessionSecurityPanel() {
     <section className="admin-card admin-security-sessions">
       <h2>Devices &amp; active sessions</h2>
       <p className="admin-muted">
-        Review sessions associated with your account and revoke those you do not recognize.
-        Refresh sessions are revoked immediately, but issued access tokens can remain usable
-        until their short expiration period.
+        Review sessions associated with your account and revoke those you do not recognize. Refresh
+        sessions are revoked immediately, but issued access tokens can remain usable until their
+        short expiration period.
       </p>
-      <button type="button" disabled={loading || busy} onClick={() => setRefresh((value) => value + 1)}>
+      <button
+        type="button"
+        disabled={loading || busy}
+        onClick={() => setRefresh((value) => value + 1)}
+      >
         Refresh sessions
       </button>
       {loading ? <p role="status">Loading sessions…</p> : null}
       {error ? <p role="alert">{error}</p> : null}
       {message ? <p role="status">{message}</p> : null}
-      {!loading && !error && sessions.length === 0 ? <p>No active refresh sessions found.</p> : null}
+      {!loading && !error && sessions.length === 0 ? (
+        <p>No active refresh sessions found.</p>
+      ) : null}
       {!loading && sessions.length > 0 ? (
         <ul className="admin-session-list">
           {sessions.map((session) => (
             <li key={session.id}>
               <div>
                 <strong>{session.userAgent || 'Unknown device or browser'}</strong>
-                <p className="admin-muted">Last used: {new Date(session.lastUsedAt).toLocaleString()}</p>
-                <p className="admin-muted">Expires: {new Date(session.expiresAt).toLocaleString()}</p>
+                <p className="admin-muted">
+                  Last used: {new Date(session.lastUsedAt).toLocaleString()}
+                </p>
+                <p className="admin-muted">
+                  Expires: {new Date(session.expiresAt).toLocaleString()}
+                </p>
               </div>
               <button type="button" disabled={busy} onClick={() => revokeSession(session.id)}>
                 Revoke session
@@ -125,13 +146,18 @@ export function SessionSecurityPanel() {
       <form className="admin-security-emergency" onSubmit={revokeAll}>
         <h3>Emergency: sign out all devices</h3>
         <p className="admin-muted">
-          If you suspect unauthorized access, revoke all refresh sessions, then change your
-          password and secure your email account. This will sign out this browser too.
+          If you suspect unauthorized access, revoke all refresh sessions, then change your password
+          and secure your email account. This will sign out this browser too.
         </p>
         <label htmlFor="emergency-confirmation">Type SIGN OUT ALL to confirm</label>
-        <input id="emergency-confirmation" value={confirmation} disabled={busy}
+        <input
+          id="emergency-confirmation"
+          value={confirmation}
+          disabled={busy}
           onChange={(event) => setConfirmation(event.target.value)}
-          autoComplete="off" required />
+          autoComplete="off"
+          required
+        />
         <button type="submit" disabled={busy || confirmation !== 'SIGN OUT ALL'}>
           {busy ? 'Revoking…' : 'Sign out all devices'}
         </button>

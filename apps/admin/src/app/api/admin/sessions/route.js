@@ -23,9 +23,15 @@ export async function GET(request) {
       headers: { Authorization: `Bearer ${access}` },
     });
     if (!response.ok) {
-      return privateResponse({
-        error: response.status === 401 ? 'Session expired. Please sign in again.' : 'Unable to load sessions.',
-      }, response.status === 401 ? 401 : 503);
+      return privateResponse(
+        {
+          error:
+            response.status === 401
+              ? 'Session expired. Please sign in again.'
+              : 'Unable to load sessions.',
+        },
+        response.status === 401 ? 401 : 503,
+      );
     }
     const data = await response.json();
     return privateResponse({ sessions: Array.isArray(data?.sessions) ? data.sessions : [] }, 200);
@@ -53,9 +59,15 @@ export async function DELETE(request) {
       headers: { Authorization: `Bearer ${access}` },
     });
     if (!response.ok) {
-      return privateResponse({
-        error: response.status === 401 ? 'Session expired. Please sign in again.' : 'Could not revoke sessions.',
-      }, response.status === 401 ? 401 : 503);
+      return privateResponse(
+        {
+          error:
+            response.status === 401
+              ? 'Session expired. Please sign in again.'
+              : 'Could not revoke sessions.',
+        },
+        response.status === 401 ? 401 : 503,
+      );
     }
     const result = privateResponse({ ok: true }, 200);
     result.cookies.set(ACCESS_COOKIE, '', { ...sessionCookieOptions, maxAge: 0 });
