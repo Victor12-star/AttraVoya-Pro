@@ -42,14 +42,24 @@ describe('account-bound MFA secret encryption', () => {
       ).toThrow();
     }
     expect(() =>
-      decryptTotpSecret({ envelope: envelope.replace('mfa1:', 'mfa2:'), userId: 'user-one', key: KEY }),
+      decryptTotpSecret({
+        envelope: envelope.replace('mfa1:', 'mfa2:'),
+        userId: 'user-one',
+        key: KEY,
+      }),
     ).toThrow();
   });
 
   it('validates keys, account identifiers, and secret formats', () => {
-    expect(() => encryptTotpSecret({ secret: SECRET, userId: 'user-one', key: Buffer.alloc(16) })).toThrow();
+    expect(() =>
+      encryptTotpSecret({ secret: SECRET, userId: 'user-one', key: Buffer.alloc(16) }),
+    ).toThrow();
     expect(() => encryptTotpSecret({ secret: SECRET, userId: '', key: KEY })).toThrow();
-    expect(() => encryptTotpSecret({ secret: 'not-base32', userId: 'user-one', key: KEY })).toThrow();
-    expect(() => decryptTotpSecret({ envelope: 'mfa1:bad', userId: 'user-one', key: KEY })).toThrow();
+    expect(() =>
+      encryptTotpSecret({ secret: 'not-base32', userId: 'user-one', key: KEY }),
+    ).toThrow();
+    expect(() =>
+      decryptTotpSecret({ envelope: 'mfa1:bad', userId: 'user-one', key: KEY }),
+    ).toThrow();
   });
 });
