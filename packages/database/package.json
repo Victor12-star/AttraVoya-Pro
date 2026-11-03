@@ -25,6 +25,7 @@
     "migrate:status": "prisma migrate status",
     "db:push": "prisma db push",
     "seed": "prisma db seed",
+    "provision:first-owner": "node scripts/provision-first-owner.js",
     "studio": "prisma studio",
     "format:schema": "prisma format",
     "validate:schema": "prisma validate",
