@@ -52,23 +52,32 @@ export function AdminUserDirectory() {
       <div className="admin-directory-heading">
         <div>
           <h2>Registered Accounts &amp; Roles</h2>
-          <p className="admin-muted">Review email verification, account status and assigned roles.</p>
+          <p className="admin-muted">
+            Review email verification, account status and assigned roles.
+          </p>
         </div>
-        <button type="button" onClick={reload} disabled={loading}>Refresh accounts</button>
+        <button type="button" onClick={reload} disabled={loading}>
+          Refresh accounts
+        </button>
       </div>
       {loading ? <p role="status">Loading registered accounts…</p> : null}
       {error ? <p role="alert">{error}</p> : null}
       {!loading && data ? (
         <>
-          <p className="admin-muted">{data.total} registered account{data.total === 1 ? '' : 's'} (excluding deleted accounts)</p>
+          <p className="admin-muted">
+            {data.total} registered account{data.total === 1 ? '' : 's'} (excluding deleted
+            accounts)
+          </p>
           <div className="admin-directory-scroll">
             <table className="admin-directory-table">
-              <thead><tr>
-                <th scope="col">Email</th>
-                <th scope="col">Account status</th>
-                <th scope="col">Email</th>
-                <th scope="col">Assigned roles</th>
-              </tr></thead>
+              <thead>
+                <tr>
+                  <th scope="col">Email</th>
+                  <th scope="col">Account status</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Assigned roles</th>
+                </tr>
+              </thead>
               <tbody>
                 {data.users.map((user) => (
                   <tr key={user.id}>
@@ -83,11 +92,23 @@ export function AdminUserDirectory() {
           </div>
           {data.users.length === 0 ? <p>No accounts found on this page.</p> : null}
           <div className="admin-directory-pagination">
-            <button type="button" disabled={page <= 1 || loading}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button>
-            <span>Page {page} of {Math.max(1, data.pages)}</span>
-            <button type="button" disabled={page >= data.pages || loading}
-              onClick={() => setPage((value) => value + 1)}>Next</button>
+            <button
+              type="button"
+              disabled={page <= 1 || loading}
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
+            >
+              Previous
+            </button>
+            <span>
+              Page {page} of {Math.max(1, data.pages)}
+            </span>
+            <button
+              type="button"
+              disabled={page >= data.pages || loading}
+              onClick={() => setPage((value) => value + 1)}
+            >
+              Next
+            </button>
           </div>
         </>
       ) : null}

@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import {
-  ACCESS_COOKIE,
-  backendRequest,
-} from '../../../../lib/admin-backend.js';
+import { ACCESS_COOKIE, backendRequest } from '../../../../lib/admin-backend.js';
 
 function reply(payload, status) {
   return NextResponse.json(payload, {
@@ -25,13 +22,17 @@ export async function GET(request) {
     });
     if (!response.ok) {
       const status = [401, 403].includes(response.status) ? response.status : 503;
-      return reply({
-        error: status === 403
-          ? 'Platform Owner access required.'
-          : status === 401
-            ? 'Session expired. Please sign in again.'
-            : 'User directory is currently unavailable.',
-      }, status);
+      return reply(
+        {
+          error:
+            status === 403
+              ? 'Platform Owner access required.'
+              : status === 401
+                ? 'Session expired. Please sign in again.'
+                : 'User directory is currently unavailable.',
+        },
+        status,
+      );
     }
     const data = await response.json();
     return reply(data, 200);

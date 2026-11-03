@@ -7,17 +7,28 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('owner user directory', () => {
   it('renders a registered account with its role without exposing credentials', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: true,
-      json: async () => ({
-        page: 1, limit: 20, total: 1, pages: 1,
-        users: [{
-          id: 'u1', email: 'person@example.test', status: 'ACTIVE',
-          verified: true, createdAt: '2026-11-03T00:00:00.000Z',
-          roles: ['USER'],
-        }],
-      }),
-    })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          page: 1,
+          limit: 20,
+          total: 1,
+          pages: 1,
+          users: [
+            {
+              id: 'u1',
+              email: 'person@example.test',
+              status: 'ACTIVE',
+              verified: true,
+              createdAt: '2026-11-03T00:00:00.000Z',
+              roles: ['USER'],
+            },
+          ],
+        }),
+      })),
+    );
     render(<AdminUserDirectory />);
     expect(await screen.findByText('person@example.test')).toBeInTheDocument();
     expect(screen.getByText('ACTIVE')).toBeInTheDocument();
@@ -27,10 +38,13 @@ describe('owner user directory', () => {
   });
 
   it('shows authorization errors instead of a misleading empty list', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: false,
-      json: async () => ({ error: 'Platform Owner access required.' }),
-    })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        json: async () => ({ error: 'Platform Owner access required.' }),
+      })),
+    );
     render(<AdminUserDirectory />);
     expect(await screen.findByRole('alert')).toHaveTextContent('Platform Owner access required.');
   });

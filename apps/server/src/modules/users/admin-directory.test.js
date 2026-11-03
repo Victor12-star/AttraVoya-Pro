@@ -28,7 +28,9 @@ async function makeApp(repository) {
       async findAuthorizationContextByUserId(id) {
         const isOwner = id === 'owner';
         return {
-          id, email: `${id}@example.test`, status: 'ACTIVE',
+          id,
+          email: `${id}@example.test`,
+          status: 'ACTIVE',
           emailVerifiedAt: new Date(),
           roles: [isOwner ? 'SUPER_ADMIN' : 'USER'],
           permissions: isOwner ? ['users:read'] : [],
@@ -51,10 +53,12 @@ describe('owner-only registered account directory', () => {
     const repository = { listUsers: vi.fn() };
     const app = await makeApp(repository);
     const anonymous = await app.inject({
-      method: 'GET', url: '/api/v1/users/admin-directory',
+      method: 'GET',
+      url: '/api/v1/users/admin-directory',
     });
     const ordinary = await app.inject({
-      method: 'GET', url: '/api/v1/users/admin-directory',
+      method: 'GET',
+      url: '/api/v1/users/admin-directory',
       headers: bearer(app, 'traveler'),
     });
     expect(anonymous.statusCode).toBe(401);
@@ -65,11 +69,20 @@ describe('owner-only registered account directory', () => {
   it('returns a bounded, private list for the Super Admin', async () => {
     const repository = {
       listUsers: vi.fn(async ({ page, limit }) => ({
-        page, limit, total: 1, pages: 1,
-        users: [{
-          id: 'u1', email: 'person@example.test', status: 'ACTIVE',
-          verified: true, createdAt: '2026-11-03T00:00:00.000Z', roles: ['USER'],
-        }],
+        page,
+        limit,
+        total: 1,
+        pages: 1,
+        users: [
+          {
+            id: 'u1',
+            email: 'person@example.test',
+            status: 'ACTIVE',
+            verified: true,
+            createdAt: '2026-11-03T00:00:00.000Z',
+            roles: ['USER'],
+          },
+        ],
       })),
     };
     const app = await makeApp(repository);
@@ -89,7 +102,8 @@ describe('owner-only registered account directory', () => {
     const repository = { listUsers: vi.fn() };
     const app = await makeApp(repository);
     const response = await app.inject({
-      method: 'GET', url: '/api/v1/users/admin-directory?page=1001',
+      method: 'GET',
+      url: '/api/v1/users/admin-directory?page=1001',
       headers: bearer(app, 'owner'),
     });
     expect(response.statusCode).toBe(400);
@@ -105,20 +119,27 @@ describe('minimal directory repository fields', () => {
       user: { count, findMany },
       $transaction: vi.fn(async () => [
         1,
-        [{
-          id: 'u1', email: 'person@example.test',
-          status: 'ACTIVE', emailVerifiedAt: new Date(),
-          createdAt: new Date('2026-11-03T00:00:00.000Z'),
-          roles: [{ role: { key: 'USER' } }],
-        }],
+        [
+          {
+            id: 'u1',
+            email: 'person@example.test',
+            status: 'ACTIVE',
+            emailVerifiedAt: new Date(),
+            createdAt: new Date('2026-11-03T00:00:00.000Z'),
+            roles: [{ role: { key: 'USER' } }],
+          },
+        ],
       ]),
     };
     const repository = createAdminDirectoryRepository(/** @type {any} */ (database));
     const result = await repository.listUsers({ page: 1, limit: 20 });
     expect(result.total).toBe(1);
     expect(result.users[0]).toEqual({
-      id: 'u1', email: 'person@example.test', status: 'ACTIVE',
-      verified: true, createdAt: '2026-11-03T00:00:00.000Z',
+      id: 'u1',
+      email: 'person@example.test',
+      status: 'ACTIVE',
+      verified: true,
+      createdAt: '2026-11-03T00:00:00.000Z',
       roles: ['USER'],
     });
     const query = findMany.mock.calls[0];

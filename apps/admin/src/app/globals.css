@@ -565,7 +565,9 @@ textarea {
   justify-content: space-between;
   gap: 16px;
 }
-.admin-directory-heading h2 { margin: 0 0 4px; }
+.admin-directory-heading h2 {
+  margin: 0 0 4px;
+}
 .admin-directory-heading button,
 .admin-directory-pagination button {
   min-height: 40px;
@@ -582,12 +584,31 @@ textarea {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.admin-directory-scroll { overflow-x: auto; max-width: 100%; }
-.admin-directory-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
-.admin-directory-table th, .admin-directory-table td {
+.admin-directory-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.admin-directory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.admin-directory-table th,
+.admin-directory-table td {
   padding: 12px;
   border-bottom: 1px solid #e3e7ee;
   overflow-wrap: anywhere;
 }
-.admin-directory-table th { color: #465168; font-weight: 700; white-space: nowrap; }
-.admin-directory-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 16px; }
+.admin-directory-table th {
+  color: #465168;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.admin-directory-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 16px;
+}

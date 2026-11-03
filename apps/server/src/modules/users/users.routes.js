@@ -46,7 +46,9 @@ export async function usersRoutes(app, options = {}) {
     ],
     schema: usersSchemas.adminDirectory,
     config: { rateLimit: { max: 30, timeWindow: '1 minute' } },
-    handler: createAdminDirectoryController(options.adminDirectoryRepository ?? adminDirectoryRepository).listUsers,
+    handler: createAdminDirectoryController(
+      options.adminDirectoryRepository ?? adminDirectoryRepository,
+    ).listUsers,
   });
 
   app.post('/admin-invitations', {
