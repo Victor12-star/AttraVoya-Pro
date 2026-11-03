@@ -186,7 +186,7 @@ describe('audited and guarded role repository', () => {
       },
     };
     const database = { $transaction: vi.fn(async (callback) => callback(tx)) };
-    const repository = createAdminRoleRepository(database);
+    const repository = createAdminRoleRepository(/** @type {any} */ (database));
     await expect(
       repository.setAdminRole({
         actorId: 'owner',
@@ -227,7 +227,7 @@ describe('audited and guarded role repository', () => {
       userRole: { create: vi.fn() },
     };
     const database = { $transaction: async (callback) => callback(tx) };
-    const repository = createAdminRoleRepository(database);
+    const repository = createAdminRoleRepository(/** @type {any} */ (database));
     await expect(
       repository.setAdminRole({
         actorId: 'owner',
