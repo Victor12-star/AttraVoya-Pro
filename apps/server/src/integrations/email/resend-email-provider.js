@@ -40,6 +40,16 @@ function passwordResetContent(webUrl, token) {
   };
 }
 
+function adminRegistrationContent(webUrl) {
+  const url = new URL('/register', webUrl).toString();
+  const safeUrl = escapeHtml(url);
+  return {
+    subject: 'Invitation to AttraVoya Pro administration',
+    text: `The AttraVoya Pro Platform Owner invited you to register an account. Register at: ${url}\n\nOnce your email is verified, the Platform Owner must separately grant you administrator access. This email does not grant access. If you did not expect this invitation, ignore it.`,
+    html: `<p>The AttraVoya Pro Platform Owner invited you to register an account.</p><p><a href="${safeUrl}">Register your account</a></p><p>After email verification, the owner must separately grant administrator access. This email alone grants no privileges. If unexpected, ignore it.</p>`,
+  };
+}
+
 export function createResendEmailProvider({ http, apiKey, from, webUrl }) {
   function key() {
     return requireProviderCredential(apiKey, 'Resend', 'RESEND_API_KEY');
@@ -83,6 +93,10 @@ export function createResendEmailProvider({ http, apiKey, from, webUrl }) {
 
     sendVerificationEmail({ to, token }) {
       return send({ to, content: verificationContent(webUrl, token) });
+    },
+
+    sendAdminRegistrationInvitation({ to }) {
+      return send({ to, content: adminRegistrationContent(webUrl) });
     },
 
     sendPasswordResetEmail({ to, token }) {

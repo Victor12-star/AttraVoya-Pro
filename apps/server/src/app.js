@@ -182,6 +182,8 @@ export async function buildApp(options = {}) {
     prefix: `${API_PREFIX}/users`,
     repository: options.usersRepository,
     adminRoleRepository: options.adminRoleRepository,
+    adminInviteRepository: options.adminInviteRepository,
+    onAdminInvitationRequested: options.onAdminInvitationRequested,
   });
 
   await app.register(entitlementsRoutes, {

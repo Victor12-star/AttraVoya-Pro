@@ -3,6 +3,14 @@ import { z } from 'zod';
 import { emailSchema, passwordSchema } from '@attravoya/validation';
 
 export const usersSchemas = Object.freeze({
+  inviteAdministrator: {
+    body: z
+      .object({
+        email: emailSchema,
+        currentPassword: z.string().min(1).max(128),
+      })
+      .strict(),
+  },
   manageAdminRole: {
     body: z
       .object({
