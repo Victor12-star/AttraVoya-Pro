@@ -43,9 +43,44 @@ export function createAdminInviteService({ repository, sendInvitation }) {
       const emailFingerprint = createHash('sha256').update(email.toLowerCase()).digest('hex');
       await repository.recordInvitation({
         actorId,
+        email: email.toLowerCase(),
         emailFingerprint,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
       return { sent: true, requiresRegistrationAndOwnerApproval: true };
+    },
+
+    async list({ page, limit }) {
+      return repository.listInvitations({ page, limit });
+    },
+
+    async revoke({ actorId, currentPassword, invitationId }) {
+      const owner = await repository.ownerCredential(actorId);
+      const valid = owner?.passwordHash
+        ? await argon2.verify(owner.passwordHash, currentPassword)
+        : false;
+      if (
+        !owner ||
+        owner.status !== 'ACTIVE' ||
+        owner.deletedAt ||
+        !owner.emailVerifiedAt ||
+        !valid
+      ) {
+        throw new AuthenticationError('Owner password confirmation failed.', {
+          code: ERROR_CODES.INVALID_CREDENTIALS,
+        });
+      }
+      const revoked = await repository.revokeInvitation({
+        actorId,
+        expectedPasswordHash: owner.passwordHash,
+        invitationId,
+      });
+      if (!revoked) {
+        throw new AuthenticationError(
+          'Invitation could not be revoked. Please refresh and sign in again.',
+        );
+      }
+      return { revoked: true };
     },
   };
 }

@@ -1,3 +1,4 @@
+import { AdminInvitationHistory } from '../../../features/users/admin-invitation-history.jsx';
 import { AdminInviteForm } from '../../../features/users/admin-invite-form.jsx';
 import { AdminRoleForm } from '../../../features/users/admin-role-form.jsx';
 import { AdminUserDirectory } from '../../../features/users/admin-user-directory.jsx';
@@ -26,6 +27,7 @@ export default function UsersPage() {
         </p>
         <AdminInviteForm />
       </section>
+      <AdminInvitationHistory />
       <section id="assign-administrator" className="admin-card admin-users-section">
         <h2>2. Assign or Remove Admin Role</h2>
         <p className="admin-muted">

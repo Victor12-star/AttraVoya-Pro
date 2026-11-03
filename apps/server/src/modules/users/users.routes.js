@@ -51,6 +51,32 @@ export async function usersRoutes(app, options = {}) {
     ).listUsers,
   });
 
+  app.get('/admin-invitations', {
+    onRequest: [
+      protectedApp.authenticate,
+      protectedApp.authorize({
+        minimumRole: ROLES.SUPER_ADMIN,
+        allPermissions: [PERMISSIONS.ROLES_WRITE],
+      }),
+    ],
+    schema: usersSchemas.adminInvitationHistory,
+    config: { rateLimit: { max: 30, timeWindow: '1 minute' } },
+    handler: inviteController.list,
+  });
+
+  app.post('/admin-invitations/:invitationId/revoke', {
+    onRequest: [
+      protectedApp.authenticate,
+      protectedApp.authorize({
+        minimumRole: ROLES.SUPER_ADMIN,
+        allPermissions: [PERMISSIONS.ROLES_WRITE],
+      }),
+    ],
+    schema: usersSchemas.revokeAdminInvitation,
+    config: { rateLimit: ACCOUNT_DELETION_RATE_LIMIT },
+    handler: inviteController.revoke,
+  });
+
   app.post('/admin-invitations', {
     onRequest: [
       protectedApp.authenticate,

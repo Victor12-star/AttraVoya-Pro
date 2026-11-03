@@ -237,6 +237,7 @@ model User {
   emergencyRecordsVerified EmergencyRecord[] @relation("EmergencyRecordVerifier")
   featureFlagsUpdated       FeatureFlag[]     @relation("FeatureFlagUpdater")
   auditLogs                 AdminAuditLog[]   @relation("AuditActor")
+  adminInvitationsSent      AdminInvitation[] @relation("AdminInvitationSender")
 
   @@index([status])
   @@index([createdAt])
@@ -1029,4 +1030,22 @@ model AdminAuditLog {
   @@index([actorUserId, createdAt])
   @@index([resourceType, resourceId, createdAt])
   @@index([requestId])
+}
+
+// Registration invitation tracking. This record never grants permissions.
+// The existing role-management endpoint is still the only way to grant ADMIN.
+model AdminInvitation {
+  id              String   @id @default(cuid())
+  email           String
+  invitedByUserId String
+  sentAt          DateTime @default(now())
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  createdAt       DateTime @default(now())
+
+  invitedBy User @relation("AdminInvitationSender", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([invitedByUserId, createdAt])
+  @@index([email, createdAt])
+  @@index([expiresAt])
 }
