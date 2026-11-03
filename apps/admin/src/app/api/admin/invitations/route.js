@@ -58,3 +58,32 @@ export async function POST(request) {
     );
   }
 }
+
+export async function GET(request) {
+  const access = request.cookies.get(ACCESS_COOKIE)?.value;
+  if (!access) {
+    return NextResponse.json({ error: 'Please sign in again.' }, { status: 401 });
+  }
+  const page = request.nextUrl.searchParams.get('page') ?? '1';
+  if (!/^[1-9][0-9]{0,3}$/.test(page) || Number(page) > 1000) {
+    return NextResponse.json({ error: 'Invalid page number.' }, { status: 400 });
+  }
+  try {
+    const response = await backendRequest(`/api/v1/users/admin-invitations?page=${page}`, {
+      headers: { Authorization: `Bearer ${access}` },
+    });
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: response.status === 403 ? 'Platform Owner access required.'
+          : response.status === 401 ? 'Please sign in again.'
+            : 'Invitation history is unavailable.' },
+        { status: [401, 403].includes(response.status) ? response.status : 503 },
+      );
+    }
+    return NextResponse.json(await response.json(), {
+      headers: { 'Cache-Control': 'private, no-store' },
+    });
+  } catch {
+    return NextResponse.json({ error: 'Invitation history is unavailable.' }, { status: 503 });
+  }
+}
