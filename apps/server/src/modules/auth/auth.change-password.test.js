@@ -13,6 +13,7 @@ function serviceFor(repository) {
 describe('authenticated password change', () => {
   it('requires the current password and revokes sessions on success', async () => {
     const oldHash = await argon2.hash('OriginalPassword123', { type: argon2.argon2id });
+    let changedHash = '';
     const repository = {
       findPasswordHashByUserId: vi.fn(async () => ({
         passwordHash: oldHash,
@@ -20,7 +21,10 @@ describe('authenticated password change', () => {
         deletedAt: null,
         emailVerifiedAt: new Date(),
       })),
-      changePasswordAndRevokeSessions: vi.fn(async () => true),
+      changePasswordAndRevokeSessions: vi.fn(async (input) => {
+        changedHash = input.passwordHash;
+        return true;
+      }),
     };
     await serviceFor(repository).changePassword({
       userId: 'user-1',
@@ -32,8 +36,7 @@ describe('authenticated password change', () => {
       expectedHash: oldHash,
       passwordHash: expect.any(String),
     });
-    const newHash = repository.changePasswordAndRevokeSessions.mock.calls[0][0].passwordHash;
-    expect(await argon2.verify(newHash, 'DifferentPassword456')).toBe(true);
+    expect(await argon2.verify(changedHash, 'DifferentPassword456')).toBe(true);
   });
 
   it('rejects an incorrect current password without making changes', async () => {
