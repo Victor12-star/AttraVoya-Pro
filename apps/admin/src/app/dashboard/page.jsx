@@ -2,6 +2,8 @@ import Link from 'next/link';
 
 const SECTIONS = [
   ['Account security', '/dashboard/security'],
+  ['Add Administrator', '/dashboard/users#invite-administrator'],
+  ['Manage Admin Roles', '/dashboard/users#assign-administrator'],
   ['Users', '/dashboard/users'],
   ['Subscriptions', '/dashboard/subscriptions'],
   ['Destinations', '/dashboard/destinations'],
