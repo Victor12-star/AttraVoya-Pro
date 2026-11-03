@@ -126,6 +126,13 @@ export async function authRoutes(app, options = {}) {
 
   app.post('/logout', controller.logout);
 
+  app.post('/change-password', {
+    ...authenticated,
+    schema: authSchemas.changePassword,
+    config: { rateLimit: PASSWORD_RESET_RATE_LIMIT },
+    handler: controller.changePassword,
+  });
+
   app.post('/forgot-password', {
     schema: authSchemas.forgotPassword,
     config: { rateLimit: PASSWORD_RESET_RATE_LIMIT },
