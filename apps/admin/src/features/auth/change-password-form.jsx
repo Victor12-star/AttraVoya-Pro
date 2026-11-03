@@ -87,12 +87,18 @@ export function ChangePasswordForm() {
         disabled={busy}
       />
       <p className="admin-muted">
-        Use 8 to 128 characters with at least one letter and one number.
-        Changing your password signs out all refresh sessions. Previously issued access
-        tokens may remain valid until they expire.
+        Use 8 to 128 characters with at least one letter and one number. Changing your password
+        signs out all refresh sessions. Previously issued access tokens may remain valid until they
+        expire.
       </p>
-      {message ? <p role="alert" className="admin-login-error">{message}</p> : null}
-      <button type="submit" disabled={busy}>{busy ? 'Updating…' : 'Change password and sign out devices'}</button>
+      {message ? (
+        <p role="alert" className="admin-login-error">
+          {message}
+        </p>
+      ) : null}
+      <button type="submit" disabled={busy}>
+        {busy ? 'Updating…' : 'Change password and sign out devices'}
+      </button>
     </form>
   );
 }

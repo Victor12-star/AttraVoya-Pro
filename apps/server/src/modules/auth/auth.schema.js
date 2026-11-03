@@ -36,10 +36,12 @@ export const authSchemas = Object.freeze({
     params: sessionIdParamsSchema,
   },
   changePassword: {
-    body: z.object({
-      currentPassword: z.string().min(1).max(128),
-      newPassword: passwordSchema,
-    }).strict(),
+    body: z
+      .object({
+        currentPassword: z.string().min(1).max(128),
+        newPassword: passwordSchema,
+      })
+      .strict(),
   },
   mobileSession: {
     body: mobileSessionSchema,

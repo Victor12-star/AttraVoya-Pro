@@ -50,24 +50,34 @@ export async function POST(request) {
 
     if (!response.ok) {
       const status = response.status;
-      return NextResponse.json({
-        error: status === 401
-          ? 'Current password is incorrect or your session has expired.'
-          : status === 400
-            ? 'New password must be different and meet password requirements.'
-            : status === 429
-              ? 'Too many attempts. Please try again later.'
-              : 'Password change could not be completed.',
-      }, { status: [400, 401, 429].includes(status) ? status : 503 });
+      return NextResponse.json(
+        {
+          error:
+            status === 401
+              ? 'Current password is incorrect or your session has expired.'
+              : status === 400
+                ? 'New password must be different and meet password requirements.'
+                : status === 429
+                  ? 'Too many attempts. Please try again later.'
+                  : 'Password change could not be completed.',
+        },
+        { status: [400, 401, 429].includes(status) ? status : 503 },
+      );
     }
 
-    const result = NextResponse.json({ ok: true }, {
-      headers: { 'Cache-Control': 'private, no-store' },
-    });
+    const result = NextResponse.json(
+      { ok: true },
+      {
+        headers: { 'Cache-Control': 'private, no-store' },
+      },
+    );
     result.cookies.set(ACCESS_COOKIE, '', { ...sessionCookieOptions, maxAge: 0 });
     result.cookies.set(REFRESH_COOKIE, '', { ...sessionCookieOptions, maxAge: 0 });
     return result;
   } catch {
-    return NextResponse.json({ error: 'Security service temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Security service temporarily unavailable.' },
+      { status: 503 },
+    );
   }
 }

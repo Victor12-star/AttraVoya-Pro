@@ -47,11 +47,13 @@ describe('authenticated password change', () => {
       }),
       changePasswordAndRevokeSessions: vi.fn(),
     };
-    await expect(serviceFor(repository).changePassword({
-      userId: 'user-1',
-      currentPassword: 'WrongPassword999',
-      newPassword: 'DifferentPassword456',
-    })).rejects.toThrow('Current password is incorrect');
+    await expect(
+      serviceFor(repository).changePassword({
+        userId: 'user-1',
+        currentPassword: 'WrongPassword999',
+        newPassword: 'DifferentPassword456',
+      }),
+    ).rejects.toThrow('Current password is incorrect');
     expect(repository.changePasswordAndRevokeSessions).not.toHaveBeenCalled();
   });
 
@@ -66,11 +68,13 @@ describe('authenticated password change', () => {
       }),
       changePasswordAndRevokeSessions: vi.fn(),
     };
-    await expect(serviceFor(repository).changePassword({
-      userId: 'user-1',
-      currentPassword: 'OriginalPassword123',
-      newPassword: 'OriginalPassword123',
-    })).rejects.toThrow('different');
+    await expect(
+      serviceFor(repository).changePassword({
+        userId: 'user-1',
+        currentPassword: 'OriginalPassword123',
+        newPassword: 'OriginalPassword123',
+      }),
+    ).rejects.toThrow('different');
     expect(repository.changePasswordAndRevokeSessions).not.toHaveBeenCalled();
   });
 
@@ -85,10 +89,12 @@ describe('authenticated password change', () => {
       }),
       changePasswordAndRevokeSessions: vi.fn(async () => false),
     };
-    await expect(serviceFor(repository).changePassword({
-      userId: 'user-1',
-      currentPassword: 'OriginalPassword123',
-      newPassword: 'DifferentPassword456',
-    })).rejects.toThrow('could not be completed');
+    await expect(
+      serviceFor(repository).changePassword({
+        userId: 'user-1',
+        currentPassword: 'OriginalPassword123',
+        newPassword: 'DifferentPassword456',
+      }),
+    ).rejects.toThrow('could not be completed');
   });
 });
