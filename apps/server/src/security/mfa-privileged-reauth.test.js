@@ -14,7 +14,13 @@ const ADMIN = {
   roles: ['ADMIN'],
 };
 
+/**
+ * @param {any} [account]
+ * @param {any} [authorization]
+ * @param {boolean} [correctPassword]
+ */
 function fixture(account = ACTIVE, authorization = ADMIN, correctPassword = true) {
+  /** @type {any} */
   const repository = {
     findPasswordHashByUserId: vi.fn(async () => account),
     findAuthorizationContextByUserId: vi.fn(async () => authorization),
