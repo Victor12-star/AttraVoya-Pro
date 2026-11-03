@@ -35,7 +35,9 @@ describe('MFA persistence migration is additive and inactive', () => {
 
   it('has no raw recovery codes, plaintext TOTP columns, privileged roles or activation defaults', () => {
     expect(schema).not.toMatch(/(?:rawRecoveryCode|plaintextTotp|mfaSecretPlaintext)/);
-    expect(migration).not.toMatch(/INSERT INTO|UPDATE "User"|ALTER TABLE "User"|SUPER_ADMIN|DEFAULT TRUE/i);
+    expect(migration).not.toMatch(
+      /INSERT INTO|UPDATE "User"|ALTER TABLE "User"|SUPER_ADMIN|DEFAULT TRUE/i,
+    );
     expect(migration).not.toContain('CREATE EXTENSION');
   });
 
