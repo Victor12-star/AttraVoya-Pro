@@ -15,12 +15,17 @@ export async function usersRoutes(app, options = {}) {
   const service = createUsersService(repository);
   const controller = createUsersController({ service, env });
   const protectedApp = /** @type {any} */ (app);
-  const adminRoles = createAdminRoleController(createAdminRoleService(options.adminRoleRepository ?? adminRoleRepository));
+  const adminRoles = createAdminRoleController(
+    createAdminRoleService(options.adminRoleRepository ?? adminRoleRepository),
+  );
 
   app.post('/admin-role', {
     onRequest: [
       protectedApp.authenticate,
-      protectedApp.authorize({ minimumRole: ROLES.SUPER_ADMIN, allPermissions: [PERMISSIONS.ROLES_WRITE] }),
+      protectedApp.authorize({
+        minimumRole: ROLES.SUPER_ADMIN,
+        allPermissions: [PERMISSIONS.ROLES_WRITE],
+      }),
     ],
     schema: usersSchemas.manageAdminRole,
     config: { rateLimit: ACCOUNT_DELETION_RATE_LIMIT },

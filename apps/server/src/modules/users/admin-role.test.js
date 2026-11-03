@@ -62,7 +62,11 @@ describe('owner-only administrator role management', () => {
       setAdminRole: vi.fn(),
     };
     const app = await makeApp(repository);
-    const anonymous = await app.inject({ method: 'POST', url: '/api/v1/users/admin-role', payload: payload() });
+    const anonymous = await app.inject({
+      method: 'POST',
+      url: '/api/v1/users/admin-role',
+      payload: payload(),
+    });
     const ordinary = await app.inject({
       method: 'POST',
       url: '/api/v1/users/admin-role',
@@ -145,53 +149,93 @@ describe('audited and guarded role repository', () => {
     const tx = {
       $queryRaw: vi.fn(async () => []),
       user: {
-        findUnique: vi.fn(async ({ where }) => where.id ? {
-          id: 'owner',
-          status: 'ACTIVE',
-          deletedAt: null,
-          passwordHash: 'expected-hash',
-          roles: [{ role: { key: 'SUPER_ADMIN' } }],
-        } : {
-          id: 'existing',
-          status: 'ACTIVE',
-          deletedAt: null,
-          emailVerifiedAt: new Date(),
-          roles: [{ role: { key: 'USER' } }],
-        }),
+        findUnique: vi.fn(async ({ where }) =>
+          where.id
+            ? {
+                id: 'owner',
+                status: 'ACTIVE',
+                deletedAt: null,
+                passwordHash: 'expected-hash',
+                roles: [{ role: { key: 'SUPER_ADMIN' } }],
+              }
+            : {
+                id: 'existing',
+                status: 'ACTIVE',
+                deletedAt: null,
+                emailVerifiedAt: new Date(),
+                roles: [{ role: { key: 'USER' } }],
+              },
+        ),
       },
       role: { findUnique: vi.fn(async () => ({ id: 'admin-role' })) },
-      userRole: { create: vi.fn(async (data) => { actions.push('role'); return data; }) },
-      authSession: { updateMany: vi.fn(async () => { actions.push('sessions'); }) },
-      adminAuditLog: { create: vi.fn(async () => { actions.push('audit'); }) },
+      userRole: {
+        create: vi.fn(async (data) => {
+          actions.push('role');
+          return data;
+        }),
+      },
+      authSession: {
+        updateMany: vi.fn(async () => {
+          actions.push('sessions');
+        }),
+      },
+      adminAuditLog: {
+        create: vi.fn(async () => {
+          actions.push('audit');
+        }),
+      },
     };
     const database = { $transaction: vi.fn(async (callback) => callback(tx)) };
     const repository = createAdminRoleRepository(database);
-    await expect(repository.setAdminRole({
-      actorId: 'owner', expectedPasswordHash: 'expected-hash',
-      email: 'existing@example.test', action: 'grant',
-    })).resolves.toEqual({ changed: true, role: 'ADMIN', action: 'grant' });
+    await expect(
+      repository.setAdminRole({
+        actorId: 'owner',
+        expectedPasswordHash: 'expected-hash',
+        email: 'existing@example.test',
+        action: 'grant',
+      }),
+    ).resolves.toEqual({ changed: true, role: 'ADMIN', action: 'grant' });
     expect(actions).toEqual(['role', 'sessions', 'audit']);
-    expect(database.$transaction).toHaveBeenCalledWith(expect.any(Function), expect.objectContaining({ isolationLevel: 'Serializable' }));
+    expect(database.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({ isolationLevel: 'Serializable' }),
+    );
   });
 
   it('blocks changes to owner accounts', async () => {
     const tx = {
       $queryRaw: vi.fn(async () => []),
-      user: { findUnique: vi.fn(async ({ where }) => where.id ? {
-        id: 'owner', status: 'ACTIVE', deletedAt: null,
-        passwordHash: 'expected-hash', roles: [{ role: { key: 'SUPER_ADMIN' } }],
-      } : {
-        id: 'another-owner', status: 'ACTIVE', deletedAt: null, emailVerifiedAt: new Date(),
-        roles: [{ role: { key: 'SUPER_ADMIN' } }],
-      }) },
+      user: {
+        findUnique: vi.fn(async ({ where }) =>
+          where.id
+            ? {
+                id: 'owner',
+                status: 'ACTIVE',
+                deletedAt: null,
+                passwordHash: 'expected-hash',
+                roles: [{ role: { key: 'SUPER_ADMIN' } }],
+              }
+            : {
+                id: 'another-owner',
+                status: 'ACTIVE',
+                deletedAt: null,
+                emailVerifiedAt: new Date(),
+                roles: [{ role: { key: 'SUPER_ADMIN' } }],
+              },
+        ),
+      },
       userRole: { create: vi.fn() },
     };
     const database = { $transaction: async (callback) => callback(tx) };
     const repository = createAdminRoleRepository(database);
-    await expect(repository.setAdminRole({
-      actorId: 'owner', expectedPasswordHash: 'expected-hash',
-      email: 'existing@example.test', action: 'grant',
-    })).rejects.toThrow('Owner accounts cannot be modified');
+    await expect(
+      repository.setAdminRole({
+        actorId: 'owner',
+        expectedPasswordHash: 'expected-hash',
+        email: 'existing@example.test',
+        action: 'grant',
+      }),
+    ).rejects.toThrow('Owner accounts cannot be modified');
     expect(tx.userRole.create).not.toHaveBeenCalled();
   });
 });

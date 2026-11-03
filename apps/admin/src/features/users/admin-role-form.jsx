@@ -30,9 +30,11 @@ export function AdminRoleForm() {
         setMessage(result.error ?? 'Unable to update administrator access.');
         return;
       }
-      setMessage(result.changed
-        ? `Administrator access ${action === 'grant' ? 'granted' : 'revoked'}. Previous sessions were revoked.`
-        : 'No change was needed; the account already has the requested role state.');
+      setMessage(
+        result.changed
+          ? `Administrator access ${action === 'grant' ? 'granted' : 'revoked'}. Previous sessions were revoked.`
+          : 'No change was needed; the account already has the requested role state.',
+      );
       setCurrentPassword('');
     } catch {
       setError(true);
@@ -45,26 +47,47 @@ export function AdminRoleForm() {
   return (
     <form className="admin-login-form" onSubmit={submit}>
       <label htmlFor="admin-role-email">Existing verified account email</label>
-      <input id="admin-role-email" type="email" required autoComplete="off"
-        maxLength={320} value={email} disabled={busy}
-        onChange={(event) => setEmail(event.target.value)} />
+      <input
+        id="admin-role-email"
+        type="email"
+        required
+        autoComplete="off"
+        maxLength={320}
+        value={email}
+        disabled={busy}
+        onChange={(event) => setEmail(event.target.value)}
+      />
       <label htmlFor="admin-role-action">Administrative action</label>
-      <select id="admin-role-action" value={action} disabled={busy}
-        onChange={(event) => setAction(event.target.value)}>
+      <select
+        id="admin-role-action"
+        value={action}
+        disabled={busy}
+        onChange={(event) => setAction(event.target.value)}
+      >
         <option value="grant">Assign Admin role</option>
         <option value="revoke">Remove Admin role</option>
       </select>
       <label htmlFor="admin-role-password">Confirm your owner password</label>
-      <input id="admin-role-password" type="password" required autoComplete="current-password"
-        value={currentPassword} disabled={busy}
-        onChange={(event) => setCurrentPassword(event.target.value)} />
+      <input
+        id="admin-role-password"
+        type="password"
+        required
+        autoComplete="current-password"
+        value={currentPassword}
+        disabled={busy}
+        onChange={(event) => setCurrentPassword(event.target.value)}
+      />
       <p className="admin-muted">
         The other person must already have a verified account. Only the Admin role can be changed
         here. Super Admin ownership cannot be transferred or removed here.
       </p>
       {message ? <p role={error ? 'alert' : 'status'}>{message}</p> : null}
       <button type="submit" disabled={busy}>
-        {busy ? 'Updating…' : action === 'grant' ? 'Confirm Admin role assignment' : 'Confirm Admin role removal'}
+        {busy
+          ? 'Updating…'
+          : action === 'grant'
+            ? 'Confirm Admin role assignment'
+            : 'Confirm Admin role removal'}
       </button>
     </form>
   );

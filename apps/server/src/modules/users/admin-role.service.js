@@ -10,7 +10,13 @@ export function createAdminRoleService(repository) {
         ? await argon2.verify(actor.passwordHash, currentPassword)
         : false;
 
-      if (!actor || actor.deletedAt || actor.status !== 'ACTIVE' || !actor.emailVerifiedAt || !valid) {
+      if (
+        !actor ||
+        actor.deletedAt ||
+        actor.status !== 'ACTIVE' ||
+        !actor.emailVerifiedAt ||
+        !valid
+      ) {
         throw new AuthenticationError('Owner password confirmation failed.', {
           code: ERROR_CODES.INVALID_CREDENTIALS,
         });
