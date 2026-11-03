@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  generateMfaRecoveryCodes,
-  hashMfaRecoveryCode,
-} from './mfa-recovery-codes.js';
+import { generateMfaRecoveryCodes, hashMfaRecoveryCode } from './mfa-recovery-codes.js';
 
 describe('MFA recovery code security primitives', () => {
   it('creates ten distinct, 160-bit Base32 recovery codes', () => {
@@ -37,9 +34,7 @@ describe('MFA recovery code security primitives', () => {
     const raw = code.replaceAll('-', '');
     const first = hashMfaRecoveryCode({ userId: 'user-one', code });
     expect(hashMfaRecoveryCode({ userId: 'user-one', code: raw })).toBe(first);
-    expect(hashMfaRecoveryCode({ userId: 'user-one', code: code.toLowerCase() })).toBe(
-      first,
-    );
+    expect(hashMfaRecoveryCode({ userId: 'user-one', code: code.toLowerCase() })).toBe(first);
     expect(hashMfaRecoveryCode({ userId: 'user-two', code })).not.toBe(first);
   });
 
@@ -55,10 +50,7 @@ describe('MFA recovery code security primitives', () => {
       code.replaceAll('-', ' '),
       code.slice(0, 5) + code.slice(6),
     ]) {
-      const invalidHash = hashMfaRecoveryCode({
-        userId: 'user-one',
-        code: invalid,
-      });
+      const invalidHash = hashMfaRecoveryCode({ userId: 'user-one', code: invalid });
       expect(invalidHash).toBeNull();
     }
     expect(() => hashMfaRecoveryCode({ userId: '', code })).toThrow();
