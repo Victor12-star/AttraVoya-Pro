@@ -31,7 +31,7 @@ export async function GET(request) {
       ? await backendRequest(`/api/v1/analytics/users?days=${days}`, {
           headers: { Authorization: `Bearer ${access}` },
         })
-      : { status: 401 };
+      : new Response(null, { status: 401 });
 
     if (response.status === 401 && refresh) {
       const refreshResponse = await backendRequest('/api/v1/auth/mobile/refresh', {
