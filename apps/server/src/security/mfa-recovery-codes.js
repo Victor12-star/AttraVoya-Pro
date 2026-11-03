@@ -43,7 +43,8 @@ export function generateMfaRecoveryCodes() {
 
   while (codes.size < CODE_COUNT) {
     const raw = encodeBase32(randomBytes(CODE_BYTES));
-    codes.add(raw.match(/.{4}/g).join('-'));
+    const groups = Array.from({ length: 8 }, (_, index) => raw.slice(index * 4, index * 4 + 4));
+    codes.add(groups.join('-'));
   }
 
   return [...codes];
