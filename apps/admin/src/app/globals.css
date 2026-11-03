@@ -612,3 +612,69 @@ textarea {
   gap: 14px;
   margin-top: 16px;
 }
+
+/* Owner session security */
+.admin-security-stack {
+  display: grid;
+  gap: 20px;
+}
+.admin-security-sessions .admin-session-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.admin-session-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e3e7ee;
+}
+.admin-session-list li p {
+  margin: 4px 0;
+}
+.admin-security-sessions button {
+  border: 1px solid #9daecb;
+  border-radius: 9px;
+  padding: 10px 16px;
+  min-height: 44px;
+  background: #fff;
+  color: #1d335b;
+  font-weight: 650;
+  cursor: pointer;
+}
+.admin-security-sessions button:focus-visible,
+.admin-security-sessions input:focus-visible {
+  outline: 3px solid #477bea;
+  outline-offset: 3px;
+}
+.admin-security-sessions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.admin-security-emergency {
+  display: grid;
+  gap: 12px;
+  max-width: 600px;
+  margin-top: 26px;
+  padding: 18px;
+  border: 1px solid #e9b4b4;
+  border-radius: 12px;
+  background: #fffafa;
+}
+.admin-security-emergency h3 {
+  margin: 0;
+}
+.admin-security-emergency input {
+  border: 1px solid #b4c1d4;
+  border-radius: 9px;
+  padding: 10px;
+  min-height: 44px;
+}
+.admin-security-emergency button:not(:disabled) {
+  background: #a72029;
+  color: #fff;
+  border-color: #a72029;
+}
