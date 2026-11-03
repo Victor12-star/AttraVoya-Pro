@@ -3,6 +3,16 @@ import { z } from 'zod';
 import { emailSchema, passwordSchema } from '@attravoya/validation';
 
 export const usersSchemas = Object.freeze({
+  adminInvitationHistory: {
+    querystring: z.object({
+      page: z.coerce.number().int().min(1).max(1000).default(1),
+      limit: z.coerce.number().int().min(1).max(20).default(20),
+    }).strict(),
+  },
+  revokeAdminInvitation: {
+    params: z.object({ invitationId: z.string().min(1).max(128) }).strict(),
+    body: z.object({ currentPassword: z.string().min(1).max(128) }).strict(),
+  },
   adminDirectory: {
     querystring: z
       .object({
