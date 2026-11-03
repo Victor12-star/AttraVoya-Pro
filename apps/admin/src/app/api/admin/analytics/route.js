@@ -52,7 +52,15 @@ export async function GET(request) {
 
     if (!response.ok) {
       const code = [401, 403].includes(response.status) ? response.status : 503;
-      return reply({ error: { message: code === 403 ? 'Administrator permission required.' : 'Unable to load analytics.' } }, code);
+      return reply(
+        {
+          error: {
+            message:
+              code === 403 ? 'Administrator permission required.' : 'Unable to load analytics.',
+          },
+        },
+        code,
+      );
     }
 
     const metrics = await response.json();
@@ -62,8 +70,13 @@ export async function GET(request) {
         ...sessionCookieOptions,
         maxAge: 15 * 60,
       });
-      const seconds = Math.max(1, Math.min(30 * 24 * 60 * 60,
-        Math.floor((Date.parse(rotated.refreshExpiresAt) - Date.now()) / 1000)));
+      const seconds = Math.max(
+        1,
+        Math.min(
+          30 * 24 * 60 * 60,
+          Math.floor((Date.parse(rotated.refreshExpiresAt) - Date.now()) / 1000),
+        ),
+      );
       result.cookies.set(REFRESH_COOKIE, rotated.refreshToken, {
         ...sessionCookieOptions,
         maxAge: Number.isFinite(seconds) ? seconds : 15 * 60,

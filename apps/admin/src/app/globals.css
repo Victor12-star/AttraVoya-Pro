@@ -441,7 +441,6 @@ textarea {
   }
 }
 
-
 /* Admin sign-in and sign-out controls */
 .admin-login-card {
   max-width: 490px;
@@ -485,7 +484,10 @@ textarea {
   opacity: 0.6;
   cursor: wait;
 }
-.admin-login-error { color: #a42321; margin: 4px 0; }
+.admin-login-error {
+  color: #a42321;
+  margin: 4px 0;
+}
 .admin-sign-out {
   margin-left: auto;
   padding: 7px 10px;

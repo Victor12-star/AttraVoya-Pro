@@ -31,9 +31,11 @@ describe('admin login', () => {
     await user.type(screen.getByLabelText('Password'), 'example-password');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Incorrect credentials');
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
-      '/api/admin/login',
-      expect.objectContaining({ method: 'POST', credentials: 'same-origin' }),
-    ));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/admin/login',
+        expect.objectContaining({ method: 'POST', credentials: 'same-origin' }),
+      ),
+    );
   });
 });

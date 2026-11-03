@@ -15,7 +15,9 @@ export function AdminLogoutButton() {
       router.refresh();
     }
   }
-  return <button type="button" disabled={busy} onClick={signOut} className="admin-sign-out">
-    {busy ? 'Signing out…' : 'Sign out'}
-  </button>;
+  return (
+    <button type="button" disabled={busy} onClick={signOut} className="admin-sign-out">
+      {busy ? 'Signing out…' : 'Sign out'}
+    </button>
+  );
 }

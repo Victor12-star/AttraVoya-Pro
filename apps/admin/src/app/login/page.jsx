@@ -64,8 +64,14 @@ export default function AdminLoginPage() {
             onChange={(event) => setPassword(event.target.value)}
             disabled={busy}
           />
-          {message ? <p role="alert" className="admin-login-error">{message}</p> : null}
-          <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+          {message ? (
+            <p role="alert" className="admin-login-error">
+              {message}
+            </p>
+          ) : null}
+          <button type="submit" disabled={busy}>
+            {busy ? 'Signing in…' : 'Sign in'}
+          </button>
         </form>
       </section>
     </main>

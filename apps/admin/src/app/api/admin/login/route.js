@@ -37,15 +37,17 @@ export async function POST(request) {
     });
     if (!response.ok) {
       return NextResponse.json(
-        { error: response.status === 401 ? 'Incorrect credentials or account unavailable.' : 'Sign in failed. Please try again.' },
+        {
+          error:
+            response.status === 401
+              ? 'Incorrect credentials or account unavailable.'
+              : 'Sign in failed. Please try again.',
+        },
         { status: response.status === 401 ? 401 : 503 },
       );
     }
     const session = await response.json();
-    if (
-      typeof session?.accessToken !== 'string' ||
-      typeof session?.refreshToken !== 'string'
-    ) {
+    if (typeof session?.accessToken !== 'string' || typeof session?.refreshToken !== 'string') {
       return NextResponse.json({ error: 'Invalid authentication response.' }, { status: 502 });
     }
 
@@ -70,14 +72,22 @@ export async function POST(request) {
       ...sessionCookieOptions,
       maxAge: 15 * 60,
     });
-    const seconds = Math.max(1, Math.min(30 * 24 * 60 * 60,
-      Math.floor((Date.parse(session.refreshExpiresAt) - Date.now()) / 1000)));
+    const seconds = Math.max(
+      1,
+      Math.min(
+        30 * 24 * 60 * 60,
+        Math.floor((Date.parse(session.refreshExpiresAt) - Date.now()) / 1000),
+      ),
+    );
     result.cookies.set(REFRESH_COOKIE, session.refreshToken, {
       ...sessionCookieOptions,
       maxAge: Number.isFinite(seconds) ? seconds : 15 * 60,
     });
     return result;
   } catch {
-    return NextResponse.json({ error: 'Authentication service temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Authentication service temporarily unavailable.' },
+      { status: 503 },
+    );
   }
 }
