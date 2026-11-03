@@ -497,3 +497,43 @@ textarea {
   color: #f0f6ff;
   cursor: pointer;
 }
+
+/* Owner administration onboarding */
+.admin-users-stack { display: grid; gap: 20px; }
+.admin-users-heading {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+.admin-users-heading h1 { margin: 8px 0; }
+.admin-primary-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 12px 20px;
+  border-radius: 11px;
+  background: #285ac7;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.admin-primary-link:focus-visible { outline: 3px solid #427cf0; outline-offset: 3px; }
+.admin-users-section { scroll-margin-top: 24px; }
+.admin-users-section h2 { margin-bottom: 6px; }
+.admin-users-section .admin-login-form { max-width: 580px; }
+.admin-users-section .admin-login-form select {
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #c5cedb;
+  border-radius: 10px;
+  background: #fff;
+  color: #172033;
+}
+@media (max-width: 720px) {
+  .admin-users-heading { flex-direction: column; gap: 12px; }
+  .admin-primary-link { width: 100%; }
+}
