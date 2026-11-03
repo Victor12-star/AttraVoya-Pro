@@ -18,7 +18,7 @@ describe('TOTP security primitives', () => {
     expect(verifyTotp({ secret: RFC_SECRET, code: '081804', now: 1_111_111_109_000 })).toBe(
       Math.floor(1_111_111_109 / 30),
     );
-    expect(verifyTotp({ secret: RFC_SECRET, code: '050471', now: 2_000_000_000_000 })).toBe(
+    expect(verifyTotp({ secret: RFC_SECRET, code: '279037', now: 2_000_000_000_000 })).toBe(
       Math.floor(2_000_000_000 / 30),
     );
   });
