@@ -33,7 +33,7 @@ describe('MFA persistence migration is additive and inactive', () => {
     expect(migration).toContain('CHECK ("lastAcceptedCounter" >= -1)');
   });
 
-  it('has no raw recovery codes, plaintext TOTP columns, privileged roles or activation defaults', () => {
+  it('excludes plaintext codes, privileged role changes and auto-activation', () => {
     expect(schema).not.toMatch(/(?:rawRecoveryCode|plaintextTotp|mfaSecretPlaintext)/);
     expect(migration).not.toMatch(
       /INSERT INTO|UPDATE "User"|ALTER TABLE "User"|SUPER_ADMIN|DEFAULT TRUE/i,
