@@ -181,6 +181,7 @@ export async function buildApp(options = {}) {
   await app.register(usersRoutes, {
     prefix: `${API_PREFIX}/users`,
     repository: options.usersRepository,
+    adminRoleRepository: options.adminRoleRepository,
   });
 
   await app.register(entitlementsRoutes, {
