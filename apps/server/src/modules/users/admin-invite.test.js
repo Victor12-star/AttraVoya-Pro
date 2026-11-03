@@ -153,7 +153,7 @@ describe('secure administrator registration invitations', () => {
       confirmOwner: async () => true,
       recordInvitation: vi.fn(),
     };
-    const app = await appWithInvitation({ repository });
+    const app = await appWithInvitation({ repository, sendInvitation: undefined });
     const response = await app.inject({
       method: 'POST',
       url: '/api/v1/users/admin-invitations',
