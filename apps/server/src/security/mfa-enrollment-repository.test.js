@@ -20,7 +20,12 @@ function fixture() {
       }),
       create: vi.fn(async ({ data }) => {
         if (credential) throw Object.assign(new Error('unique conflict'), { code: 'P2002' });
-        credential = { ...data, secretEnvelope: data.secretEnvelope, enabledAt: null };
+        credential = {
+          ...data,
+          secretEnvelope: data.secretEnvelope,
+          enabledAt: null,
+          lastAcceptedCounter: -1,
+        };
         return credential;
       }),
       findUnique: vi.fn(async () => credential),
