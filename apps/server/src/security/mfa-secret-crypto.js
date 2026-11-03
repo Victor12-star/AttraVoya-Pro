@@ -36,7 +36,12 @@ export function encryptTotpSecret({ secret, userId, key }) {
   cipher.setAAD(associatedData(userId));
   const ciphertext = Buffer.concat([cipher.update(secret, 'utf8'), cipher.final()]);
   const tag = cipher.getAuthTag();
-  return [ENVELOPE_VERSION, iv.toString('base64url'), ciphertext.toString('base64url'), tag.toString('base64url')].join(':');
+  return [
+    ENVELOPE_VERSION,
+    iv.toString('base64url'),
+    ciphertext.toString('base64url'),
+    tag.toString('base64url'),
+  ].join(':');
 }
 
 /**
@@ -69,7 +74,9 @@ export function decryptTotpSecret({ envelope, userId, key }) {
     const decipher = createDecipheriv('aes-256-gcm', key, iv, { authTagLength: TAG_BYTES });
     decipher.setAAD(aad);
     decipher.setAuthTag(tag);
-    const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+    const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString(
+      'utf8',
+    );
     if (!/^[A-Z2-7]{32}$/.test(plaintext)) throw new Error('Invalid plaintext.');
     return plaintext;
   } catch {
