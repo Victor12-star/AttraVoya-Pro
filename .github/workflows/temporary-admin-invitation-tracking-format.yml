@@ -24,7 +24,6 @@ jobs:
       - name: Format invitation tracking changes
         run: |
           pnpm exec prettier --write \
-            packages/database/prisma/schema.prisma \
             apps/server/src/modules/users/admin-invite.repository.js \
             apps/server/src/modules/users/admin-invite.service.js \
             apps/server/src/modules/users/admin-invite.controller.js \
@@ -37,8 +36,7 @@ jobs:
             apps/admin/src/app/dashboard/users/page.jsx
       - name: Commit scoped formatting
         run: |
-          git add -- packages/database/prisma/schema.prisma \
-            apps/server/src/modules/users/admin-invite.repository.js \
+          git add --             apps/server/src/modules/users/admin-invite.repository.js \
             apps/server/src/modules/users/admin-invite.service.js \
             apps/server/src/modules/users/admin-invite.controller.js \
             apps/server/src/modules/users/admin-invite.test.js \
