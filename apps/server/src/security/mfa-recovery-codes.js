@@ -28,8 +28,12 @@ function normalizeRecoveryCode(code) {
   if (typeof code !== 'string') return null;
   const raw = code.replaceAll('-', '').toUpperCase();
   if (!CODE_PATTERN.test(raw)) return null;
-  if (code !== raw && !/^[A-Za-z2-7]{4}(?:-[A-Za-z2-7]{4}){7}$/.test(code)) {
-    return null;
+  if (code !== raw) {
+    if (code.length !== 39) return null;
+    for (let index = 0; index < code.length; index += 1) {
+      if (index % 5 === 4 && code[index] !== '-') return null;
+      if (index % 5 !== 4 && code[index] === '-') return null;
+    }
   }
   return raw;
 }
