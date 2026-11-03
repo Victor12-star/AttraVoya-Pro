@@ -228,6 +228,9 @@ model User {
   checkoutAttempts          CheckoutAttempt[]
   revenueCatSubscriberIdentity RevenueCatSubscriberIdentity?
   authSessions              AuthSession[]
+  mfaTotpCredential         MfaTotpCredential?
+  mfaRecoveryCodes          MfaRecoveryCode[]
+  mfaChallenges             MfaChallenge[]
   emailVerificationTokens   EmailVerificationToken[]
   passwordResetTokens       PasswordResetToken[]
   trips                     Trip[]
@@ -454,6 +457,53 @@ model AuthSession {
   @@index([userId, expiresAt])
   @@index([userId, revokedAt])
   @@index([expiresAt])
+}
+
+// MFA remains inactive until the complete challenge and login gate are implemented.
+// Encrypted secrets and recovery hashes are written only by audited auth services.
+model MfaTotpCredential {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  secretEnvelope      String
+  pendingExpiresAt    DateTime?
+  enabledAt           DateTime?
+  lastAcceptedCounter Int       @default(-1)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([pendingExpiresAt])
+  @@index([enabledAt])
+}
+
+model MfaRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String    @unique
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+}
+
+// This one-time challenge record never grants access on its own.
+model MfaChallenge {
+  id            String    @id @default(cuid())
+  userId        String
+  challengeHash String    @unique
+  purpose       String
+  attempts      Int       @default(0)
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt, consumedAt])
 }
 
 model EmailVerificationToken {
