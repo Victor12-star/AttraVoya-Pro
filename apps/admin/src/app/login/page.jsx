@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -26,7 +28,8 @@ export default function AdminLoginPage() {
         setMessage(result.error ?? 'Unable to sign in. Please try again.');
         return;
       }
-      window.location.assign('/dashboard/analytics');
+      router.replace('/dashboard/analytics');
+      router.refresh();
     } catch {
       setMessage('Sign in is temporarily unavailable. Please try again.');
     } finally {
