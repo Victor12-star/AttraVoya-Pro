@@ -1,5 +1,6 @@
 import { AdminInviteForm } from '../../../features/users/admin-invite-form.jsx';
 import { AdminRoleForm } from '../../../features/users/admin-role-form.jsx';
+import { AdminUserDirectory } from '../../../features/users/admin-user-directory.jsx';
 
 export default function UsersPage() {
   return (
@@ -16,6 +17,7 @@ export default function UsersPage() {
           Add Administrator
         </a>
       </header>
+      <AdminUserDirectory />
       <section id="invite-administrator" className="admin-card admin-users-section">
         <h2>1. Invite New Administrator</h2>
         <p className="admin-muted">
