@@ -173,11 +173,15 @@ describe('tracked invitation lifecycle authorization', () => {
     const app = await appWithInvitation({ repository, sendInvitation: vi.fn() });
     const anonymous = await app.inject({ method: 'GET', url: '/api/v1/users/admin-invitations' });
     const traveler = await app.inject({
-      method: 'GET', url: '/api/v1/users/admin-invitations', headers: bearer(app, 'traveler'),
+      method: 'GET',
+      url: '/api/v1/users/admin-invitations',
+      headers: bearer(app, 'traveler'),
     });
     const revoke = await app.inject({
-      method: 'POST', url: '/api/v1/users/admin-invitations/id123/revoke',
-      headers: bearer(app, 'traveler'), payload: { currentPassword: 'Hello123' },
+      method: 'POST',
+      url: '/api/v1/users/admin-invitations/id123/revoke',
+      headers: bearer(app, 'traveler'),
+      payload: { currentPassword: 'Hello123' },
     });
     expect(anonymous.statusCode).toBe(401);
     expect(traveler.statusCode).toBe(403);
@@ -188,11 +192,18 @@ describe('tracked invitation lifecycle authorization', () => {
 
   it('returns owner invitation history without credentials', async () => {
     const repository = {
-      listInvitations: vi.fn(async () => ({ page: 1, limit: 20, total: 0, pages: 0, invitations: [] })),
+      listInvitations: vi.fn(async () => ({
+        page: 1,
+        limit: 20,
+        total: 0,
+        pages: 0,
+        invitations: [],
+      })),
     };
     const app = await appWithInvitation({ repository, sendInvitation: vi.fn() });
     const result = await app.inject({
-      method: 'GET', url: '/api/v1/users/admin-invitations',
+      method: 'GET',
+      url: '/api/v1/users/admin-invitations',
       headers: bearer(app, 'owner'),
     });
     expect(result.statusCode).toBe(200);
@@ -205,26 +216,34 @@ describe('tracked invitation lifecycle authorization', () => {
     const hash = await argon2.hash('OwnerPassword123', { type: argon2.argon2id });
     const repository = {
       ownerCredential: vi.fn(async () => ({
-        passwordHash: hash, status: 'ACTIVE',
-        emailVerifiedAt: new Date(), deletedAt: null,
+        passwordHash: hash,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        deletedAt: null,
       })),
       revokeInvitation: vi.fn(async () => true),
     };
     const app = await appWithInvitation({ repository, sendInvitation: vi.fn() });
     const denied = await app.inject({
-      method: 'POST', url: '/api/v1/users/admin-invitations/invite123/revoke',
-      headers: bearer(app, 'owner'), payload: { currentPassword: 'WrongPassword' },
+      method: 'POST',
+      url: '/api/v1/users/admin-invitations/invite123/revoke',
+      headers: bearer(app, 'owner'),
+      payload: { currentPassword: 'WrongPassword' },
     });
     expect(denied.statusCode).toBe(401);
     expect(repository.revokeInvitation).not.toHaveBeenCalled();
     const result = await app.inject({
-      method: 'POST', url: '/api/v1/users/admin-invitations/invite123/revoke',
-      headers: bearer(app, 'owner'), payload: { currentPassword: 'OwnerPassword123' },
+      method: 'POST',
+      url: '/api/v1/users/admin-invitations/invite123/revoke',
+      headers: bearer(app, 'owner'),
+      payload: { currentPassword: 'OwnerPassword123' },
     });
     expect(result.statusCode).toBe(200);
     expect(result.json()).toEqual({ revoked: true });
     expect(repository.revokeInvitation).toHaveBeenCalledWith({
-      actorId: 'owner', expectedPasswordHash: hash, invitationId: 'invite123',
+      actorId: 'owner',
+      expectedPasswordHash: hash,
+      invitationId: 'invite123',
     });
   });
 });

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-import { ACCESS_COOKIE, backendRequest, validSameOrigin } from '../../../../../../lib/admin-backend.js';
+import {
+  ACCESS_COOKIE,
+  backendRequest,
+  validSameOrigin,
+} from '../../../../../../lib/admin-backend.js';
 
 export async function POST(request, { params }) {
   if (!validSameOrigin(request)) {
@@ -18,13 +22,17 @@ export async function POST(request, { params }) {
   } catch {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
-  if (typeof body?.currentPassword !== 'string' || !body.currentPassword ||
-      body.currentPassword.length > 128) {
+  if (
+    typeof body?.currentPassword !== 'string' ||
+    !body.currentPassword ||
+    body.currentPassword.length > 128
+  ) {
     return NextResponse.json({ error: 'Enter your owner password.' }, { status: 400 });
   }
   try {
     const response = await backendRequest(
-      `/api/v1/users/admin-invitations/${encodeURIComponent(invitationId)}/revoke`, {
+      `/api/v1/users/admin-invitations/${encodeURIComponent(invitationId)}/revoke`,
+      {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${access}` },
         body: JSON.stringify({ currentPassword: body.currentPassword }),
@@ -32,12 +40,19 @@ export async function POST(request, { params }) {
     );
     if (!response.ok) {
       const status = [400, 401, 403, 429].includes(response.status) ? response.status : 503;
-      return NextResponse.json({
-        error: status === 401 ? 'Password or session confirmation failed.'
-          : status === 403 ? 'Platform Owner access required.'
-            : status === 429 ? 'Too many attempts. Please try again later.'
-              : 'Unable to revoke the invitation record.',
-      }, { status });
+      return NextResponse.json(
+        {
+          error:
+            status === 401
+              ? 'Password or session confirmation failed.'
+              : status === 403
+                ? 'Platform Owner access required.'
+                : status === 429
+                  ? 'Too many attempts. Please try again later.'
+                  : 'Unable to revoke the invitation record.',
+        },
+        { status },
+      );
     }
     return NextResponse.json(await response.json(), {
       headers: { 'Cache-Control': 'private, no-store' },

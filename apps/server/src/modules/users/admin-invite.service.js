@@ -59,8 +59,13 @@ export function createAdminInviteService({ repository, sendInvitation }) {
       const valid = owner?.passwordHash
         ? await argon2.verify(owner.passwordHash, currentPassword)
         : false;
-      if (!owner || owner.status !== 'ACTIVE' || owner.deletedAt ||
-          !owner.emailVerifiedAt || !valid) {
+      if (
+        !owner ||
+        owner.status !== 'ACTIVE' ||
+        owner.deletedAt ||
+        !owner.emailVerifiedAt ||
+        !valid
+      ) {
         throw new AuthenticationError('Owner password confirmation failed.', {
           code: ERROR_CODES.INVALID_CREDENTIALS,
         });
@@ -71,7 +76,9 @@ export function createAdminInviteService({ repository, sendInvitation }) {
         invitationId,
       });
       if (!revoked) {
-        throw new AuthenticationError('Invitation could not be revoked. Please refresh and sign in again.');
+        throw new AuthenticationError(
+          'Invitation could not be revoked. Please refresh and sign in again.',
+        );
       }
       return { revoked: true };
     },

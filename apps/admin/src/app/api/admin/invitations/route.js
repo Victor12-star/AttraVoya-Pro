@@ -74,9 +74,14 @@ export async function GET(request) {
     });
     if (!response.ok) {
       return NextResponse.json(
-        { error: response.status === 403 ? 'Platform Owner access required.'
-          : response.status === 401 ? 'Please sign in again.'
-            : 'Invitation history is unavailable.' },
+        {
+          error:
+            response.status === 403
+              ? 'Platform Owner access required.'
+              : response.status === 401
+                ? 'Please sign in again.'
+                : 'Invitation history is unavailable.',
+        },
         { status: [401, 403].includes(response.status) ? response.status : 503 },
       );
     }
