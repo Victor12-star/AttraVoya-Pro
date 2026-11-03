@@ -238,6 +238,39 @@ export function createAuthService({ repository, issueAccessToken, refreshSession
       }
     },
 
+    async changePassword({ userId, currentPassword, newPassword }) {
+      const current = await repository.findPasswordHashByUserId(userId);
+      const valid = await argon2.verify(
+        current?.passwordHash ?? DUMMY_PASSWORD_HASH,
+        currentPassword,
+      );
+      if (
+        !current ||
+        current.deletedAt ||
+        current.status !== 'ACTIVE' ||
+        !current.emailVerifiedAt ||
+        !valid
+      ) {
+        throw new AuthenticationError('Current password is incorrect.', {
+          code: ERROR_CODES.INVALID_CREDENTIALS,
+        });
+      }
+      if (await argon2.verify(current.passwordHash, newPassword)) {
+        throw new ValidationError('Choose a new password different from your current one.');
+      }
+      const passwordHash = await argon2.hash(newPassword, { type: argon2.argon2id });
+      const changed = await repository.changePasswordAndRevokeSessions({
+        userId,
+        expectedHash: current.passwordHash,
+        passwordHash,
+      });
+      if (!changed) {
+        throw new AuthenticationError(
+          'Password change could not be completed. Please sign in again.',
+        );
+      }
+    },
+
     async forgotPassword(email) {
       const userId = await repository.findUserIdByEmail(email);
       if (!userId) return { resetToken: null };

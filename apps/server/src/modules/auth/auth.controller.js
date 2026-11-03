@@ -188,6 +188,15 @@ export function createAuthController({
       return sendPrivate(reply, undefined, 204);
     },
 
+    async changePassword(request, reply) {
+      await service.changePassword({
+        userId: authenticatedUserId(request),
+        ...request.body,
+      });
+      clearSessionCookies(reply, env);
+      return sendPrivate(reply, { message: 'Password changed. Sign in again on all devices.' });
+    },
+
     async forgotPassword(request, reply) {
       const result = await service.forgotPassword(request.body.email);
 

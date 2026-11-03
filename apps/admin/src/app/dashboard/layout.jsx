@@ -13,6 +13,7 @@ const NAV_GROUPS = [
       ['Analytics', '/dashboard/analytics'],
       ['Users', '/dashboard/users'],
       ['Subscriptions', '/dashboard/subscriptions'],
+      ['Account security', '/dashboard/security'],
     ],
   },
   {

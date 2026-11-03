@@ -71,6 +71,32 @@ export const authRepository = Object.freeze({
     return mapAuthorizationContext(user);
   },
 
+  async findPasswordHashByUserId(userId) {
+    return prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true, status: true, deletedAt: true, emailVerifiedAt: true },
+    });
+  },
+
+  async changePasswordAndRevokeSessions({ userId, expectedHash, passwordHash, now = new Date() }) {
+    return prisma.$transaction(async (tx) => {
+      const updated = await tx.user.updateMany({
+        where: { id: userId, passwordHash: expectedHash, status: 'ACTIVE', deletedAt: null },
+        data: { passwordHash },
+      });
+      if (updated.count !== 1) return false;
+      await tx.authSession.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: now },
+      });
+      await tx.passwordResetToken.updateMany({
+        where: { userId, usedAt: null },
+        data: { usedAt: now },
+      });
+      return true;
+    });
+  },
+
   async findUserByEmailForLogin(email) {
     return prisma.user.findUnique({
       where: { email },

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import {
   forgotPasswordSchema,
+  passwordSchema,
   loginSchema,
   registerSchema,
   resetPasswordSchema,
@@ -33,6 +34,14 @@ export const authSchemas = Object.freeze({
   },
   revokeSession: {
     params: sessionIdParamsSchema,
+  },
+  changePassword: {
+    body: z
+      .object({
+        currentPassword: z.string().min(1).max(128),
+        newPassword: passwordSchema,
+      })
+      .strict(),
   },
   mobileSession: {
     body: mobileSessionSchema,
