@@ -1,0 +1,62 @@
+name: Temporary Admin Invite Formatting
+on:
+  push:
+    branches:
+      - feat/admin-invite-onboarding
+permissions:
+  contents: write
+jobs:
+  format-invite:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Format invitation changes
+        run: |
+          pnpm exec prettier --write \
+            apps/server/src/modules/users/admin-invite.service.js \
+            apps/server/src/modules/users/admin-invite.repository.js \
+            apps/server/src/modules/users/admin-invite.controller.js \
+            apps/server/src/modules/users/admin-invite.test.js \
+            apps/server/src/modules/users/users.routes.js \
+            apps/server/src/modules/users/users.schema.js \
+            apps/server/src/integrations/email/resend-email-provider.js \
+            apps/server/src/app.js \
+            apps/admin/src/app/api/admin/invitations/route.js \
+            apps/admin/src/features/users/admin-invite-form.jsx \
+            apps/admin/src/app/dashboard/users/page.jsx \
+            apps/admin/src/app/dashboard/page.jsx \
+            apps/admin/src/app/globals.css \
+            apps/admin/tests/unit/admin-invite-form.test.jsx
+      - name: Commit scoped formatting
+        run: |
+          git add -- \
+            apps/server/src/modules/users/admin-invite.service.js \
+            apps/server/src/modules/users/admin-invite.repository.js \
+            apps/server/src/modules/users/admin-invite.controller.js \
+            apps/server/src/modules/users/admin-invite.test.js \
+            apps/server/src/modules/users/users.routes.js \
+            apps/server/src/modules/users/users.schema.js \
+            apps/server/src/integrations/email/resend-email-provider.js \
+            apps/server/src/app.js \
+            apps/admin/src/app/api/admin/invitations/route.js \
+            apps/admin/src/features/users/admin-invite-form.jsx \
+            apps/admin/src/app/dashboard/users/page.jsx \
+            apps/admin/src/app/dashboard/page.jsx \
+            apps/admin/src/app/globals.css \
+            apps/admin/tests/unit/admin-invite-form.test.jsx
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'style(admin): format invitation onboarding'
+          git push origin HEAD:feat/admin-invite-onboarding
