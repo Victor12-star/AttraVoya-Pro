@@ -19,16 +19,16 @@ export default function UsersPage() {
       <section id="invite-administrator" className="admin-card admin-users-section">
         <h2>1. Invite New Administrator</h2>
         <p className="admin-muted">
-          Send account registration instructions by email. Nobody becomes an administrator
-          from the invitation alone.
+          Send account registration instructions by email. Nobody becomes an administrator from the
+          invitation alone.
         </p>
         <AdminInviteForm />
       </section>
       <section id="assign-administrator" className="admin-card admin-users-section">
         <h2>2. Assign or Remove Admin Role</h2>
         <p className="admin-muted">
-          The person must already have an active, verified account. Confirm your owner password
-          to assign or remove the Admin role. Owner accounts cannot be modified here.
+          The person must already have an active, verified account. Confirm your owner password to
+          assign or remove the Admin role. Owner accounts cannot be modified here.
         </p>
         <AdminRoleForm />
       </section>

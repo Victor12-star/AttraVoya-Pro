@@ -45,13 +45,16 @@ export async function POST(request) {
       };
       return NextResponse.json(
         { error: errors[status] ?? 'Invitation email is currently unavailable.' },
-        { status: [400,401,403,429].includes(status) ? status : 503 },
+        { status: [400, 401, 403, 429].includes(status) ? status : 503 },
       );
     }
     return NextResponse.json(await response.json(), {
       headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch {
-    return NextResponse.json({ error: 'Invitation service is currently unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Invitation service is currently unavailable.' },
+      { status: 503 },
+    );
   }
 }

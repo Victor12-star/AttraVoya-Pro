@@ -53,15 +53,23 @@ function bearer(app, id) {
 describe('secure administrator registration invitations', () => {
   it('blocks anonymous and regular-user requests before sending mail', async () => {
     const sendInvitation = vi.fn();
-    const repository = { ownerCredential: vi.fn(), confirmOwner: vi.fn(), recordInvitation: vi.fn() };
+    const repository = {
+      ownerCredential: vi.fn(),
+      confirmOwner: vi.fn(),
+      recordInvitation: vi.fn(),
+    };
     const app = await appWithInvitation({ sendInvitation, repository });
     const payload = { email: 'colleague@example.test', currentPassword: 'OwnerPassword123' };
     const anonymous = await app.inject({
-      method: 'POST', url: '/api/v1/users/admin-invitations', payload,
+      method: 'POST',
+      url: '/api/v1/users/admin-invitations',
+      payload,
     });
     const traveler = await app.inject({
-      method: 'POST', url: '/api/v1/users/admin-invitations',
-      headers: bearer(app, 'traveler'), payload,
+      method: 'POST',
+      url: '/api/v1/users/admin-invitations',
+      headers: bearer(app, 'traveler'),
+      payload,
     });
     expect(anonymous.statusCode).toBe(401);
     expect(traveler.statusCode).toBe(403);
@@ -73,7 +81,10 @@ describe('secure administrator registration invitations', () => {
     const hash = await argon2.hash('OwnerPassword123', { type: argon2.argon2id });
     const repository = {
       ownerCredential: vi.fn(async () => ({
-        passwordHash: hash, status: 'ACTIVE', emailVerifiedAt: new Date(), deletedAt: null,
+        passwordHash: hash,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        deletedAt: null,
       })),
       confirmOwner: vi.fn(async () => true),
       recordInvitation: vi.fn(async () => ({})),
@@ -91,7 +102,8 @@ describe('secure administrator registration invitations', () => {
     expect(sendInvitation).toHaveBeenCalledWith({ to: 'colleague@example.test' });
     expect(repository.confirmOwner).toHaveBeenCalledWith('owner', hash);
     expect(repository.recordInvitation).toHaveBeenCalledWith({
-      actorId: 'owner', emailFingerprint: expect.stringMatching(/^[0-9a-f]{64}$/),
+      actorId: 'owner',
+      emailFingerprint: expect.stringMatching(/^[0-9a-f]{64}$/),
     });
     expect(response.body).not.toContain('password');
   });
@@ -100,24 +112,31 @@ describe('secure administrator registration invitations', () => {
     const hash = await argon2.hash('OwnerPassword123', { type: argon2.argon2id });
     const repository = {
       ownerCredential: vi.fn(async () => ({
-        passwordHash: hash, status: 'ACTIVE', emailVerifiedAt: new Date(), deletedAt: null,
+        passwordHash: hash,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        deletedAt: null,
       })),
       confirmOwner: vi.fn(async () => false),
       recordInvitation: vi.fn(),
     };
     const sendInvitation = vi.fn();
     const service = createAdminInviteService({ repository, sendInvitation });
-    await expect(service.invite({
-      actorId: 'owner',
-      email: 'colleague@example.test',
-      currentPassword: 'OwnerPassword123',
-    })).rejects.toThrow('Owner authorization changed');
+    await expect(
+      service.invite({
+        actorId: 'owner',
+        email: 'colleague@example.test',
+        currentPassword: 'OwnerPassword123',
+      }),
+    ).rejects.toThrow('Owner authorization changed');
     expect(sendInvitation).not.toHaveBeenCalled();
-    await expect(service.invite({
-      actorId: 'owner',
-      email: 'colleague@example.test',
-      currentPassword: 'WrongPassword',
-    })).rejects.toThrow('Owner password confirmation failed');
+    await expect(
+      service.invite({
+        actorId: 'owner',
+        email: 'colleague@example.test',
+        currentPassword: 'WrongPassword',
+      }),
+    ).rejects.toThrow('Owner password confirmation failed');
     expect(sendInvitation).not.toHaveBeenCalled();
     expect(repository.recordInvitation).not.toHaveBeenCalled();
   });
@@ -126,7 +145,10 @@ describe('secure administrator registration invitations', () => {
     const hash = await argon2.hash('OwnerPassword123', { type: argon2.argon2id });
     const repository = {
       ownerCredential: async () => ({
-        passwordHash: hash, status: 'ACTIVE', emailVerifiedAt: new Date(), deletedAt: null,
+        passwordHash: hash,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        deletedAt: null,
       }),
       confirmOwner: async () => true,
       recordInvitation: vi.fn(),

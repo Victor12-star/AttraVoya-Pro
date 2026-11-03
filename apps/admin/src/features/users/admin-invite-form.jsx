@@ -29,7 +29,9 @@ export function AdminInviteForm() {
         setMessage(result.error ?? 'Could not send invitation.');
         return;
       }
-      setMessage('Registration invitation sent. Once the person verifies their account, use Assign Admin role to grant access.');
+      setMessage(
+        'Registration invitation sent. Once the person verifies their account, use Assign Admin role to grant access.',
+      );
       setCurrentPassword('');
       setEmail('');
     } catch {
@@ -65,8 +67,8 @@ export function AdminInviteForm() {
         disabled={busy}
       />
       <p className="admin-muted">
-        The invitation links to regular account registration; it does not grant administrator privileges.
-        After email verification, you must separately assign the Admin role below.
+        The invitation links to regular account registration; it does not grant administrator
+        privileges. After email verification, you must separately assign the Admin role below.
       </p>
       {message ? <p role={error ? 'alert' : 'status'}>{message}</p> : null}
       <button type="submit" disabled={busy}>

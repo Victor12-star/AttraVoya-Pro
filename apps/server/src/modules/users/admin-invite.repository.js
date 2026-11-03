@@ -21,9 +21,14 @@ export function createAdminInviteRepository(database = prisma) {
           roles: { select: { role: { select: { key: true } } } },
         },
       });
-      return Boolean(owner && owner.passwordHash === expectedHash &&
-        owner.status === 'ACTIVE' && owner.emailVerifiedAt && !owner.deletedAt &&
-        owner.roles.some(({ role }) => role.key === ROLES.SUPER_ADMIN));
+      return Boolean(
+        owner &&
+        owner.passwordHash === expectedHash &&
+        owner.status === 'ACTIVE' &&
+        owner.emailVerifiedAt &&
+        !owner.deletedAt &&
+        owner.roles.some(({ role }) => role.key === ROLES.SUPER_ADMIN),
+      );
     },
     async recordInvitation({ actorId, emailFingerprint }) {
       return database.adminAuditLog.create({

@@ -18,8 +18,13 @@ export function createAdminInviteService({ repository, sendInvitation }) {
       const passwordValid = owner?.passwordHash
         ? await argon2.verify(owner.passwordHash, currentPassword)
         : false;
-      if (!owner || owner.status !== 'ACTIVE' || owner.deletedAt ||
-          !owner.emailVerifiedAt || !passwordValid) {
+      if (
+        !owner ||
+        owner.status !== 'ACTIVE' ||
+        owner.deletedAt ||
+        !owner.emailVerifiedAt ||
+        !passwordValid
+      ) {
         throw new AuthenticationError('Owner password confirmation failed.', {
           code: ERROR_CODES.INVALID_CREDENTIALS,
         });
