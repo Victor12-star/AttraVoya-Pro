@@ -182,6 +182,7 @@ export async function buildApp(options = {}) {
     prefix: `${API_PREFIX}/users`,
     repository: options.usersRepository,
     adminRoleRepository: options.adminRoleRepository,
+    adminDirectoryRepository: options.adminDirectoryRepository,
     adminInviteRepository: options.adminInviteRepository,
     onAdminInvitationRequested: options.onAdminInvitationRequested,
   });

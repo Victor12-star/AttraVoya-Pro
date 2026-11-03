@@ -1,4 +1,6 @@
 import { env } from '../../config/env.js';
+import { createAdminDirectoryController } from './admin-directory.controller.js';
+import { adminDirectoryRepository } from './admin-directory.repository.js';
 import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
 import { createAdminInviteController } from './admin-invite.controller.js';
 import { createAdminInviteService } from './admin-invite.service.js';
@@ -34,6 +36,21 @@ export async function usersRoutes(app, options = {}) {
       sendInvitation: configuredEmail,
     }),
   );
+  app.get('/admin-directory', {
+    onRequest: [
+      protectedApp.authenticate,
+      protectedApp.authorize({
+        minimumRole: ROLES.SUPER_ADMIN,
+        allPermissions: [PERMISSIONS.USERS_READ],
+      }),
+    ],
+    schema: usersSchemas.adminDirectory,
+    config: { rateLimit: { max: 30, timeWindow: '1 minute' } },
+    handler: createAdminDirectoryController(
+      options.adminDirectoryRepository ?? adminDirectoryRepository,
+    ).listUsers,
+  });
+
   app.post('/admin-invitations', {
     onRequest: [
       protectedApp.authenticate,
