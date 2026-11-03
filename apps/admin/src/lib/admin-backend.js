@@ -27,7 +27,7 @@ export async function backendRequest(path, options = {}) {
 export const sessionCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  sameSite: /** @type {const} */ ('strict'),
   path: '/',
 };
 
