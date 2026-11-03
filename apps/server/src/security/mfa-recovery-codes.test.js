@@ -52,7 +52,8 @@ describe('MFA recovery code security primitives', () => {
       code.replaceAll('-', ' '),
       code.slice(0, 5) + code.slice(6),
     ]) {
-      expect(hashMfaRecoveryCode({ userId: 'user-one', code: invalid })).toBeNull();
+      const invalidHash = hashMfaRecoveryCode({ userId: 'user-one', code: invalid });
+      expect(invalidHash).toBeNull();
     }
     expect(() => hashMfaRecoveryCode({ userId: '', code })).toThrow();
     expect(() => hashMfaRecoveryCode({ userId: 'bad:user', code })).toThrow();
