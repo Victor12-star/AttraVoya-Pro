@@ -1,4 +1,9 @@
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { ACCESS_COOKIE, REFRESH_COOKIE } from '../../lib/admin-backend.js';
+import { AdminLogoutButton } from '../../features/auth/admin-logout-button.jsx';
 
 const NAV_GROUPS = [
   {
@@ -35,7 +40,12 @@ const NAV_GROUPS = [
 ];
 
 /** @param {{ children: import('react').ReactNode }} props */
-export default function DashboardLayout({ children }) {
+export default async function DashboardLayout({ children }) {
+  const session = await cookies();
+  if (!session.has(ACCESS_COOKIE) && !session.has(REFRESH_COOKIE)) {
+    redirect('/login');
+  }
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar" aria-label="Administration sidebar">
@@ -65,6 +75,7 @@ export default function DashboardLayout({ children }) {
         <div className="admin-sidebar-footer">
           <span className="admin-sidebar-status" aria-hidden="true" />
           Secure administration
+          <AdminLogoutButton />
         </div>
       </aside>
       <div className="admin-workspace">
