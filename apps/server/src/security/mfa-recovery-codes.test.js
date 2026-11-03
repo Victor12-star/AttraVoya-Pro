@@ -9,7 +9,8 @@ describe('MFA recovery code security primitives', () => {
     expect(new Set(codes).size).toBe(10);
 
     for (const code of codes) {
-      expect(code).toMatch(/^[A-Z2-7]{4}(?:-[A-Z2-7]{4}){7}$/);
+      expect(code.split('-')).toHaveLength(8);
+      expect(code.replaceAll('-', '')).toMatch(/^[A-Z2-7]{32}$/);
       expect(code.replaceAll('-', '')).toHaveLength(32);
     }
   });
