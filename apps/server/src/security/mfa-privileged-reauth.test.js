@@ -99,8 +99,8 @@ describe('privileged MFA enrollment reauthentication', () => {
   it('fails closed when the password check throws', async () => {
     const { verifyPassword, verifyHash } = fixture();
     verifyHash.mockRejectedValueOnce(new Error('password verifier unavailable'));
-    await expect(
-      verifyPassword({ userId: 'user-one', password: 'valid' }),
-    ).rejects.toThrow('password verifier unavailable');
+    await expect(verifyPassword({ userId: 'user-one', password: 'valid' })).rejects.toThrow(
+      'password verifier unavailable',
+    );
   });
 });
