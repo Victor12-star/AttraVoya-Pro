@@ -4,7 +4,22 @@ import { useCallback, useEffect, useState } from 'react';
 
 export function AdminUserDirectory() {
   const [page, setPage] = useState(1);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(
+    /** @type {{
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+      users: Array<{
+        id: string;
+        email: string;
+        status: string;
+        verified: boolean;
+        createdAt: string;
+        roles: string[];
+      }>;
+    } | null} */ (null),
+  );
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
