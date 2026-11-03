@@ -440,3 +440,58 @@ textarea {
     width: calc(100% - 24px);
   }
 }
+
+
+/* Admin sign-in and sign-out controls */
+.admin-login-card {
+  max-width: 490px;
+  margin: 5vh auto 0;
+}
+.admin-login-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+.admin-login-form label {
+  color: #203653;
+  font-weight: 650;
+}
+.admin-login-form input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #c5cedb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+}
+.admin-login-form input:focus-visible,
+.admin-login-form button:focus-visible,
+.admin-sign-out:focus-visible {
+  outline: 3px solid #477ff0;
+  outline-offset: 2px;
+}
+.admin-login-form button {
+  min-height: 46px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: #2e64d6;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-login-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.admin-login-error { color: #a42321; margin: 4px 0; }
+.admin-sign-out {
+  margin-left: auto;
+  padding: 7px 10px;
+  border: 1px solid #91add7;
+  border-radius: 9px;
+  background: transparent;
+  color: #f0f6ff;
+  cursor: pointer;
+}
