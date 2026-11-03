@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateMfaRecoveryCodes, hashMfaRecoveryCode } from './mfa-recovery-codes.js';
+import {
+  generateMfaRecoveryCodes,
+  hashMfaRecoveryCode,
+} from './mfa-recovery-codes.js';
 
 describe('MFA recovery code security primitives', () => {
   it('creates ten distinct, 160-bit Base32 recovery codes', () => {
