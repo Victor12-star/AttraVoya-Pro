@@ -1,7 +1,9 @@
+import { SessionSecurityPanel } from '../../../features/auth/session-security-panel.jsx';
 import { ChangePasswordForm } from '../../../features/auth/change-password-form.jsx';
 
 export default function SecurityPage() {
   return (
+    <div className="admin-security-stack">
     <section className="admin-card admin-login-card">
       <h1>Account security</h1>
       <p className="admin-muted">
@@ -10,5 +12,7 @@ export default function SecurityPage() {
       </p>
       <ChangePasswordForm />
     </section>
+    <SessionSecurityPanel />
+    </div>
   );
 }
