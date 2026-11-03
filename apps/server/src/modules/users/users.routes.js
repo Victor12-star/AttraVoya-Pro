@@ -1,4 +1,8 @@
 import { env } from '../../config/env.js';
+import { createEmailProvider } from '../../integrations/email/email-provider.factory.js';
+import { createAdminInviteController } from './admin-invite.controller.js';
+import { createAdminInviteService } from './admin-invite.service.js';
+import { adminInviteRepository } from './admin-invite.repository.js';
 import { PERMISSIONS, ROLES } from '@attravoya/constants';
 import { createAdminRoleService } from './admin-role.service.js';
 import { adminRoleRepository } from './admin-role.repository.js';
@@ -18,6 +22,30 @@ export async function usersRoutes(app, options = {}) {
   const adminRoles = createAdminRoleController(
     createAdminRoleService(options.adminRoleRepository ?? adminRoleRepository),
   );
+
+  const configuredEmail =
+    options.onAdminInvitationRequested ??
+    (env.RESEND_API_KEY?.trim() && env.EMAIL_FROM?.trim()
+      ? ({ to }) => createEmailProvider().sendAdminRegistrationInvitation({ to })
+      : undefined);
+  const inviteController = createAdminInviteController(
+    createAdminInviteService({
+      repository: options.adminInviteRepository ?? adminInviteRepository,
+      sendInvitation: configuredEmail,
+    }),
+  );
+  app.post('/admin-invitations', {
+    onRequest: [
+      protectedApp.authenticate,
+      protectedApp.authorize({
+        minimumRole: ROLES.SUPER_ADMIN,
+        allPermissions: [PERMISSIONS.ROLES_WRITE],
+      }),
+    ],
+    schema: usersSchemas.inviteAdministrator,
+    config: { rateLimit: ACCOUNT_DELETION_RATE_LIMIT },
+    handler: inviteController.invite,
+  });
 
   app.post('/admin-role', {
     onRequest: [
