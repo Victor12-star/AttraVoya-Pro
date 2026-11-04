@@ -29,7 +29,9 @@ describe('dedicated MFA encryption key configuration', () => {
 
   it('rejects noncanonical encodings that decode to the same bytes', () => {
     const valid = Buffer.alloc(32, 1).toString('base64url');
-    const alteredLastCharacter = valid.slice(0, -1) + (valid.endsWith('Q') ? 'R' : 'Q');
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    const finalIndex = alphabet.indexOf(valid.at(-1));
+    const alteredLastCharacter = valid.slice(0, -1) + alphabet[finalIndex ^ 1];
     expect(() => parseMfaEncryptionKey(alteredLastCharacter)).toThrow('dedicated 32-byte');
     expect(parseMfaEncryptionKey(valid)).toEqual(Buffer.alloc(32, 1));
   });
