@@ -27,6 +27,10 @@ function assertPrivilegedContext(context, userId) {
  * The caller must obtain userId from a verified authenticated session.
  * The account label is always fetched from trusted server-side persistence.
  */
+/**
+ * @param {{ authenticationRepository?: any, enrollmentRepository?: any, encryptionKey?: Buffer,
+ *   verifyHash?: ((hash: string, password: string) => Promise<boolean>) }} [options]
+ */
 export function createPrivilegedMfaEnrollmentService({
   authenticationRepository = authRepository,
   enrollmentRepository = mfaEnrollmentRepository,
@@ -56,7 +60,7 @@ export function createPrivilegedMfaEnrollmentService({
     }
     const context = await authenticationRepository.findAuthorizationContextByUserId(userId);
     assertPrivilegedContext(context, userId);
-    return context;
+    return /** @type {NonNullable<typeof context>} */ (context);
   }
 
   return Object.freeze({
