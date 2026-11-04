@@ -118,9 +118,9 @@ describe('atomic Prisma MFA login challenge repository', () => {
     expect(
       await repository.recordFailedAttempt({ ...input, now: NOW, userId: 'another-user' }),
     ).toBe(false);
-    expect(
-      await repository.consumeChallenge({ ...input, now: NOW, purpose: 'OTHER' }),
-    ).rejects.toThrow('identity');
+    expect(() =>
+      repository.consumeChallenge({ ...input, now: NOW, purpose: 'OTHER' }),
+    ).toThrow('identity');
   });
 
   it('fails closed on unavailable database and invalid persistence inputs', async () => {
@@ -130,9 +130,9 @@ describe('atomic Prisma MFA login challenge repository', () => {
     await expect(
       repository.consumeChallenge({ ...INPUT, now: NOW, maxAttempts: 5 }),
     ).rejects.toThrow('database unavailable');
-    await expect(
+    expect(() =>
       repository.recordFailedAttempt({ ...INPUT, now: NOW, maxAttempts: 100 }),
-    ).rejects.toThrow('bounds');
-    await expect(repository.findChallenge('raw-secret')).rejects.toThrow('hash');
+    ).toThrow('bounds');
+    expect(() => repository.findChallenge('raw-secret')).toThrow('hash');
   });
 });
