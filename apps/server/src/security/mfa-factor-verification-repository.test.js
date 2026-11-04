@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMfaFactorVerificationRepository } from './mfa-factor-verification-repository.js';
 
 function fixture() {
+  /** @type {{ userId: string, secretEnvelope: string, enabledAt: Date | null, lastAcceptedCounter: number }} */
   const factor = {
     userId: 'admin-one',
     secretEnvelope: 'mfa1:encrypted-envelope',
