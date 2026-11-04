@@ -83,9 +83,12 @@ describe('atomic Prisma MFA login challenge repository', () => {
       ).toBe(true);
     }
     expect(getStored().attempts).toBe(5);
-    expect(
-      await repository.recordFailedAttempt({ ...INPUT, now: NOW, maxAttempts: 5 }),
-    ).toBe(false);
+    const lockedAttempt = await repository.recordFailedAttempt({
+      ...INPUT,
+      now: NOW,
+      maxAttempts: 5,
+    });
+    expect(lockedAttempt).toBe(false);
     expect(prismaClient.mfaChallenge.updateMany).toHaveBeenCalledWith({
       where: {
         ...INPUT,
@@ -115,9 +118,12 @@ describe('atomic Prisma MFA login challenge repository', () => {
     await create();
     const input = { ...INPUT, now: LATER, maxAttempts: 5 };
     expect(await repository.consumeChallenge(input)).toBe(false);
-    expect(
-      await repository.recordFailedAttempt({ ...input, now: NOW, userId: 'another-user' }),
-    ).toBe(false);
+    const otherAccount = await repository.recordFailedAttempt({
+      ...input,
+      now: NOW,
+      userId: 'another-user',
+    });
+    expect(otherAccount).toBe(false);
     const invalidPurpose = repository.consumeChallenge({ ...input, now: NOW, purpose: 'OTHER' });
     await expect(invalidPurpose).rejects.toThrow('identity');
   });
@@ -126,9 +132,12 @@ describe('atomic Prisma MFA login challenge repository', () => {
     const { repository, prismaClient, create } = fixture();
     await create();
     prismaClient.mfaChallenge.updateMany.mockRejectedValueOnce(new Error('database unavailable'));
-    await expect(
-      repository.consumeChallenge({ ...INPUT, now: NOW, maxAttempts: 5 }),
-    ).rejects.toThrow('database unavailable');
+    const unavailableDatabase = repository.consumeChallenge({
+      ...INPUT,
+      now: NOW,
+      maxAttempts: 5,
+    });
+    await expect(unavailableDatabase).rejects.toThrow('database unavailable');
     const invalidLimit = repository.recordFailedAttempt({ ...INPUT, now: NOW, maxAttempts: 100 });
     await expect(invalidLimit).rejects.toThrow('bounds');
     await expect(repository.findChallenge('raw-secret')).rejects.toThrow('hash');
