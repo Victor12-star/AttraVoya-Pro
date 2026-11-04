@@ -31,13 +31,14 @@ function codeAt(now) {
 }
 
 function fixture() {
+  /** @type {{ enabledAt: Date | null, secretEnvelope: string, lastAcceptedCounter: number }} */
   const factor = {
     enabledAt: new Date(NOW - 60_000),
     secretEnvelope: encryptTotpSecret({ secret: SECRET, userId: 'admin-one', key: KEY }),
     lastAcceptedCounter: -1,
   };
   const repository = {
-    findEnabledFactor: vi.fn(async () => ({ ...factor })),
+    findEnabledFactor: vi.fn(async () => /** @type {typeof factor | null} */ ({ ...factor })),
     consumeTotpCounter: vi.fn(async ({ expectedEnvelope, counter }) => {
       if (
         !factor.enabledAt ||
