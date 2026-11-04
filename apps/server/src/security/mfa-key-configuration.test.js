@@ -21,7 +21,7 @@ describe('dedicated MFA encryption key configuration', () => {
       Buffer.alloc(16).toString('base64url'),
       Buffer.alloc(33).toString('base64url'),
       Buffer.alloc(32).toString('base64'),
-      Buffer.alloc(32).toString('base64url') + '=',
+      `${Buffer.alloc(32).toString('base64url')}=`,
     ]) {
       expect(() => parseMfaEncryptionKey(candidate)).toThrow('dedicated 32-byte');
     }
