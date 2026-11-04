@@ -12,7 +12,7 @@ function fixture() {
   };
   const prismaClient = {
     mfaTotpCredential: {
-      findUnique: vi.fn(async () => ({ ...factor })),
+      findUnique: vi.fn(async () => /** @type {typeof factor | null} */ ({ ...factor })),
       updateMany: vi.fn(async ({ where, data }) => {
         if (
           factor.userId !== where.userId ||
@@ -48,8 +48,8 @@ describe('Prisma enabled MFA factor verification repository', () => {
   });
 
   it('rejects an inactive or nonexistent factor', async () => {
-    const { prismaClient, repository } = fixture();
-    prismaClient.mfaTotpCredential.findUnique.mockResolvedValueOnce({ enabledAt: null });
+    const { factor, prismaClient, repository } = fixture();
+    prismaClient.mfaTotpCredential.findUnique.mockResolvedValueOnce({ ...factor, enabledAt: null });
     expect(await repository.findEnabledFactor('admin-one')).toBeNull();
     prismaClient.mfaTotpCredential.findUnique.mockResolvedValueOnce(null);
     expect(await repository.findEnabledFactor('admin-one')).toBeNull();
