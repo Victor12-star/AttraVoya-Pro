@@ -9,10 +9,7 @@
  * @returns {Buffer} Exactly 32 bytes for AES-256-GCM.
  */
 export function parseMfaEncryptionKey(encodedKey) {
-  if (
-    typeof encodedKey !== 'string' ||
-    !/^[A-Za-z0-9_-]{43}$/.test(encodedKey)
-  ) {
+  if (typeof encodedKey !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(encodedKey)) {
     throw new TypeError('A dedicated 32-byte MFA encryption key is required.');
   }
 
