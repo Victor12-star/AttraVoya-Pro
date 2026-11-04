@@ -91,10 +91,14 @@ describe('isolated enabled MFA factor verification', () => {
 
   it('fails on tampered or differently bound ciphertext without a counter update', async () => {
     const { service, factor, repository } = fixture();
-    factor.secretEnvelope = encryptTotpSecret({ secret: SECRET, userId: 'another-user', key: KEY });
-    await expect(service.verify({ userId: 'admin-one', code: codeAt(NOW), now: NOW })).rejects.toThrow(
-      'decrypted',
-    );
+    factor.secretEnvelope = encryptTotpSecret({
+      secret: SECRET,
+      userId: 'another-user',
+      key: KEY,
+    });
+    await expect(
+      service.verify({ userId: 'admin-one', code: codeAt(NOW), now: NOW }),
+    ).rejects.toThrow('decrypted');
     expect(repository.consumeTotpCounter).not.toHaveBeenCalled();
   });
 
