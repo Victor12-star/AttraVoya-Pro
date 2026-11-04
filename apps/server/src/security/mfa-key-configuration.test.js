@@ -31,7 +31,7 @@ describe('dedicated MFA encryption key configuration', () => {
     const valid = Buffer.alloc(32, 1).toString('base64url');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
     const finalIndex = alphabet.indexOf(valid.at(-1));
-    const alteredLastCharacter = valid.slice(0, -1) + alphabet[finalIndex ^ 1];
+    const alteredLastCharacter = valid.slice(0, -1) + alphabet.charAt(finalIndex ^ 1);
     expect(() => parseMfaEncryptionKey(alteredLastCharacter)).toThrow('dedicated 32-byte');
     expect(parseMfaEncryptionKey(valid)).toEqual(Buffer.alloc(32, 1));
   });
