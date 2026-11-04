@@ -86,12 +86,13 @@ describe('privileged MFA enrollment composition', () => {
 
   it('uses the trusted account email, never a client-supplied label', async () => {
     const { service, enrollmentRepository, verifyHash } = fixture();
-    const result = await service.prepare({
+    const forgedInput = /** @type {any} */ ({
       userId: 'user-one',
       password: 'correct',
       account: 'attacker@example.test',
       now: NOW,
     });
+    const result = await service.prepare(forgedInput);
     const provisioning = new URL(result.provisioningUri);
     expect(provisioning.pathname).toContain('verified-admin%40example.test');
     expect(provisioning.pathname).not.toContain('attacker');
