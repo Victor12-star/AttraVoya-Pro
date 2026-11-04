@@ -160,12 +160,14 @@ describe('GroundedTravelAssistant', () => {
       ),
     );
     expect(swedenSignal.aborted).toBe(true);
-    fireEvent.click(screen.getByRole('button', { name: 'Which local language should I use?' }));
-    expect(
-      await screen.findByText(
-        'For Norway, the supported destination language is: Swedish (Svenska).',
-      ),
-    ).toBeInTheDocument();
+    // The request being called does not guarantee the phrasebook state has
+    // committed. Retry the user action until the destination reference is ready.
+    await waitFor(() => {
+      fireEvent.click(screen.getByRole('button', { name: 'Which local language should I use?' }));
+      expect(
+        screen.getByText('For Norway, the supported destination language is: Swedish (Svenska).'),
+      ).toBeInTheDocument();
+    });
   });
 
   it('answers a language question only from the normalized destination phrasebook', async () => {
