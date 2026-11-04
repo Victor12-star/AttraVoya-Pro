@@ -79,7 +79,8 @@ describe('privileged MFA enrollment composition', () => {
     expect(() => createPrivilegedMfaEnrollmentService({ encryptionKey: Buffer.alloc(16) })).toThrow(
       '32-byte',
     );
-    expect(() => createPrivilegedMfaEnrollmentService({ encryptionKey: 'secret' })).toThrow(
+    const invalidKey = /** @type {any} */ ('secret');
+    expect(() => createPrivilegedMfaEnrollmentService({ encryptionKey: invalidKey })).toThrow(
       '32-byte',
     );
   });
