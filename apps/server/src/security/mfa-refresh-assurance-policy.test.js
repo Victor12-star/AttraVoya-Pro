@@ -63,9 +63,7 @@ describe('route-free privileged refresh assurance policy', () => {
     ];
     for (const invalid of invalidRecords) {
       const { policy, assuranceRepository, input } = fixture();
-      assuranceRepository.findVerifiedAssurance.mockResolvedValueOnce(
-        /** @type {any} */ (invalid),
-      );
+      assuranceRepository.findVerifiedAssurance.mockResolvedValueOnce(/** @type {any} */ (invalid));
       expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
     }
   });
