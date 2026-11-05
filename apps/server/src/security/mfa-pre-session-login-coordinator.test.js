@@ -23,7 +23,7 @@ function fixture({ decision = 'MFA_REQUIRED' } = {}) {
 }
 
 describe('route-free pre-session MFA login coordinator', () => {
-  it('issues a temporary challenge only after credentials and current MFA policy pass', async () => {
+  it('issues a challenge only after password and MFA policy checks', async () => {
     const { coordinator, authenticatePassword, sessionPolicy, challengeService } = fixture();
     const credentials = { email: 'admin@example.test', password: 'valid-password' };
     const result = await coordinator.authenticate(credentials);
