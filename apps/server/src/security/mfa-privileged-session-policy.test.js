@@ -6,6 +6,7 @@ import { createMfaPrivilegedSessionPolicy } from './mfa-privileged-session-polic
 const USER_ID = 'admin-one';
 const VERIFIED_AT = new Date('2026-09-01T00:00:00.000Z');
 
+/** @param {{ roles?: string[], factorEnabled?: boolean }} [options] */
 function fixture({ roles = [ROLES.SUPER_ADMIN], factorEnabled = true } = {}) {
   /** @type {any} */
   const authorization = {
