@@ -7,7 +7,7 @@ const TOKEN = 'a'.repeat(43);
 const EXPIRY = '2026-11-05T23:00:00.000Z';
 
 function fixture({ decision = 'MFA_REQUIRED' } = {}) {
-  const authenticatePassword = vi.fn(async () => ({ userId: USER_ID }));
+  const authenticatePassword = vi.fn(async () => /** @type {{ userId: string } | null} */ ({ userId: USER_ID }));
   const sessionPolicy = {
     evaluate: vi.fn(async () => ({ decision })),
   };
@@ -99,9 +99,9 @@ describe('route-free pre-session MFA login coordinator', () => {
   it('requires a password verifier, current policy and challenge persistence', () => {
     expect(() =>
       createMfaPreSessionLoginCoordinator({
-        authenticatePassword: null,
-        sessionPolicy: {},
-        challengeService: {},
+        authenticatePassword: /** @type {any} */ (null),
+        sessionPolicy: /** @type {any} */ ({}),
+        challengeService: /** @type {any} */ ({}),
       }),
     ).toThrow('dependencies');
   });
