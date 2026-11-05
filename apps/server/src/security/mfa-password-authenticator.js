@@ -49,7 +49,8 @@ export function createMfaPasswordAuthenticator({
 
     const user = await repository.findUserByEmailForLogin(email);
     // Unknown accounts must still incur an Argon2 password verification.
-    const validPassword = (await verifyPassword(user?.passwordHash ?? DUMMY_PASSWORD_HASH, password)) === true;
+    const validPassword =
+      (await verifyPassword(user?.passwordHash ?? DUMMY_PASSWORD_HASH, password)) === true;
 
     if (
       !validPassword ||
