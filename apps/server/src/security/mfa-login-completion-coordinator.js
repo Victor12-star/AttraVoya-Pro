@@ -30,6 +30,7 @@ export function createMfaLoginCompletionCoordinator({ sessionPolicy, challengeSe
   }
 
   return Object.freeze({
+    /** @param {{ userId?: string, challengeToken?: string, code?: string, now?: number }} [input] */
     async complete({ userId, challengeToken, code, now } = {}) {
       if (
         typeof userId !== 'string' ||
