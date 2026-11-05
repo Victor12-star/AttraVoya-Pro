@@ -17,6 +17,7 @@ const USER_ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
  *
  * Fail closed on invalid identities, inactive/deleted/unverified accounts,
  * missing factor enrollment, and persistence errors.
+ * @param {{ repository?: any, factorRepository?: any }} [options]
  */
 export function createMfaPrivilegedSessionPolicy({
   repository = authRepository,
