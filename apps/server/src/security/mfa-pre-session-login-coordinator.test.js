@@ -46,7 +46,7 @@ describe('route-free pre-session MFA login coordinator', () => {
 
   it('denies rejected passwords and does not reveal whether MFA is enrolled', async () => {
     const { coordinator, authenticatePassword, sessionPolicy, challengeService } = fixture();
-    authenticatePassword.mockResolvedValueOnce(null);
+    authenticatePassword.mockResolvedValueOnce(/** @type {any} */ (null));
     expect(await coordinator.authenticate({ password: 'invalid' })).toEqual({
       decision: 'DENY',
     });
