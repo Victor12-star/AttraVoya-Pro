@@ -33,7 +33,7 @@ describe('route-free privileged refresh assurance policy', () => {
     expect(assuranceRepository.findVerifiedAssurance).not.toHaveBeenCalled();
   });
 
-  it('permits a privileged user only with fresh, bound and unrevoked server assurance', async () => {
+  it('requires fresh, bound, unrevoked server assurance for privileged users', async () => {
     const { policy, sessionPolicy, assuranceRepository, input } = fixture();
     expect(await policy.evaluate(input)).toEqual({ decision: 'ALLOW_MFA_ASSURED' });
     expect(sessionPolicy.evaluate).toHaveBeenCalledWith(USER_ID);
