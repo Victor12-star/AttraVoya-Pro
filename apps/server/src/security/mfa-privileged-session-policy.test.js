@@ -7,6 +7,7 @@ const USER_ID = 'admin-one';
 const VERIFIED_AT = new Date('2026-09-01T00:00:00.000Z');
 
 function fixture({ roles = [ROLES.SUPER_ADMIN], factorEnabled = true } = {}) {
+  /** @type {any} */
   const authorization = {
     id: USER_ID,
     status: 'ACTIVE',
