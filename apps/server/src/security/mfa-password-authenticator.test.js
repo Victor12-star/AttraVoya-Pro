@@ -10,6 +10,7 @@ const ACCOUNT = {
   emailVerifiedAt: new Date('2026-11-05T12:00:00.000Z'),
 };
 
+/** @param {any} [user] */
 function fixture(user = ACCOUNT) {
   const repository = {
     findUserByEmailForLogin: vi.fn(async () => user),
@@ -36,9 +37,10 @@ describe('isolated pre-session MFA password authenticator', () => {
     const { authenticate, verifyPassword } = fixture(null);
     expect(await authenticate({ email: 'unknown@example.test', password: 'incorrect' })).toBeNull();
     expect(verifyPassword).toHaveBeenCalledOnce();
-    const [hash, password] = verifyPassword.mock.calls[0];
-    expect(hash).toMatch(/^\$argon2id\$/);
-    expect(password).toBe('incorrect');
+    expect(verifyPassword).toHaveBeenCalledWith(
+      expect.stringMatching(/^\$argon2id\$/),
+      'incorrect',
+    );
   });
 
   it('denies wrong passwords without returning account information', async () => {
