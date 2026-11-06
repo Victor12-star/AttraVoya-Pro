@@ -523,6 +523,7 @@ model MfaSessionAssurance {
   user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   session AuthSession @relation(fields: [sessionId, userId], references: [id, userId], onDelete: Cascade)
 
+  @@unique([sessionId, userId])
   @@index([userId, expiresAt])
   @@index([expiresAt, revokedAt])
 }
