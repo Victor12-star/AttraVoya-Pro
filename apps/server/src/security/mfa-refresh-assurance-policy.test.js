@@ -33,6 +33,34 @@ describe('route-free privileged refresh assurance policy', () => {
     expect(assuranceRepository.findVerifiedAssurance).not.toHaveBeenCalled();
   });
 
+  it('rechecks password-only eligibility before refresh authorization', async () => {
+    const { policy, sessionPolicy, assuranceRepository, input } = fixture('PASSWORD_ONLY');
+    expect(await policy.evaluate(input)).toEqual({ decision: 'ALLOW_PASSWORD_ONLY' });
+    expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
+    expect(assuranceRepository.findVerifiedAssurance).not.toHaveBeenCalled();
+  });
+
+  it('denies password-only refresh after privilege promotion, suspension or policy change', async () => {
+    for (const newDecision of ['MFA_REQUIRED', 'DENY', 'ENROLLMENT_REQUIRED', 'UNKNOWN']) {
+      const { policy, sessionPolicy, assuranceRepository, input } = fixture('PASSWORD_ONLY');
+      sessionPolicy.evaluate
+        .mockResolvedValueOnce({ decision: 'PASSWORD_ONLY' })
+        .mockResolvedValueOnce({ decision: newDecision });
+      expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
+      expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
+      expect(assuranceRepository.findVerifiedAssurance).not.toHaveBeenCalled();
+    }
+  });
+
+  it('does not grant password-only authorization if the second lookup fails', async () => {
+    const { policy, sessionPolicy, assuranceRepository, input } = fixture('PASSWORD_ONLY');
+    sessionPolicy.evaluate
+      .mockResolvedValueOnce({ decision: 'PASSWORD_ONLY' })
+      .mockRejectedValueOnce(new Error('authorization unavailable'));
+    await expect(policy.evaluate(input)).rejects.toThrow('authorization unavailable');
+    expect(assuranceRepository.findVerifiedAssurance).not.toHaveBeenCalled();
+  });
+
   it('requires fresh, bound, unrevoked server assurance for privileged users', async () => {
     const { policy, sessionPolicy, assuranceRepository, input } = fixture();
     expect(await policy.evaluate(input)).toEqual({ decision: 'ALLOW_MFA_ASSURED' });
