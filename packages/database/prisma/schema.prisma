@@ -459,6 +459,7 @@ model AuthSession {
   @@index([userId, expiresAt])
   @@index([userId, revokedAt])
   @@index([expiresAt])
+  @@unique([id, userId])
 }
 
 // MFA remains inactive until the complete challenge and login gate are implemented.
@@ -520,7 +521,7 @@ model MfaSessionAssurance {
   createdAt  DateTime @default(now())
 
   user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session AuthSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session AuthSession @relation(fields: [sessionId, userId], references: [id, userId], onDelete: Cascade)
 
   @@index([userId, expiresAt])
   @@index([expiresAt, revokedAt])
