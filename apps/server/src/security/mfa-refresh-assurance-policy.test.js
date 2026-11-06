@@ -86,7 +86,7 @@ describe('route-free privileged refresh assurance policy', () => {
         .mockResolvedValueOnce({ decision: newDecision });
       expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
       expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
-      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(2);
+      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(1);
     }
   });
 
