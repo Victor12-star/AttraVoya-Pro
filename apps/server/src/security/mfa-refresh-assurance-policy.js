@@ -71,8 +71,15 @@ export function createMfaRefreshAssurancePolicy({ sessionPolicy, assuranceReposi
         return Object.freeze({ decision: 'DENY' });
       }
 
-      // This is only a decision helper. Token issuance must still recheck
-      // current authorization and use atomic refresh-token rotation.
+      // Recheck privileges after the database read so a role removal,
+      // suspension, or factor change during proof lookup cannot reuse
+      // the prior authorization decision. Token issuance must still
+      // independently recheck and use atomic refresh-token rotation.
+      const currentPolicy = await sessionPolicy.evaluate(userId);
+      if (currentPolicy?.decision !== 'MFA_REQUIRED') {
+        return Object.freeze({ decision: 'DENY' });
+      }
+
       return Object.freeze({ decision: 'ALLOW_MFA_ASSURED' });
     },
   });
