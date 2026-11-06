@@ -45,6 +45,13 @@ export function createMfaRefreshAssurancePolicy({ sessionPolicy, assuranceReposi
       // refresh. A disabled account or role change must not inherit assurance.
       const policy = await sessionPolicy.evaluate(userId);
       if (policy?.decision === 'PASSWORD_ONLY') {
+        // Prevent an ordinary account promoted to an MFA-required role
+        // during evaluation from inheriting password-only refresh access.
+        // Live token issuance must also independently check authorization.
+        const currentPolicy = await sessionPolicy.evaluate(userId);
+        if (currentPolicy?.decision !== 'PASSWORD_ONLY') {
+          return Object.freeze({ decision: 'DENY' });
+        }
         return Object.freeze({ decision: 'ALLOW_PASSWORD_ONLY' });
       }
       if (policy?.decision !== 'MFA_REQUIRED') {
