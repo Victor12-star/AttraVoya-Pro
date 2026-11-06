@@ -43,6 +43,33 @@ describe('route-free privileged refresh assurance policy', () => {
     });
   });
 
+  it('rechecks current privileges after proof lookup before allowing MFA', async () => {
+    const { policy, sessionPolicy, assuranceRepository, input } = fixture();
+    expect(await policy.evaluate(input)).toEqual({ decision: 'ALLOW_MFA_ASSURED' });
+    expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
+    expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(1);
+  });
+
+  it('denies if access is revoked or enrollment changes while proof is read', async () => {
+    for (const newDecision of ['DENY', 'ENROLLMENT_REQUIRED', 'PASSWORD_ONLY']) {
+      const { policy, sessionPolicy, assuranceRepository, input } = fixture();
+      sessionPolicy.evaluate
+        .mockResolvedValueOnce({ decision: 'MFA_REQUIRED' })
+        .mockResolvedValueOnce({ decision: newDecision });
+      expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
+      expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
+      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('fails closed if the post-proof authorization recheck loses database access', async () => {
+    const { policy, sessionPolicy, input } = fixture();
+    sessionPolicy.evaluate
+      .mockResolvedValueOnce({ decision: 'MFA_REQUIRED' })
+      .mockRejectedValueOnce(new Error('authorization unavailable'));
+    await expect(policy.evaluate(input)).rejects.toThrow('authorization unavailable');
+  });
+
   it('denies inactive, enrollment-required and unrecognized policy decisions', async () => {
     for (const decision of ['DENY', 'ENROLLMENT_REQUIRED', 'UNKNOWN']) {
       const { policy, assuranceRepository, input } = fixture(decision);
