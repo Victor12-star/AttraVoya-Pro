@@ -231,6 +231,7 @@ model User {
   mfaTotpCredential         MfaTotpCredential?
   mfaRecoveryCodes          MfaRecoveryCode[]
   mfaChallenges             MfaChallenge[]
+  mfaSessionAssurances      MfaSessionAssurance[]
   emailVerificationTokens   EmailVerificationToken[]
   passwordResetTokens       PasswordResetToken[]
   trips                     Trip[]
@@ -453,10 +454,12 @@ model AuthSession {
   createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mfaAssurance MfaSessionAssurance?
 
   @@index([userId, expiresAt])
   @@index([userId, revokedAt])
   @@index([expiresAt])
+  @@unique([id, userId])
 }
 
 // MFA remains inactive until the complete challenge and login gate are implemented.
@@ -504,6 +507,25 @@ model MfaChallenge {
 
   @@index([userId, expiresAt])
   @@index([expiresAt, consumedAt])
+}
+
+// Inactive, server-owned MFA proof bound to one issued refresh session.
+// Presence alone does not authorize a request; current roles and session state
+// must be checked independently before token issuance.
+model MfaSessionAssurance {
+  sessionId  String   @id
+  userId     String
+  verifiedAt DateTime
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session AuthSession @relation(fields: [sessionId, userId], references: [id, userId], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([userId, expiresAt])
+  @@index([expiresAt, revokedAt])
 }
 
 model EmailVerificationToken {
