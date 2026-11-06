@@ -89,6 +89,52 @@ describe('inactive atomic MFA assurance writes', () => {
     ).toBe(false);
   });
 
+  it('revokes one account MFA proofs and returns the affected count', async () => {
+    const { repository, updateMany } = fixture();
+    updateMany.mockResolvedValueOnce({ count: 3 });
+    const firstCount = await repository.revokeAllVerifiedAssurances({
+      userId: INPUT.userId,
+      now: NOW,
+    });
+    expect(firstCount).toBe(3);
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { userId: INPUT.userId, revokedAt: null },
+      data: { revokedAt: NOW },
+    });
+    updateMany.mockResolvedValueOnce({ count: 0 });
+    const repeatCount = await repository.revokeAllVerifiedAssurances({
+      userId: INPUT.userId,
+      now: NOW,
+    });
+    expect(repeatCount).toBe(0);
+  });
+
+  it('rejects invalid account-wide revocation identities without touching persistence', async () => {
+    const { repository, updateMany } = fixture();
+    await expect(
+      repository.revokeAllVerifiedAssurances({ userId: '../someone', now: NOW }),
+    ).rejects.toThrow('identity');
+    await expect(
+      repository.revokeAllVerifiedAssurances({
+        userId: INPUT.userId,
+        now: new Date(Number.NaN),
+      }),
+    ).rejects.toThrow('identity');
+    expect(updateMany).not.toHaveBeenCalled();
+  });
+
+  it('fails closed on account-wide revocation database failures and malformed results', async () => {
+    const { repository, updateMany } = fixture();
+    updateMany.mockRejectedValueOnce(new Error('database unavailable'));
+    await expect(
+      repository.revokeAllVerifiedAssurances({ userId: INPUT.userId, now: NOW }),
+    ).rejects.toThrow('database unavailable');
+    updateMany.mockResolvedValueOnce(/** @type {any} */ ({ count: -1 }));
+    await expect(
+      repository.revokeAllVerifiedAssurances({ userId: INPUT.userId, now: NOW }),
+    ).rejects.toThrow('revocation result');
+  });
+
   it('fails closed on invalid revocation inputs and database errors', async () => {
     const { repository, updateMany, executeRaw } = fixture();
     await expect(

@@ -63,6 +63,31 @@ export function createMfaAssuranceWriteRepository({ prismaClient }) {
       return inserted === 1;
     },
 
+    /**
+     * Bulk invalidate independently persisted MFA assurance for one account.
+     * Invoke after trusted account lockout, factor reset or administrator
+     * privilege removal. This helper does not revoke AuthSession tokens:
+     * production integration MUST perform both in a controlled transaction.
+     *
+     * @param {{userId: string, now: Date}} input
+     */
+    async revokeAllVerifiedAssurances({ userId, now }) {
+      if (!validId(userId) || !validDate(now)) {
+        throw new TypeError('Invalid MFA assurance account revocation identity.');
+      }
+
+      // The user restriction prevents one account's lockout from affecting
+      // another account. Conditional updates make repeated calls harmless.
+      const changed = await prismaClient.mfaSessionAssurance.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: now },
+      });
+      if (!Number.isSafeInteger(changed?.count) || changed.count < 0) {
+        throw new Error('Invalid MFA assurance revocation result.');
+      }
+      return changed.count;
+    },
+
     /** @param {{userId: string, sessionId: string, now: Date}} input */
     async revokeVerifiedAssurance({ userId, sessionId, now }) {
       if (!validId(userId) || !validId(sessionId) || !validDate(now)) {
