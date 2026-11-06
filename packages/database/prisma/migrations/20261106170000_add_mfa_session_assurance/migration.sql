@@ -13,6 +13,7 @@ CREATE TABLE "MfaSessionAssurance" (
   CONSTRAINT "MfaSessionAssurance_time_check" CHECK ("expiresAt" > "verifiedAt")
 );
 
+CREATE UNIQUE INDEX "MfaSessionAssurance_sessionId_userId_key" ON "MfaSessionAssurance"("sessionId", "userId");
 CREATE INDEX "MfaSessionAssurance_userId_expiresAt_idx" ON "MfaSessionAssurance"("userId", "expiresAt");
 CREATE INDEX "MfaSessionAssurance_expiresAt_revokedAt_idx" ON "MfaSessionAssurance"("expiresAt", "revokedAt");
 ALTER TABLE "MfaSessionAssurance" ADD CONSTRAINT "MfaSessionAssurance_userId_fkey"
