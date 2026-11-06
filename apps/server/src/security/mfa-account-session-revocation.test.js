@@ -22,7 +22,9 @@ function fixture() {
 
 describe('isolated transactional MFA account session revocation', () => {
   it('requires a transaction and rejects untrusted identifiers and dates', async () => {
-    expect(() => createMfaAccountSessionRevocation({ prismaClient: {} })).toThrow('Prisma');
+    expect(() => createMfaAccountSessionRevocation({ prismaClient: {} })).toThrow(
+      'Prisma',
+    );
     const { service, transaction } = fixture();
     for (const input of [
       { userId: '../other', now: NOW },
@@ -64,14 +66,12 @@ describe('isolated transactional MFA account session revocation', () => {
   it('propagates failures so the Prisma transaction can roll back', async () => {
     const { service, updateSessions, updateAssurances } = fixture();
     updateSessions.mockRejectedValueOnce(new Error('session database failure'));
-    await expect(service.revokeAll({ userId: USER_ID, now: NOW })).rejects.toThrow(
-      'session database failure',
-    );
+    const attempt = service.revokeAll({ userId: USER_ID, now: NOW });
+    await expect(attempt).rejects.toThrow('session database failure');
     expect(updateAssurances).not.toHaveBeenCalled();
     updateAssurances.mockRejectedValueOnce(new Error('assurance database failure'));
-    await expect(service.revokeAll({ userId: USER_ID, now: NOW })).rejects.toThrow(
-      'assurance database failure',
-    );
+    const retry = service.revokeAll({ userId: USER_ID, now: NOW });
+    await expect(retry).rejects.toThrow('assurance database failure');
   });
 
   it('rejects missing transaction dependencies and invalid mutation counts', async () => {
@@ -83,13 +83,11 @@ describe('isolated transactional MFA account session revocation', () => {
     const service = createMfaAccountSessionRevocation({
       prismaClient: { $transaction: transaction },
     });
-    await expect(service.revokeAll({ userId: USER_ID, now: NOW })).rejects.toThrow(
-      'repositories',
-    );
+    const incomplete = service.revokeAll({ userId: USER_ID, now: NOW });
+    await expect(incomplete).rejects.toThrow('repositories');
     const { service: validService, updateAssurances } = fixture();
     updateAssurances.mockResolvedValueOnce({ count: -1 });
-    await expect(validService.revokeAll({ userId: USER_ID, now: NOW })).rejects.toThrow(
-      'revocation result',
-    );
+    const invalid = validService.revokeAll({ userId: USER_ID, now: NOW });
+    await expect(invalid).rejects.toThrow('revocation result');
   });
 });
