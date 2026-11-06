@@ -87,6 +87,33 @@ export function createMfaRefreshAssurancePolicy({ sessionPolicy, assuranceReposi
         return Object.freeze({ decision: 'DENY' });
       }
 
+      // Re-read the persisted proof after authorization. A concurrent
+      // revocation during the policy lookup must not pass on stale evidence.
+      // This remains a non-atomic helper: the future token issuer MUST
+      // protect final authorization, proof validity, and token rotation.
+      const currentAssurance = await assuranceRepository.findVerifiedAssurance({
+        userId,
+        sessionId,
+      });
+      const currentVerifiedAt = currentAssurance?.verifiedAt;
+      const currentExpiresAt = currentAssurance?.expiresAt;
+      if (
+        currentAssurance?.userId !== userId ||
+        currentAssurance?.sessionId !== sessionId ||
+        currentAssurance?.revokedAt != null ||
+        !(currentVerifiedAt instanceof Date) ||
+        !Number.isFinite(currentVerifiedAt.getTime()) ||
+        !(currentExpiresAt instanceof Date) ||
+        !Number.isFinite(currentExpiresAt.getTime()) ||
+        currentVerifiedAt.getTime() > now ||
+        now - currentVerifiedAt.getTime() > MAX_ASSURANCE_AGE_MS ||
+        currentExpiresAt.getTime() <= now ||
+        currentVerifiedAt.getTime() !== verifiedAt.getTime() ||
+        currentExpiresAt.getTime() !== expiresAt.getTime()
+      ) {
+        return Object.freeze({ decision: 'DENY' });
+      }
+
       return Object.freeze({ decision: 'ALLOW_MFA_ASSURED' });
     },
   });
