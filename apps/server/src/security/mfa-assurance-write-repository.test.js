@@ -44,7 +44,10 @@ describe('inactive atomic MFA assurance writes', () => {
     const { repository, executeRaw } = fixture();
     expect(await repository.createVerifiedAssurance(INPUT)).toBe(true);
     expect(executeRaw).toHaveBeenCalledTimes(1);
-    const [fragments, ...parameters] = executeRaw.mock.calls[0];
+    const recordedCall = /** @type {[TemplateStringsArray, ...unknown[]]} */ (
+      /** @type {unknown} */ (executeRaw.mock.calls[0])
+    );
+    const [fragments, ...parameters] = recordedCall;
     const sql = fragments.join('?');
     expect(sql).toContain('INSERT INTO "MfaSessionAssurance"');
     expect(sql).toContain('FROM "AuthSession"');
