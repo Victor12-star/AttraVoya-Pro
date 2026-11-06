@@ -39,11 +39,20 @@ describe('isolated server-owned MFA assurance read repository', () => {
     expect(
       await repository.findVerifiedAssurance({ userId: USER_ID, sessionId: SESSION_ID }),
     ).toMatchObject({ userId: USER_ID, sessionId: SESSION_ID });
+    const query = /** @type {any} */ (findFirst.mock.calls[0]?.[0]);
+    expect(query.where.expiresAt.gt.getTime()).toBe(
+      query.where.session.is.expiresAt.gt.getTime(),
+    );
+    expect(query.where.verifiedAt.lte.getTime()).toBe(
+      query.where.expiresAt.gt.getTime(),
+    );
     expect(findFirst).toHaveBeenCalledWith({
       where: {
         userId: USER_ID,
         sessionId: SESSION_ID,
         revokedAt: null,
+        expiresAt: { gt: expect.any(Date) },
+        verifiedAt: { lte: expect.any(Date) },
         session: {
           is: {
             userId: USER_ID,
