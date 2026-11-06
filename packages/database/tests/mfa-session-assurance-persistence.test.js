@@ -3,9 +3,15 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const schema = fs.readFileSync(path.resolve(import.meta.dirname, '../prisma/schema.prisma'), 'utf8');
+const schema = fs.readFileSync(
+  path.resolve(import.meta.dirname, '../prisma/schema.prisma'),
+  'utf8',
+);
 const migration = fs.readFileSync(
-  path.resolve(import.meta.dirname, '../prisma/migrations/20261106170000_add_mfa_session_assurance/migration.sql'),
+  path.resolve(
+    import.meta.dirname,
+    '../prisma/migrations/20261106170000_add_mfa_session_assurance/migration.sql',
+  ),
   'utf8',
 );
 
@@ -14,8 +20,12 @@ describe('inactive MFA session assurance persistence', () => {
     expect(schema).toContain('model MfaSessionAssurance {');
     expect(schema).toContain('sessionId  String   @id');
     expect(schema).toContain('@@unique([id, userId])');
-    expect(schema).toContain('@relation(fields: [sessionId, userId], references: [id, userId], onDelete: Cascade)');
-    expect(migration).toContain('FOREIGN KEY ("sessionId", "userId") REFERENCES "AuthSession"("id", "userId")');
+    expect(schema).toContain(
+      '@relation(fields: [sessionId, userId], references: [id, userId], onDelete: Cascade)',
+    );
+    expect(migration).toContain(
+      'FOREIGN KEY ("sessionId", "userId") REFERENCES "AuthSession"("id", "userId")',
+    );
   });
 
   it('supports bounded and revocable persisted verification without plaintext factors', () => {
@@ -28,7 +38,9 @@ describe('inactive MFA session assurance persistence', () => {
 
   it('adds only inactive schema and never mutates existing account authorization', () => {
     expect(migration).toContain('CREATE TABLE "MfaSessionAssurance"');
-    expect(migration).not.toMatch(/INSERT INTO|UPDATE "User"|ALTER TABLE "User"|SUPER_ADMIN|CREATE EXTENSION/i);
+    expect(migration).not.toMatch(
+      /INSERT INTO|UPDATE "User"|ALTER TABLE "User"|SUPER_ADMIN|CREATE EXTENSION/i,
+    );
     expect(migration).toContain('ON DELETE CASCADE');
   });
 });
