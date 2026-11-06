@@ -27,16 +27,19 @@ export function createMfaAssuranceReadRepository({ prismaClient }) {
 
       // A proof for a revoked/expired session cannot be reused. Prisma's
       // relational filter enforces ownership in the same database read.
+      const now = new Date();
       const proof = await prismaClient.mfaSessionAssurance.findFirst({
         where: {
           userId,
           sessionId,
           revokedAt: null,
+          expiresAt: { gt: now },
+          verifiedAt: { lte: now },
           session: {
             is: {
               userId,
               revokedAt: null,
-              expiresAt: { gt: new Date() },
+              expiresAt: { gt: now },
             },
           },
         },

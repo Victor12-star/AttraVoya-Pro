@@ -44,6 +44,8 @@ describe('isolated server-owned MFA assurance read repository', () => {
         userId: USER_ID,
         sessionId: SESSION_ID,
         revokedAt: null,
+        expiresAt: { gt: expect.any(Date) },
+        verifiedAt: { lte: expect.any(Date) },
         session: {
           is: {
             userId: USER_ID,
