@@ -75,7 +75,7 @@ describe('route-free privileged refresh assurance policy', () => {
     const { policy, sessionPolicy, assuranceRepository, input } = fixture();
     expect(await policy.evaluate(input)).toEqual({ decision: 'ALLOW_MFA_ASSURED' });
     expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
-    expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(1);
+    expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(2);
   });
 
   it('denies if access is revoked or enrollment changes while proof is read', async () => {
@@ -86,7 +86,7 @@ describe('route-free privileged refresh assurance policy', () => {
         .mockResolvedValueOnce({ decision: newDecision });
       expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
       expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
-      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(1);
+      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(2);
     }
   });
 
@@ -96,6 +96,44 @@ describe('route-free privileged refresh assurance policy', () => {
       .mockResolvedValueOnce({ decision: 'MFA_REQUIRED' })
       .mockRejectedValueOnce(new Error('authorization unavailable'));
     await expect(policy.evaluate(input)).rejects.toThrow('authorization unavailable');
+  });
+
+  it('denies proof revoked or removed during the final authorization recheck', async () => {
+    for (const changed of [
+      null,
+      { userId: USER_ID, sessionId: SESSION_ID, revokedAt: new Date(NOW) },
+      { userId: USER_ID, sessionId: 'other-session' },
+      { userId: USER_ID, sessionId: SESSION_ID, verifiedAt: new Date(NOW + 1) },
+      { userId: USER_ID, sessionId: SESSION_ID, verifiedAt: new Date(NOW - 13 * HOUR) },
+      { userId: USER_ID, sessionId: SESSION_ID, expiresAt: new Date(NOW) },
+    ]) {
+      const { policy, sessionPolicy, assuranceRepository, input } = fixture();
+      assuranceRepository.findVerifiedAssurance.mockResolvedValueOnce({
+        userId: USER_ID,
+        sessionId: SESSION_ID,
+        verifiedAt: new Date(NOW - HOUR),
+        expiresAt: new Date(NOW + HOUR),
+        revokedAt: null,
+      });
+      assuranceRepository.findVerifiedAssurance.mockResolvedValueOnce(/** @type {any} */ (changed));
+      expect(await policy.evaluate(input)).toEqual({ decision: 'DENY' });
+      expect(sessionPolicy.evaluate).toHaveBeenCalledTimes(2);
+      expect(assuranceRepository.findVerifiedAssurance).toHaveBeenCalledTimes(2);
+    }
+  });
+
+  it('fails closed when the final persisted assurance lookup errors', async () => {
+    const { policy, assuranceRepository, input } = fixture();
+    assuranceRepository.findVerifiedAssurance
+      .mockResolvedValueOnce({
+        userId: USER_ID,
+        sessionId: SESSION_ID,
+        verifiedAt: new Date(NOW - HOUR),
+        expiresAt: new Date(NOW + HOUR),
+        revokedAt: null,
+      })
+      .mockRejectedValueOnce(new Error('proof database unavailable'));
+    await expect(policy.evaluate(input)).rejects.toThrow('proof database unavailable');
   });
 
   it('denies inactive, enrollment-required and unrecognized policy decisions', async () => {
