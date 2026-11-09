@@ -1,3 +1,5 @@
+import { ROLES } from '@attravoya/constants';
+
 const ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 const HASH_PATTERN = /^[a-f0-9]{64}$/;
 const MAX_ASSURANCE_AGE_MS = 12 * 60 * 60 * 1000;
@@ -7,8 +9,9 @@ const MAX_ASSURANCE_AGE_MS = 12 * 60 * 60 * 1000;
  *
  * The single conditional database UPDATE prevents an expired/revoked MFA proof
  * or revoked/expired session from rotating credentials after a separate read.
- * A trusted caller must authorize the account role and factor policy, and
- * final token issuance must be guarded by the production auth integration.
+ * The same write also checks current active, verified, privileged account
+ * status and enabled MFA enrollment. The future production token issuer must
+ * separately enforce revocation and role-change serialization.
  * No HTTP route or live session service imports this helper.
  */
 export function createMfaAssuredRefreshRotation({ prismaClient }) {
@@ -42,6 +45,17 @@ export function createMfaAssuredRefreshRotation({ prismaClient }) {
           refreshTokenHash: currentHash,
           revokedAt: null,
           expiresAt: { gt: now },
+          user: {
+            is: {
+              status: 'ACTIVE',
+              deletedAt: null,
+              emailVerifiedAt: { not: null },
+              roles: {
+                some: { role: { is: { key: { in: [ROLES.ADMIN, ROLES.SUPER_ADMIN] } } } },
+              },
+              mfaTotpCredential: { is: { enabledAt: { not: null } } },
+            },
+          },
           mfaAssurance: {
             is: {
               userId,
