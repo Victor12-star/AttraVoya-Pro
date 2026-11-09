@@ -23,9 +23,7 @@ function fixture() {
 
 describe('inactive atomic MFA-assured refresh rotation', () => {
   it('requires persistence and rejects malformed or reused refresh hashes', async () => {
-    expect(() => createMfaAssuredRefreshRotation({ prismaClient: {} })).toThrow(
-      'required',
-    );
+    expect(() => createMfaAssuredRefreshRotation({ prismaClient: {} })).toThrow('required');
     const { rotation, updateMany } = fixture();
     for (const invalid of [
       { ...INPUT, userId: '../wrong' },
