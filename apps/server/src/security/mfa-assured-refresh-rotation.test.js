@@ -1,3 +1,4 @@
+import { ROLES } from '@attravoya/constants';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMfaAssuredRefreshRotation } from './mfa-assured-refresh-rotation.js';
@@ -47,6 +48,17 @@ describe('inactive atomic MFA-assured refresh rotation', () => {
         refreshTokenHash: CURRENT_HASH,
         revokedAt: null,
         expiresAt: { gt: NOW },
+        user: {
+          is: {
+            status: 'ACTIVE',
+            deletedAt: null,
+            emailVerifiedAt: { not: null },
+            roles: {
+              some: { role: { is: { key: { in: [ROLES.ADMIN, ROLES.SUPER_ADMIN] } } } },
+            },
+            mfaTotpCredential: { is: { enabledAt: { not: null } } },
+          },
+        },
         mfaAssurance: {
           is: {
             userId: INPUT.userId,
