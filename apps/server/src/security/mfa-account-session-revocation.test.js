@@ -22,9 +22,7 @@ function fixture() {
 
 describe('isolated transactional MFA account session revocation', () => {
   it('requires a transaction and rejects untrusted identifiers and dates', async () => {
-    expect(() => createMfaAccountSessionRevocation({ prismaClient: {} })).toThrow(
-      'Prisma',
-    );
+    expect(() => createMfaAccountSessionRevocation({ prismaClient: {} })).toThrow('Prisma');
     const { service, transaction } = fixture();
     for (const input of [
       { userId: '../other', now: NOW },
