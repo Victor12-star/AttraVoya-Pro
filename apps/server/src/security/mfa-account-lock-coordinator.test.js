@@ -43,7 +43,15 @@ function fixture() {
   const coordinator = createMfaAccountLockCoordinator({
     prismaClient: { $transaction: transaction },
   });
-  return { coordinator, transaction, queryRaw, updateSessions, updateAssurances, updateRotation, sequence };
+  return {
+    coordinator,
+    transaction,
+    queryRaw,
+    updateSessions,
+    updateAssurances,
+    updateRotation,
+    sequence,
+  };
 }
 
 describe('inactive MFA account transaction lock coordinator', () => {
@@ -98,7 +106,9 @@ describe('inactive MFA account transaction lock coordinator', () => {
     expect(updateRotation).not.toHaveBeenCalled();
 
     const unguarded = createMfaAccountLockCoordinator({
-      prismaClient: { $transaction: (action) => action({ authSession: { updateMany: updateRotation } }) },
+      prismaClient: {
+        $transaction: (action) => action({ authSession: { updateMany: updateRotation } }),
+      },
     });
     await expect(unguarded.rotate(ROTATION)).rejects.toThrow('advisory lock');
     expect(updateRotation).not.toHaveBeenCalled();
