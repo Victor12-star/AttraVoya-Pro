@@ -52,11 +52,11 @@ describe('inactive atomic MFA-assured refresh rotation', () => {
           is: {
             status: 'ACTIVE',
             deletedAt: null,
-            emailVerifiedAt: { not: null },
+            emailVerifiedAt: { lte: NOW },
             roles: {
               some: { role: { is: { key: { in: [ROLES.ADMIN, ROLES.SUPER_ADMIN] } } } },
             },
-            mfaTotpCredential: { is: { enabledAt: { not: null } } },
+            mfaTotpCredential: { is: { enabledAt: { lte: NOW } } },
           },
         },
         mfaAssurance: {
