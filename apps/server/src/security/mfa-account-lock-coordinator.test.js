@@ -14,7 +14,7 @@ const ROTATION = {
 
 function fixture() {
   const sequence = [];
-  const queryRaw = vi.fn(async () => {
+  const queryRaw = vi.fn(async (_parts = [''], _userId = '') => {
     sequence.push('lock');
     return [{ pg_advisory_xact_lock: null }];
   });
@@ -63,7 +63,7 @@ describe('inactive MFA account transaction lock coordinator', () => {
     expect(transaction).toHaveBeenCalledTimes(1);
     expect(queryRaw).toHaveBeenCalledTimes(1);
     const [parts, userId] = queryRaw.mock.calls[0];
-    expect(parts.join('?')).toContain('pg_advisory_xact_lock(hashtextextended(?, 0))');
+    expect(parts?.join('?')).toContain('pg_advisory_xact_lock(hashtextextended(?, 0))');
     expect(userId).toBe(USER_ID);
     expect(updateRotation).toHaveBeenCalledTimes(1);
     expect(sequence).toEqual(['begin', 'lock', 'rotation', 'commit']);
