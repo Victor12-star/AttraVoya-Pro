@@ -71,7 +71,10 @@ describe('inactive MFA account transaction lock coordinator', () => {
 
   it('acquires the matching lock before revoking sessions and assurances', async () => {
     const { coordinator, queryRaw, updateRotation, updateAssurances, sequence } = fixture();
-    updateRotation.mockResolvedValueOnce({ count: 2 });
+    updateRotation.mockImplementationOnce(async () => {
+      sequence.push('rotation');
+      return { count: 2 };
+    });
     await expect(coordinator.revokeAll({ userId: USER_ID, now: NOW })).resolves.toEqual({
       revokedSessions: 2,
       revokedAssurances: 1,
