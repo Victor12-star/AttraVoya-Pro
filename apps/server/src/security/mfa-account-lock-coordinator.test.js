@@ -77,6 +77,14 @@ describe('inactive MFA account transaction lock coordinator', () => {
     expect(sequence).toEqual(['begin', 'lock', 'rotation', 'commit']);
   });
 
+  it('rejects a spent refresh token without treating the lock as authentication', async () => {
+    const { coordinator, updateRotation, sequence } = fixture();
+    updateRotation.mockResolvedValueOnce({ count: 0 });
+    await expect(coordinator.rotate(ROTATION)).resolves.toBe(false);
+    expect(updateRotation).toHaveBeenCalledTimes(1);
+    expect(sequence).toEqual(['begin', 'lock', 'commit']);
+  });
+
   it('acquires the matching lock before revoking sessions and assurances', async () => {
     const { coordinator, queryRaw, updateRotation, updateAssurances, sequence } = fixture();
     updateRotation.mockImplementationOnce(async () => {
